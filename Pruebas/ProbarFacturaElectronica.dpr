@@ -1,3 +1,17 @@
+(******************************************************************************
+ PROYECTO FACTURACION ELECTRONICA
+
+ Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+
+ Proyecto que concentra todas las pruebas de unidad de la libreria.
+
+ Este archivo pertenece al proyecto de codigo fuente de BambuCode:
+ http://bambucode.com/codigoabierto
+
+ La licencia de este codigo fuente se encuentra en:
+ http://github.com/bambucode/bc_facturaelectronica/blob/master/LICENCIA
+ ******************************************************************************)
+
 program ProbarFacturaElectronica;
 {
 
@@ -19,6 +33,8 @@ uses
   TestFramework,
   GUITestRunner,
   TextTestRunner,
+  TestClaseOpenSSL in 'TestClaseOpenSSL.pas',
+   TestSelloDigital in 'TestSelloDigital.pas',
   TestFacturaElectronica in 'TestFacturaElectronica.pas',
   FacturaElectronica in '..\FacturaElectronica.pas',
   FeCFDv2 in '..\CFD\FeCFDv2.pas',
@@ -26,14 +42,12 @@ uses
   FacturaReglamentacion in '..\FacturaReglamentacion.pas',
   ComprobanteFiscal in '..\CFD\ComprobanteFiscal.pas',
   TestComprobanteFiscal in 'TestComprobanteFiscal.pas',
-  SelloDigital in '..\CFD\SelloDigital.pas',
-  TestSelloDigital in 'TestSelloDigital.pas',
+  SelloDigital in '..\SelloDigital.pas',
   TestPrueba in 'TestPrueba.pas',
   libeay32 in '..\libeay32.pas',
   OpenSSLUtils in '..\OpenSSLUtils.pas',
   ClaseOpenSSL in '..\ClaseOpenSSL.pas',
-  LibEay32Plus in '..\LibEay32Plus.pas',
-  TestClaseOpenSSL in 'TestClaseOpenSSL.pas';
+  LibEay32Plus in '..\LibEay32Plus.pas';
 
 {$R *.RES}
 

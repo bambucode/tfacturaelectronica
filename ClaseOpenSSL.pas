@@ -1,8 +1,12 @@
 (******************************************************************************
+ PROYECTO FACTURACION ELECTRONICA
+ Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+
  Libreria usada para interactuar con la libreria OpenSSL y exportar sus metodos
  de hashing/digestion usando una llave privada.
 
- Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Este archivo pertenece al proyecto de codigo fuente de Bambu Code:
+ http://bambucode.com/codigoabierto
 
  La licencia de este codigo fuente se encuentra en:
  http://github.com/bambucode/bc_facturaelectronica/blob/master/LICENCIA
@@ -15,7 +19,7 @@ uses libeay32, SysUtils, Windows;
 
   type
 
-    TTipoDigestion = (tdMD5, tdSHA1);
+    TTipoDigestionOpenSSL = (tdMD5, tdSHA1);
     TNoExisteArchivoException = Exception;
     TLlaveFormatoIncorrectoException = Exception;
     TLlaveLecturaException = Exception;
@@ -43,7 +47,7 @@ uses libeay32, SysUtils, Windows;
         /// <summary>Hace una digestion (hashing) de la Cadena segun el Tipo de digestion y regresa el resultado en formato base64</summary>
         /// <param name="sCadena">Cadena a la cual se va a hacer la digestion</param>
         /// <param name="trTipo">Tipo de digestion a realizar (tdMD5, tdSHA1)</param>
-        function HacerDigestion(sCadena: WideString; trTipo: TTipoDigestion) : String;
+        function HacerDigestion(sCadena: WideString; trTipo: TTipoDigestionOpenSSL) : String;
         destructor Destroy;
     end;
 
@@ -212,7 +216,7 @@ begin
     // siguiente codigo EVP_PKEY_free(pkey); una vez usado el resultado de la misma
 end;
 
-function TOpenSSL.HacerDigestion(sCadena: WideString; trTipo: TTipoDigestion) : String;
+function TOpenSSL.HacerDigestion(sCadena: WideString; trTipo: TTipoDigestionOpenSSL) : String;
 var
   mdctx: EVP_MD_CTX;
   {$IF CompilerVersion >= 20}
