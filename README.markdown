@@ -1,25 +1,27 @@
-﻿BAMBU CODE - FACTURACION ELECTRONICA
+﻿FACTURACION ELECTRONICA
 =====================================
-Este es un conjunto de librerias que sirven para generar la factura electronica de acuerdo
-a los artículos y leyes establecidos en la ley de Mexico y definidos por el SAT.
+Esta es una librería que sirve para generar una factura electrónica de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
-El propósito es servir como una libreria gratuita, de codigo libre, de facil uso en la cual
-a través del esfuerzo de la comunidad este actualizada al día.
+El propósito es servir como una libreria gratuita, de código abierto, de fácil uso en la cual con el esfuerzo de la comunidad siempre esté actualizada y funcional.
 
 Algunos aspectos que busca tener esta libreria:
 
-- Estar actualizada al dia.
+- Estar vigente (actualizada)
 - No depender de librerias comerciales.
 - Ser de fácil uso.
 - Que pueda ser integrada fácilmente a cualquier proyecto existente.
-- Contar con pruebas de unidad automatizadas para corroborar el funcionamiento adecuado de
-cada función.
+- Contar con pruebas de unidad automatizadas para corroborar el funcionamiento adecuado de cada función y clase.
+
+<b>NOTA: Las librerías aún en desarrollo y están siendo constantemente actualizadas. Tan pronto se tenga lista una versión beta del código se removerá este aviso. - 26 Octubre 2010</b> 
+
+Más información sobre este proyecto en:
+<http://www.bambucode.com/codigoabierto>
 
 Requerimientos técnicos
 ------------
 - Contar con alguna edición de Delphi.
 - Contar con librerias libeay32.dll, ssleay32.dll y el ejecutable openssl.exe (solo para las pruebas automatizadas)
-las cuales se encuentran en la siguiente liga: http://www.openssl.org/related/binaries.html
+las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/binaries.html>
 
 Notas adicionales
 ------------
@@ -33,16 +35,16 @@ La libreria está siendo probada con las versiones de Delphi 2007 y Delphi XE.
 
 Colaboradores actuales.
 -------------
-* Ing. Luis Carrasco - Bambu Code SA de CV - http://github.com/lcarrasco
+* Ing. Luis Carrasco - Bambu Code SA de CV - <http://github.com/lcarrasco>
 
 ¿Nuevo en github/uso de git?
 -------------
 Algunas personas no están familiarizadas con el uso de Git (sistema de manejo de código fuente) por lo que pueden
 obtener más información sobre las amplias ventajas de usarlo en la siguiente liga:
 
-* Libro ProGit - http://progit.org/book 
-* Traducción Libro ProGit parcial en español - http://progit.org/book/es/
+* Libro ProGit (en inglés)- <http://progit.org/book> 
+* Traducción Libro ProGit parcial (en español) - <http://progit.org/book/es/>
 
 Si desean pueden usar el siguiente software (de uso libre para proyectos no comerciales) para interactuar con Git
 bajo Windows:
-http://www.syntevo.com/smartgit
+<http://www.syntevo.com/smartgit>
