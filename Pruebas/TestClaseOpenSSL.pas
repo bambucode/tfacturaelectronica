@@ -1,3 +1,13 @@
+(******************************************************************************
+ Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+
+ Este archivo pertenece al proyecto de codigo fuente de Bambu Code:
+ http://bambucode.com/codigoabierto
+
+ La licencia de este codigo fuente se encuentra en:
+ http://github.com/bambucode/bc_facturaelectronica/blob/master/LICENCIA
+ ******************************************************************************)
+
 unit TestClaseOpenSSL;
 
 interface
@@ -9,7 +19,6 @@ type
 
   TestTOpenSSL = class(TTestPrueba)
   strict private
-      sRutaExe : String;
       fOpenSSL: TOpenSSL;
       fArchivoLlavePrivada: String;
       fClaveLlavePrivada: String;
@@ -48,13 +57,12 @@ end;
 
 procedure TestTOpenSSL.EjecutarComandoOpenSSL(sComando: String);
 begin
-  ShellExecute(Application.Handle, nil, pChar(_RUTA_OPENSSL_EXE), PChar(sComando),nil,SW_SHOW);
+  ShellExecute(Application.Handle, nil, pChar(_RUTA_OPENSSL_EXE), PChar(sComando),nil,SW_HIDE);
 end;
 
 procedure TestTOpenSSL.HacerDigestion_TipoMD5_FuncioneCorrectamente;
 var
     sResultadoMD5DeClase, sResultadoMD5OpenSSL: WideString;
-    sRutaLlavePEM: String;
 
     function QuitarRetornos(sCad: WideString) : WideString;
     begin
@@ -104,6 +112,7 @@ end;
 
 procedure TestTOpenSSL.HacerDigestion_TipoSHA1_FuncioneCorrectamente;
 begin
+   // TODO: Implementar pruebas y validaciones de SHA1
    CheckTrue(True);
 end;
 

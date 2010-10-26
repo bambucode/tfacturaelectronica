@@ -1,4 +1,13 @@
-unit ClaseOpenSSL;
+(******************************************************************************
+ Libreria usada para interactuar con la libreria OpenSSL y exportar sus metodos
+ de hashing/digestion usando una llave privada.
+
+ Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+
+ La licencia de este codigo fuente se encuentra en:
+ http://github.com/bambucode/bc_facturaelectronica/blob/master/LICENCIA
+ ******************************************************************************)
+ unit ClaseOpenSSL;
 
 interface
 
@@ -60,6 +69,7 @@ end;
 destructor TOpenSSL.Destroy;
 begin
   	EVP_cleanup;
+    inherited;
 end;
 
 // Funcion obtenida de: DelphiAccess - http://www.delphiaccess.com/forum/index.php?topic=3092.0
@@ -118,6 +128,11 @@ begin
   result := StrPas(PAnsiChar(@ErrMsg));
 end;
 
+// Metodo creado por Luis Carrasco (luis@bambucode.com) con ayuda de
+// Marco Ferrante <marco@csita.unige.it>
+// Lee una llave binaria (.key) que tiene formato DER en memoria
+// para ser usada para hacer una digestion MD5, SHA1, etc. sin necesidad
+// de crear y usar un archivo PEM primero
 function TOpenSSL.ObtenerLlavePrivadaDesencriptada() : pEVP_PKEY;
 var
     bioArchivoLlave : pBIO;

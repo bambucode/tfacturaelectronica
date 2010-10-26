@@ -1,3 +1,12 @@
+(******************************************************************************
+ Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+
+ Este archivo pertenece al proyecto de codigo fuente de Bambu Code:
+ http://bambucode.com/codigoabierto
+
+ La licencia de este codigo fuente se encuentra en:
+ http://github.com/bambucode/bc_facturaelectronica/blob/master/LICENCIA
+ ******************************************************************************)
 unit TestPrueba;
 
 interface
@@ -30,8 +39,8 @@ procedure TTestPrueba.SetUp;
 begin
    inherited;
    fDirTemporal:=GetEnvironmentVariable('TEMP') + '\';
-   fRutaFixtures:='C:\Delphi\Otros\bc_facturacionelectronica\Pruebas\fixtures\';
    fRutaEXE := ExtractFilePath(Application.ExeName);
+   fRutaFixtures:=fRutaEXE + 'fixtures\';
 end;
 
 function TTestPrueba.leerContenidoDeArchivo(sNombreArchivo: String): WideString;
@@ -55,14 +64,13 @@ var
 begin
   slArchivo := TStringList.Create;
   slArchivo.Text:=sContenido;
-  slArchivo.SaveToFile('C:\Delphi\Otros\bc_facturacionelectronica\Pruebas/fixtures/' + sArchivo);
+  slArchivo.SaveToFile(fRutaEXE + 'fixtures/' + sArchivo);
   FreeAndNil(slArchivo);
 end;
 
 procedure TTestPrueba.guardarArchivoTemporal(sContenido: Widestring; sArchivo: String);
 var
   txt : TextFile;
-  buf : String;
 begin
   AssignFile(txt, fDirTemporal + sArchivo);
   Rewrite(txt);
