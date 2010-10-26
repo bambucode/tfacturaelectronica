@@ -20,17 +20,16 @@ Requerimientos técnicos
 - Contar con alguna edición de Delphi.
 - Contar con librerias libeay32.dll, ssleay32.dll y el ejecutable openssl.exe (solo para las pruebas automatizadas)
 las cuales se encuentran en la siguiente liga: http://www.openssl.org/related/binaries.html
- 
+
 Notas adicionales
 ------------
 El ejecutable que use esta libreria deberá contar con los archivos DLL de openssl en el mismo directorio de la
 aplicación para que pueda funcionar. Considere esto cuando genere un instalador o vaya a distribuir su aplicación
 final.
 
-Compatbilidad con versiones
+Compatibilidad con versiones
 ------------
 La libreria está siendo probada con las versiones de Delphi 2007 y Delphi XE.
-
 
 Colaboradores actuales.
 -------------
