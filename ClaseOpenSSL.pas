@@ -15,7 +15,7 @@
 
 interface
 
-uses libeay32, SysUtils, Windows;
+uses libeay32, SysUtils, Windows, OpenSSLUtils;
 
   type
 
@@ -41,21 +41,24 @@ uses libeay32, SysUtils, Windows;
         function ObtenerUltimoMensajeDeError: string;
     public
         /// <summary>Crea el objeto, inicializa la liberia OpenSSL, y establece la llave privada a usar</summary>
+        constructor Create(); overload;
+        /// <summary>Hace una digestion (hashing) de la Cadena segun el Tipo de digestion y regresa el resultado en formato base64</summary>
         /// <param name="ArchivoLlavePrivada">Ruta completa al archivo de llave privada a usar (archivo con extension .key)</param>
         /// <param name="ClaveLlavePrivada">La clave privada a usar para abrir el archivo de llave privada</param>
-        constructor Create(ArchivoLlavePrivada, ClaveLlavePrivada: String); overload;
-        /// <summary>Hace una digestion (hashing) de la Cadena segun el Tipo de digestion y regresa el resultado en formato base64</summary>
         /// <param name="sCadena">Cadena a la cual se va a hacer la digestion</param>
         /// <param name="trTipo">Tipo de digestion a realizar (tdMD5, tdSHA1)</param>
-        function HacerDigestion(sCadena: WideString; trTipo: TTipoDigestionOpenSSL) : String;
+        function HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String; sCadena: WideString; trTipo: TTipoDigestionOpenSSL) : String;
+        /// <summary>Obtiene un certificado con sus propiedades llenas</summary>
+        /// <param name="sArchivo">Ruta completa del archivo de certificado (extension .cer)</param>
+        function ObtenerCertificado(sArchivo: String) : TX509Certificate;
         destructor Destroy;
     end;
 
 implementation
 
-uses  StrUtils, libeay32plus;
+uses  StrUtils, libeay32plus, dialogs;
 
-constructor TOpenSSL.Create(ArchivoLlavePrivada, ClaveLlavePrivada: String);
+constructor TOpenSSL.Create();
 begin
   OpenSSL_add_all_algorithms;
   OpenSSL_add_all_ciphers;
@@ -65,9 +68,6 @@ begin
   // Seed the pseudo-random number generator
   // This should be something a little more "random"!
   // RAND_load_file('c:\windows\paint.exe', 512);
-
-  fArchivoLlavePrivada:=ArchivoLlavePrivada;
-  fClaveLlavePrivada:= ClaveLlavePrivada;
 end;
 
 destructor TOpenSSL.Destroy;
@@ -150,6 +150,8 @@ var
         p8pass: PChar;
     {$IFEND}
 begin
+
+
     // Creamos el objeto en memoria para leer la llave en formato binario .DER (.KEY)
     bioArchivoLlave := BIO_new(BIO_s_file());
 
@@ -186,7 +188,7 @@ begin
         if not Assigned(p8) then
           raise TLlaveLecturaException.Create('Error al leer llave privada. Error reportado: '+ ObtenerUltimoMensajeDeError);
 
-        // Des encriptamos la llave usando la clave proporcionada
+        // Des encriptamos la llave en memoria usando la clave proporcionada
         p8inf := PKCS8_decrypt(p8, p8pass, StrLen(p8pass));
         if Not Assigned(p8inf) then
         begin
@@ -216,7 +218,25 @@ begin
     // siguiente codigo EVP_PKEY_free(pkey); una vez usado el resultado de la misma
 end;
 
-function TOpenSSL.HacerDigestion(sCadena: WideString; trTipo: TTipoDigestionOpenSSL) : String;
+function TOpenSSL.ObtenerCertificado(sArchivo: String) : TX509Certificate;
+var
+  CertX509: TX509Certificate;
+begin
+  CertX509:=TX509Certificate.Create;
+  try
+      CertX509.LoadFromFile(sArchivo, DER);
+  except
+      On E:Exception do
+      begin
+         // TODO: CHecar los posibles errores generados
+         // "Unable to read certificate file"
+      end;
+  end;
+
+  Result:=CertX509;
+end;
+
+function TOpenSSL.HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String; sCadena: WideString; trTipo: TTipoDigestionOpenSSL) : String;
 var
   mdctx: EVP_MD_CTX;
   {$IF CompilerVersion >= 20}
@@ -229,6 +249,9 @@ var
 	ekLlavePrivada: pEVP_PKEY;
   Len: cardinal;
 begin
+  fArchivoLlavePrivada:=ArchivoLlavePrivada;
+  fClaveLlavePrivada:= ClaveLlavePrivada;
+
   Len:=0;
   ekLlavePrivada := ObtenerLlavePrivadaDesencriptada;
   // Copiamos la cadena al buffer de entrada
