@@ -40,8 +40,8 @@ begin
    // Leemos la cadena original que vamos a usar en las pruebas
    fCadenaOriginalAProbar:=leerContenidoDeFixture('sello_digital/cadena_original_validada_en_utf8.txt');
    // Especificamos la llave privada de pruebas del SAT usadas en las pruebas
-   fCertificado.RutaLlavePrivada:=fRutaFixtures + 'openssl\aaa010101aaa_CSD_02.key';
-   fCertificado.ClaveLlavePrivada:=leerContenidoDeFixture('openssl\aaa010101aaa_CSD_02_clave.txt');
+   fCertificado.LlavePrivada.Ruta:=fRutaFixtures + 'openssl\aaa010101aaa_CSD_02.key';
+   fCertificado.LlavePrivada.Clave:=leerContenidoDeFixture('openssl\aaa010101aaa_CSD_02_clave.txt');
 end;
 
 procedure TestTSelloDigital.SelloCalcualado_DeCadenaOriginalConMD5_SeaCorrecto;

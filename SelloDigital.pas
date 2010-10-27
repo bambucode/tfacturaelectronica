@@ -34,6 +34,7 @@ private
     function calcularSello(): WideString;
 public
     constructor Create(sCadenaOriginal: WideString; Certificado: TFECertificado; TipoDigestion: TTipoDigestionOpenSSL);
+    destructor Destroy;
     property SelloCalculado : WideString read calcularSello;
 end;
 
@@ -45,17 +46,22 @@ constructor TSelloDigital.Create(sCadenaOriginal: WideString; Certificado: TFECe
 begin
   inherited Create;
   // Creamos nuestra clase OpenSSL usada para hacer la digestión
-  fOpenSSL:=TOpenSSL.Create(Certificado.RutaLlavePrivada, Certificado.ClaveLlavePrivada);
+  fOpenSSL:=TOpenSSL.Create();
   fCadenaOriginal:=sCadenaOriginal;
   fDigestion:=TipoDigestion;
   fCertificado:=Certificado;
+end;
+
+destructor TSelloDigital.Destroy;
+begin
+    FreeAndNil(fOpenSSL);
 end;
 
 // Calcula el Sello Digital para la Cadena Original preparada en el constructor
 function TSelloDigital.calcularSello : WideString;
 begin
   // TODO: Checar que la cadena original este validada (este codificada con UTF8, etc)
-  Result:=fOpenSSL.HacerDigestion(fCadenaOriginal, fDigestion);
+  Result:=fOpenSSL.HacerDigestion(fCertificado.LlavePrivada.Ruta, fCertificado.LlavePrivada.Clave, fCadenaOriginal, fDigestion);
   // TODO: Checar
   // El Data Binding del cfdv2.xsl se genera muy bien pero aveces resulta que, por ejemplo, el cliente NO tiene "Numero Interior" o "Colonia" es por eso que en la unidad cfdv2.pas te recomiendo hacer una busqueda y remplazo de :
 end;
