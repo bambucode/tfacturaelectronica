@@ -42,6 +42,7 @@ Colaboradores actuales.
 Algunas personas no están familiarizadas con el uso de Git (sistema de manejo de código fuente) por lo que pueden
 obtener más información sobre las amplias ventajas de usarlo en la siguiente liga:
 
+* Video de introducción a Git/Github (en inglés) - <http://www.pragprog.com/screencasts/v-scgithub/insider-guide-to-github>
 * Libro ProGit (en inglés)- <http://progit.org/book> 
 * Traducción Libro ProGit parcial (en español) - <http://progit.org/book/es/>
 
