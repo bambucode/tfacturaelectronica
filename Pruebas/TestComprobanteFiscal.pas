@@ -1,4 +1,13 @@
-unit TestComprobanteFiscal;
+(* *****************************************************************************
+  Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+
+  Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
+  http://bambucode.com/codigoabierto
+
+  La licencia de este codigo fuente se encuentra en:
+  http://github.com/bambucode/bc_facturaelectronica/blob/master/LICENCIA
+  ***************************************************************************** *)
+  unit TestComprobanteFiscal;
 
 interface
 
@@ -15,10 +24,10 @@ type
     procedure TearDown; override;
 
   published
+      procedure Create_NuevoComprobante_GenereEstructuraXMLBasica;
       procedure setReceptor_Receptor_LoGuardeEnXML;
       procedure setEmisor_Emisor_LoGuardeEnXML;
       procedure AgregarConcepto_Concepto_LoGuardeEnXML;
-      procedure Create_NuevoComprobante_GenereEstructuraXMLBasica;
       procedure setCertificado_Certificado_GuardeNumeroDeSerieEnEstructuraXML;
   end;
 
@@ -39,8 +48,23 @@ begin
 end;
 
 procedure TestTFEComprobanteFiscal.AgregarConcepto_Concepto_LoGuardeEnXML;
+var
+   Concepto: TFEConcepto;
+   sXMLConcepto : WideString;
 begin
-    //
+   sXMLConcepto:=leerContenidoDeFixture('comprobante_fiscal/concepto.xml');
+
+   Concepto.Cantidad:=12.55;
+   Concepto.Unidad:='pz';
+   // Incluimos algunos caracteres invalidos para el XML para verificar
+   // que se estén "escapando" correctamente
+   Concepto.Descripcion:='Jabón & Jabón Modelo <ABC>';
+   Concepto.ValorUnitario:=30.50;
+
+   fComprobanteFiscal.AgregarConcepto(Concepto);
+   
+   CheckEquals(sXMLConcepto, fComprobanteFiscal.fXmlComprobante.XML,
+              'El concepto no fue almacenado correctamente en la estrucutr XML');
 end;
 
 procedure TestTFEComprobanteFiscal.Create_NuevoComprobante_GenereEstructuraXMLBasica;
@@ -51,7 +75,7 @@ begin
     // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
    sXMLEncabezadoBasico:=leerContenidoDeFixture('comprobante_fiscal/comprobante_nuevo.xml');
    NuevoComprobante := TFEComprobanteFiscal.Create;
-   
+
    // Checamos que sea igual que nuestro Fixture...
    CheckEquals(sXMLEncabezadoBasico, fComprobanteFiscal.fXmlComprobante.XML, 'El encabezado del XML basico para un comprobante no fue el correcto');
    FreeAndNil(NuevoComprobante);

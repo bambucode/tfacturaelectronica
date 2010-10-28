@@ -35,19 +35,29 @@ begin
    Result:=FloatToStrF(dMonto,ffFixed,10,2);
 end;
 
+// Las cadenas usadas en el XML deben de escapar caracteres incorrectos
+// Ref: http://dof.gob.mx/nota_detalle.php?codigo=5146699&fecha=15/06/2010
 class function TFEReglamentacion.ComoCadena(sCadena: String) : String;
+var
+   sCadenaEscapada: String;
 begin
-    // TODO: Escapar lo siguiente:
+    sCadenaEscapada:=sCadena;
+    // Las siguientes validaciones las omitimos ya que las mismas clases
+    // de Delphi lo hacen por nosotros:
     // En el caso del & se deberá usar la secuencia &amp;
     // En el caso del “ se deberá usar la secuencia &quot;
     // En el caso del < se deberá usar la secuencia &lt;
     // En el caso del > se deberá usar la secuencia &gt;
     // En el caso del ‘ se deberá usar la secuencia &apos;
+
+    // Si se presentan nuevas reglas para los Strings en el XML, incluirlas aqui
+
+    Result:=sCadenaEscapada;
 end;
 
 class function TFEReglamentacion.ComoCantidad(dCantidad: Double) : String;
 begin
-   Result:=FloatToStrF(dCantidad,ffFixed,10,0);
+   Result:=FloatToStr(dCantidad);
 end;
 
 end.

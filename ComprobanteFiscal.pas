@@ -169,18 +169,29 @@ begin
   with fXmlComprobante.Emisor do
 		begin
         RFC := Emisor.RFC;
-        Nombre := Emisor.Nombre;
+        Nombre := TFEReglamentacion.ComoCadena(Emisor.Nombre);
         with DomicilioFiscal do // Alias de UbicacionFiscal
         begin
-            Calle := Emisor.Direccion.Calle;
-      			NoExterior := Emisor.Direccion.NoExterior; // Opcional
-            NoInterior := Emisor.Direccion.NoInterior; // Opcional
-      			Colonia := Emisor.Direccion.Colonia;       // Opcional
-      			Localidad := Emisor.Direccion.Localidad;   // Opcional
-      			Referencia := Emisor.Direccion.Referencia; // Opcional
-            Municipio := Emisor.Direccion.Municipio;
-            Estado :=Emisor.Direccion.Estado;
-            Pais := Emisor.Direccion.Pais;
+            Calle := TFEReglamentacion.ComoCadena(Emisor.Direccion.Calle);
+
+            if Trim(Emisor.Direccion.NoExterior) <> '' then
+      			   NoExterior := Emisor.Direccion.NoExterior; // Opcional
+
+            if Trim(Emisor.Direccion.NoInterior) <> '' then
+               NoInterior := Emisor.Direccion.NoInterior; // Opcional
+
+            if Trim(Emisor.Direccion.Colonia) <> '' then
+      			   Colonia := TFEReglamentacion.ComoCadena(Emisor.Direccion.Colonia);       // Opcional
+
+            if Trim(Emisor.Direccion.Localidad) <> '' then
+      			   Localidad := TFEReglamentacion.ComoCadena(Emisor.Direccion.Localidad);   // Opcional
+
+            if Trim(Emisor.Direccion.Referencia) <> '' then
+      			   Referencia := TFEReglamentacion.ComoCadena(Emisor.Direccion.Referencia); // Opcional
+
+            Municipio := TFEReglamentacion.ComoCadena(Emisor.Direccion.Municipio);
+            Estado :=TFEReglamentacion.ComoCadena(Emisor.Direccion.Estado);
+            Pais := TFEReglamentacion.ComoCadena(Emisor.Direccion.Pais);
             CodigoPostal := Emisor.Direccion.CodigoPostal;
         end;
     end;
@@ -191,28 +202,31 @@ begin
   with fXmlComprobante.Receptor do
 		begin
         RFC := Receptor.RFC;
-        Nombre := Receptor.Nombre;
+        Nombre := TFEReglamentacion.ComoCadena(Receptor.Nombre);
 
         with Domicilio do
         begin
-            Calle := Receptor.Direccion.Calle;
-      			NoExterior := Receptor.Direccion.NoExterior; // Opcional
-            NoInterior := Receptor.Direccion.NoInterior; // Opcional
-      			Colonia := Receptor.Direccion.Colonia;       // Opcional
-      			Localidad := Receptor.Direccion.Localidad;   // Opcional
-      			Referencia := Receptor.Direccion.Referencia; // Opcional
-            Municipio := Receptor.Direccion.Municipio;
-            Estado :=Receptor.Direccion.Estado;
-            Pais := Receptor.Direccion.Pais;
+            Calle := TFEReglamentacion.ComoCadena(Receptor.Direccion.Calle);
+
+            if Trim(Receptor.Direccion.NoExterior) <> '' then
+      			   NoExterior := Receptor.Direccion.NoExterior; // Opcional
+
+            if Trim(Receptor.Direccion.NoInterior) <> '' then
+               NoInterior := Receptor.Direccion.NoInterior; // Opcional
+
+            if Trim(Receptor.Direccion.Colonia) <> '' then
+      			   Colonia := TFEReglamentacion.ComoCadena(Receptor.Direccion.Colonia);       // Opcional
+            if Trim(Receptor.Direccion.Localidad) <> '' then
+      			   Localidad := TFEReglamentacion.ComoCadena(Receptor.Direccion.Localidad);   // Opcional
+            if Trim(Receptor.Direccion.Referencia) <> '' then
+      			   Referencia := TFEReglamentacion.ComoCadena(Receptor.Direccion.Referencia); // Opcional
+            Municipio := TFEReglamentacion.ComoCadena(Receptor.Direccion.Municipio);
+            Estado :=TFEReglamentacion.ComoCadena(Receptor.Direccion.Estado);
+            Pais := TFEReglamentacion.ComoCadena(Receptor.Direccion.Pais);
             CodigoPostal := Receptor.Direccion.CodigoPostal;
         end; {with CFD.Receptor.Domicilio}
 		end; {with CFD.Receptor}
 end;
-
-{procedure TFEComprobanteFiscal.setCertificado(sContenidoCertificado : WideString);
-begin
-    fXmlComprobante.Certificado:=sContenidoCertificado;
-end;}
 
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
 var
@@ -252,9 +266,14 @@ begin
 			with fXmlComprobante.Conceptos.Add do
 			begin
 				  Cantidad := TFEReglamentacion.ComoCantidad(Concepto.Cantidad);
-    		  Unidad := Concepto.Unidad; // Opcional
-    			NoIdentificacion := Concepto.NoIdentificacion; // Opcional
-				  Descripcion := Concepto.Descripcion;
+
+          if Trim(Concepto.Unidad) <> '' then
+    		     Unidad := Concepto.Unidad; // Opcional
+
+          if Trim(Concepto.NoIdentificacion) <> '' then
+    			   NoIdentificacion := TFEReglamentacion.ComoCadena(Concepto.NoIdentificacion); // Opcional
+
+				  Descripcion := TFEReglamentacion.ComoCadena(Concepto.Descripcion);
 				  ValorUnitario := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario);
 				  Importe := TFEReglamentacion.ComoMoneda(Concepto.Importe);
 			end;
