@@ -156,6 +156,7 @@ var
   function NombreMesANumero(sMes: String) : Integer;
   begin
     sMes:=Uppercase(sMes);
+    Result:=0;
     if sMes = 'JAN' then Result:=1;
     if sMes = 'FEB' then Result:=2;
     if sMes = 'MAR' then Result:=3;
