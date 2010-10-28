@@ -31,6 +31,11 @@ TFECertificadoNoVigente = Exception;
 /// Se encarga de validar y formatear todos los datos de la factura que le sean proporcionados
 ///</summary>
 TFEComprobanteFiscal = class
+{$IFDEF VERSION_DE_PRUEBA}
+public
+{$ELSE}
+private
+{$ENDIF}
     fDocumentoXML: TXMLDocument;
     fXmlComprobante : IFEXMLComprobante;
     sCadenaOriginal: WideString;
@@ -54,8 +59,8 @@ public
     destructor Destroy();
 
     // Propiedades del comprobante normal
-    property Folio: Integer write setFolio;
-    property Serie: String write setSerie;
+    property Folio: TFEFolio write setFolio;
+    property Serie: TFESerie write setSerie;
     property Receptor : TFEContribuyente write setReceptor;
     property Emisor: TFEContribuyente write setEmisor;
     procedure AgregarConcepto(Concepto: TFEConcepto);
@@ -281,12 +286,13 @@ end;
 
 procedure TFEComprobanteFiscal.setFolio(Folio: TFEFolio);
 begin
-    //
+    fXmlComprobante.Folio := IntToStr(Folio);
 end;
 
 procedure TFEComprobanteFiscal.setSerie(Serie: TFESerie);
 begin
-   //
+   if Trim(Serie) <> '' then
+      fXmlComprobante.Serie:=Serie;
 end;
 
 {

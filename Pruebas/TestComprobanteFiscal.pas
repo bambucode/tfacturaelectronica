@@ -29,6 +29,8 @@ type
       procedure setEmisor_Emisor_LoGuardeEnXML;
       procedure AgregarConcepto_Concepto_LoGuardeEnXML;
       procedure setCertificado_Certificado_GuardeNumeroDeSerieEnEstructuraXML;
+      procedure setSerie_Serie_LoGuardeEnXML;
+      procedure setFolio_Folio_LoGuardeEnXML;
   end;
 
 implementation
@@ -67,13 +69,41 @@ begin
               'El concepto no fue almacenado correctamente en la estrucutr XML');
 end;
 
+procedure TestTFEComprobanteFiscal.setSerie_Serie_LoGuardeEnXML;
+var
+   sXMLFixture: WideString;
+   Serie: TFESerie;
+begin
+    // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
+   sXMLFixture:=leerContenidoDeFixture('comprobante_fiscal/serie.xml');
+
+   Serie:='ABC';
+   fComprobanteFiscal.Serie:=Serie;
+
+   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML, 'No se guardo la Serie en la estructura del XML');
+end;
+
+procedure TestTFEComprobanteFiscal.setFolio_Folio_LoGuardeEnXML;
+var
+   sXMLFixture: WideString;
+   Folio: TFEFolio;
+begin
+    // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
+   sXMLFixture:=leerContenidoDeFixture('comprobante_fiscal/folio.xml');
+
+   Folio:=12345678;
+   fComprobanteFiscal.Folio:=Folio;
+
+   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML, 'No se guardo el Folio en la estructura del XML');
+end;
+
 procedure TestTFEComprobanteFiscal.Create_NuevoComprobante_GenereEstructuraXMLBasica;
 var
    sXMLEncabezadoBasico: WideString;
    NuevoComprobante: TFEComprobanteFiscal;
 begin
     // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-   sXMLEncabezadoBasico:=leerContenidoDeFixture('comprobante_fiscal/comprobante_nuevo.xml');
+   sXMLEncabezadoBasico:=leerContenidoDeFixture('comprobante_fiscal/nuevo.xml');
    NuevoComprobante := TFEComprobanteFiscal.Create;
 
    // Checamos que sea igual que nuestro Fixture...
@@ -89,7 +119,7 @@ begin
    Certificado.Ruta:=fRutaFixtures + _RUTA_CERTIFICADO;
 
    // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-   sXMLConNumSerieCertificado:=leerContenidoDeFixture('comprobante_fiscal/comprobante_numeroserie.xml');
+   sXMLConNumSerieCertificado:=leerContenidoDeFixture('comprobante_fiscal/numeroserie.xml');
 
    // Especificamos el certificado que usaremos a la clase comprobante
    fComprobanteFiscal.Certificado:=Certificado;

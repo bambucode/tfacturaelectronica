@@ -11,6 +11,7 @@
  La licencia de este codigo fuente se encuentra en:
  http://github.com/bambucode/bc_facturaelectronica/blob/master/LICENCIA
  ******************************************************************************)
+{$DEFINE VERSION_DE_PRUEBA}
 
 program ProbarFacturaElectronica;
 {
@@ -23,6 +24,9 @@ program ProbarFacturaElectronica;
   default.
 
 }
+
+// Creamos el define para que podamos acceder a las variables privadas de las clases
+// para que sean probadas
 
 {$IFDEF CONSOLE_TESTRUNNER}
 {$APPTYPE CONSOLE}
