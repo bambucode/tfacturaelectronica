@@ -11,8 +11,10 @@ Algunos aspectos que busca tener esta libreria:
 - Ser de fácil uso.
 - Que pueda ser integrada fácilmente a cualquier proyecto existente.
 - Contar con pruebas de unidad automatizadas para corroborar el funcionamiento adecuado de cada función y clase.
+- Estar implementada en clases (seguir reglas de programación orientada a objetos).
+- Esconder los detalles de implementación/técnicos al usuario final (el programador que use la clase).
 
-<b>NOTA: Las librerías aún en desarrollo y están siendo constantemente actualizadas. Tan pronto se tenga lista una versión beta del código se removerá este aviso. - 26 Octubre 2010</b> 
+<b>NOTA: Las librerías aún están en desarrollo y están siendo constantemente actualizadas. Tan pronto se tenga lista una versión beta del código se removerá este aviso. - 28 Octubre 2010</b> 
 
 Más información sobre este proyecto en:
 <http://www.bambucode.com/codigoabierto>
