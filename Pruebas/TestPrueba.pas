@@ -2,7 +2,7 @@
  PROYECTO FACTURACION ELECTRONICA
  Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
 
- Este archivo pertenece al proyecto de codigo fuente de Bambu Code:
+ Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
  http://bambucode.com/codigoabierto
 
  La licencia de este codigo fuente se encuentra en:

@@ -5,7 +5,7 @@
  Libreria usada para interactuar con la libreria OpenSSL y exportar sus metodos
  de hashing/digestion usando una llave privada.
 
- Este archivo pertenece al proyecto de codigo fuente de Bambu Code:
+ Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
  http://bambucode.com/codigoabierto
 
  La licencia de este codigo fuente se encuentra en:

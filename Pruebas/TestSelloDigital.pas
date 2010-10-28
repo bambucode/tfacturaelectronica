@@ -3,7 +3,7 @@
 
  Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
 
- Este archivo pertenece al proyecto de codigo fuente de BambuCode:
+ Este archivo pertenece al proyecto de codigo abierto de BambuCode:
  http://bambucode.com/codigoabierto
 
  La licencia de este codigo fuente se encuentra en:

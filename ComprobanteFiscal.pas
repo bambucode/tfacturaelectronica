@@ -5,7 +5,7 @@
  Esta clase representa un Comprobante Fiscal Digital en su Version 2.0 asi como
  los metodos para generarla.
 
- Este archivo pertenece al proyecto de codigo fuente de Bambu Code:
+ Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
  http://bambucode.com/codigoabierto
 
  La licencia de este codigo fuente se encuentra en:

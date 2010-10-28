@@ -5,7 +5,7 @@
 
  Proyecto que concentra todas las pruebas de unidad de la libreria.
 
- Este archivo pertenece al proyecto de codigo fuente de BambuCode:
+ Este archivo pertenece al proyecto de abierto fuente de BambuCode:
  http://bambucode.com/codigoabierto
 
  La licencia de este codigo fuente se encuentra en:
@@ -34,20 +34,21 @@ uses
   GUITestRunner,
   TextTestRunner,
   TestClaseOpenSSL in 'TestClaseOpenSSL.pas',
-   TestSelloDigital in 'TestSelloDigital.pas',
-  TestFacturaElectronica in 'TestFacturaElectronica.pas',
-  FacturaElectronica in '..\FacturaElectronica.pas',
+  TestSelloDigital in 'TestSelloDigital.pas',
   FeCFDv2 in '..\CFD\FeCFDv2.pas',
   FacturaTipos in '..\FacturaTipos.pas',
   FacturaReglamentacion in '..\FacturaReglamentacion.pas',
-  ComprobanteFiscal in '..\CFD\ComprobanteFiscal.pas',
+  ComprobanteFiscal in '..\ComprobanteFiscal.pas',
   TestComprobanteFiscal in 'TestComprobanteFiscal.pas',
   SelloDigital in '..\SelloDigital.pas',
+  TestFacturaElectronica in 'TestFacturaElectronica.pas',
+  FacturaElectronica in '..\FacturaElectronica.pas',
   TestPrueba in 'TestPrueba.pas',
   libeay32 in '..\libeay32.pas',
   OpenSSLUtils in '..\OpenSSLUtils.pas',
   ClaseOpenSSL in '..\ClaseOpenSSL.pas',
-  LibEay32Plus in '..\LibEay32Plus.pas';
+  LibEay32Plus in '..\LibEay32Plus.pas',
+  ConstantesFixtures in 'ConstantesFixtures.pas';
 
 {$R *.RES}
 

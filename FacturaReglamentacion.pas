@@ -5,7 +5,7 @@
  Metodos para validar los diferentes tipos de datos y como deben de estar
  especificados en el archivo XML.
 
- Este archivo pertenece al proyecto de codigo fuente de Bambu Code:
+ Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
  http://bambucode.com/codigoabierto
 
  La licencia de este codigo fuente se encuentra en:

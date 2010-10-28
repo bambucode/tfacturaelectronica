@@ -8,7 +8,7 @@
  Agradecimientos:
    - Marco Ferrante por su ayuda para importar la funcion PKCS8_decrypt
 
- Este archivo pertenece al proyecto de codigo fuente de Bambu Code:
+ Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
  http://bambucode.com/codigoabierto
 
  La licencia de este codigo fuente y el resto de la libreria se encuentra en:
