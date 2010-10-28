@@ -79,6 +79,7 @@ TX509Certificate = class
     function getSubject: String;
     function getNotBefore: TDateTime;
     function getNotAfter: TDateTime;
+    function getSerialNumber: String;
     function VerifyCalback(ok: integer; ctx: pX509_STORE_CTX): integer;
   public
     fCertificate: pX509;
@@ -86,6 +87,7 @@ TX509Certificate = class
     destructor Destroy; override;
     property Issuer: String read getIssuer;
     property Subject: String read getSubject;
+    property SerialNumber: String read getSerialNumber;
     property NotBefore: TDateTime read getNotBefore;
     property NotAfter: TDateTime read getNotAfter;
     function IsTrusted(CACertificate: array of TX509Certificate): boolean; overload;
@@ -422,6 +424,18 @@ end;
 function TX509Certificate.getSubject: String;
 begin
 result := getDN(X509_get_subject_name(fCertificate));
+end;
+
+// Nueva funcion creada para obtener el Numero de Serie
+// del certificado
+function TX509Certificate.getSerialNumber: String;
+var
+   Buffer : array [0..20] of Caracter;
+   v: pASN1_STRING;
+begin
+   v := X509_get_serialNumber(fCertificate);
+   StrLCopy(pansichar(@buffer), v.data, v.length);
+   Result:=Buffer;
 end;
 
 function TX509Certificate.getNotBefore: TDateTime;

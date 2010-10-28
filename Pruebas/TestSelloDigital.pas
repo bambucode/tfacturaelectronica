@@ -47,6 +47,8 @@ end;
 procedure TestTSelloDigital.SelloCalcualado_DeCadenaOriginalConMD5_SeaCorrecto;
 var
   SelloDigitalCorrecto, ResultadoSelloCalculado: WideString;
+const
+  _LONGITUD_SELLO_DIGITAL = 172;
 begin
     // Ahora la calculada previamente con el programa MicroE del SAT
     SelloDigitalCorrecto:=leerContenidoDeFixture('sello_digital/sello_digital_correcto.txt');
@@ -58,6 +60,7 @@ begin
     ResultadoSelloCalculado:=fSelloDigital.SelloCalculado;
 
     CheckEquals(SelloDigitalCorrecto, ResultadoSelloCalculado, 'El procedimiento para calcular el sello digital fallo, el resultado no fue el mismo que el ejemplo del SAT');
+    CheckEquals(_LONGITUD_SELLO_DIGITAL, Length(ResultadoSelloCalculado), 'La longitud del sello digital no fue la correcta, debe de ser siempre de  ' + IntToStr(_LONGITUD_SELLO_DIGITAL));
     FreeAndNil(fSelloDigital);
 end;
 

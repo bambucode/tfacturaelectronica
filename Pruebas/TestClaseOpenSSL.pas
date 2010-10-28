@@ -66,17 +66,9 @@ begin
 end;
 
 procedure TestTOpenSSL.EjecutarComandoOpenSSL(sComando: String);
-var
-   slBat: TStrings;
 begin
-  DeleteFile(fDirTemporal + 'openssltest.bat');
-
-  slBat:=TStringList.Create;
-  slBat.Add(_RUTA_OPENSSL_EXE + ' ' + sComando);
-  slBat.SaveToFile(fDirTemporal + 'openssltest.bat');
-  FreeAndNil(slBat);
-  Sleep(100);
-  ShellExecute(Application.Handle,PChar('Open'),PChar(fDirTemporal + 'openssltest.bat'),nil,nil,SW_HIDE);
+  ShellExecute(Application.Handle,nil,PChar('cmd.exe'),
+               PChar('/c ' + _RUTA_OPENSSL_EXE + ' ' + sComando),nil,SW_HIDE);
   // Hacemos esperar 1 segundo para que termine openssl.exe.
   Sleep(1000);
 end;
@@ -155,12 +147,11 @@ begin
   FreeAndNil(fOpenSSL2);
 end;
 
-procedure TestTOpenSSL.
-  ObtenerCertificado_CertificadoDePrueba_RegreseElCertificadoConPropiedades;
+procedure TestTOpenSSL.ObtenerCertificado_CertificadoDePrueba_RegreseElCertificadoConPropiedades;
 var
   Certificado: TX509Certificate;
-  sInicioVigencia, sFinVigencia: String;
   dtInicioVigencia, dtFinVigencia: TDateTime;
+  sNumSerie: String;
 
   function NombreMesANumero(sMes: String) : Integer;
   begin
@@ -196,6 +187,24 @@ var
       Result:=StrToDateTime(sDia + '/' + IntToStr(NombreMesANumero(sMes)) + '/' + sAno + ' ' + sHora);
   end;
 
+  // Convertimos el num de serie que regresa OpenSSL en hexadecimal
+  // a integer de Delphi. Gracias a usuario 'dado' por su ayuda
+  // para obtener este dato: http://www.clubdelphi.com/foros/showthread.php?t=66807&page=14
+  function ValidarSerieDeOpenSSL(Serie: String) : String;
+  var
+     n: Integer;
+     NumSerie: String;
+  begin
+    NumSerie := '';
+    n := 9;
+		while n <= length(Serie) do
+		begin
+			NumSerie := NumSerie + Serie[n];
+			n := n + 2;
+		end;
+    Result:=NumSerie;
+  end;
+
 const
   _NOMBRE_CERTIFICADO = 'openssl\aaa010101aaa_CSD_02.cer';
 begin
@@ -205,15 +214,27 @@ begin
   // poder corroborarlos...
   EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _NOMBRE_CERTIFICADO +
                           '" -noout -startdate > "' + fDirTemporal + 'VigenciaInicio.txt" ');
-
-  Sleep(1000);
   dtInicioVigencia:=leerFechaDeArchivo(fDirTemporal + 'VigenciaInicio.txt');
+  // Fin de vigencia
+  EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _NOMBRE_CERTIFICADO +
+                          '" -noout -enddate > "' + fDirTemporal + 'VigenciaFin.txt" ');
+  dtFinVigencia:=leerFechaDeArchivo(fDirTemporal + 'VigenciaFin.txt');
+
+  // Numero de Serie
+  EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _NOMBRE_CERTIFICADO +
+                          '" -noout -serial > "' + fDirTemporal + 'Serial.txt" ');
+
+  // "Limpiamos" el Serie que nos da el OpenSSL ya que incluye caracteres de mas...
+  sNumSerie:= ValidarSerieDeOpenSSL(leerContenidoDeArchivo(fDirTemporal + 'Serial.txt'));
 
   Certificado := fOpenSSL.ObtenerCertificado(fRutaFixtures + _NOMBRE_CERTIFICADO);
 
   // Checamos las propiedades que nos interesan
   CheckEquals(dtInicioVigencia, Certificado.NotBefore, 'El inicio de vigencia del certificado no fue el mismo que regreso OpenSSL');
-  //CheckEquals(dtFinVigencia, Certificado.NotBefore, 'El fin de vigencia del certificado no fue el mismo que regreso OpenSSL');
+  CheckEquals(dtFinVigencia, Certificado.NotAfter, 'El fin de vigencia del certificado no fue el mismo que regreso OpenSSL');
+  CheckEquals(sNumSerie, Certificado.SerialNumber, 'El numero de serie del certificado no fue el mismo que regreso OpenSSL');
+  // Checamos que la longitud del Numero de Serie sea de 20 (especificada en el RFC 3280 de la especificacion X509)
+  CheckEquals(20, Length(Certificado.SerialNumber), 'La longitud del numero de serie no fue la correcta');
   FreeAndNil(Certificado);
 end;
 

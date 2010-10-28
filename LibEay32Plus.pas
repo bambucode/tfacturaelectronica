@@ -45,6 +45,9 @@ type
     Attributes: Pointer; // STACK_OF(X509_ATTRIBUTE) *attributes;
 	end;
 
+const
+  LIBEAY_DLL_NAME = 'libeay32.dll';
+
 // Las siguientes funciones fueron obtenidas del archivo pkcs8.c del codigo fuente de la
 // libreria OpenSSL 0.9.6.
 function d2i_PKCS8_bio(bp: pBIO; p8: pX509_SIG) : pX509_SIG; cdecl;
@@ -53,14 +56,14 @@ function EVP_PKCS82PKEY(p8 : pPKCS8_Priv_Key_Info) : pEVP_PKEY; cdecl;
 function PKCS8_decrypt(p8: pX509_SIG; Pass: PCharacter; PassLen: integer): pPKCS8_Priv_Key_Info; cdecl;
 function d2i_PKCS8_PRIV_KEY_INFO(var a: pPKCS8_Priv_Key_Info; pp: PCharacter; Length: LongInt): pPKCS8_Priv_Key_Info; cdecl;
 procedure PKCS8_PRIV_KEY_INFO_free(var a: pPKCS8_Priv_Key_Info); cdecl;
-
+// Funciones para obtener datos del certificado
+procedure EVP_MD_CTX_init(ctx: PEVP_MD_CTX); cdecl; external LIBEAY_DLL_NAME;
+function EVP_MD_CTX_cleanup(ctx: PEVP_MD_CTX): integer; cdecl; external LIBEAY_DLL_NAME;
+function ASN1_INTEGER_to_BN(ai: pASN1_INTEGER; bn: pBIGNUM): pBIGNUM; cdecl; external LIBEAY_DLL_NAME;
 
 implementation
 
 uses SysUtils;
-
-const
-  LIBEAY_DLL_NAME = 'libeay32.dll';
 
 function d2i_PKCS8_bio; external LIBEAY_DLL_NAME;
 procedure X509_SIG_free; external LIBEAY_DLL_NAME;
