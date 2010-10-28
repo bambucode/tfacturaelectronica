@@ -24,11 +24,19 @@ type
       class function ComoMoneda(dMonto: Currency) : String;
       class function ComoCadena(sCadena: String) : String;
       class function ComoCantidad(dCantidad: Double) : String;
+      class function ComoFechaHora(dtFecha: TDateTime) : String;
   end;
 
 implementation
 
 uses SysUtils;
+
+// Segun las reglas del SAT:
+// "Se expresa en la forma aaaa-mm-ddThh:mm:ss, de acuerdo con la especificación ISO 8601"
+class function TFEReglamentacion.ComoFechaHora(dtFecha: TDateTime) : String;
+begin
+  Result := FormatDateTime('yyyymmdd', dtFecha) + 'T' + FormatDateTime('hh:nn:ss', dtFecha);
+end;
 
 class function TFEReglamentacion.ComoMoneda(dMonto: Currency) : String;
 begin
