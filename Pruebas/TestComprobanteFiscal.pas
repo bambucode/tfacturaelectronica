@@ -19,12 +19,13 @@ type
       procedure setEmisor_Emisor_LoGuardeEnXML;
       procedure AgregarConcepto_Concepto_LoGuardeEnXML;
       procedure Create_NuevoComprobante_GenereEstructuraXMLBasica;
+      procedure setCertificado_Certificado_GuardeNumeroDeSerieEnEstructuraXML;
   end;
 
 implementation
 
 uses
-  Windows, SysUtils, Classes;
+  Windows, SysUtils, Classes, ConstantesFixtures;
 
 procedure TestTFEComprobanteFiscal.SetUp;
 begin
@@ -45,6 +46,23 @@ end;
 procedure TestTFEComprobanteFiscal.Create_NuevoComprobante_GenereEstructuraXMLBasica;
 begin
   //
+end;
+
+procedure TestTFEComprobanteFiscal.setCertificado_Certificado_GuardeNumeroDeSerieEnEstructuraXML;
+var
+   Certificado: TFECertificado;
+   sXMLConNumSerieCertificado: WideString;
+begin
+   Certificado.Ruta:=fRutaFixtures + _RUTA_CERTIFICADO;
+
+   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
+   sXMLConNumSerieCertificado:=leerContenidoDeFixture('comprobante_fiscal/comprobante_numeroserie.xml');
+
+   // Especificamos el certificado que usaremos a la clase comprobante
+   fComprobanteFiscal.Certificado:=Certificado;
+
+   // Checamos que sea igual que nuestro Fixture...
+   CheckEquals(sXMLConNumSerieCertificado, fComprobanteFiscal.fXmlComprobante.XML, 'El Contenido XML del Comprobante no almaceno correctamente los datos del receptor (es diferente al fixture receptor.xml)');
 end;
 
 procedure TestTFEComprobanteFiscal.setEmisor_Emisor_LoGuardeEnXML;
@@ -71,7 +89,6 @@ begin
   // Establecemos el receptor
   fComprobanteFiscal.Emisor:=Emisor;
 
-  //guardarContenido(fComprobanteFiscal.fXmlComprobante.XML, 'emisor.xml');
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
   sXMLConReceptor:=leerContenidoDeFixture('comprobante_fiscal/emisor.xml');
   CheckEquals(sXMLConReceptor, fComprobanteFiscal.fXmlComprobante.XML, 'El Contenido XML del Comprobante no almaceno correctamente los datos del receptor (es diferente al fixture receptor.xml)');

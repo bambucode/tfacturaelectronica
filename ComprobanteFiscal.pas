@@ -15,11 +15,15 @@ unit ComprobanteFiscal;
 
 interface
 
-uses FacturaTipos, SelloDigital, FeCFDv2,
+uses FacturaTipos, SelloDigital, FeCFDv2, SysUtils,
 // Unidades especificas de manejo de XML:
 XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd;
 
 type
+
+// Excepciones que pueden ser generadas
+TFECertificadoNoExisteException = Exception;
+TFECertificadoNoVigente = Exception;
 
 ///<summary>Representa la estructura de comprobante fiscal digital (ver2.0) y sus elementos
 /// definidos de acuerdo al XSD del SAT. Esta pensado para ser extendido en las versiones
@@ -70,7 +74,7 @@ implementation
 // manualmente en el EXE
 // Mas Info en: http://delphi.about.com/od/objectpascalide/a/embed_resources.htm
 
-uses SysUtils, FacturaReglamentacion, Dialogs, ClaseOpenSSL;
+uses FacturaReglamentacion, Dialogs, ClaseOpenSSL, OpenSSLUtils;
 
 // Al crear el objeto, comenzamos a "llenar" el XML interno
 constructor TFEComprobanteFiscal.Create();
@@ -211,14 +215,35 @@ begin
 end;}
 
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
+var
+   x509Certificado: TX509Certificate;
+   dtVigenciaInicio, dtVigenciaFin: TDateTime;
 begin
       // Ya que tenemos los datos del certificado, lo procesamos para obtener los datos
       // necesarios
+      fCertificado := Certificado;
+      x509Certificado := TX509Certificate.Create;
+      try
+         if Not FileExists(Certificado.Ruta) then
+            raise TFECertificadoNoExisteException.Create('No existe el archivo del certificado')
+         else
+            x509Certificado.LoadFromFile(Certificado.Ruta);
 
-      // Ya procesado llenamos su propiedad en el XML
-      {fXmlComprobante.NoAprobacion := StrToIntDef(OpcC('FacturaE','FolioNoAprobacion'),0);
-		  fXmlComprobante.AnoAprobacion := StrToIntDef(OpcC('FacturaE','FolioAnoAprobacion'),0);
-		  fXmlComprobante.NoCertificado := OpcC('FacturaE','CertNo');}
+         // Llenamos las propiedades
+         fCertificado.VigenciaInicio:=x509Certificado.NotBefore;
+         fCertificado.VigenciaFin:=x509Certificado.NotAfter;
+
+         // Checamos que el certificado este dentro de la vigencia
+         if Not ((Now >= fCertificado.VigenciaInicio) and (Now <= fCertificado.VigenciaFin)) then
+            raise TFECertificadoNoVigente.Create('El certificado no tiene vigencia actual');
+
+         fCertificado.NumeroSerie:=x509Certificado.SerialNumber;
+
+         // Ya procesado llenamos su propiedad en el XML
+         fXmlComprobante.NoCertificado := fCertificado.NumeroSerie;
+      finally
+         FreeAndNil(x509Certificado);
+      end;
 end;
 
 procedure TFEComprobanteFiscal.AgregarConcepto(Concepto: TFEConcepto);

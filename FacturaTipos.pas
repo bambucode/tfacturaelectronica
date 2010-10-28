@@ -69,7 +69,7 @@ TFECertificado = record
     LlavePrivada: TFELlavePrivada;
     VigenciaInicio: TDateTime;
     VigenciaFin: TDateTime;
-    Numero: String;
+    NumeroSerie: String;
 end;
 
 TFEBloqueFolios = record

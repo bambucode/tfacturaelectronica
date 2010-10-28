@@ -42,8 +42,8 @@ const
 implementation
 
 uses
-  Windows, SysUtils, Classes, FacturaTipos, ShellApi, Forms, OpenSSLUtils, DateUtils;
-
+  Windows, SysUtils, Classes, FacturaTipos, ShellApi, Forms, OpenSSLUtils, DateUtils,
+  ConstantesFixtures;
 
 procedure TestTOpenSSL.BorrarArchivoTempSiExiste(sNombre: String);
   begin
@@ -205,29 +205,27 @@ var
     Result:=NumSerie;
   end;
 
-const
-  _NOMBRE_CERTIFICADO = 'openssl\aaa010101aaa_CSD_02.cer';
 begin
   BorrarArchivoTempSiExiste(fDirTemporal + 'VigenciaInicio.txt');
 
   // Procesamos el certificado con el OpenSSL.exe para obtener los datos y
   // poder corroborarlos...
-  EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _NOMBRE_CERTIFICADO +
+  EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _RUTA_CERTIFICADO +
                           '" -noout -startdate > "' + fDirTemporal + 'VigenciaInicio.txt" ');
   dtInicioVigencia:=leerFechaDeArchivo(fDirTemporal + 'VigenciaInicio.txt');
   // Fin de vigencia
-  EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _NOMBRE_CERTIFICADO +
+  EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _RUTA_CERTIFICADO +
                           '" -noout -enddate > "' + fDirTemporal + 'VigenciaFin.txt" ');
   dtFinVigencia:=leerFechaDeArchivo(fDirTemporal + 'VigenciaFin.txt');
 
   // Numero de Serie
-  EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _NOMBRE_CERTIFICADO +
+  EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _RUTA_CERTIFICADO +
                           '" -noout -serial > "' + fDirTemporal + 'Serial.txt" ');
 
   // "Limpiamos" el Serie que nos da el OpenSSL ya que incluye caracteres de mas...
   sNumSerie:= ValidarSerieDeOpenSSL(leerContenidoDeArchivo(fDirTemporal + 'Serial.txt'));
 
-  Certificado := fOpenSSL.ObtenerCertificado(fRutaFixtures + _NOMBRE_CERTIFICADO);
+  Certificado := fOpenSSL.ObtenerCertificado(fRutaFixtures + _RUTA_CERTIFICADO);
 
   // Checamos las propiedades que nos interesan
   CheckEquals(dtInicioVigencia, Certificado.NotBefore, 'El inicio de vigencia del certificado no fue el mismo que regreso OpenSSL');
