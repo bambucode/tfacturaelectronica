@@ -30,6 +30,9 @@
 ******************************************************************************)
 unit OpenSSLUtils;
 
+{$WARNINGS OFF}
+{$HINTS OFF}
+
 interface
 uses libeay32, SysUtils;
 
@@ -127,7 +130,7 @@ TMessageSigner = class
     fCertificate, fOtherCertificates: pX509;
     fKey: pEVP_PKEY;
     fMessage: ansistring;
-    fPrivateKeyFile, fCertificateFile, fOtherCertificateFile: TFileName;
+    fPrivateKeyFile, fCertificateFile: TFileName;
     fPassword: ansistring;
     fSignedMessage: ansistring;
   public
@@ -869,5 +872,7 @@ fSignedMessage := ansistring( StrPas(buff) );
 FreeMem(buff);
 end;
 
+{$WARNINGS ON}
+{$HINTS ON}
 
 end.
