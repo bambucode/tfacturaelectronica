@@ -44,8 +44,17 @@ begin
 end;
 
 procedure TestTFEComprobanteFiscal.Create_NuevoComprobante_GenereEstructuraXMLBasica;
+var
+   sXMLEncabezadoBasico: WideString;
+   NuevoComprobante: TFEComprobanteFiscal;
 begin
-  //
+    // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
+   sXMLEncabezadoBasico:=leerContenidoDeFixture('comprobante_fiscal/comprobante_nuevo.xml');
+   NuevoComprobante := TFEComprobanteFiscal.Create;
+   
+   // Checamos que sea igual que nuestro Fixture...
+   CheckEquals(sXMLEncabezadoBasico, fComprobanteFiscal.fXmlComprobante.XML, 'El encabezado del XML basico para un comprobante no fue el correcto');
+   FreeAndNil(NuevoComprobante);
 end;
 
 procedure TestTFEComprobanteFiscal.setCertificado_Certificado_GuardeNumeroDeSerieEnEstructuraXML;
@@ -62,7 +71,7 @@ begin
    fComprobanteFiscal.Certificado:=Certificado;
 
    // Checamos que sea igual que nuestro Fixture...
-   CheckEquals(sXMLConNumSerieCertificado, fComprobanteFiscal.fXmlComprobante.XML, 'El Contenido XML del Comprobante no almaceno correctamente los datos del receptor (es diferente al fixture receptor.xml)');
+   CheckEquals(sXMLConNumSerieCertificado, fComprobanteFiscal.fXmlComprobante.XML, 'El Contenido XML no contiene el numero de serie del certificado o este es incorrecto.');
 end;
 
 procedure TestTFEComprobanteFiscal.setEmisor_Emisor_LoGuardeEnXML;
