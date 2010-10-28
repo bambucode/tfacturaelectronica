@@ -51,7 +51,7 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils;
         /// <summary>Obtiene un certificado con sus propiedades llenas</summary>
         /// <param name="sArchivo">Ruta completa del archivo de certificado (extension .cer)</param>
         function ObtenerCertificado(sArchivo: String) : TX509Certificate;
-        destructor Destroy;
+        destructor Destroy; override;
     end;
 
 implementation

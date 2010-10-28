@@ -34,7 +34,7 @@ private
     function calcularSello(): WideString;
 public
     constructor Create(sCadenaOriginal: WideString; Certificado: TFECertificado; TipoDigestion: TTipoDigestionOpenSSL);
-    destructor Destroy;
+    destructor Destroy; override;
     property SelloCalculado : WideString read calcularSello;
 end;
 
@@ -55,6 +55,7 @@ end;
 destructor TSelloDigital.Destroy;
 begin
     FreeAndNil(fOpenSSL);
+    inherited Destroy;
 end;
 
 // Calcula el Sello Digital para la Cadena Original preparada en el constructor
