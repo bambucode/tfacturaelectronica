@@ -19,7 +19,11 @@ interface
 
 type
 
-TFEFormasDePago = (fpUnaSolaExhibicion, fpParcialidades);
+TFEFolio = Integer;
+TFESerie = String;
+
+TFEFormaDePago = (fpUnaSolaExhibicion, fpParcialidades);
+TFETipoComprobante = (tcIngreso, tcEgreso, tcTraslado);
 
 TFEDireccion = record
   Calle: String;
@@ -75,13 +79,10 @@ end;
 TFEBloqueFolios = record
     NumeroAprobacion: Integer;
     AnoAprobacion: Integer;
-    Serie: String; // Opcional
+    Serie: TFESerie; // Opcional
     FolioInicial: Integer;
     FolioFinal: Integer;
 end;
-
-TFEFolio = Integer;
-TFESerie = String;
 
 implementation
 

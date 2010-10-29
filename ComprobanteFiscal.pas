@@ -24,6 +24,7 @@ type
 // Excepciones que pueden ser generadas
 TFECertificadoNoExisteException = Exception;
 TFECertificadoNoVigente = Exception;
+TFEFolioFueraDeRango = Exception;
 
 ///<summary>Representa la estructura de comprobante fiscal digital (ver2.0) y sus elementos
 /// definidos de acuerdo al XSD del SAT. Esta pensado para ser extendido en las versiones
@@ -40,35 +41,49 @@ private
     fXmlComprobante : IFEXMLComprobante;
     sCadenaOriginal: WideString;
     fSelloDigital : TSelloDigital;
-    iFolio: TFEFolio;
-    sSerie : TFESerie;
+    fFolio: TFEFolio;
     fCertificado: TFECertificado;
+    fBloqueFolios: TFEBloqueFolios;
+    fFormaDePago : TFEFormaDePago;
+    fTipoComprobante: TFeTipoComprobante;
+    fExpedidoEn: TFeDireccion;
+
+    procedure setExpedidoEn(ExpedidoEn: TFEDireccion);
+    procedure setTipoComprobante(Tipo: TFETipoComprobante);
+    procedure setFormaDePago(FormaDePago: TFEFormaDePago);
     procedure setReceptor(Receptor: TFEContribuyente);
     procedure setEmisor(Emisor: TFEContribuyente);
     procedure setFolio(Folio: TFEFolio);
-    procedure setSerie(Serie: TFESerie);
+    function obtenerSerie() : TFESerie;
     //procedure setCertificado(sContenidoCertificado : WideString);
     procedure setCertificado(Certificado: TFECertificado);
     function getXML() : WideString;
     ///<summary>Obtiene la 'Cadena Original' segun las reglas del Anexo 20</summary>
     function getCadenaOriginal() : WideString;
+    procedure setBloqueFolios(Bloque: TFEBloqueFolios);
+    procedure ValidarQueFolioEsteEnRango;
 public
     // Version del CFD que implementa este código
     const Version = '2';
     constructor Create();
-    destructor Destroy();
+    destructor Destroy(); override;
 
     // Propiedades del comprobante normal
-    property Folio: TFEFolio write setFolio;
-    property Serie: TFESerie write setSerie;
+    property Folio: TFEFolio read fFolio write setFolio;
+    property Serie: TFESerie read obtenerSerie;
     property Receptor : TFEContribuyente write setReceptor;
     property Emisor: TFEContribuyente write setEmisor;
     procedure AgregarConcepto(Concepto: TFEConcepto);
+    property FormaDePago : TFEFormaDePago read fFormaDePago write setFormaDePago;
+    property Tipo : TFETipoComprobante read fTipoComprobante write setTipoComprobante;
+    property ExpedidoEn: TFEDireccion read fExpedidoEn write setExpedidoEn;
+    //property InformacionAduanera: TFEInformacionAduanera read fInfoAduanera write SetInformacionAduanera;
 
     // Propiedades especificas al comprobante electronico
     property XML: WideString read getXML;
     property CadenaOriginal: WideString read getCadenaOriginal;
-    property Certificado : TFECertificado write setCertificado;
+    property Certificado : TFECertificado read fCertificado write setCertificado;
+    property BloqueFolios: TFEBloqueFolios read fBloqueFolios write setBloqueFolios;
     //property Certificado : WideString write setCertificado;
 end;
 
@@ -85,6 +100,11 @@ uses FacturaReglamentacion, Dialogs, ClaseOpenSSL, OpenSSLUtils;
 constructor TFEComprobanteFiscal.Create();
 begin
     sCadenaOriginal:='';
+
+    // Incializamos los valores del comprobante con datos invalidos
+    fBloqueFolios.FolioInicial := -1;
+    fBloqueFolios.FolioFinal := -1;
+    fFolio:=-1;
 
     // Creamos el objeto XML
     fDocumentoXML := TXMLDocument.Create(nil);
@@ -103,7 +123,10 @@ end;
 
 destructor TFEComprobanteFiscal.Destroy();
 begin
-    FreeAndNil(fDocumentoXML);
+    // Al ser una interface el objeto TXMLDocument se libera automaticamente por Delphi al dejar de ser usado
+    // aunque para asegurarnos hacemos lo siguiente:
+    fXmlComprobante:=nil;
+    inherited;
 end;
 
 // Regresamos la Cadena Original de este comprobante fiscal segun las reglas
@@ -145,30 +168,7 @@ begin
     FreeAndNil(XSLTransformador);
 end;
 
-// Regresa el XML final del comprobante ya lleno
-function TFEComprobanteFiscal.getXML() : WideString;
-var
-  TipoDigestion: TTipoDigestionOpenSSL;
-begin
-    // Calculamos el sello digital para la cadena original de la factura
-    if Assigned(fSelloDigital) then
-        FreeAndNil(fSelloDigital);
-
-    // Segun la leglislacion vigente si la factura se hace antes del 1 de Enero del 2011, usamos MD5
-    if Now < EncodeDate(2011,1,1) then
-		    TipoDigestion:=tdMD5
-	  else // Si es 2011 usamos el algoritmo SHA-1
-		    TipoDigestion:=tdSHA1;
-
-    // Creamos la clase SelloDigital que nos ayudara a "sellar" la factura en XML
-    fSelloDigital:=TSelloDigital.Create(Self.CadenaOriginal, fCertificado, tdMD5);
-
-    // Finalmente regresamos la factura en XML con todas sus propiedades llenas
-    fXmlComprobante.Sello:=fSelloDigital.SelloCalculado;
-    FreeAndNil(fSelloDigital);
-    Result:=fDocumentoXML.XML.Text;
-end;
-
+// 1. Datos de quien la expide (Emisor) (Art. 29-A, Fraccion I)
 procedure TFEComprobanteFiscal.setEmisor(Emisor: TFEContribuyente);
 begin
   with fXmlComprobante.Emisor do
@@ -202,6 +202,7 @@ begin
     end;
 end;
 
+// 3. Clave del RFC de la persona a favor de quien se expida la factura (29-A, Fraccion IV)
 procedure TFEComprobanteFiscal.setReceptor(Receptor: TFEContribuyente);
 begin
   with fXmlComprobante.Receptor do
@@ -236,7 +237,6 @@ end;
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
 var
    x509Certificado: TX509Certificate;
-   dtVigenciaInicio, dtVigenciaFin: TDateTime;
 begin
       // Ya que tenemos los datos del certificado, lo procesamos para obtener los datos
       // necesarios
@@ -284,15 +284,77 @@ begin
 			end;
 end;
 
+procedure TFEComprobanteFiscal.ValidarQueFolioEsteEnRango;
+begin
+    // Validamos que el folio este dentro del rango definido si ya se nos fue proporcionado
+    // el bloque de folios y el numero de folio
+    if ((fBloqueFolios.FolioInicial > -1) And (fFolio > -1)) then
+    begin
+       if Not ((Folio >= fBloqueFolios.FolioInicial) And (Folio <= fBloqueFolios.FolioFinal))  then
+          raise TFEFolioFueraDeRango.Create('El folio se encuentra fuera del rango autorizado');
+    end;
+end;
+
+//8. Numero de folio, el cual debe de ser asignado de manera automatica por el sistema
 procedure TFEComprobanteFiscal.setFolio(Folio: TFEFolio);
 begin
+    fFolio := Folio;
+    ValidarQueFolioEsteEnRango();
     fXmlComprobante.Folio := IntToStr(Folio);
 end;
 
-procedure TFEComprobanteFiscal.setSerie(Serie: TFESerie);
+// Acceso rapido a la serie de la factura
+function  TFEComprobanteFiscal.obtenerSerie() : TFESerie;
 begin
-   if Trim(Serie) <> '' then
-      fXmlComprobante.Serie:=Serie;
+    Result:=fBloqueFolios.Serie;
+end;
+
+procedure TFEComprobanteFiscal.setBloqueFolios(Bloque: TFEBloqueFolios);
+begin
+    // Asignamos el bloque a la variable interna y validamos que este dentro del rango...
+    fBloqueFolios := Bloque;
+    ValidarQueFolioEsteEnRango();
+
+    fXmlComprobante.AnoAprobacion:=Bloque.AnoAprobacion;
+    fXmlComprobante.NoAprobacion:=Bloque.NumeroAprobacion;
+
+    if Trim(Serie) <> '' then
+      fXmlComprobante.Serie:=Bloque.Serie;
+end;
+
+// 2. Lugar y fecha de expedicion (29-A, Fraccion III) - En caso de ser sucursal
+procedure TFEComprobanteFiscal.setExpedidoEn(ExpedidoEn: TFEDireccion);
+begin
+    // TODO: Implementar
+end;
+
+procedure TFEComprobanteFiscal.setTipoComprobante(Tipo: TFETipoComprobante);
+var
+   sTipo: String;
+begin
+    fTipoComprobante:=Tipo;
+    case Tipo of
+      tcIngreso: sTipo:='ingreso';
+      tcEgreso: sTipo:='egreso';
+      tcTraslado: sTipo:='traslado';
+    end;
+
+    // TODO: Que cambios deben hacerse cuando es un egreso o traslado???
+    fXmlComprobante.TipoDeComprobante:=sTipo;
+end;
+
+//9. Cumplir con las reglas de control de pagos (Art 29, fraccion V)
+procedure TFEComprobanteFiscal.setFormaDePago(FormaDePago: TFEFormaDePago);
+var
+   sForma: String;
+begin
+   fFormaDePago:=FormaDePago;
+   case fFormaDePago of
+     fpUnaSolaExhibicion: sForma:='Pago en una sola exhibición';
+     fpParcialidades: sForma:='Pago en parcialidades';
+   end;
+
+   fXmlComprobante.FormaDePago:='';
 end;
 
 {
@@ -331,5 +393,38 @@ begin
 			end;}
 	 //	end ; {CFD.Impuestos}
 //end;
+
+
+// Regresa el XML final del comprobante ya lleno
+function TFEComprobanteFiscal.getXML() : WideString;
+var
+  TipoDigestion: TTipoDigestionOpenSSL;
+begin
+    // Especificamos la fecha exacta en la que se genero la factura
+    fXMLComprobante.Fecha:=TFEReglamentacion.ComoFechaHora(Now);
+
+    // En base a los conceptos agregados, llenamos los totales
+    //LlenarTotalesEImpuestos;
+
+    // **** YA ESTA COMPLETO EL XML ***
+
+    // Calculamos el sello digital para la cadena original de la factura
+    if Assigned(fSelloDigital) then
+        FreeAndNil(fSelloDigital);
+
+    // Segun la leglislacion vigente si la factura se hace antes del 1 de Enero del 2011, usamos MD5
+    if Now < EncodeDate(2011,1,1) then
+		    TipoDigestion:=tdMD5
+	  else // Si es 2011 usamos el algoritmo SHA-1
+		    TipoDigestion:=tdSHA1;
+
+    // Creamos la clase SelloDigital que nos ayudara a "sellar" la factura en XML
+    fSelloDigital:=TSelloDigital.Create(Self.CadenaOriginal, fCertificado, TipoDigestion);
+
+    // Finalmente regresamos la factura en XML con todas sus propiedades llenas
+    fXmlComprobante.Sello:=fSelloDigital.SelloCalculado;
+    FreeAndNil(fSelloDigital);
+    Result:=fDocumentoXML.XML.Text;
+end;
 
 end.

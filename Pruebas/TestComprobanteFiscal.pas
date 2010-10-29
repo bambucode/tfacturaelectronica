@@ -29,8 +29,9 @@ type
       procedure setEmisor_Emisor_LoGuardeEnXML;
       procedure AgregarConcepto_Concepto_LoGuardeEnXML;
       procedure setCertificado_Certificado_GuardeNumeroDeSerieEnEstructuraXML;
-      procedure setSerie_Serie_LoGuardeEnXML;
       procedure setFolio_Folio_LoGuardeEnXML;
+      procedure setBloqueFolios_Bloque_LoGuardeEnXML;
+      procedure setBloqueFolios_FolioFueraDeRango_CauseExcepcion;
   end;
 
 implementation
@@ -69,18 +70,47 @@ begin
               'El concepto no fue almacenado correctamente en la estrucutr XML');
 end;
 
-procedure TestTFEComprobanteFiscal.setSerie_Serie_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscal.setBloqueFolios_Bloque_LoGuardeEnXML;
 var
    sXMLFixture: WideString;
-   Serie: TFESerie;
+   Bloque: TFEBloqueFolios;
 begin
     // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-   sXMLFixture:=leerContenidoDeFixture('comprobante_fiscal/serie.xml');
+   sXMLFixture:=leerContenidoDeFixture('comprobante_fiscal/bloque_folios.xml');
 
-   Serie:='ABC';
-   fComprobanteFiscal.Serie:=Serie;
+   Bloque.NumeroAprobacion:=12345;
+   Bloque.AnoAprobacion:=2010;
+   Bloque.Serie:='ABC';
 
-   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML, 'No se guardo la Serie en la estructura del XML');
+   // Asignamos el bloque de folios
+   fComprobanteFiscal.BloqueFolios:=Bloque;
+   //guardarContenido(fComprobanteFiscal.fXmlComprobante.XML, 'comprobante_fiscal/bloque_folios.xml');
+   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
+              'No se guardo el numero de aprobacion, serie y año de aprobacion en la estructura del XML');
+end;
+
+procedure TestTFEComprobanteFiscal.setBloqueFolios_FolioFueraDeRango_CauseExcepcion;
+var
+   Bloque: TFEBloqueFolios;
+   bHuboError: Boolean;
+begin
+   Bloque.FolioInicial:=1000;
+   Bloque.FolioFinal:=2000;
+   bHuboError:=False;
+
+   // Asignamos primero un Numero de Folio fuera del rango
+   fComprobanteFiscal.Folio:=Bloque.FolioInicial - 5;
+
+   // Ahora, Asignamos el bloque de folios
+   try
+      fComprobanteFiscal.BloqueFolios:=Bloque;
+   except
+      On TFEFolioFueraDeRango do
+         bHuboError:=True;
+   end;
+
+   CheckEquals(True, bHuboError,
+   'No se lanzo la excepcion al asignar un folio fuera del rango especificado en la propiedad BloqueFolios');
 end;
 
 procedure TestTFEComprobanteFiscal.setFolio_Folio_LoGuardeEnXML;
