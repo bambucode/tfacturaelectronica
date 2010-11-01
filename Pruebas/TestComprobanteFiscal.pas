@@ -32,6 +32,12 @@ type
       procedure setFolio_Folio_LoGuardeEnXML;
       procedure setBloqueFolios_Bloque_LoGuardeEnXML;
       procedure setBloqueFolios_FolioFueraDeRango_CauseExcepcion;
+      procedure setTotal_Monto_LoGuardeEnXML;
+      procedure setSubtotal_Monto_LoGuardeEnXML;
+      procedure AgregarImpuesto_Retenido_LoGuardeEnXML;
+      procedure AgregarImpuesto_Trasladadado_LoGuardeEnXML;
+      procedure AgregarImpuesto_VariosRetenidos_SumeSuTotal;
+      procedure AgregarImpuesto_VariosTrasladados_SumeSuTotal;
   end;
 
 implementation
@@ -125,6 +131,60 @@ begin
    fComprobanteFiscal.Folio:=Folio;
 
    CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML, 'No se guardo el Folio en la estructura del XML');
+end;
+
+procedure TestTFEComprobanteFiscal.setTotal_Monto_LoGuardeEnXML;
+var
+   sXMLFixture: WideString;
+const
+   _TOTAL_COMPROBANTE = 1000;
+begin
+   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
+   sXMLFixture:=leerContenidoDeFixture('comprobante_fiscal/total.xml');
+
+   // Especificamos el certificado que usaremos a la clase comprobante
+   fComprobanteFiscal.Total:=_TOTAL_COMPROBANTE;
+   
+   // Checamos que sea igual que nuestro Fixture...
+   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
+                            'El Contenido XML no contiene el monto total o este es incorrecto.');
+end;
+
+procedure TestTFEComprobanteFiscal.setSubtotal_Monto_LoGuardeEnXML;
+var
+   sXMLFixture: WideString;
+const
+   _SUBTOTAL_COMPROBANTE = 1000;
+begin
+   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
+   sXMLFixture:=leerContenidoDeFixture('comprobante_fiscal/subtotal.xml');
+
+   // Especificamos el certificado que usaremos a la clase comprobante
+   fComprobanteFiscal.SubTotal:=_SUBTOTAL_COMPROBANTE;
+   
+   // Checamos que sea igual que nuestro Fixture...
+   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
+                            'El Contenido XML no contiene el monto de subtotal o este es incorrecto.');
+end;
+
+procedure TestTFEComprobanteFiscal.AgregarImpuesto_Retenido_LoGuardeEnXML;
+begin
+    //
+end;
+
+procedure TestTFEComprobanteFiscal.AgregarImpuesto_Trasladadado_LoGuardeEnXML;
+begin
+    //
+end;
+
+procedure TestTFEComprobanteFiscal.AgregarImpuesto_VariosRetenidos_SumeSuTotal;
+begin
+    //
+end;
+
+procedure TestTFEComprobanteFiscal.AgregarImpuesto_VariosTrasladados_SumeSuTotal;
+begin
+    //
 end;
 
 procedure TestTFEComprobanteFiscal.Create_NuevoComprobante_GenereEstructuraXMLBasica;
