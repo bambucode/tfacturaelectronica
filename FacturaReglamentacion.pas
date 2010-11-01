@@ -25,6 +25,7 @@ type
       class function ComoCadena(sCadena: String) : String;
       class function ComoCantidad(dCantidad: Double) : String;
       class function ComoFechaHora(dtFecha: TDateTime) : String;
+      class function ComoTasaImpuesto(dTasa: Double) : String;
   end;
 
 implementation
@@ -41,6 +42,11 @@ end;
 class function TFEReglamentacion.ComoMoneda(dMonto: Currency) : String;
 begin
    Result:=FloatToStrF(dMonto,ffFixed,10,2);
+end;
+
+class function TFEReglamentacion.ComoTasaImpuesto(dTasa: Double) : String;
+begin
+   Result:=FloatToStrF(dTasa,ffFixed,10,2);
 end;
 
 // Las cadenas usadas en el XML deben de escapar caracteres incorrectos
