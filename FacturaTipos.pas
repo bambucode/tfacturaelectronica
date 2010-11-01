@@ -84,6 +84,17 @@ TFEBloqueFolios = record
     FolioFinal: Integer;
 end;
 
+TFEImpuestoRetenido = record
+  Nombre : String; // IVA, ISR
+  Importe: Currency;
+end;
+
+TFEImpuestoTrasladado = record
+    Nombre: String; // IVA, IEPS
+    Tasa: Double;
+    Importe : Currency;
+end;
+
 implementation
 
 function TFEConcepto.Importe : Currency;

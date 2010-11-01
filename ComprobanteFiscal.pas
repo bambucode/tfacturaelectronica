@@ -87,11 +87,20 @@ type
     property ExpedidoEn: TFeDireccion read fExpedidoEn write setExpedidoEn;
     property Total: Currency read fTotal write setTotal;
     property SubTotal: Currency read fSubTotal write setSubtotal;
+    property TotalImpuestosRetenidos : Currency read fTotalImpuestosRetenidos;
+    property TotalImpuestosTrasladados : Currency read fTotalImpuestosTrasladados;
     // property InformacionAduanera: TFEInformacionAduanera read fInfoAduanera write SetInformacionAduanera;
 
     // Metoodos:
     procedure AgregarConcepto(Concepto: TFEConcepto);
-    procedure AgregarImpuesto(NuevoImpuesto: TFEImpuesto);
+    /// <summary>Agrega un nuevo impuesto de retención (ISR, IVA) al comprobante generando su XML
+    /// y sumandolo al total de dicho impuesto. </summary>
+    /// <param name="NuevoImpuesto">El nuevo Impuesto con los datos de nombre e importe del mismo</param>
+    procedure AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoRetenido);
+    /// <summary>Agrega un nuevo impuesto de traslado (IVA, IEPS) al comprobante generando su XML y
+    /// sumandolo al total de dicho impuesto. </summary>
+    /// <param name="NuevoImpuesto">El nuevo Impuesto con los datos de nombre, tasa e importe del mismo</param>
+    procedure AgregarImpuestoTrasladado(NuevoImpuesto: TFEImpuestoTrasladado);
     procedure Cancelar();
 
     // Propiedades especificas al comprobante electronico
@@ -413,29 +422,24 @@ begin
    fXMLComprobante.SubTotal:=TFEReglamentacion.ComoMoneda(dMonto);
 end;
 
-// Se encarga de agregar un nuevo impuesto al arreglo de impuestos
-// del XML sumando el total de cada tipo
-procedure TFEComprobanteFiscal.AgregarImpuesto(NuevoImpuesto: TFEImpuesto);
+procedure TFEComprobanteFiscal.AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoRetenido);
 begin
-     case NuevoImpuesto.Tipo of
+     fTotalImpuestosRetenidos:= fTotalImpuestosRetenidos + NuevoImpuesto.Importe;
+     with fXMLComprobante.Impuestos.Retenciones.Add do
+     begin
+         Impuesto := TFEReglamentacion.ComoCadena(NuevoImpuesto.Nombre);
+         Importe := TFEReglamentacion.ComoMoneda(NuevoImpuesto.Importe);
+     end;
+end;
 
-          tiRetenido: begin
-             fTotalImpuestosRetenidos:= fTotalImpuestosRetenidos + NuevoImpuesto.Importe;
-             with fXMLComprobante.Impuestos.Retenciones.Add do
-             begin
-                 Impuesto := TFEReglamentacion.ComoCadena(NuevoImpuesto.Nombre);
-                 Importe := TFEReglamentacion.ComoMoneda(NuevoImpuesto.Importe);
-             end;
-          end;
-
-          tiTrasladado: begin
-             fTotalImpuestosTrasladados:= fTotalImpuestosTrasladados + NuevoImpuesto.Importe;
-             with fXMLComprobante.Impuestos.Traslados.Add do
-             begin
-                 Impuesto := TFEReglamentacion.ComoCadena(NuevoImpuesto.Nombre);
-                 Importe := TFEReglamentacion.ComoMoneda(NuevoImpuesto.Importe);
-             end;
-          end;
+procedure TFEComprobanteFiscal.AgregarImpuestoTrasladado(NuevoImpuesto: TFEImpuestoTrasladado);
+begin
+     fTotalImpuestosTrasladados:= fTotalImpuestosTrasladados + NuevoImpuesto.Importe;
+     with fXMLComprobante.Impuestos.Traslados.Add do
+     begin
+         Impuesto := TFEReglamentacion.ComoCadena(NuevoImpuesto.Nombre);
+         Tasa := TFEReglamentacion.ComoTasaImpuesto(NuevoImpuesto.Tasa);
+         Importe := TFEReglamentacion.ComoMoneda(NuevoImpuesto.Importe);
      end;
 end;
 

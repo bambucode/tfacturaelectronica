@@ -34,8 +34,8 @@ type
       procedure setBloqueFolios_FolioFueraDeRango_CauseExcepcion;
       procedure setTotal_Monto_LoGuardeEnXML;
       procedure setSubtotal_Monto_LoGuardeEnXML;
-      procedure AgregarImpuesto_Retenido_LoGuardeEnXML;
-      procedure AgregarImpuesto_Trasladadado_LoGuardeEnXML;
+      procedure AgregarImpuestoRetenido_Impuesto_LoGuardeEnXML;
+      procedure AgregarImpuestoTrasladado_Impuesto_LoGuardeEnXML;
       procedure AgregarImpuesto_VariosRetenidos_SumeSuTotal;
       procedure AgregarImpuesto_VariosTrasladados_SumeSuTotal;
   end;
@@ -167,14 +167,54 @@ begin
                             'El Contenido XML no contiene el monto de subtotal o este es incorrecto.');
 end;
 
-procedure TestTFEComprobanteFiscal.AgregarImpuesto_Retenido_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscal.AgregarImpuestoRetenido_Impuesto_LoGuardeEnXML;
+var
+   ImpuestoRetenido: TFEImpuestoRetenido;
+   TotalImpuestosAnterior: Currency;
+   sXMLFixture: WideString;
 begin
-    //
+   ImpuestoRetenido.Nombre:='ISR';
+   ImpuestoRetenido.Importe:=1000;
+
+   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
+   sXMLFixture:=leerContenidoDeFixture('comprobante_fiscal/agregarimpuesto_retencion.xml');
+   TotalImpuestosAnterior:=fComprobanteFiscal.TotalImpuestosRetenidos;
+
+   // Agregamos el impuesto en cuestion
+   fComprobanteFiscal.AgregarImpuestoRetenido(ImpuestoRetenido);
+   
+   // Comprobamos el XML y el total de impuestos retenidos
+   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
+               'El Contenido XML no contiene el impuesto retenido o este es incorrecto.');
+
+   CheckEquals(TotalImpuestosAnterior + ImpuestoRetenido.Importe, fComprobanteFiscal.TotalImpuestosRetenidos,
+               'No se sumo correctamente el importe del impuesto al total de impuestos retenidos');
 end;
 
-procedure TestTFEComprobanteFiscal.AgregarImpuesto_Trasladadado_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscal.AgregarImpuestoTrasladado_Impuesto_LoGuardeEnXML;
+var
+   ImpuestoTrasladado: TFEImpuestoTrasladado;
+   TotalImpuestosAnterior: Currency;
+   sXMLFixture: WideString;
 begin
-    //
+   ImpuestoTrasladado.Nombre:='IVA';
+   ImpuestoTrasladado.Tasa:=16;
+   ImpuestoTrasladado.Importe:=1000;
+
+   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
+   sXMLFixture:=leerContenidoDeFixture('comprobante_fiscal/agregarimpuesto_trasladado.xml');
+   TotalImpuestosAnterior:=fComprobanteFiscal.TotalImpuestosTrasladados;
+
+   // Agregamos el impuesto en cuestion
+   fComprobanteFiscal.AgregarImpuestoTrasladado(ImpuestoTrasladado);
+   //guardarContenido(fComprobanteFiscal.fXmlComprobante.XML, 'comprobante_fiscal/agregarimpuesto_trasladado.xml');
+
+   // Comprobamos el XML y el total de impuestos retenidos
+   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
+               'El Contenido XML no contiene el impuesto trasladado o este es incorrecto.');
+
+   CheckEquals(TotalImpuestosAnterior + ImpuestoTrasladado.Importe, fComprobanteFiscal.TotalImpuestosTrasladados,
+               'No se sumo correctamente el importe del impuesto al total de impuestos trasladados');
 end;
 
 procedure TestTFEComprobanteFiscal.AgregarImpuesto_VariosRetenidos_SumeSuTotal;
