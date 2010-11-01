@@ -36,8 +36,8 @@ type
       procedure setSubtotal_Monto_LoGuardeEnXML;
       procedure AgregarImpuestoRetenido_Impuesto_LoGuardeEnXML;
       procedure AgregarImpuestoTrasladado_Impuesto_LoGuardeEnXML;
-      procedure AgregarImpuesto_VariosRetenidos_SumeSuTotal;
-      procedure AgregarImpuesto_VariosTrasladados_SumeSuTotal;
+      procedure AgregarImpuestoRetenido_Varios_SumeSuTotal;
+      procedure AgregarImpuestoTrasladado_Varios_SumeSuTotal;
   end;
 
 implementation
@@ -217,14 +217,62 @@ begin
                'No se sumo correctamente el importe del impuesto al total de impuestos trasladados');
 end;
 
-procedure TestTFEComprobanteFiscal.AgregarImpuesto_VariosRetenidos_SumeSuTotal;
+procedure TestTFEComprobanteFiscal.AgregarImpuestoRetenido_Varios_SumeSuTotal;
+var
+   iCuantos, I: Integer;
+   aImpuestos : Array of TFEImpuestoRetenido;
+   dTotalImpuestos: Double;
 begin
-    //
+   // Agregamos una cantidad aleatoria de impuestos
+   Randomize;
+   iCuantos:=Random(9);
+   SetLength(aImpuestos, iCuantos);
+   dTotalImpuestos:=0;
+
+   // Creamos los impuestos
+   for i := 0 to Length(aImpuestos) - 1 do
+   begin
+        aImpuestos[I].Nombre:=IntToStr(I);
+        aImpuestos[I].Importe:=Random(999);
+        dTotalImpuestos:=dTotalImpuestos + aImpuestos[I].Importe;
+   end;
+
+   // Los agregamos al comprobante
+   for i := 0 to Length(aImpuestos)- 1 do
+       fComprobanteFiscal.AgregarImpuestoRetenido(aImpuestos[I]);
+
+   CheckEquals(dTotalImpuestos, fComprobanteFiscal.TotalImpuestosRetenidos,
+              'El total de impuestos retenidos no fue la suma de todos los impuestos agregados');
+
 end;
 
-procedure TestTFEComprobanteFiscal.AgregarImpuesto_VariosTrasladados_SumeSuTotal;
+procedure TestTFEComprobanteFiscal.AgregarImpuestoTrasladado_Varios_SumeSuTotal;
+var
+   iCuantos, I: Integer;
+   aImpuestos : Array of TFEImpuestoTrasladado;
+   dTotalImpuestos: Double;
 begin
-    //
+   // Agregamos una cantidad aleatoria de impuestos
+   Randomize;
+   iCuantos:=Random(9);
+   SetLength(aImpuestos, iCuantos);
+   dTotalImpuestos:=0;
+
+   // Creamos los impuestos
+   for i := 0 to Length(aImpuestos) - 1 do
+   begin
+        aImpuestos[I].Nombre:=IntToStr(I);
+        aImpuestos[I].Tasa:=Random(9);
+        aImpuestos[I].Importe:=Random(999);
+        dTotalImpuestos:=dTotalImpuestos + aImpuestos[I].Importe;
+   end;
+
+   // Los agregamos al comprobante
+   for i := 0 to Length(aImpuestos)- 1 do
+       fComprobanteFiscal.AgregarImpuestoTrasladado(aImpuestos[I]);
+
+   CheckEquals(dTotalImpuestos, fComprobanteFiscal.TotalImpuestosTrasladados,
+              'El total de impuestos trasladados no fue la suma de todos los impuestos agregados');
 end;
 
 procedure TestTFEComprobanteFiscal.Create_NuevoComprobante_GenereEstructuraXMLBasica;
