@@ -50,6 +50,12 @@ TFEContribuyente = record
   Direccion: TFeDireccion;
 end;
 
+TFEDatosAduana = record
+  NumeroDocumento: String;
+  FechaExpedicion: TDateTime;
+  Aduana: String;
+end;
+
 TFEConcepto = record
   Cantidad: Double;
   Unidad: String;
@@ -57,6 +63,8 @@ TFEConcepto = record
   ValorUnitario: Currency;
   // Datos opcionales
   NoIdentificacion: String;
+  DatosAduana: TFEDatosAduana;
+  CuentaPredial: String;
 public
   function Importe() : Currency;
 end;
