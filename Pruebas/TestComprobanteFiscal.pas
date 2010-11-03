@@ -292,6 +292,8 @@ begin
   sCadenaOriginalCorrecta := leerContenidoDeFixture('microe/factura_cadena_original.txt');
 
   // 1. Definimos los datos de los folios
+  fComprobanteFiscal.Folio:=1;
+
   Bloque.NumeroAprobacion := 35;
   Bloque.AnoAprobacion := 2008;
   Bloque.Serie := 'AA';
@@ -339,7 +341,7 @@ begin
   // Agregamos el impuesto de este articulo
   Impuesto1.Nombre := 'IVA';
   Impuesto1.Tasa := 16;
-  Impuesto1.Importe := Concepto1.Importe / (Impuesto1.Tasa);
+  Impuesto1.Importe := Concepto1.Importe * (Impuesto1.Tasa / 100);
   fComprobanteFiscal.AgregarImpuestoTrasladado(Impuesto1);
 
   Concepto2.NoIdentificacion := '2';
@@ -348,16 +350,15 @@ begin
   Concepto2.Descripcion := '  Magic Mouse';
   Concepto2.ValorUnitario := 900;
   fComprobanteFiscal.AgregarConcepto(Concepto2);
-
   // Agregamos el impuesto de este articulo
   Impuesto2.Nombre := 'IVA';
   Impuesto2.Tasa := 16;
-  Impuesto2.Importe := Concepto2.Importe / (Impuesto2.Tasa);
+  Impuesto2.Importe := Concepto2.Importe * (Impuesto2.Tasa / 100);
   fComprobanteFiscal.AgregarImpuestoTrasladado(Impuesto2);
 
   Concepto3.NoIdentificacion := '3';
   Concepto3.Cantidad := 5.5;
-  Concepto3.Unidad := 'hrs';
+  Concepto3.Unidad := 'HRS';
   Concepto3.Descripcion := 'Servicio de soporte técnico  ';
   Concepto3.ValorUnitario := 120;
   fComprobanteFiscal.AgregarConcepto(Concepto3);
@@ -365,8 +366,13 @@ begin
   // Agregamos el impuesto de este articulo
   Impuesto3.Nombre := 'IVA';
   Impuesto3.Tasa := 16;
-  Impuesto3.Importe := Concepto3.Importe / (Impuesto3.Tasa);
+  Impuesto3.Importe := Concepto3.Importe * (Impuesto3.Tasa / 100);
   fComprobanteFiscal.AgregarImpuestoTrasladado(Impuesto3);
+
+  // Establecemos las propiedades generales del comprobante
+  fComprobanteFiscal.FormaDePago:=fpUnaSolaExhibicion;
+  fComprobanteFiscal.Tipo:=tcIngreso;
+  fComprobanteFiscal.AsignarDescuento(0,'');
 
   // Asignamos el subtotal de la factura
   fComprobanteFiscal.SubTotal := Concepto1.Importe + Concepto2.Importe + Concepto3.Importe;
