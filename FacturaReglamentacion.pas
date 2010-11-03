@@ -25,6 +25,7 @@ type
       class function ComoCadena(sCadena: String) : String;
       class function ComoCantidad(dCantidad: Double) : String;
       class function ComoFechaHora(dtFecha: TDateTime) : String;
+      class function ComoFechaAduanera(dtFecha: TDateTime) : String;
       class function ComoTasaImpuesto(dTasa: Double) : String;
   end;
 
@@ -36,7 +37,14 @@ uses SysUtils;
 // "Se expresa en la forma aaaa-mm-ddThh:mm:ss, de acuerdo con la especificación ISO 8601"
 class function TFEReglamentacion.ComoFechaHora(dtFecha: TDateTime) : String;
 begin
-  Result := FormatDateTime('yyyymmdd', dtFecha) + 'T' + FormatDateTime('hh:nn:ss', dtFecha);
+  Result := FormatDateTime('yyyy-mm-dd', dtFecha) + 'T' + FormatDateTime('hh:nn:ss', dtFecha);
+end;
+
+class function TFEReglamentacion.ComoFechaAduanera(dtFecha: TDateTime) : String;
+begin
+   // Formato sacado del CFDv2.XSD: "Atributo requerido para expresar la fecha de expedición
+   // del documento aduanero que ampara la importación del bien. Se expresa en el formato aaaa-mm-dd"
+   Result := FormatDateTime('yyyy-mm-dd', dtFecha);
 end;
 
 class function TFEReglamentacion.ComoMoneda(dMonto: Currency) : String;
@@ -71,7 +79,8 @@ end;
 
 class function TFEReglamentacion.ComoCantidad(dCantidad: Double) : String;
 begin
-   Result:=FloatToStr(dCantidad);
+   // De acuerdo al programa MicroE le asigna dos decimales aunque sea entero
+   Result:=FloatToStrF(dCantidad,ffFixed,10,2);
 end;
 
 end.
