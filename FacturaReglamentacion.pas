@@ -79,8 +79,12 @@ end;
 
 class function TFEReglamentacion.ComoCantidad(dCantidad: Double) : String;
 begin
-   // De acuerdo al programa MicroE le asigna dos decimales aunque sea entero
-   Result:=FloatToStrF(dCantidad,ffFixed,10,2);
+   // Las cantidades cerradas las regresamos sin decimales
+   // las que tienen fracciones con 2 digitos decimales...
+   if Frac(dCantidad) > 0 then
+      Result:=FloatToStrF(dCantidad,ffFixed,10,2)
+   else
+      Result:=IntToStr(Round(dCantidad));
 end;
 
 end.

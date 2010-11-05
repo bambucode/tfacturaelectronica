@@ -22,7 +22,7 @@ type
   public
     procedure SetUp; override;
     procedure TearDown; override;
-
+    function GenerarComprobanteFiscal(DeArchivoXML: String; Certificado: TFECertificado) : String;
   published
     procedure Create_NuevoComprobante_GenereEstructuraXMLBasica;
     procedure setReceptor_Receptor_LoGuardeEnXML;
@@ -39,12 +39,14 @@ type
     procedure AgregarImpuestoRetenido_Varios_SumeSuTotal;
     procedure AgregarImpuestoTrasladado_Varios_SumeSuTotal;
     procedure CadenaOriginal_DeComprobante_SeaCorrecta;
+    procedure SelloDigital_DeComprobante_SeaCorrecto;
+    procedure XML_DeComprobanteHecho_GenereXMLCorrectamente;
   end;
 
 implementation
 
 uses
-  Windows, SysUtils, Classes, ConstantesFixtures;
+  Windows, SysUtils, Classes, ConstantesFixtures, DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFDv2;
 
 procedure TestTFEComprobanteFiscal.SetUp;
 begin
@@ -279,109 +281,272 @@ begin
     'El total de impuestos trasladados no fue la suma de todos los impuestos agregados');
 end;
 
-procedure TestTFEComprobanteFiscal.CadenaOriginal_DeComprobante_SeaCorrecta;
+// Funcion comun para generar el comprobante fiscal con los mismos datos
+// que el XML especificado como parametro, regresa el Sello
+function TestTFEComprobanteFiscal.GenerarComprobanteFiscal(DeArchivoXML: String; Certificado: TFECertificado): String;
 var
   Bloque: TFEBloqueFolios;
-  Certificado: TFECertificado;
-  Concepto1, Concepto2, Concepto3: TFEConcepto;
+  I: Integer;
+  Concepto: TFEConcepto;
   Emisor, Receptor: TFEContribuyente;
-  Impuesto1, Impuesto2, Impuesto3: TFEImpuestoTrasladado;
-  sCadenaOriginalCorrecta: WideString;
+  ExpedidoEn: TFEExpedidoEn;
+  ImpuestoTrasladado: TFEImpuestoTrasladado;
+  ImpuestoRetenido: TFEImpuestoRetenido;
+  dSubtotal, dTotal: Double;
+
+  fXMLPrueba : TXMLDocument;
+  fXMLComprobantePrueba: IFEXMLComprobante;
+
+  procedure leerComprobanteXML();
+  begin
+       fXMLPrueba := TXMLDocument.Create(nil);
+       fXMLPrueba.LoadFromFile(DeArchivoXML);
+       fXmlComprobantePrueba := GetComprobante(fXMLPrueba);
+  end;
+
+  function ConvertirFechaComprobanteADateTime(sFechaHora: String) : TDateTime;
+  var
+     sAno, sMes, sDia, sHora, sMin, sMs: String;
+  begin
+     // Ejemplo: 2009-08-16T16:30:00
+     sAno:=Copy(sFechaHora,1,4);
+     sMes:=Copy(sFechaHora,6,2);
+     sDia:=Copy(sFechaHora,9,2);
+     sHora:=Copy(sFechaHora,12,2);
+     sMin:=Copy(sFechaHora,15,2);
+     sMs:=Copy(sFechaHora,18,2);
+     Result:=EncodeDateTime(StrToInt(sAno),StrToInt(sMes),StrToInt(sDia),StrToInt(sHora),StrToInt(sMin),StrToInt(sMs),0);
+  end;
+
 begin
-  // Leemos la cadena original generada por el programa de MicroE del SAT.
-  sCadenaOriginalCorrecta := leerContenidoDeFixture('microe/factura_cadena_original.txt');
-
+  // Leemos el fixture de comprobante XML para obtener sus propiedades y asignarlas al comprobante
+  leerComprobanteXML();
   // 1. Definimos los datos de los folios
-  fComprobanteFiscal.Folio:=1;
+  fComprobanteFiscal.Folio:=StrToInt(fXmlComprobantePrueba.Folio);
+  // Si es la version de prueba, establecemos la fecha/hora para que coincida
+  // con la fecha/hora en que se genero el comprobante usando MicroE
+  fComprobanteFiscal.fFechaGeneracion := ConvertirFechaComprobanteADateTime(fXmlComprobantePrueba.Fecha);
 
-  Bloque.NumeroAprobacion := 35;
-  Bloque.AnoAprobacion := 2008;
-  Bloque.Serie := 'AA';
+  Bloque.NumeroAprobacion := fXmlComprobantePrueba.NoAprobacion;
+  Bloque.AnoAprobacion := fXmlComprobantePrueba.AnoAprobacion;
+  Bloque.Serie := fXmlComprobantePrueba.Serie;
   Bloque.FolioInicial := 1;
-  Bloque.FolioFinal := 1000;
+  // Indicamos que el folio final es el folio del comprobante + 1 para que siempre este "en reango"
+  Bloque.FolioFinal := StrToInt(fXmlComprobantePrueba.Folio) + 1;
   fComprobanteFiscal.BloqueFolios := Bloque;
 
   // 2. Establecemos el certificado a usar
-  Certificado.Ruta := fRutaFixtures + _MICROE_ARCHIVO_CERTIFICADO;
-  Certificado.LlavePrivada.Ruta := fRutaFixtures + _MICROE_ARCHIVO_LLAVE_PRIVADA;
-  Certificado.LlavePrivada.Clave := _MICROE_CLAVE_LLAVE_PRIVADA;
   fComprobanteFiscal.Certificado := Certificado;
 
   // 3. Establecemos el Emisor y Receptor
-  Emisor.Nombre := 'CONTRIBUYENTE DE PRUEBA FICTICIO FICTICIO';
-  Emisor.RFC := 'FIFC000101AM1';
-  Emisor.Direccion.Calle := '1';
-  Emisor.Direccion.NoExterior := '99';
-  Emisor.Direccion.CodigoPostal := '72620';
-  Emisor.Direccion.Colonia := 'CENTRO';
-  Emisor.Direccion.Localidad := 'SAN MIGUEL XOXTLA';
-  Emisor.Direccion.Municipio := 'SAN MIGUEL XOXTLA';
-  Emisor.Direccion.Estado := 'PUEBLA';
-  Emisor.Direccion.Pais := 'MÉXICO';
-  fComprobanteFiscal.Emisor := Emisor;
+  with  fXmlComprobantePrueba.Emisor do
+  begin
+      Emisor.Nombre :=Nombre;
+      Emisor.RFC := RFC;
+      Emisor.Direccion.Calle := DomicilioFiscal.Calle;
+      Emisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
+      Emisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
+      Emisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
+      Emisor.Direccion.Colonia := DomicilioFiscal.Colonia;
+      Emisor.Direccion.Localidad := DomicilioFiscal.Localidad;
+      Emisor.Direccion.Municipio := DomicilioFiscal.Municipio;
+      Emisor.Direccion.Estado := DomicilioFiscal.Estado;
+      Emisor.Direccion.Pais := DomicilioFiscal.Pais;
+      fComprobanteFiscal.Emisor := Emisor;
+  end;
 
-  Receptor.Nombre := 'CONTRIBUYENTE DE PRUEBA CUATRO SA DE CV';
-  Receptor.RFC := 'CPC400101CM9';
-  Receptor.Direccion.Calle := 'AV HIDALGO';
-  Receptor.Direccion.NoExterior := '77';
-  Receptor.Direccion.CodigoPostal := '06300';
-  Receptor.Direccion.Colonia := 'GUERRERO';
-  Receptor.Direccion.Estado := 'DISTRITO FEDERAL';
-  Receptor.Direccion.Pais := 'México';
-  fComprobanteFiscal.Receptor := Receptor;
+  with  fXmlComprobantePrueba.Receptor do
+  begin
+      Receptor.Nombre := Nombre;
+      Receptor.RFC := RFC;
+      Receptor.Direccion.Calle := Domicilio.Calle;
+      Receptor.Direccion.NoExterior := Domicilio.NoExterior;
+      Receptor.Direccion.CodigoPostal := Domicilio.CodigoPostal;
+      Receptor.Direccion.Colonia := Domicilio.Colonia;
+      Receptor.Direccion.Estado := Domicilio.Estado;
+      Receptor.Direccion.Localidad := Domicilio.Localidad;
+      Receptor.Direccion.Municipio := Domicilio.Municipio;
+      Receptor.Direccion.Pais := Domicilio.Pais;
+      fComprobanteFiscal.Receptor := Receptor;
+  end;
+
+  // Tiene direccion de "Expedido En" ??
+  if fXmlComprobantePrueba.Emisor.ExpedidoEn.Calle <> '' then
+  begin
+      with fXmlComprobantePrueba.Emisor.ExpedidoEn do
+      begin
+          ExpedidoEn.Calle := Calle;
+          ExpedidoEn.NoExterior := NoExterior;
+          ExpedidoEn.CodigoPostal := CodigoPostal;
+          ExpedidoEn.Localidad:= Localidad;
+          ExpedidoEn.Municipio:=Municipio;
+          ExpedidoEn.Colonia := Colonia;
+          ExpedidoEn.Estado := Estado;
+          ExpedidoEn.Pais := Pais;
+      end;
+      fComprobanteFiscal.ExpedidoEn:=ExpedidoEn;
+  end;
 
   // 4. Agregamos los conceptos
-  Concepto1.Cantidad := 1;
-  Concepto1.NoIdentificacion := '1';
-  Concepto1.Unidad := 'PZ';
-  Concepto1.Descripcion := 'Mac    Book Air';
-  Concepto1.ValorUnitario := 10000;
-  fComprobanteFiscal.AgregarConcepto(Concepto1);
+  dSubtotal:=0;
+  dTotal:=0;
 
-  // Agregamos el impuesto de este articulo
-  Impuesto1.Nombre := 'IVA';
-  Impuesto1.Tasa := 16;
-  Impuesto1.Importe := Concepto1.Importe * (Impuesto1.Tasa / 100);
-  fComprobanteFiscal.AgregarImpuestoTrasladado(Impuesto1);
+  for I := 0 to fXmlComprobantePrueba.Conceptos.Count - 1 do
+  begin
+      with fXmlComprobantePrueba.Conceptos.Concepto[I] do
+      begin
+          Concepto.Cantidad := StrToFloat(Cantidad);
+          Concepto.NoIdentificacion := NoIdentificacion;
+          Concepto.Unidad := Unidad;
+          Concepto.Descripcion := Descripcion;
+          Concepto.ValorUnitario := StrToFloat(ValorUnitario);
+          Concepto.CuentaPredial:=CuentaPredial.Numero;
+          dSubtotal:=dSubtotal + Concepto.Importe;
+          // TODO: Leer datos de aduana si acaso los tiene
+      end;
+      fComprobanteFiscal.AgregarConcepto(Concepto);
+  end;
 
-  Concepto2.NoIdentificacion := '2';
-  Concepto2.Cantidad := 3;
-  Concepto2.Unidad := 'PZ';
-  Concepto2.Descripcion := '  Magic Mouse';
-  Concepto2.ValorUnitario := 900;
-  fComprobanteFiscal.AgregarConcepto(Concepto2);
-  // Agregamos el impuesto de este articulo
-  Impuesto2.Nombre := 'IVA';
-  Impuesto2.Tasa := 16;
-  Impuesto2.Importe := Concepto2.Importe * (Impuesto2.Tasa / 100);
-  fComprobanteFiscal.AgregarImpuestoTrasladado(Impuesto2);
+  // Agregamos las reteneciones
+  for I := 0 to fXmlComprobantePrueba.Impuestos.Retenciones.Count - 1 do
+    begin
+      with fXmlComprobantePrueba.Impuestos.Retenciones do
+      begin
+        ImpuestoRetenido.Nombre:=Retencion[I].Impuesto;
+        ImpuestoRetenido.Importe:=StrToFloat(Retencion[I].Importe);
 
-  Concepto3.NoIdentificacion := '3';
-  Concepto3.Cantidad := 5.5;
-  Concepto3.Unidad := 'HRS';
-  Concepto3.Descripcion := 'Servicio de soporte técnico  ';
-  Concepto3.ValorUnitario := 120;
-  fComprobanteFiscal.AgregarConcepto(Concepto3);
+        fComprobanteFiscal.AgregarImpuestoRetenido(Impuestoretenido);
+      end;
+    end;
 
-  // Agregamos el impuesto de este articulo
-  Impuesto3.Nombre := 'IVA';
-  Impuesto3.Tasa := 16;
-  Impuesto3.Importe := Concepto3.Importe * (Impuesto3.Tasa / 100);
-  fComprobanteFiscal.AgregarImpuestoTrasladado(Impuesto3);
+    // Agregamos los impuestos trasladados
+    for I := 0 to fXmlComprobantePrueba.Impuestos.Traslados.Count - 1 do
+    begin
+      with fXmlComprobantePrueba.Impuestos.Traslados do
+      begin
+        ImpuestoTrasladado.Nombre:=Traslado[I].Impuesto;
+        ImpuestoTrasladado.Tasa:=StrToFloat(Traslado[I].Tasa);
+        ImpuestoTrasladado.Importe:=StrToFloat(Traslado[I].Importe);
 
-  // Establecemos las propiedades generales del comprobante
-  fComprobanteFiscal.FormaDePago:=fpUnaSolaExhibicion;
-  fComprobanteFiscal.Tipo:=tcIngreso;
-  fComprobanteFiscal.AsignarDescuento(0,'');
+        fComprobanteFiscal.AgregarImpuestoTrasladado(ImpuestoTrasladado);
+      end;
+    end;
 
-  // Asignamos el subtotal de la factura
-  fComprobanteFiscal.SubTotal := Concepto1.Importe + Concepto2.Importe + Concepto3.Importe;
+    // Checamos si el XML proveido tiene los totales de impuestos desglosados...
+    if fXmlComprobantePrueba.Impuestos.TotalImpuestosTrasladados <> '' then
+       fComprobanteFiscal.DesglosarTotalesImpuestos:=True
+    else
+       fComprobanteFiscal.DesglosarTotalesImpuestos:=False;
 
-  // Asignamos el total de la factura (subtotal + impuestos)
-  fComprobanteFiscal.Total := fComprobanteFiscal.SubTotal + (Impuesto1.Importe + Impuesto2.Importe + Impuesto3.Importe);
+    // Que forma de pago tuvo??
+    // Asignamos el mismo texto de la forma de pago ya que unos usan mayusculas otros minusculas, etc.
+    if AnsiPos('UNA',Uppercase(fXmlComprobantePrueba.FormaDePago)) > 0 then
+    begin
+       fComprobanteFiscal._CADENA_PAGO_UNA_EXHIBICION := fXmlComprobantePrueba.FormaDePago;
+       fComprobanteFiscal.FormaDePago:=fpUnaSolaExhibicion;
+    end else
+    begin
+       fComprobanteFiscal._CADENA_PAGO_PARCIALIDADES:= fXmlComprobantePrueba.FormaDePago;
+       fComprobanteFiscal.FormaDePago:=fpParcialidades;
+    end;
 
+    // Tipo de comprobante
+    if fXmlComprobantePrueba.TipoDeComprobante = 'ingreso' then
+       fComprobanteFiscal.Tipo:=tcIngreso;
+
+    if fXmlComprobantePrueba.TipoDeComprobante = 'egreso' then
+       fComprobanteFiscal.Tipo:=tcEgreso;
+
+    if fXmlComprobantePrueba.TipoDeComprobante = 'traslado' then
+       fComprobanteFiscal.Tipo:=tcTraslado;
+
+    // Asignamos el descuento
+    if fXmlComprobantePrueba.Descuento <> '' then
+       fComprobanteFiscal.AsignarDescuento(StrToFloat(fXmlComprobantePrueba.Descuento),'');
+
+    // Asignamos el subtotal de la factura
+    fComprobanteFiscal.SubTotal := dSubTotal;
+
+    // Asignamos el total de la factura (subtotal + impuestos)
+    fComprobanteFiscal.Total := fComprobanteFiscal.SubTotal +
+                                fComprobanteFiscal.TotalImpuestosRetenidos +
+                                fComprobanteFiscal.TotalImpuestosTrasladados;
+
+    // Regresamos el sello del XML leido
+    Result:=fXmlComprobantePrueba.Sello;
+end;
+
+procedure TestTFEComprobanteFiscal.CadenaOriginal_DeComprobante_SeaCorrecta;
+var
+  sCadenaOriginalCorrecta: WideString;
+  Certificado: TFECertificado;
+const
+  // Archivos de ejemplo del SAT usados por la aplicacion MicroE del SAT
+  // Ref: http://www.sat.gob.mx/sitio_internet/servicios/20_16360.html
+  _MICROE_ARCHIVO_CERTIFICADO = 'comprobante_fiscal\FIFC000101AM1.cer';
+  _MICROE_ARCHIVO_LLAVE_PRIVADA = 'comprobante_fiscal\FIFC000101AM1.key';
+  _MICROE_CLAVE_LLAVE_PRIVADA = '12345678a';
+begin
+  // Leemos la cadena original generada por el programa de MicroE del SAT. (que
+  // copiamos y pegamos del PDF que genero)
+  sCadenaOriginalCorrecta := leerContenidoDeFixture('comprobante_fiscal/factura_cadena_original.txt');
+
+  // Llenamos el comprobante fiscal con datos usados para generar la factura
+  Certificado.Ruta := fRutaFixtures + _MICROE_ARCHIVO_CERTIFICADO;
+  Certificado.LlavePrivada.Ruta := fRutaFixtures + _MICROE_ARCHIVO_LLAVE_PRIVADA;
+  Certificado.LlavePrivada.Clave := _MICROE_CLAVE_LLAVE_PRIVADA;
+
+  GenerarComprobanteFiscal(fRutaFixtures + 'comprobante_fiscal/comprobante_cadena_original.xml',
+                           Certificado);
+
+  guardarArchivoTemporal(fComprobanteFiscal.CadenaOriginal, 'test_cadena_original.txt');
+  // Comparamos el resultado del metodo de la clase con el del archivo codificado con la funcion
+  // UTF8Encode
   CheckEquals(sCadenaOriginalCorrecta, fComprobanteFiscal.CadenaOriginal,
              'La cadena original no fue generada correctamente');
+end;
+
+procedure TestTFEComprobanteFiscal.SelloDigital_DeComprobante_SeaCorrecto;
+var
+  sSelloDigitalCorrecto: String;
+  Certificado: TFECertificado;
+begin
+  // Llenamos los datos que fueron usados para generar dicho comprobante
+  Certificado.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.cer';
+  Certificado.LlavePrivada.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.key';
+  Certificado.LlavePrivada.Clave := '12345678a';
+
+  // Llenamos el comprobante fiscal con datos usados para generar la factura
+  sSelloDigitalCorrecto := GenerarComprobanteFiscal(fRutaFixtures +  'comprobante_fiscal/comprobante_para_sello_digital.xml',
+                           Certificado);
+
+  // TEMPORAL:
+  guardarArchivoTemporal(fComprobanteFiscal.CadenaOriginal, 'cad_orig.txt');
+
+  CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
+              'El sello digital no fue calculado correctamente');
+end;
+
+procedure TestTFEComprobanteFiscal.XML_DeComprobanteHecho_GenereXMLCorrectamente;
+var
+  sSelloDigitalCorrecto: String;
+  Certificado: TFECertificado;
+  fDocXML: TXMLDocument;
+begin
+  // Llenamos los datos que fueron usados para generar dicho comprobante
+  Certificado.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.cer';
+  Certificado.LlavePrivada.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.key';
+  Certificado.LlavePrivada.Clave := '12345678a';
+
+  // Llenamos el comprobante fiscal con datos usados para generar la factura
+  sSelloDigitalCorrecto := GenerarComprobanteFiscal(fRutaFixtures +  'comprobante_fiscal/comprobante_correcto.xml',
+                           Certificado);
+
+   // TEMPORAL:
+  guardarArchivoTemporal(fComprobanteFiscal.CadenaOriginal, 'mycadena.txt');
+  fComprobanteFiscal.GuardarEnArchivo(fDirTemporal + 'myxml.xml');
+
+  CheckEquals(True, True, '');
 end;
 
 procedure TestTFEComprobanteFiscal.Create_NuevoComprobante_GenereEstructuraXMLBasica;
@@ -460,7 +625,7 @@ begin
     NoExterior := '06700';
     NoInterior := '';
     CodigoPostal := '95465';
-    Colonia := 'Prau Prau';
+    Colonia := 'Cienegas';
     Municipio := 'Monterrey';
     Estado := 'Nuevo León';
     Pais := 'México';

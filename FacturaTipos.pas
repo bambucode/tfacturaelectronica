@@ -38,6 +38,10 @@ TFEDireccion = record
   Referencia: String;
 end;
 
+// Expedido en es un "alias" de direccion, la definimos por si en el
+// futuro diferente en algo a al direccion
+TFEExpedidoEn = TFEDireccion;
+
 TFEDocumentoAduanero = record
   Numero: String;
   Fecha: TDateTime;
