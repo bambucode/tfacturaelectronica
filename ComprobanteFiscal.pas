@@ -76,7 +76,7 @@ type
     procedure setCertificado(Certificado: TFECertificado);
     function getXML(): WideString;
     /// <summary>Obtiene la 'Cadena Original' segun las reglas del Anexo 20</summary>
-    function getCadenaOriginal(): String;
+    function getCadenaOriginal(): TStringCadenaOriginal;
     function getSelloDigital(): String;
     procedure setBloqueFolios(Bloque: TFEBloqueFolios);
     procedure ValidarQueFolioEsteEnRango;
@@ -124,7 +124,7 @@ type
 
     // Propiedades especificas al comprobante electronico
     property XML: WideString read getXML;
-    property CadenaOriginal: String read getCadenaOriginal;
+    property CadenaOriginal: TStringCadenaOriginal read getCadenaOriginal;
     property SelloDigital: String read getSelloDigital;
     property Certificado: TFECertificado read fCertificado write setCertificado;
     property BloqueFolios: TFEBloqueFolios read fBloqueFolios write setBloqueFolios;
@@ -186,12 +186,12 @@ end;
 
 // Generamos la estructura "Cadena Original" de acuerdo a las reglas del SAT
 // definidas en: http://www.sat.gob.mx/sitio_internet/e_sat/comprobantes_fiscales/15_6543.html
-function TFEComprobanteFiscal.getCadenaOriginal(): String;
+function TFEComprobanteFiscal.getCadenaOriginal(): TStringCadenaOriginal;
 const
   _PIPE = '|';
 
 var
-  sRes: String;
+  sRes: TStringCadenaOriginal;
   I: Integer;
 
   // Funcion usada para remover los espacios internos
@@ -375,7 +375,7 @@ begin
   // TODO: Arreglar nodo Complemento segun la regla 10
 
   // 8) Datos de Cada Retención de Impuestos
-  if fTotalImpuestosRetenidos > 0 then  // Solo accedemos al nodo XML si hubo retenciones
+  if fTotalImpuestosRetenidos > 0 then // Solo accedemos al nodo XML si hubo retenciones
     for I := 0 to fXmlComprobante.Impuestos.Retenciones.Count - 1 do
     begin
       with fXmlComprobante.Impuestos.Retenciones do
@@ -405,9 +405,8 @@ begin
 
   // 6. El final de la cadena original será expresado mediante una cadena de caracteres || (doble “pipe”).
   // 7. Toda la cadena de original se encuentra expresada en el formato de codificación UTF-8.
-  sRes := UTF8Encode(sRes + _PIPE);
   // Solo agregamos un PIPE mas porque el ultimo atributo tiene al final su pipe.
-  result := sRes;
+  result := UTF8Encode(sRes + _PIPE);
 end;
 
 // Regresamos la Cadena Original de este comprobante fiscal segun las reglas
@@ -752,7 +751,6 @@ var
   TipoDigestion: TTipoDigestionOpenSSL;
   SelloDigital: TSelloDigital;
   sRes: String;
-  sCadenaOriginal: WideString;
 begin
   sRes := '';
   // Segun la leglislacion vigente si la factura se hace antes del 1 de Enero del 2011, usamos MD5
@@ -763,8 +761,7 @@ begin
 
   try
     // Creamos la clase SelloDigital que nos ayudara a "sellar" la factura en XML
-    sCadenaOriginal := Self.CadenaOriginal;
-    SelloDigital := TSelloDigital.Create(sCadenaOriginal, fCertificado, TipoDigestion);
+    SelloDigital := TSelloDigital.Create(Self.CadenaOriginal, fCertificado, TipoDigestion);
 
     // Finalmente regresamos la factura en XML con todas sus propiedades llenas
     sRes := SelloDigital.SelloCalculado;

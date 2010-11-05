@@ -19,6 +19,16 @@ interface
 
 type
 
+// El tipo de String en el que debe estar codificada la "Cadena Original"
+// ya que al estar en UTF8 Delphi 2007 necesita que sea del tipo UTF8String
+// y si es Delphi 2009 o superior necesita que sea RawByteString
+// Si NO se usan estos tipos de datos se pierden caracteres en memoria
+{$IF Compilerversion >= 20}
+TStringCadenaOriginal = RawByteString;
+{$ELSE}
+TStringCadenaOriginal = UTF8String;
+{$IFEND}
+
 TFEFolio = Integer;
 TFESerie = String;
 

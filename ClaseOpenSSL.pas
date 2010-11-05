@@ -19,8 +19,15 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils;
 
   type
 
+    {$IF Compilerversion >= 20}
+    TCadenaUTF8 = RawByteString;
+    {$ELSE}
+    TCadenaUTF8 = UTF8String;
+    {$IFEND}
+
     TTipoDigestionOpenSSL = (tdMD5, tdSHA1);
     TNoExisteArchivoException = Exception;
+    TCertificadoLlaveEsFiel = Exception;
     TLlaveFormatoIncorrectoException = Exception;
     TLlaveLecturaException = Exception;
     TLlavePrivadaClaveIncorrectaException = Exception;
@@ -42,12 +49,15 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils;
     public
         /// <summary>Crea el objeto, inicializa la liberia OpenSSL, y establece la llave privada a usar</summary>
         constructor Create(); overload;
-        /// <summary>Hace una digestion (hashing) de la Cadena segun el Tipo de digestion y regresa el resultado en formato base64</summary>
-        /// <param name="ArchivoLlavePrivada">Ruta completa al archivo de llave privada a usar (archivo con extension .key)</param>
+        /// <summary>Hace una digestion (hashing) de la Cadena segun el Tipo de digestion y regresa el
+        /// resultado en formato base64</summary>
+        /// <param name="ArchivoLlavePrivada">Ruta completa al archivo de llave privada a usar
+        /// (archivo con extension .key)</param>
         /// <param name="ClaveLlavePrivada">La clave privada a usar para abrir el archivo de llave privada</param>
-        /// <param name="sCadena">Cadena a la cual se va a hacer la digestion</param>
+        /// <param name="sCadena">Cadena a la cual se va a hacer la digestion (pre-codificada en UTF8)</param>
         /// <param name="trTipo">Tipo de digestion a realizar (tdMD5, tdSHA1)</param>
-        function HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String; sCadena: WideString; trTipo: TTipoDigestionOpenSSL) : String;
+        function HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String; sCadena: TCadenaUTF8;
+                 trTipo: TTipoDigestionOpenSSL) : String;
         /// <summary>Obtiene un certificado con sus propiedades llenas</summary>
         /// <param name="sArchivo">Ruta completa del archivo de certificado (extension .cer)</param>
         function ObtenerCertificado(sArchivo: String) : TX509Certificate;
@@ -56,7 +66,7 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils;
 
 implementation
 
-uses  StrUtils, libeay32plus, dialogs;
+uses  StrUtils, libeay32plus;
 
 constructor TOpenSSL.Create();
 begin
@@ -64,10 +74,6 @@ begin
   OpenSSL_add_all_ciphers;
   OpenSSL_add_all_digests;
   ERR_load_crypto_strings;
-
-  // Seed the pseudo-random number generator
-  // This should be something a little more "random"!
-  // RAND_load_file('c:\windows\paint.exe', 512);
 end;
 
 destructor TOpenSSL.Destroy;
@@ -123,7 +129,7 @@ end;
 function TOpenSSL.ObtenerUltimoMensajeDeError: string;
 var
   {$IF CompilerVersion >= 20}
-     ErrMsg: array [0..160] of WideChar;
+     ErrMsg: array [0..160] of AnsiChar;
   {$ELSE}
       ErrMsg: array [0..160] of Char;
   {$IFEND}
@@ -150,8 +156,6 @@ var
         p8pass: PChar;
     {$IFEND}
 begin
-
-
     // Creamos el objeto en memoria para leer la llave en formato binario .DER (.KEY)
     bioArchivoLlave := BIO_new(BIO_s_file());
 
@@ -160,7 +164,8 @@ begin
 
     // Checamos que la extension de la llave privada sea la correcta
     if AnsiPos('.PEM', Uppercase(fArchivoLlavePrivada)) > 0 then
-      Raise TLlaveFormatoIncorrectoException.Create('La llave privada debe de ser el archivo binario (.key, .cer) y no el formato base64 .pem');
+      Raise TLlaveFormatoIncorrectoException.Create('La llave privada debe de ser el archivo binario (.key, .cer) y ' +
+            'no el formato base64 .pem');
 
     // Leemos el archivo de llave binario en el objeto creado en memoria
     // DIferentes parametros si usa Delphi 2009 o superior...
@@ -169,7 +174,8 @@ begin
     {$ELSE}
         if BIO_read_filename(bioArchivoLlave, PChar(AnsiString(fArchivoLlavePrivada))) = 0 then
     {$IFEND}
-          raise TLlaveLecturaException.Create('Error al leer llave privada. Error reportado: '+ ObtenerUltimoMensajeDeError);
+          raise TLlaveLecturaException.Create('Error al leer llave privada. Error reportado: '+
+                ObtenerUltimoMensajeDeError);
 
     // Convertimos al tipo adecuado de acuerdo a la version de Delphi...
     {$IF CompilerVersion >= 20}
@@ -186,7 +192,8 @@ begin
         //  Leemos la llave en formato binario (PKCS8)
         p8 := d2i_PKCS8_bio(bioArchivoLlave, nil);
         if not Assigned(p8) then
-          raise TLlaveLecturaException.Create('Error al leer llave privada. Error reportado: '+ ObtenerUltimoMensajeDeError);
+          raise TLlaveLecturaException.Create('Error al leer llave privada. Error reportado: '+
+                ObtenerUltimoMensajeDeError);
 
         // Des encriptamos la llave en memoria usando la clave proporcionada
         p8inf := PKCS8_decrypt(p8, p8pass, StrLen(p8pass));
@@ -196,10 +203,17 @@ begin
            // TODO: Crear excepciones para los diferentes tipos de error que puede haber al
            // tratar de desencriptar la llave privada
            // Llave incorrecta (Mensaje exacto: 23077074:PKCS12 routines:PKCS12_pbe_crype:pkcs12 cipherfinal error)
-           if AnsiPos('cipherfinal error', sMsgErr) > 0 then
+           if ((AnsiPos('cipherfinal error', sMsgErr) > 0) or (AnsiPos('bad decrypt', sMsgErr) > 0)) then
               raise TLlavePrivadaClaveIncorrectaException.Create('La clave de la llave privada fue incorrecta')
            else
-              raise TLlaveLecturaException.Create('Error al desencriptar llave privada. Error reportado: '+ ObtenerUltimoMensajeDeError);
+              raise TLlaveLecturaException.Create('Error desconocido al desencriptar llave privada. Error reportado: '+
+                    ObtenerUltimoMensajeDeError);
+
+           // No esta dando un certificado de la FIEL??
+           {if AnsiPos('bad decrypt', sMsgErr) > 0 then
+              raise TCertificadoLlaveEsFiel.Create('El certificado (archivo de llave) pertenece a la FIEL. + '
+              'Use el certificado de Llave Privada')
+           else}
         end;
     finally
         // Liberamos las variables usadas en memoria
@@ -236,15 +250,17 @@ begin
   Result:=CertX509;
 end;
 
-function TOpenSSL.HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String; sCadena: WideString; trTipo: TTipoDigestionOpenSSL) : String;
+
+function TOpenSSL.HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String; sCadena: TCadenaUTF8;
+         trTipo: TTipoDigestionOpenSSL) : String;
 var
   mdctx: EVP_MD_CTX;
   {$IF CompilerVersion >= 20}
       Inbuf: Array [0..8192] of AnsiChar;
-      Outbuf: array [0..1023] of AnsiChar;
+      Outbuf: array [0..1024] of AnsiChar;
   {$ELSE}
-      Inbuf: Array [0..8192] of Char;
-      Outbuf: array [0..1023] of Char;
+      Inbuf, HexRes: Array [0..8192] of Char;
+      Outbuf: array [0..1024] of Char;
   {$IFEND}
 	ekLlavePrivada: pEVP_PKEY;
   Len: cardinal;
@@ -254,7 +270,11 @@ begin
 
   Len:=0;
   ekLlavePrivada := ObtenerLlavePrivadaDesencriptada;
-  // Copiamos la cadena al buffer de entrada
+
+  // NOTA IMPORTANTE:
+  // Esta funcion debe de recibir RawByteString en Delphi 2009 o superior y tipo UTF8String en Delphi 2007
+  // de lo contrario no copiara correctamente los datos en memoria regresando sellos invalidos
+  //CodeSite.Send('CodePage',StringCodePage(sCadena));
   StrPCopy(inbuf,sCadena);
 
   if not Assigned(ekLlavePrivada) then
@@ -273,6 +293,7 @@ begin
   // Liberamos el puntero a la llave privada usada previamente
   EVP_PKEY_free(ekLlavePrivada);
 
+  // Regresa los resultados en formato Base64
 	Result := BinToBase64(@outbuf,Len);
 end;
 

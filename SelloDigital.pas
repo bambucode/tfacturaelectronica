@@ -25,7 +25,7 @@ type
 /// 'sellar' la factura electrónica.
 ///</summary>
 TSelloDigital = class
-    fCadenaOriginal: WideString;
+    fCadenaOriginal: TStringCadenaOriginal;
     fDigestion: TTipoDigestionOpenSSL;
     fOpenSSL: TOpenSSL;
     fCertificado: TFECertificado;
@@ -33,7 +33,7 @@ TSelloDigital = class
 private
     function calcularSello(): WideString;
 public
-    constructor Create(sCadenaOriginal: WideString; Certificado: TFECertificado; TipoDigestion: TTipoDigestionOpenSSL);
+    constructor Create(sCadenaOriginal: TStringCadenaOriginal; Certificado: TFECertificado; TipoDigestion: TTipoDigestionOpenSSL);
     destructor Destroy; override;
     property SelloCalculado : WideString read calcularSello;
 end;
@@ -42,7 +42,7 @@ implementation
 
 uses Sysutils, StrUtils;
 
-constructor TSelloDigital.Create(sCadenaOriginal: WideString; Certificado: TFECertificado; TipoDigestion: TTipoDigestionOpenSSL);
+constructor TSelloDigital.Create(sCadenaOriginal: TStringCadenaOriginal; Certificado: TFECertificado; TipoDigestion: TTipoDigestionOpenSSL);
 begin
   inherited Create;
   // Creamos nuestra clase OpenSSL usada para hacer la digestión
@@ -62,9 +62,14 @@ end;
 function TSelloDigital.calcularSello : WideString;
 begin
   // TODO: Checar que la cadena original este validada (este codificada con UTF8, etc)
-  Result:=fOpenSSL.HacerDigestion(fCertificado.LlavePrivada.Ruta, fCertificado.LlavePrivada.Clave, fCadenaOriginal, fDigestion);
+  Result:=fOpenSSL.HacerDigestion(fCertificado.LlavePrivada.Ruta,
+                                  fCertificado.LlavePrivada.Clave,
+                                  fCadenaOriginal,
+                                  fDigestion);
   // TODO: Checar
-  // El Data Binding del cfdv2.xsl se genera muy bien pero aveces resulta que, por ejemplo, el cliente NO tiene "Numero Interior" o "Colonia" es por eso que en la unidad cfdv2.pas te recomiendo hacer una busqueda y remplazo de :
+  // El Data Binding del cfdv2.xsl se genera muy bien pero aveces resulta que, por ejemplo, el
+  // cliente NO tiene "Numero Interior" o "Colonia" es por eso que en la unidad cfdv2.pas te recomiendo
+  // hacer una busqueda y remplazo de :
 end;
 
 end.

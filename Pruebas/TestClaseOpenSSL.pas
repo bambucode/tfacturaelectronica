@@ -99,6 +99,17 @@ const
   _ARCHIVO_LLAVE_PEM = 'aaa010101aaa_CSD_02.pem';
   _ARCHIVO_CADENA_TEMPORAL = 'cadena_hacerdigestion.txt';
   _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL = 'md5_cadena_hacerdigestion.txt';
+
+  procedure guardarArchivoEnUTF8(sContenido: TStringCadenaOriginal; sArchivo: String);
+  var
+    txt : TextFile;
+  begin
+    AssignFile(txt, fDirTemporal + sArchivo);
+    Rewrite(txt);
+    Write(txt, sContenido);
+    CloseFile(txt);
+  end;
+
 begin
   // Borramos los archivos temporales que vamos a usar si acaso existen (de pruebas pasadas)
   BorrarArchivoTempSiExiste(_ARCHIVO_CADENA_TEMPORAL);
@@ -106,7 +117,7 @@ begin
   BorrarArchivoTempSiExiste('md5_cadena_de_prueba.bin');
 
   // Guardamos el contenido de la cadena de prueba a un archivo temporal
-  guardarArchivoTemporal(UTF8Encode(_CADENA_DE_PRUEBA), _ARCHIVO_CADENA_TEMPORAL);
+  guardarArchivoEnUTF8(UTF8Encode(_CADENA_DE_PRUEBA), _ARCHIVO_CADENA_TEMPORAL);
 
   // Primero hacemos la digestion usando openssl.exe y la linea de comandos
   EjecutarComandoOpenSSL('dgst -md5 -sign "' + fRutaFixtures + 'openssl\' +

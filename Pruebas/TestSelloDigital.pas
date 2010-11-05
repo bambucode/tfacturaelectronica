@@ -21,7 +21,7 @@ type
   TestTSelloDigital = class(TTestPrueba)
   strict private
     fSelloDigital: TSelloDigital;
-    fCadenaOriginalAProbar : WideString;
+    fCadenaOriginalAProbar : TStringCadenaOriginal;
     fCertificado: TFECertificado;
   public
     procedure SetUp; override;
@@ -46,7 +46,7 @@ end;
 
 procedure TestTSelloDigital.SelloCalcualado_DeCadenaOriginalConMD5_SeaCorrecto;
 var
-  SelloDigitalCorrecto, ResultadoSelloCalculado: WideString;
+  SelloDigitalCorrecto, ResultadoSelloCalculado: String;
 const
   _LONGITUD_SELLO_DIGITAL = 172;
 begin
