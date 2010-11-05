@@ -1,4 +1,4 @@
-(******************************************************************************
+{******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
  Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
 
@@ -11,7 +11,7 @@
 
  La licencia de este codigo fuente se encuentra en:
  http://github.com/bambucode/bc_facturaelectronica/blob/master/LICENCIA
- ******************************************************************************)
+ ******************************************************************************}
 
 unit SelloDigital;
 

@@ -1,4 +1,4 @@
-(* *****************************************************************************
+{* *****************************************************************************
   PROYECTO FACTURACION ELECTRONICA
   Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
 
@@ -10,7 +10,7 @@
 
   La licencia de este codigo fuente se encuentra en:
   http://github.com/bambucode/bc_facturaelectronica/blob/master/LICENCIA
-  ***************************************************************************** *)
+  ***************************************************************************** *}
 unit ComprobanteFiscal;
 
 interface
@@ -82,7 +82,7 @@ type
     procedure ValidarQueFolioEsteEnRango;
 
   public
-  // Version del CFD que implementa este cÛdigo
+  // Version del CFD que implementa este c√≥digo
     const
     Version = '2';
     constructor Create();
@@ -111,7 +111,7 @@ type
     /// <summary>Agrega un nuevo concepto al comprobante</summary>
     /// <param name="Concepto">La estructura del concepto con todos los datos del mismo.</param>
     procedure AgregarConcepto(Concepto: TFEConcepto);
-    /// <summary>Agrega un nuevo impuesto de retenciÛn (ISR, IVA) al comprobante generando su XML
+    /// <summary>Agrega un nuevo impuesto de retenci√≥n (ISR, IVA) al comprobante generando su XML
     /// y sumandolo al total de dicho impuesto. </summary>
     /// <param name="NuevoImpuesto">El nuevo Impuesto con los datos de nombre e importe del mismo</param>
     procedure AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoRetenido);
@@ -144,7 +144,7 @@ uses FacturaReglamentacion, Dialogs, ClaseOpenSSL, StrUtils, SelloDigital,
 // Al crear el objeto, comenzamos a "llenar" el XML interno
 constructor TFEComprobanteFiscal.Create();
 begin
-  _CADENA_PAGO_UNA_EXHIBICION := 'Una sola exhibiciÛn';
+  _CADENA_PAGO_UNA_EXHIBICION := 'Una sola exhibici√≥n';
   _CADENA_PAGO_PARCIALIDADES := 'En parcialidades';
 
   sCadenaOriginal := '';
@@ -231,8 +231,8 @@ var
 
   function LimpiaCampo(sTexto: String): String;
   begin
-    // 1. Ninguno de los atributos que conforman al comprobante fiscal digital deber· contener el caracter | (ìpipeî)
-    // debido a que este ser· utilizado como caracter de control en la formaciÛn de la cadena original.
+    // 1. Ninguno de los atributos que conforman al comprobante fiscal digital deber√° contener el caracter | (‚Äúpipe‚Äù)
+    // debido a que este ser√° utilizado como caracter de control en la formaci√≥n de la cadena original.
     sTexto := AnsiReplaceStr(sTexto, _PIPE, '');
     // Quitamos los retornos de carro
     // Reemplazamos los TABs, retornos de carro por espacios  (Regla 5.a) del Anexo 20
@@ -246,7 +246,7 @@ var
 
   procedure AgregarAtributo(NodoPadre: IXMLNode; sNombreAtributo: String);
   begin
-    // 5. Los datos opcionales no expresados, no aparecer·n en la cadena original y no tendr·n delimitador alguno.
+    // 5. Los datos opcionales no expresados, no aparecer√°n en la cadena original y no tendr√°n delimitador alguno.
     // Si se nos fue especificado un nodo "padre" checamos si tiene al atributo hijo
     // si no, ni siquiera lo "consultamos" ya que lo agregaria al XML con valores vacios
     if Assigned(NodoPadre) then
@@ -313,7 +313,7 @@ begin
 
   sRes := '';
 
-  // 2. El inicio de la cadena original se encuentra marcado mediante una secuencia de caracteres || (doble ìpipeî).
+  // 2. El inicio de la cadena original se encuentra marcado mediante una secuencia de caracteres || (doble ‚Äúpipe‚Äù).
   sRes := _PIPE + _PIPE;
   // 1) Datos del comprobante
 
@@ -337,7 +337,7 @@ begin
   AgregarAtributo(fXmlComprobante.Emisor, 'nombre');
   // 3) Datos del domicilio fiscal del emisor
   AgregarUbicacionFiscal(fXmlComprobante.Emisor.DomicilioFiscal);
-  // 4) Datos del Domicilio de ExpediciÛn del Comprobante
+  // 4) Datos del Domicilio de Expedici√≥n del Comprobante
   if (Trim(fExpedidoEn.Calle) <> '') then
     AgregarUbicacion(fXmlComprobante.Emisor.ExpedidoEn);
   // 5) Datos del Receptor
@@ -374,7 +374,7 @@ begin
   // TODO: Agregar los "ComplementoConcepto" regla 9 del Anexo 20
   // TODO: Arreglar nodo Complemento segun la regla 10
 
-  // 8) Datos de Cada RetenciÛn de Impuestos
+  // 8) Datos de Cada Retenci√≥n de Impuestos
   if fTotalImpuestosRetenidos > 0 then // Solo accedemos al nodo XML si hubo retenciones
     for I := 0 to fXmlComprobante.Impuestos.Retenciones.Count - 1 do
     begin
@@ -403,8 +403,8 @@ begin
   if fDesglosarTotalesImpuestos = True then
     AgregarAtributo(fXmlComprobante.Impuestos, 'totalImpuestosTrasladados');
 
-  // 6. El final de la cadena original ser· expresado mediante una cadena de caracteres || (doble ìpipeî).
-  // 7. Toda la cadena de original se encuentra expresada en el formato de codificaciÛn UTF-8.
+  // 6. El final de la cadena original ser√° expresado mediante una cadena de caracteres || (doble ‚Äúpipe‚Äù).
+  // 7. Toda la cadena de original se encuentra expresada en el formato de codificaci√≥n UTF-8.
   // Solo agregamos un PIPE mas porque el ultimo atributo tiene al final su pipe.
   result := UTF8Encode(sRes + _PIPE);
 end;
@@ -602,16 +602,16 @@ procedure TFEComprobanteFiscal.Cancelar;
 begin
   { http://www.validacfd.com/phpbb3/viewtopic.php?f=15&t=113&p=596&hilit=egreso#p596 - User: Carlos R
     Algunos detalles tecnicos-practicos que generalmente se omiten.
-    * Al cancelar las facturas se deber· incorporar en los reportes mensuales con "|0|". pero no es tan simple.
-    Si es en el mismo dia, tendr·s que insertar la serie y el folio primermente en |1| y posteriormente la declaras en |0|,
+    * Al cancelar las facturas se deber√° incorporar en los reportes mensuales con "|0|". pero no es tan simple.
+    Si es en el mismo dia, tendr√°s que insertar la serie y el folio primermente en |1| y posteriormente la declaras en |0|,
     no de primera mano en |0|. (ojala me haya explicado)
     Variable1: Cancelas el mismo dia
     Variable2: Cancelas el mes
     Variable3: Cancelas otro mes
 
-    en cualquiera de los casos el sistema tendr· que ser capaz de incorporarlo en el reporte como cancelado.
+    en cualquiera de los casos el sistema tendr√° que ser capaz de incorporarlo en el reporte como cancelado.
 
-    Si adem·s de la cancelaciÛn se realizÛ nota de crÈdito (por devoluciÛn o por descuento) el sistema deber· de
+    Si adem√°s de la cancelaci√≥n se realiz√≥ nota de cr√©dito (por devoluci√≥n o por descuento) el sistema deber√° de
     generar el documento como un "egreso", recuerda que para el SAT solo existen: INGRESO, EGRESO, TRASLADO.
   }
 end;
