@@ -25,6 +25,13 @@ Requerimientos técnicos
 - Contar con librerias libeay32.dll, ssleay32.dll y el ejecutable openssl.exe (solo para las pruebas automatizadas)
 las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/binaries.html>
 
+¿Qué falta por implementar?
+-------------
+- Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT.
+- Implementar la version 3 de los CFD (o comprobantes digitales en linea).
+- Manejo y pruebas de conceptos con datos aduanales.
+- Manejo y pruebas de articulos con cuenta predial.
+
 Notas adicionales
 ------------
 El ejecutable que use esta libreria deberá contar con los archivos DLL de openssl en el mismo directorio de la
