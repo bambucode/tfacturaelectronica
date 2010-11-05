@@ -67,8 +67,14 @@ end;
 
 procedure TestTOpenSSL.EjecutarComandoOpenSSL(sComando: String);
 begin
-  ShellExecute(Application.Handle,nil,PChar('cmd.exe'),
+  {$IF CompilerVersion >= 20}
+      ShellExecute(Application.Handle,nil,PChar('cmd.exe'),
+               PWideChar('/c ' + _RUTA_OPENSSL_EXE + ' ' + sComando),nil,SW_HIDE);
+  {$ELSE}
+      ShellExecute(Application.Handle,nil,PChar('cmd.exe'),
                PChar('/c ' + _RUTA_OPENSSL_EXE + ' ' + sComando),nil,SW_HIDE);
+  {$IFEND}
+
   // Hacemos esperar 1 segundo para que termine openssl.exe.
   Sleep(1000);
 end;
@@ -85,7 +91,10 @@ var
 const
   // Se puede probar la efectividad del metodo cambiando la siguiente cadena
   // la cual debe ser la misma entre el resultado de la clase y de comandos manuales de Openssl.exe
-  _CADENA_DE_PRUEBA = 'Esta es una cadena de prueba para la digestion';
+  _CADENA_DE_PRUEBA = '||2.0|AA|2|2010-11-03T13:36:23|35|2008|ingreso|UNA SOLA EXHIBICIÓN|13360.00|0.00|15497.60|FIFC000101AM1|CONTRIBUYENTE DE PRUEBA' +
+               ' FICTICIO FICTICIO|1|99|CENTRO|SAN MIGUEL XOXTLA|SAN MIGUEL XOXTLA|PUEBLA|MÉXICO|72620|CPC400101CM9|CONTRIBUYENTE DE PRUEBA CUATRO' +
+               ' SA DE CV|AV HIDALGO|77|GUERRERO|DISTRITO FEDERAL|México|06300|1.00|PZ|1|Mac Book Air|10000.00|10000.00|3.00|PZ|2|Magic Mouse|900.00' +
+               '|2700.00|5.50|HRS|3|Servicio de soporte técnico|120.00|660.00|IVA|16.00|1600.00|IVA|16.00|432.00|IVA|16.00|105.60|2137.60||';
 
   _ARCHIVO_LLAVE_PEM = 'aaa010101aaa_CSD_02.pem';
   _ARCHIVO_CADENA_TEMPORAL = 'cadena_hacerdigestion.txt';
@@ -97,7 +106,7 @@ begin
   BorrarArchivoTempSiExiste('md5_cadena_de_prueba.bin');
 
   // Guardamos el contenido de la cadena de prueba a un archivo temporal
-  guardarArchivoTemporal(_CADENA_DE_PRUEBA, _ARCHIVO_CADENA_TEMPORAL);
+  guardarArchivoTemporal(UTF8Encode(_CADENA_DE_PRUEBA), _ARCHIVO_CADENA_TEMPORAL);
 
   // Primero hacemos la digestion usando openssl.exe y la linea de comandos
   EjecutarComandoOpenSSL('dgst -md5 -sign "' + fRutaFixtures + 'openssl\' +
@@ -113,7 +122,7 @@ begin
   // Quitamos los retornos de carro ya que la codificacion Base64 de OpenSSL la regresa con ENTERs
   sResultadoMD5OpenSSL := QuitarRetornos(leerContenidoDeArchivo(fDirTemporal + _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL));
   // Ahora, hacemos la digestion con la libreria
-  sResultadoMD5DeClase := fOpenSSL.HacerDigestion(fArchivoLlavePrivada, fClaveLlavePrivada,_CADENA_DE_PRUEBA, tdMD5);
+  sResultadoMD5DeClase := fOpenSSL.HacerDigestion(fArchivoLlavePrivada, fClaveLlavePrivada, UTF8Encode(_CADENA_DE_PRUEBA), tdMD5);
 
   // Comparamos los resultados (sin retornos de carro), los cuales deben de ser los mismos
   CheckEquals(sResultadoMD5OpenSSL, sResultadoMD5DeClase, 'La digestion MD5 de la clase no fue la misma que la de OpenSSL');
