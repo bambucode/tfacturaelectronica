@@ -3,8 +3,8 @@
  Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
 
  Clase usada para generar el Sello Digital de una Cadena Original proveniente
- de una factura electr髇ica. Aqui se especifican todas las reglas especificadas
- por el SAT para la generaci髇 del mismo.
+ de una factura electr贸nica. Aqui se especifican todas las reglas especificadas
+ por el SAT para la generaci贸n del mismo.
 
  Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
  http://bambucode.com/codigoabierto
@@ -22,7 +22,7 @@ uses  Windows, FacturaTipos, ClaseOpenSSL;
 type
 
 ///<summary>Representa el Sello Digital con el cual debemos de
-/// 'sellar' la factura electr髇ica.
+/// 'sellar' la factura electr贸nica.
 ///</summary>
 TSelloDigital = class
     fCadenaOriginal: TStringCadenaOriginal;
@@ -45,7 +45,7 @@ uses Sysutils, StrUtils;
 constructor TSelloDigital.Create(sCadenaOriginal: TStringCadenaOriginal; Certificado: TFECertificado; TipoDigestion: TTipoDigestionOpenSSL);
 begin
   inherited Create;
-  // Creamos nuestra clase OpenSSL usada para hacer la digesti髇
+  // Creamos nuestra clase OpenSSL usada para hacer la digesti贸n
   fOpenSSL:=TOpenSSL.Create();
   fCadenaOriginal:=sCadenaOriginal;
   fDigestion:=TipoDigestion;
