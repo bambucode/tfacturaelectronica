@@ -27,6 +27,8 @@
  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
  Adaptado por Pablo Romero (c) 2010 Cordoba, Argentina
+ Modificado por Luis Carrasco (c) Bambu Code SA de CV, Chihuahua, México
+ Funciones añadidas: -AsBase64 : Obtiene el certificado en codificacion Base64
 ******************************************************************************)
 unit OpenSSLUtils;
 
@@ -99,6 +101,7 @@ TX509Certificate = class
     function Text: String;
     procedure LoadFromFile(FileName: string); overload;
     procedure LoadFromFile(FileName: string; Encoding: TEncoding); overload;
+    function AsBase64() : String;
   end;
 TX509CertificateArray = array of TX509Certificate;
 
@@ -162,7 +165,7 @@ function GetErrorMessage: string;
 
 implementation
 
-uses DateUtils;
+uses DateUtils, LibEay32Plus;
 
 constructor EOpenSSL.Create(Msg: string);
 begin
@@ -472,6 +475,36 @@ end;
 procedure TX509Certificate.LoadFromFile(FileName: string);
 begin
 LoadFromFile(Filename, auto);
+end;
+
+// Function created by Luis Carrasco (Bambu Code SA de CV)
+// to obtain the certificate as base64 encoded format.
+function TX509Certificate.AsBase64() : String;
+var
+  bioOut: pBIO;
+  buff: PCharacter;
+  buffsize, I: integer;
+  x: Pointer;
+
+begin
+  // This code was translated from x509.c from the OpenSSL source code
+  Result := '';
+  try
+      OBJ_create(toPCharacter('2.99999.3'),
+                 toPCharacter('SET.ex3'),
+                 toPCharacter('SET x509v3 extension 3'));
+
+      bioOut := BIO_new(BIO_s_mem);
+      i:=PEM_write_bio_X509(bioOut, fCertificate);
+      BuffSize := BIO_pending(bioOut);
+      GetMem(buff, buffsize+1);
+      BIO_read(bioOut, buff, buffsize);
+      Result := StrPas(buff);
+  finally
+      // Free the memory
+      FreeMem(Buff);
+      BIO_free(bioOut);
+  end;
 end;
 
 procedure TX509Certificate.LoadFromFile(FileName: string; Encoding: TEncoding);

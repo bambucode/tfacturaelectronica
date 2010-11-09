@@ -48,6 +48,7 @@ type
 const
   LIBEAY_DLL_NAME = 'libeay32.dll';
 
+function toPCharacter(Str: String) : PCharacter;
 // Las siguientes funciones fueron obtenidas del archivo pkcs8.c del codigo fuente de la
 // libreria OpenSSL 0.9.6.
 function d2i_PKCS8_bio(bp: pBIO; p8: pX509_SIG) : pX509_SIG; cdecl;
@@ -61,6 +62,9 @@ procedure EVP_MD_CTX_init(ctx: PEVP_MD_CTX); cdecl; external LIBEAY_DLL_NAME;
 function EVP_MD_CTX_cleanup(ctx: PEVP_MD_CTX): integer; cdecl; external LIBEAY_DLL_NAME;
 function ASN1_INTEGER_to_BN(ai: pASN1_INTEGER; bn: pBIGNUM): pBIGNUM; cdecl; external LIBEAY_DLL_NAME;
 
+// Funciones necesarias para obtener el Certificado en Base 64
+function OBJ_create(oid, SN, Ln: PCharacter) : Integer; cdecl; external LIBEAY_DLL_NAME;
+
 implementation
 
 uses SysUtils;
@@ -72,6 +76,17 @@ function d2i_PKCS8_PRIV_KEY_INFO; external LIBEAY_DLL_NAME;
 procedure PKCS8_PRIV_KEY_INFO_free; external LIBEAY_DLL_NAME;
 function PKCS8_decrypt; external LIBEAY_DLL_NAME;
 
+{$IF CompilerVersion >= 20}
+    function toPCharacter(Str: String) : PCharacter;
+    begin
+       Result:=PAnsiChar(AnsiString(Str));
+    end;
+{$ELSE}
+    function toPCharacter(Str: String) : PCharacter;
+    begin
+       Result:=PChar(AnsiString(Str));
+    end;
+{$IFEND}
 
 end.
 
