@@ -64,6 +64,7 @@ function ASN1_INTEGER_to_BN(ai: pASN1_INTEGER; bn: pBIGNUM): pBIGNUM; cdecl; ext
 
 // Funciones necesarias para obtener el Certificado en Base 64
 function OBJ_create(oid, SN, Ln: PCharacter) : Integer; cdecl; external LIBEAY_DLL_NAME;
+procedure OBJ_cleanup(); cdecl; external LIBEAY_DLL_NAME;
 
 implementation
 
