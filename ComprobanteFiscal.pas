@@ -56,13 +56,11 @@ type
     fDescuento: Currency;
     sMotivoDescuento: String;
     bIncluirCertificadoEnXML: Boolean;
-    fTotal: Currency;
     fSubTotal: Currency;
     fTotalImpuestosRetenidos: Currency;
     fTotalImpuestosTrasladados: Currency;
     fDesglosarTotalesImpuestos: Boolean;
 
-    procedure setTotal(dMonto: Currency);
     procedure setSubTotal(dMonto: Currency);
     procedure setExpedidoEn(ExpedidoEn: TFeExpedidoEn);
     procedure setTipoComprobante(Tipo: TFeTipoComprobante);
@@ -79,14 +77,12 @@ type
     function getCadenaOriginal(): TStringCadenaOriginal;
     function getSelloDigital(): String;
     procedure setBloqueFolios(Bloque: TFEBloqueFolios);
+    function getTotal() : Currency;
     procedure ValidarQueFolioEsteEnRango;
-
   public
   // Version del CFD que implementa este código
     const
          Version = '2';
-         _CADENA_INICIO_CERTIFICADO = '-----BEGIN CERTIFICATE-----';
-         _CADENA_FIN_CERTIFICADO    = '-----END CERTIFICATE-----';
 
     constructor Create();
     destructor Destroy(); override;
@@ -99,7 +95,7 @@ type
     property FormaDePago: TFEFormaDePago read fFormaDePago write setFormaDePago;
     property Tipo: TFeTipoComprobante read fTipoComprobante write setTipoComprobante;
     property ExpedidoEn: TFeDireccion read fExpedidoEn write setExpedidoEn;
-    property Total: Currency read fTotal write setTotal;
+    property Total: Currency read getTotal;
     property SubTotal: Currency read fSubTotal write setSubTotal;
     property TotalImpuestosRetenidos: Currency read fTotalImpuestosRetenidos;
     property TotalImpuestosTrasladados: Currency read fTotalImpuestosTrasladados;
@@ -131,8 +127,11 @@ type
     property SelloDigital: String read getSelloDigital;
     property Certificado: TFECertificado read fCertificado write setCertificado;
     property BloqueFolios: TFEBloqueFolios read fBloqueFolios write setBloqueFolios;
-    // property Certificado : WideString write setCertificado;
   end;
+
+const
+    _CADENA_INICIO_CERTIFICADO = '-----BEGIN CERTIFICATE-----';
+    _CADENA_FIN_CERTIFICADO    = '-----END CERTIFICATE-----';
 
 implementation
 
@@ -147,7 +146,7 @@ uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
 // Al crear el objeto, comenzamos a "llenar" el XML interno
 constructor TFEComprobanteFiscal.Create();
 begin
-  _CADENA_PAGO_UNA_EXHIBICION := 'Una sola exhibición';
+  _CADENA_PAGO_UNA_EXHIBICION := 'Pago en una sola exhibición';
   _CADENA_PAGO_PARCIALIDADES := 'En parcialidades';
 
   // Establecemos los defaults
@@ -163,7 +162,7 @@ begin
   fBloqueFolios.FolioFinal := -1;
   fFolio := -1;
   // Establecemos los totales en cero...
-  fTotal := 0;
+  fDescuento := 0;
   fSubTotal := 0;
   fTotalImpuestosRetenidos := 0;
   fTotalImpuestosTrasladados := 0;
@@ -316,9 +315,8 @@ begin
       // Opcional
     end;
 
-  // Si se tuvo un descuento lo aplicamos aqui:
-  if fDescuento > 0 then
-    fXmlComprobante.Total := TFEReglamentacion.ComoMoneda(fTotal - fDescuento);
+  // Asignamos el total del comprobante
+  fXmlComprobante.Total := TFEReglamentacion.ComoMoneda(Self.Total);
 
   sRes := '';
 
@@ -462,9 +460,16 @@ end;
   end;
 }
 
+// Regresa el total con descuento si acaso se especifico
+function TFEComprobanteFiscal.getTotal() : Currency;
+begin
+   Result:=fSubTotal + fTotalImpuestosRetenidos + fTotalImpuestosTrasladados - fDescuento;
+end;
+
 procedure TFEComprobanteFiscal.AsignarDescuento(ImporteDescuento: Currency; Motivo: String);
 begin
   fDescuento := ImporteDescuento;
+
   sMotivoDescuento := Motivo;
   fXmlComprobante.Descuento := TFEReglamentacion.ComoMoneda(fDescuento);
 
@@ -745,12 +750,6 @@ begin
   end;
 
   fXmlComprobante.FormaDePago := sForma;
-end;
-
-procedure TFEComprobanteFiscal.setTotal(dMonto: Currency);
-begin
-  fTotal := dMonto;
-  fXmlComprobante.Total := TFEReglamentacion.ComoMoneda(dMonto);
 end;
 
 procedure TFEComprobanteFiscal.setSubTotal(dMonto: Currency);
