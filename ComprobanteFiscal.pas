@@ -1,4 +1,4 @@
-{* *****************************************************************************
+﻿{* *****************************************************************************
   PROYECTO FACTURACION ELECTRONICA
   Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
 
@@ -55,7 +55,7 @@ type
     sForma: String;
     fDescuento: Currency;
     sMotivoDescuento: String;
-
+    bIncluirCertificadoEnXML: Boolean;
     fTotal: Currency;
     fSubTotal: Currency;
     fTotalImpuestosRetenidos: Currency;
@@ -84,7 +84,10 @@ type
   public
   // Version del CFD que implementa este código
     const
-    Version = '2';
+         Version = '2';
+         _CADENA_INICIO_CERTIFICADO = '-----BEGIN CERTIFICATE-----';
+         _CADENA_FIN_CERTIFICADO    = '-----END CERTIFICATE-----';
+
     constructor Create();
     destructor Destroy(); override;
 
@@ -101,8 +104,8 @@ type
     property TotalImpuestosRetenidos: Currency read fTotalImpuestosRetenidos;
     property TotalImpuestosTrasladados: Currency read fTotalImpuestosTrasladados;
     property CondicionesDePago: String read fCondicionesDePago write setCondicionesDePago;
-    property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos
-      write fDesglosarTotalesImpuestos;
+    property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
+    property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML;
 
     /// <summary>Asigna el importe total de descuentos aplicados al comprobante asi como su motivo </summary>
     /// <param name="ImporteDescuento">El monto total de descuentos realizados al comprobante</param>
@@ -147,7 +150,13 @@ begin
   _CADENA_PAGO_UNA_EXHIBICION := 'Una sola exhibición';
   _CADENA_PAGO_PARCIALIDADES := 'En parcialidades';
 
+  // Establecemos los defaults
   sCadenaOriginal := '';
+
+  // Establecemos como default que SI queremos incluir el certificado en el XML
+  // ya que presenta la ventaja de poder validar el comprobante con solo el archivo
+  // XML.
+  bIncluirCertificadoEnXML := True;
 
   // Incializamos los valores del comprobante con datos invalidos
   fBloqueFolios.FolioInicial := -1;
@@ -539,6 +548,19 @@ end;
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
 var
   x509Certificado: TX509Certificate;
+  CertificadoBase64: String;
+
+  // Quita los encabezados, pie y retornos de carro del certificado
+  function QuitarCaracteresNoUsadosEnCertificado(sCertificadoBase64: String) : String;
+  begin
+      sCertificadoBase64:=AnsiReplaceStr(sCertificadoBase64, #13, '');
+      sCertificadoBase64:=AnsiReplaceStr(sCertificadoBase64, #10, '');
+      // Quitamos encabezado del certificado
+      sCertificadoBase64:=AnsiReplaceStr(sCertificadoBase64, _CADENA_INICIO_CERTIFICADO, '');
+      // Quitamos el pie del certificado
+      Result:=AnsiReplaceStr(sCertificadoBase64, _CADENA_FIN_CERTIFICADO, '');
+  end;
+
 begin
   // Ya que tenemos los datos del certificado, lo procesamos para obtener los datos
   // necesarios
@@ -549,6 +571,10 @@ begin
       raise TFECertificadoNoExisteException.Create('No existe el archivo del certificado')
     else
       x509Certificado.LoadFromFile(Certificado.Ruta);
+
+    // Obtenemos el certificado codificado en Base64 para incluirlo en el comprobante
+    CertificadoBase64:=QuitarCaracteresNoUsadosEnCertificado(X509Certificado.AsBase64);
+    //CodeSite.Send('Certificado Base64', CertificadoBase64);
 
     // Llenamos las propiedades
     fCertificado.VigenciaInicio := x509Certificado.NotBefore;
@@ -562,6 +588,10 @@ begin
 
     // Ya procesado llenamos su propiedad en el XML
     fXmlComprobante.NoCertificado := fCertificado.NumeroSerie;
+    // Incluir el certificado en el XML?
+    if bIncluirCertificadoEnXML = True then
+       fXmlComprobante.Certificado := CertificadoBase64;
+
   finally
     FreeAndNil(x509Certificado);
   end;
