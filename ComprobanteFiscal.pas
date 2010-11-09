@@ -15,7 +15,7 @@ unit ComprobanteFiscal;
 
 interface
 
-uses FacturaTipos, FeCFDv2, SysUtils,
+uses FacturaTipos, FeCFDv2, SysUtils, dialogs, 
   // Unidades especificas de manejo de XML:
   XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd;
 
@@ -141,7 +141,7 @@ implementation
 // manualmente en el EXE
 // Mas Info en: http://delphi.about.com/od/objectpascalide/a/embed_resources.htm
 
-uses FacturaReglamentacion, Dialogs, ClaseOpenSSL, StrUtils, SelloDigital,
+uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
   OpenSSLUtils;
 
 // Al crear el objeto, comenzamos a "llenar" el XML interno
@@ -548,17 +548,17 @@ end;
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
 var
   x509Certificado: TX509Certificate;
-  CertificadoBase64: String;
+  CertificadoBase64: WideString;
 
   // Quita los encabezados, pie y retornos de carro del certificado
-  function QuitarCaracteresNoUsadosEnCertificado(sCertificadoBase64: String) : String;
+  function QuitarCaracteresNoUsadosEnCertificado(sCertificadoBase64: WideString) : WideString;
   begin
-      sCertificadoBase64:=AnsiReplaceStr(sCertificadoBase64, #13, '');
-      sCertificadoBase64:=AnsiReplaceStr(sCertificadoBase64, #10, '');
+      sCertificadoBase64:=StringReplace(sCertificadoBase64, #13, '', [rfReplaceAll, rfIgnoreCase]);
+      sCertificadoBase64:=StringReplace(sCertificadoBase64, #10, '', [rfReplaceAll, rfIgnoreCase]);
       // Quitamos encabezado del certificado
-      sCertificadoBase64:=AnsiReplaceStr(sCertificadoBase64, _CADENA_INICIO_CERTIFICADO, '');
+      sCertificadoBase64:=StringReplace(sCertificadoBase64, _CADENA_INICIO_CERTIFICADO, '', [rfReplaceAll, rfIgnoreCase]);
       // Quitamos el pie del certificado
-      Result:=AnsiReplaceStr(sCertificadoBase64, _CADENA_FIN_CERTIFICADO, '');
+      Result:=StringReplace(sCertificadoBase64, _CADENA_FIN_CERTIFICADO, '', [rfReplaceAll, rfIgnoreCase]);
   end;
 
 begin
@@ -572,10 +572,6 @@ begin
     else
       x509Certificado.LoadFromFile(Certificado.Ruta);
 
-    // Obtenemos el certificado codificado en Base64 para incluirlo en el comprobante
-    CertificadoBase64:=QuitarCaracteresNoUsadosEnCertificado(X509Certificado.AsBase64);
-    //CodeSite.Send('Certificado Base64', CertificadoBase64);
-
     // Llenamos las propiedades
     fCertificado.VigenciaInicio := x509Certificado.NotBefore;
     fCertificado.VigenciaFin := x509Certificado.NotAfter;
@@ -588,9 +584,18 @@ begin
 
     // Ya procesado llenamos su propiedad en el XML
     fXmlComprobante.NoCertificado := fCertificado.NumeroSerie;
+
     // Incluir el certificado en el XML?
     if bIncluirCertificadoEnXML = True then
-       fXmlComprobante.Certificado := CertificadoBase64;
+    begin
+       // Obtenemos el certificado codificado en Base64 para incluirlo en el comprobante
+       CertificadoBase64:=X509Certificado.AsBase64;
+       //ShowMessage(CertificadoBase64 + '<--');
+       CertificadoBase64:=QuitarCaracteresNoUsadosEnCertificado(X509Certificado.AsBase64);
+       //CodeSite.Send('Certificado Base64', CertificadoBase64);
+       //CodeSite.Send('length', Length(CertificadoBase64));
+       fXmlComprobante.Certificado := TFEReglamentacion.ComoCadena(CertificadoBase64);
+    end;
 
   finally
     FreeAndNil(x509Certificado);

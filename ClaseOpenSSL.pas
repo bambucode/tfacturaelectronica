@@ -259,7 +259,7 @@ var
       Inbuf: Array [0..8192] of AnsiChar;
       Outbuf: array [0..1024] of AnsiChar;
   {$ELSE}
-      Inbuf, HexRes: Array [0..8192] of Char;
+      Inbuf: Array [0..8192] of Char;
       Outbuf: array [0..1024] of Char;
   {$IFEND}
 	ekLlavePrivada: pEVP_PKEY;
