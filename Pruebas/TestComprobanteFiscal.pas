@@ -29,6 +29,7 @@ type
     procedure setEmisor_Emisor_LoGuardeEnXML;
     procedure AgregarConcepto_Concepto_LoGuardeEnXML;
     procedure setCertificado_Certificado_GuardeNumeroDeSerieEnEstructuraXML;
+    procedure setCertificado_IncluyendoEnXML_GuardeCertificadoBase64EnXML;
     procedure setFolio_Folio_LoGuardeEnXML;
     procedure setBloqueFolios_Bloque_LoGuardeEnXML;
     procedure setBloqueFolios_FolioFueraDeRango_CauseExcepcion;
@@ -294,7 +295,7 @@ var
   ExpedidoEn: TFEExpedidoEn;
   ImpuestoTrasladado: TFEImpuestoTrasladado;
   ImpuestoRetenido: TFEImpuestoRetenido;
-  dSubtotal, dTotal: Double;
+  dSubtotal: Double;
 
   fXMLPrueba: TXMLDocument;
   fXMLComprobantePrueba: IFEXMLComprobante;
@@ -393,7 +394,6 @@ begin
 
   // 4. Agregamos los conceptos
   dSubtotal := 0;
-  dTotal := 0;
 
   for I := 0 to fXMLComprobantePrueba.Conceptos.Count - 1 do
   begin
@@ -483,9 +483,7 @@ end;
 procedure TestTFEComprobanteFiscal.CadenaOriginal_DeComprobante_SeaCorrecta;
 var
   sCadenaOriginalCorrecta: TStringCadenaOriginal;
-  sCadenaFixture, sCadenaClase: String;
   Certificado: TFECertificado;
-  iCodePageCadenaFixture, iCodePageClase: Word;
 
   // Creamos una rutina especial para leer el archivo de cadena original de ejemplo
   // ya que viene en UTF8 y tiene que ser leida como tal para poder compararla
@@ -545,7 +543,6 @@ procedure TestTFEComprobanteFiscal.XML_DeComprobanteHecho_GenereXMLCorrectamente
 var
   sSelloDigitalCorrecto: String;
   Certificado: TFECertificado;
-  fDocXML: TXMLDocument;
 begin
   // Llenamos los datos que fueron usados para generar dicho comprobante
   Certificado.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.cer';
@@ -588,12 +585,33 @@ begin
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
   sXMLConNumSerieCertificado := leerContenidoDeFixture('comprobante_fiscal/numeroserie.xml');
 
+  // Especificamos que NO incluya el certificado en el XML (esa es otra prueba independiente)
+  fComprobanteFiscal.IncluirCertificadoEnXml:=False;
   // Especificamos el certificado que usaremos a la clase comprobante
   fComprobanteFiscal.Certificado := Certificado;
 
   // Checamos que sea igual que nuestro Fixture...
   CheckEquals(sXMLConNumSerieCertificado, fComprobanteFiscal.fXmlComprobante.XML,
     'El Contenido XML no contiene el numero de serie del certificado o este es incorrecto.');
+end;
+
+procedure TestTFEComprobanteFiscal.setCertificado_IncluyendoEnXML_GuardeCertificadoBase64EnXML;
+var
+  Certificado: TFECertificado;
+  sXMLConCertificado: WideString;
+begin
+  Certificado.Ruta := fRutaFixtures + _RUTA_CERTIFICADO;
+
+  // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
+  sXMLConCertificado := leerContenidoDeFixture('comprobante_fiscal/con_certificado.xml');
+
+  // Especificamos que Si incluya el certificado en el XML
+  fComprobanteFiscal.IncluirCertificadoEnXml:=True;
+  // Especificamos el certificado que usaremos a la clase comprobante
+  fComprobanteFiscal.Certificado := Certificado;
+  // Checamos que sea igual que nuestro Fixture...
+  CheckEquals(sXMLConCertificado, fComprobanteFiscal.fXmlComprobante.XML,
+    'El Contenido XML no incluyo el contenido del certificado o este es incorrecto.');
 end;
 
 procedure TestTFEComprobanteFiscal.setEmisor_Emisor_LoGuardeEnXML;
