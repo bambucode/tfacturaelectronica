@@ -482,29 +482,31 @@ end;
 function TX509Certificate.AsBase64() : String;
 var
   bioOut: pBIO;
-  buff: PCharacter;
-  buffsize, I: integer;
-  x: Pointer;
-
+  Buffer: array [0..2048] of Caracter;
+  Res: String;
 begin
   // This code was translated from x509.c from the OpenSSL source code
-  Result := '';
+  Res := '';
+  Buffer:='';
+  bioOut:=nil;
   try
       OBJ_create(toPCharacter('2.99999.3'),
                  toPCharacter('SET.ex3'),
                  toPCharacter('SET x509v3 extension 3'));
 
       bioOut := BIO_new(BIO_s_mem);
-      i:=PEM_write_bio_X509(bioOut, fCertificate);
-      BuffSize := BIO_pending(bioOut);
-      GetMem(buff, buffsize+1);
-      BIO_read(bioOut, buff, buffsize);
-      Result := StrPas(buff);
+      // We obtain the certificate in base64 encoded format into the bioOut pointer
+      if PEM_write_bio_X509(bioOut, fCertificate) = 1 then
+          BIO_read(bioOut, @Buffer, SizeOf(Buffer))
+      else
+          Res:='';
   finally
       // Free the memory
-      FreeMem(Buff);
-      BIO_free(bioOut);
+      OBJ_cleanup();
+      BIO_free_all(bioOut);
   end;
+
+  Result:=StrPas(Buffer);
 end;
 
 procedure TX509Certificate.LoadFromFile(FileName: string; Encoding: TEncoding);
