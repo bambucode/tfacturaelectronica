@@ -1,4 +1,4 @@
-﻿FACTURACION ELECTRONICA
+﻿TFACTURACIONELECTRONICA (Beta)
 =====================================
 Esta es una librería que sirve para generar una factura electrónica de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
@@ -14,8 +14,6 @@ Algunos aspectos que busca tener esta libreria:
 - Estar implementada en clases (seguir reglas de programación orientada a objetos).
 - Esconder los detalles de implementación/técnicos al usuario final (el programador que use la clase).
 
-<b>NOTA: Las librerías aún están en desarrollo y están siendo constantemente actualizadas. Tan pronto se tenga lista una versión beta del código se removerá este aviso. - 28 Octubre 2010</b> 
-
 Más información sobre este proyecto en:
 <http://www.bambucode.com/codigoabierto>
 
@@ -27,10 +25,17 @@ las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/b
 
 ¿Qué falta por implementar?
 -------------
-- Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT.
-- Implementar la version 3 de los CFD (o comprobantes digitales en linea).
+- Manejo de Adendas.
 - Manejo y pruebas de conceptos con datos aduanales.
 - Manejo y pruebas de articulos con cuenta predial.
+- Implementar la version 3 de los CFD (o comprobantes digitales en linea).
+- Implementar la lectura de un CFD y que al mismo tiempo verifique si es válido o no.
+- Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT.
+
+¿Cómo puedo colaborar?
+-------------
+Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí puedes obtener más información sobre como hacerlo en la siguiente página:
+<http://www.bambucode.com/codigoabierto/facturacion_electronica_delphi.php>
 
 Notas adicionales
 ------------
@@ -46,15 +51,3 @@ Colaboradores actuales.
 -------------
 * Ing. Luis Carrasco - Bambu Code SA de CV - <http://github.com/lcarrasco>
 
-¿Nuevo en github/uso de git?
--------------
-Algunas personas no están familiarizadas con el uso de Git (sistema de manejo de código fuente) por lo que pueden
-obtener más información sobre las amplias ventajas de usarlo en la siguiente liga:
-
-* Video de introducción a Git/Github (en inglés) - <http://www.pragprog.com/screencasts/v-scgithub/insider-guide-to-github>
-* Libro ProGit (en inglés)- <http://progit.org/book> 
-* Traducción Libro ProGit parcial (en español) - <http://progit.org/book/es/>
-
-Si desean pueden usar el siguiente software (de uso libre para proyectos no comerciales) para interactuar con Git
-bajo Windows:
-<http://www.syntevo.com/smartgit>

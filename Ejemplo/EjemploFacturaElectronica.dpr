@@ -118,7 +118,7 @@ begin
       Factura.AgregarConcepto(Concepto2);
 
       // Le damos un descuento
-      Factura.AsignarDescuento(5, 'Por pronto pago');
+      //Factura.AsignarDescuento(5, 'Por pronto pago');
 
       // Mandamos generar la factura con el siguiente folio disponible
       sArchivo:=GetDesktopFolder() + '\MiFactura.xml';

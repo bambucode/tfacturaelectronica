@@ -33,7 +33,7 @@ type
     procedure setFolio_Folio_LoGuardeEnXML;
     procedure setBloqueFolios_Bloque_LoGuardeEnXML;
     procedure setBloqueFolios_FolioFueraDeRango_CauseExcepcion;
-    procedure setTotal_Monto_LoGuardeEnXML;
+    //procedure setTotal_Monto_LoGuardeEnXML;
     procedure setSubtotal_Monto_LoGuardeEnXML;
     procedure AgregarImpuestoRetenido_Impuesto_LoGuardeEnXML;
     procedure AgregarImpuestoTrasladado_Impuesto_LoGuardeEnXML;
@@ -139,6 +139,7 @@ begin
     'No se guardo el Folio en la estructura del XML');
 end;
 
+{
 procedure TestTFEComprobanteFiscal.setTotal_Monto_LoGuardeEnXML;
 var
   sXMLFixture: WideString;
@@ -149,12 +150,12 @@ begin
   sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/total.xml');
 
   // Especificamos el certificado que usaremos a la clase comprobante
-  fComprobanteFiscal.Total := _TOTAL_COMPROBANTE;
+  fComprobanteFiscal.SubTotal := _TOTAL_COMPROBANTE;
 
   // Checamos que sea igual que nuestro Fixture...
   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
     'El Contenido XML no contiene el monto total o este es incorrecto.');
-end;
+end;   }
 
 procedure TestTFEComprobanteFiscal.setSubtotal_Monto_LoGuardeEnXML;
 var
@@ -473,8 +474,8 @@ begin
   fComprobanteFiscal.SubTotal := dSubtotal;
 
   // Asignamos el total de la factura (subtotal + impuestos)
-  fComprobanteFiscal.Total := fComprobanteFiscal.SubTotal +
-    fComprobanteFiscal.TotalImpuestosRetenidos + fComprobanteFiscal.TotalImpuestosTrasladados;
+  {fComprobanteFiscal.Total := fComprobanteFiscal.SubTotal +
+    fComprobanteFiscal.TotalImpuestosRetenidos + fComprobanteFiscal.TotalImpuestosTrasladados; }
 
   // Regresamos el sello del XML leido
   Result := fXMLComprobantePrueba.Sello;
