@@ -98,6 +98,8 @@ begin
       Factura:=TFacturaElectronica.Create(Emisor, Receptor, BloqueFolios, Certificado, tcIngreso);
       //Factura.OnComprobanteGenerado:=onComprobanteGenerado;
 
+      Factura.MetodoDePago:='efectivo';
+
       // Definimos todos los conceptos que incluyo la factura
       Concepto1.Cantidad:=1;
       Concepto1.Unidad:='PZ';

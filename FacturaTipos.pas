@@ -64,6 +64,10 @@ TFEContribuyente = record
   Direccion: TFeDireccion;
 end;
 
+// Pre-definimos los tipos de contribuyentes de Publico en General y Extranjero
+TContribuyentePublicoGeneral = TFEContribuyente;
+TContribuyenteExtranjero = TFEContribuyente;
+
 TFEDatosAduana = record
   NumeroDocumento: String;
   FechaExpedicion: TDateTime;
@@ -111,11 +115,21 @@ TFEImpuestoRetenido = record
   Importe: Currency;
 end;
 
+TFEImpuestosRetenidos = Array of TFEImpuestoRetenido;
+
 TFEImpuestoTrasladado = record
     Nombre: String; // IVA, IEPS
     Tasa: Double;
     Importe : Currency;
 end;
+
+TFEImpuestosTrasladados = Array of TFEImpuestoTrasladado;
+
+// La definicion de la interfase de un comprobante comun para todas las versiones
+IComprobanteDigital = Interface(IInterface)
+
+end;
+
 
 implementation
 
