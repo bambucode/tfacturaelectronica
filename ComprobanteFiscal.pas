@@ -84,7 +84,11 @@ type
     procedure setBloqueFolios(Bloque: TFEBloqueFolios);
     function getTotal() : Currency;
     procedure ValidarQueFolioEsteEnRango;
+ {$IFDEF VERSION_DE_PRUEBA}
+  public
+{$ELSE}
   protected
+{$ENDIF}
     // Propiedades del comprobante normal
     property Folio: TFEFolio read fFolio write setFolio;
     property Receptor: TFEContribuyente read fReceptor write setReceptor;
