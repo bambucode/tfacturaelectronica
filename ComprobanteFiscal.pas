@@ -50,6 +50,7 @@ type
     fExpedidoEn: TFeExpedidoEn;
     fFechaGeneracion: TDateTime;
     fCondicionesDePago: String;
+    fMetodoDePago: String;
     fEmisor: TFEContribuyente;
     fReceptor: TFEContribuyente;
     sForma: String;
@@ -65,6 +66,10 @@ type
     procedure setExpedidoEn(ExpedidoEn: TFeExpedidoEn);
     procedure setTipoComprobante(Tipo: TFeTipoComprobante);
     procedure setFormaDePago(FormaDePago: TFEFormaDePago);
+    /// <summary>Establece la forma de pago, para expresar el método de pago de los bienes o servicios amparados por el
+    /// comprobante. Se entiende como método de pago leyendas tales como: cheque, tarjeta de crédito o debito, depósito
+    // en cuenta, etc.</summary>
+    procedure setMetodoDePago(sFormaDePago: String);
     procedure setReceptor(Receptor: TFEContribuyente);
     procedure setEmisor(Emisor: TFEContribuyente);
     procedure setFolio(Folio: TFEFolio);
@@ -79,29 +84,17 @@ type
     procedure setBloqueFolios(Bloque: TFEBloqueFolios);
     function getTotal() : Currency;
     procedure ValidarQueFolioEsteEnRango;
-  public
-  // Version del CFD que implementa este código
-    const
-         Version = '2';
-
-    constructor Create();
-    destructor Destroy(); override;
-
+  protected
     // Propiedades del comprobante normal
     property Folio: TFEFolio read fFolio write setFolio;
-    property Serie: TFESerie read obtenerSerie;
     property Receptor: TFEContribuyente read fReceptor write setReceptor;
     property Emisor: TFEContribuyente read fEmisor write setEmisor;
     property FormaDePago: TFEFormaDePago read fFormaDePago write setFormaDePago;
     property Tipo: TFeTipoComprobante read fTipoComprobante write setTipoComprobante;
     property ExpedidoEn: TFeDireccion read fExpedidoEn write setExpedidoEn;
-    property Total: Currency read getTotal;
     property SubTotal: Currency read fSubTotal write setSubTotal;
-    property TotalImpuestosRetenidos: Currency read fTotalImpuestosRetenidos;
-    property TotalImpuestosTrasladados: Currency read fTotalImpuestosTrasladados;
     property CondicionesDePago: String read fCondicionesDePago write setCondicionesDePago;
-    property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
-    property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML;
+    property MetodoDePago: String read fMetodoDePago write setMetodoDePago;
 
     /// <summary>Asigna el importe total de descuentos aplicados al comprobante asi como su motivo </summary>
     /// <param name="ImporteDescuento">El monto total de descuentos realizados al comprobante</param>
@@ -118,15 +111,28 @@ type
     /// sumandolo al total de dicho impuesto. </summary>
     /// <param name="NuevoImpuesto">El nuevo Impuesto con los datos de nombre, tasa e importe del mismo</param>
     procedure AgregarImpuestoTrasladado(NuevoImpuesto: TFEImpuestoTrasladado);
-    procedure Cancelar();
     procedure GuardarEnArchivo(sArchivoDestino: String);
+    property Certificado: TFECertificado read fCertificado write setCertificado;
+    property BloqueFolios: TFEBloqueFolios read fBloqueFolios write setBloqueFolios;
+  public
+    // Version del CFD que implementa este código
+    const
+         Version = '2';
+
+    constructor Create();
+    destructor Destroy(); override;
+    procedure Cancelar();
+    property Serie: TFESerie read obtenerSerie;
+    property TotalImpuestosRetenidos: Currency read fTotalImpuestosRetenidos;
+    property TotalImpuestosTrasladados: Currency read fTotalImpuestosTrasladados;
+    property Total: Currency read getTotal;
 
     // Propiedades especificas al comprobante electronico
+    property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
+    property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML;
     property XML: WideString read getXML;
     property CadenaOriginal: TStringCadenaOriginal read getCadenaOriginal;
     property SelloDigital: String read getSelloDigital;
-    property Certificado: TFECertificado read fCertificado write setCertificado;
-    property BloqueFolios: TFEBloqueFolios read fBloqueFolios write setBloqueFolios;
   end;
 
 const
@@ -307,12 +313,10 @@ begin
     with fXmlComprobante.Impuestos do
     begin
       if (fTotalImpuestosRetenidos > 0) then
-        TotalImpuestosRetenidos := TFEReglamentacion.ComoMoneda(fTotalImpuestosRetenidos);
-      // Opcional
+        TotalImpuestosRetenidos := TFEReglamentacion.ComoMoneda(fTotalImpuestosRetenidos); // Opcional
 
       if (fTotalImpuestosTrasladados > 0) then
-        TotalImpuestosTrasladados := TFEReglamentacion.ComoMoneda(fTotalImpuestosTrasladados);
-      // Opcional
+        TotalImpuestosTrasladados := TFEReglamentacion.ComoMoneda(fTotalImpuestosTrasladados); // Opcional
     end;
 
   // Asignamos el total del comprobante
@@ -602,9 +606,15 @@ begin
        fXmlComprobante.Certificado := TFEReglamentacion.ComoCadena(CertificadoBase64);
     end;
 
-  finally
-    FreeAndNil(x509Certificado);
+  except
+     // Pasamos la excepcion tal y como esta
+     On E: Exception do
+     begin
+        FreeAndNil(x509Certificado);
+        raise Exception.Create(E.Message);
+     end;
   end;
+  FreeAndNil(x509Certificado);
 end;
 
 procedure TFEComprobanteFiscal.AgregarConcepto(Concepto: TFEConcepto);
@@ -687,11 +697,11 @@ begin
   fBloqueFolios := Bloque;
   ValidarQueFolioEsteEnRango();
 
-  fXmlComprobante.AnoAprobacion := Bloque.AnoAprobacion;
-  fXmlComprobante.NoAprobacion := Bloque.NumeroAprobacion;
-
   if Trim(Serie) <> '' then
     fXmlComprobante.Serie := Bloque.Serie;
+
+  fXmlComprobante.NoAprobacion := Bloque.NumeroAprobacion;
+  fXmlComprobante.AnoAprobacion := Bloque.AnoAprobacion;
 end;
 
 // 2. Lugar y fecha de expedicion (29-A, Fraccion III) - En caso de ser sucursal
@@ -750,6 +760,12 @@ begin
   end;
 
   fXmlComprobante.FormaDePago := sForma;
+end;
+
+procedure TFEComprobanteFiscal.setMetodoDePago(sFormaDePago: String);
+begin
+  if Trim(sFormaDePago) <> '' then
+     fXmlComprobante.MetodoDePago:=TFEReglamentacion.ComoCadena(sFormaDePago);
 end;
 
 procedure TFEComprobanteFiscal.setSubTotal(dMonto: Currency);
