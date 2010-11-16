@@ -40,6 +40,7 @@ type
     procedure AgregarImpuestoRetenido_Varios_SumeSuTotal;
     procedure AgregarImpuestoTrasladado_Varios_SumeSuTotal;
     procedure CadenaOriginal_DeComprobante_SeaCorrecta;
+    procedure SelloDigital_DespuesDeHaberObtenidoCadenaOriginal_SeaCorrecto;
     procedure SelloDigital_DeComprobante_SeaCorrecto;
     procedure XML_DeComprobanteHecho_GenereXMLCorrectamente;
   end;
@@ -538,6 +539,38 @@ begin
 
   CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
               'El sello digital no fue calculado correctamente');
+end;
+
+procedure TestTFEComprobanteFiscal.SelloDigital_DespuesDeHaberObtenidoCadenaOriginal_SeaCorrecto;
+var
+  sSelloDigitalCorrecto: String;
+  Certificado: TFECertificado;
+  CadenaOriginal, CadenaOriginalPostSello :  TStringCadenaOriginal;
+begin
+  // Llenamos los datos que fueron usados para generar dicho comprobante
+  Certificado.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.cer';
+  Certificado.LlavePrivada.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.key';
+  Certificado.LlavePrivada.Clave := '12345678a';
+
+  // Llenamos el comprobante fiscal con datos usados para generar la factura
+  sSelloDigitalCorrecto := GenerarComprobanteFiscal
+    (fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml', Certificado);
+
+  // Obtenemos la cadena original primero
+  CadenaOriginal:=fComprobanteFiscal.CadenaOriginal;
+  CheckTrue(CadenaOriginal <> '', 'La cadena original esta vacia');
+
+  // Ahora, obtenemos el sello el cual debe ser el mismo
+  CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
+              'El sello digital no fue calculado correctamente');
+
+  // Checamos que la cadena original sea la misma despues de haber calculado el sello
+  CheckEquals(CadenaOriginal, fComprobanteFiscal.CadenaOriginal,
+              'La cadena original no fue la misma despues del segundo llamado');
+
+  // Verificamos obtener el sello digital de nuevo y que sea el mismo
+  CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
+              'El sello digital no fue calculado correctamente la segunda ocasion');
 end;
 
 procedure TestTFEComprobanteFiscal.XML_DeComprobanteHecho_GenereXMLCorrectamente;
