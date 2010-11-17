@@ -40,7 +40,7 @@ type
     procedure AgregarImpuestoRetenido_Varios_SumeSuTotal;
     procedure AgregarImpuestoTrasladado_Varios_SumeSuTotal;
     procedure CadenaOriginal_DeComprobante_SeaCorrecta;
-    procedure SelloDigital_DespuesDeHaberObtenidoCadenaOriginal_SeaCorrecto;
+    procedure SelloDigital_DespuesDeVariosSegundos_SeaElMismo;
     procedure SelloDigital_DeComprobante_SeaCorrecto;
     procedure XML_DeComprobanteHecho_GenereXMLCorrectamente;
   end;
@@ -541,7 +541,7 @@ begin
               'El sello digital no fue calculado correctamente');
 end;
 
-procedure TestTFEComprobanteFiscal.SelloDigital_DespuesDeHaberObtenidoCadenaOriginal_SeaCorrecto;
+procedure TestTFEComprobanteFiscal.SelloDigital_DespuesDeVariosSegundos_SeaElMismo;
 var
   sSelloDigitalCorrecto: String;
   Certificado: TFECertificado;
@@ -553,20 +553,18 @@ begin
   Certificado.LlavePrivada.Clave := '12345678a';
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
-  sSelloDigitalCorrecto := GenerarComprobanteFiscal
-    (fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml', Certificado);
+  GenerarComprobanteFiscal(fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml',
+                           Certificado);
 
-  // Obtenemos la cadena original primero
-  CadenaOriginal:=fComprobanteFiscal.CadenaOriginal;
-  CheckTrue(CadenaOriginal <> '', 'La cadena original esta vacia');
+  // Establecemos la propiedad de DEBUG solamente para que use la fecha/hora actual
+  // para la generacion del comprobante y corroborar este funcionamiento
+  fComprobanteFiscal._USAR_HORA_REAL := True;
 
-  // Ahora, obtenemos el sello el cual debe ser el mismo
-  CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
-              'El sello digital no fue calculado correctamente');
+  // Obtenemos el sello por primera vez...
+  sSelloDigitalCorrecto:=fComprobanteFiscal.SelloDigital;
 
-  // Checamos que la cadena original sea la misma despues de haber calculado el sello
-  CheckEquals(CadenaOriginal, fComprobanteFiscal.CadenaOriginal,
-              'La cadena original no fue la misma despues del segundo llamado');
+  // Nos esperamos 2 segundos (para forzar que la fecha de generacion sea diferente)
+  Sleep(2500);
 
   // Verificamos obtener el sello digital de nuevo y que sea el mismo
   CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,

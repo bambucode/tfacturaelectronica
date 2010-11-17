@@ -41,7 +41,7 @@ type
     _CADENA_PAGO_PARCIALIDADES: String;
     fDocumentoXML: TXMLDocument;
     fXmlComprobante: IFEXMLComprobante;
-    sCadenaOriginal: String;
+    sCacheCadenaOriginal: TStringCadenaOriginal;
     fFolio: TFEFolio;
     fCertificado: TFECertificado;
     fBloqueFolios: TFEBloqueFolios;
@@ -86,6 +86,7 @@ type
     procedure ValidarQueFolioEsteEnRango;
  {$IFDEF VERSION_DE_PRUEBA}
   public
+    _USAR_HORA_REAL : Boolean;
 {$ELSE}
   protected
 {$ENDIF}
@@ -160,7 +161,11 @@ begin
   _CADENA_PAGO_PARCIALIDADES := 'En parcialidades';
 
   // Establecemos los defaults
-  sCadenaOriginal := '';
+  sCacheCadenaOriginal:='';
+
+  {$IFDEF VERSION_DE_PRUEBA}
+    _USAR_HORA_REAL := False;
+  {$ENDIF}
 
   // Establecemos como default que SI queremos incluir el certificado en el XML
   // ya que presenta la ventaja de poder validar el comprobante con solo el archivo
@@ -301,127 +306,137 @@ var
   end;
 
 begin
-  // Especificamos la fecha exacta en la que se esta generando el comprobante
-{$IFDEF VERSION_DE_PRUEBA}
-  // Si estamos en las pruebas de unidad, dejamos que la prueba
-  // defina la fecha/hora en que se "genero" el comprobante
-  // para que sea el mismo que se uso al haber sido generado con el MicroE
-{$ELSE}
-  fFechaGeneracion := Now;
-{$ENDIF}
-  fXmlComprobante.Fecha := TFEReglamentacion.ComoFechaHora(fFechaGeneracion);
+     // Checamos si la cadena original fue calcualda previamente, si asi fue, la
+     // regresamos sin tener que "re-calcular" la cadena...
+     if (sCacheCadenaOriginal <> '') then
+        Result:=sCacheCadenaOriginal
+     else
+     begin
+           // Especificamos la fecha exacta en la que se esta generando el comprobante
+          {$IFDEF VERSION_DE_PRUEBA}
+            // Si estamos en las pruebas de unidad, dejamos que la prueba
+            // defina la fecha/hora en que se "genero" el comprobante
+            // para que sea el mismo que se uso al haber sido generado con el MicroE
+            if (_USAR_HORA_REAL = True) then
+               fFechaGeneracion:=Now;
+          {$ELSE}
+            fFechaGeneracion := Now;
+          {$ENDIF}
+            fXmlComprobante.Fecha := TFEReglamentacion.ComoFechaHora(fFechaGeneracion);
 
-  // Agregamos al XML los totales de los diferentes tipos de impuestos usados
-  // si asi se desea...
-  if fDesglosarTotalesImpuestos = True then
-    with fXmlComprobante.Impuestos do
-    begin
-      if (fTotalImpuestosRetenidos > 0) then
-        TotalImpuestosRetenidos := TFEReglamentacion.ComoMoneda(fTotalImpuestosRetenidos); // Opcional
+            // Agregamos al XML los totales de los diferentes tipos de impuestos usados
+            // si asi se desea...
+            if fDesglosarTotalesImpuestos = True then
+              with fXmlComprobante.Impuestos do
+              begin
+                if (fTotalImpuestosRetenidos > 0) then
+                  TotalImpuestosRetenidos := TFEReglamentacion.ComoMoneda(fTotalImpuestosRetenidos); // Opcional
 
-      if (fTotalImpuestosTrasladados > 0) then
-        TotalImpuestosTrasladados := TFEReglamentacion.ComoMoneda(fTotalImpuestosTrasladados); // Opcional
-    end;
+                if (fTotalImpuestosTrasladados > 0) then
+                  TotalImpuestosTrasladados := TFEReglamentacion.ComoMoneda(fTotalImpuestosTrasladados); // Opcional
+              end;
 
-  // Asignamos el total del comprobante
-  fXmlComprobante.Total := TFEReglamentacion.ComoMoneda(Self.Total);
+            // Asignamos el total del comprobante
+            fXmlComprobante.Total := TFEReglamentacion.ComoMoneda(Self.Total);
 
-  sRes := '';
+            sRes := '';
 
-  // 2. El inicio de la cadena original se encuentra marcado mediante una secuencia de caracteres || (doble “pipe”).
-  sRes := _PIPE + _PIPE;
-  // 1) Datos del comprobante
+            // 2. El inicio de la cadena original se encuentra marcado mediante una secuencia de caracteres || (doble “pipe”).
+            sRes := _PIPE + _PIPE;
+            // 1) Datos del comprobante
 
-  // NOTA IMPORTANTE: El parametro nombre de atributo tiene que ser exactamente igual que el de la definicion
-  // del XSD (minusculas y mayusculas) ya que es sensible a ello.
-  AgregarAtributo(fXmlComprobante, 'version');
-  AgregarAtributo(fXmlComprobante, 'serie');
-  AgregarAtributo(fXmlComprobante, 'folio');
-  AgregarAtributo(fXmlComprobante, 'fecha');
-  AgregarAtributo(fXmlComprobante, 'noAprobacion');
-  AgregarAtributo(fXmlComprobante, 'anoAprobacion');
-  AgregarAtributo(fXmlComprobante, 'tipoDeComprobante');
-  AgregarAtributo(fXmlComprobante, 'formaDePago');
-  AgregarAtributo(fXmlComprobante, 'condicionesDePago');
+            // NOTA IMPORTANTE: El parametro nombre de atributo tiene que ser exactamente igual que el de la definicion
+            // del XSD (minusculas y mayusculas) ya que es sensible a ello.
+            AgregarAtributo(fXmlComprobante, 'version');
+            AgregarAtributo(fXmlComprobante, 'serie');
+            AgregarAtributo(fXmlComprobante, 'folio');
+            AgregarAtributo(fXmlComprobante, 'fecha');
+            AgregarAtributo(fXmlComprobante, 'noAprobacion');
+            AgregarAtributo(fXmlComprobante, 'anoAprobacion');
+            AgregarAtributo(fXmlComprobante, 'tipoDeComprobante');
+            AgregarAtributo(fXmlComprobante, 'formaDePago');
+            AgregarAtributo(fXmlComprobante, 'condicionesDePago');
 
-  AgregarAtributo(fXmlComprobante, 'subTotal');
-  AgregarAtributo(fXmlComprobante, 'descuento');
-  AgregarAtributo(fXmlComprobante, 'total');
-  // 2) Datos del emisor
-  AgregarAtributo(fXmlComprobante.Emisor, 'rfc');
-  AgregarAtributo(fXmlComprobante.Emisor, 'nombre');
-  // 3) Datos del domicilio fiscal del emisor
-  AgregarUbicacionFiscal(fXmlComprobante.Emisor.DomicilioFiscal);
-  // 4) Datos del Domicilio de Expedición del Comprobante
-  if (Trim(fExpedidoEn.Calle) <> '') then
-    AgregarUbicacion(fXmlComprobante.Emisor.ExpedidoEn);
-  // 5) Datos del Receptor
-  AgregarAtributo(fXmlComprobante.Receptor, 'rfc');
-  AgregarAtributo(fXmlComprobante.Receptor, 'nombre');
-  // 6) Datos del domicilio fiscal del Receptor
-  AgregarUbicacion(fXmlComprobante.Receptor.Domicilio);
-  // 7) Datos de Cada Concepto Relacionado en el Comprobante
-  for I := 0 to fXmlComprobante.Conceptos.Count - 1 do
-  begin
-    with fXmlComprobante.Conceptos do
-    begin
-      AgregarAtributo(Concepto[I], 'cantidad');
-      AgregarAtributo(Concepto[I], 'unidad');
-      AgregarAtributo(Concepto[I], 'noIdentificacion');
-      AgregarAtributo(Concepto[I], 'descripcion');
-      AgregarAtributo(Concepto[I], 'valorUnitario');
-      AgregarAtributo(Concepto[I], 'importe');
+            AgregarAtributo(fXmlComprobante, 'subTotal');
+            AgregarAtributo(fXmlComprobante, 'descuento');
+            AgregarAtributo(fXmlComprobante, 'total');
+            // 2) Datos del emisor
+            AgregarAtributo(fXmlComprobante.Emisor, 'rfc');
+            AgregarAtributo(fXmlComprobante.Emisor, 'nombre');
+            // 3) Datos del domicilio fiscal del emisor
+            AgregarUbicacionFiscal(fXmlComprobante.Emisor.DomicilioFiscal);
+            // 4) Datos del Domicilio de Expedición del Comprobante
+            if (Trim(fExpedidoEn.Calle) <> '') then
+              AgregarUbicacion(fXmlComprobante.Emisor.ExpedidoEn);
+            // 5) Datos del Receptor
+            AgregarAtributo(fXmlComprobante.Receptor, 'rfc');
+            AgregarAtributo(fXmlComprobante.Receptor, 'nombre');
+            // 6) Datos del domicilio fiscal del Receptor
+            AgregarUbicacion(fXmlComprobante.Receptor.Domicilio);
+            // 7) Datos de Cada Concepto Relacionado en el Comprobante
+            for I := 0 to fXmlComprobante.Conceptos.Count - 1 do
+            begin
+              with fXmlComprobante.Conceptos do
+              begin
+                AgregarAtributo(Concepto[I], 'cantidad');
+                AgregarAtributo(Concepto[I], 'unidad');
+                AgregarAtributo(Concepto[I], 'noIdentificacion');
+                AgregarAtributo(Concepto[I], 'descripcion');
+                AgregarAtributo(Concepto[I], 'valorUnitario');
+                AgregarAtributo(Concepto[I], 'importe');
 
-      // TODO: Agregar soporte para informacion aduanera ya que se repiten los nodos
-      { if Concepto[I].InformacionAduanera.HasAttribute('numero') then
-        AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['numero']);
+                // TODO: Agregar soporte para informacion aduanera ya que se repiten los nodos
+                { if Concepto[I].InformacionAduanera.HasAttribute('numero') then
+                  AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['numero']);
 
-        if Concepto[I].InformacionAduanera.HasAttribute('fecha') then
-        AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['fecha']);
+                  if Concepto[I].InformacionAduanera.HasAttribute('fecha') then
+                  AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['fecha']);
 
-        if Concepto[I].InformacionAduanera.HasAttribute('aduana') then
-        AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['aduana']); }
+                  if Concepto[I].InformacionAduanera.HasAttribute('aduana') then
+                  AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['aduana']); }
 
-      AgregarAtributo(Concepto[I], 'CuentaPredial.numero');
-    end;
-  end;
+                AgregarAtributo(Concepto[I], 'CuentaPredial.numero');
+              end;
+            end;
 
-  // TODO: Agregar los "ComplementoConcepto" regla 9 del Anexo 20
-  // TODO: Arreglar nodo Complemento segun la regla 10
+            // TODO: Agregar los "ComplementoConcepto" regla 9 del Anexo 20
+            // TODO: Arreglar nodo Complemento segun la regla 10
 
-  // 8) Datos de Cada Retención de Impuestos
-  if fTotalImpuestosRetenidos > 0 then // Solo accedemos al nodo XML si hubo retenciones
-    for I := 0 to fXmlComprobante.Impuestos.Retenciones.Count - 1 do
-    begin
-      with fXmlComprobante.Impuestos.Retenciones do
-      begin
-        AgregarAtributo(Retencion[I], 'impuesto');
-        AgregarAtributo(Retencion[I], 'importe');
-      end;
-    end;
+            // 8) Datos de Cada Retención de Impuestos
+            if fTotalImpuestosRetenidos > 0 then // Solo accedemos al nodo XML si hubo retenciones
+              for I := 0 to fXmlComprobante.Impuestos.Retenciones.Count - 1 do
+              begin
+                with fXmlComprobante.Impuestos.Retenciones do
+                begin
+                  AgregarAtributo(Retencion[I], 'impuesto');
+                  AgregarAtributo(Retencion[I], 'importe');
+                end;
+              end;
 
-  if fDesglosarTotalesImpuestos = True then
-    AgregarAtributo(fXmlComprobante.Impuestos, 'totalImpuestosRetenidos');
+            if fDesglosarTotalesImpuestos = True then
+              AgregarAtributo(fXmlComprobante.Impuestos, 'totalImpuestosRetenidos');
 
-  // 9) Datos de Cada Traslado de Impuestos
-  if fTotalImpuestosTrasladados > 0 then
-    for I := 0 to fXmlComprobante.Impuestos.Traslados.Count - 1 do
-    begin
-      with fXmlComprobante.Impuestos.Traslados do
-      begin
-        AgregarAtributo(Traslado[I], 'impuesto');
-        AgregarAtributo(Traslado[I], 'tasa');
-        AgregarAtributo(Traslado[I], 'importe');
-      end;
-    end;
+            // 9) Datos de Cada Traslado de Impuestos
+            if fTotalImpuestosTrasladados > 0 then
+              for I := 0 to fXmlComprobante.Impuestos.Traslados.Count - 1 do
+              begin
+                with fXmlComprobante.Impuestos.Traslados do
+                begin
+                  AgregarAtributo(Traslado[I], 'impuesto');
+                  AgregarAtributo(Traslado[I], 'tasa');
+                  AgregarAtributo(Traslado[I], 'importe');
+                end;
+              end;
 
-  if fDesglosarTotalesImpuestos = True then
-    AgregarAtributo(fXmlComprobante.Impuestos, 'totalImpuestosTrasladados');
+            if fDesglosarTotalesImpuestos = True then
+              AgregarAtributo(fXmlComprobante.Impuestos, 'totalImpuestosTrasladados');
 
-  // 6. El final de la cadena original será expresado mediante una cadena de caracteres || (doble “pipe”).
-  // 7. Toda la cadena de original se encuentra expresada en el formato de codificación UTF-8.
-  // Solo agregamos un PIPE mas porque el ultimo atributo tiene al final su pipe.
-  result := UTF8Encode(sRes + _PIPE);
+            // 6. El final de la cadena original será expresado mediante una cadena de caracteres || (doble “pipe”).
+            // 7. Toda la cadena de original se encuentra expresada en el formato de codificación UTF-8.
+            // Solo agregamos un PIPE mas porque el ultimo atributo tiene al final su pipe.
+            sCacheCadenaOriginal := UTF8Encode(sRes + _PIPE);
+            Result:=sCacheCadenaOriginal;
+     end;
 end;
 
 // Regresamos la Cadena Original de este comprobante fiscal segun las reglas
@@ -821,6 +836,8 @@ begin
     sRes := SelloDigital.SelloCalculado;
   except
     // TODO: Manejar los diferentes tipos de excepciones...
+    on E:Exception do
+       raise E.Create(E.Message);
   end;
   // Liberamos la clase de sello usada previamente
   FreeAndNil(SelloDigital);
