@@ -37,6 +37,9 @@ private
   fOnComprobanteGenerado: TOnComprobanteGenerado;
   // Funciones y procedimientos
   procedure LlenarComprobante(iFolio: Integer; fpFormaDePago: TFEFormaDePago);
+  function obtenerCertificado() : TFECertificado;
+published
+  property FechaGeneracion;
 public
   property Folio: TFEFolio read fFolio write fFolio;
   property Receptor: TFEContribuyente read fReceptor write fReceptor;
@@ -50,6 +53,8 @@ public
   property Conceptos: TFEConceptos read fArrConceptos;
   property ImpuestosRetenidos: TFEImpuestosRetenidos read fArrImpuestosRetenidos;
   property ImpuestosTrasladados: TFEImpuestosTrasladados read fArrImpuestosTrasladados;
+  property Certificado : TFECertificado read obtenerCertificado;
+  property BloqueFolios: TFEBloqueFolios read fBloqueFolios;
 
   /// <summary>Evento que es llamado inemdiatamente después de que el CFD fue generado,
   /// el cual puede ser usado para registrar en su sistema contable el registro de la factura
@@ -141,6 +146,13 @@ begin
     Result:=Length(fArrConceptos) - 1;
 end;
 
+// Obtenemos el certificado de la clase padre para obtener el record
+// con los datos de serie, no aprobacion, etc.
+function TFacturaElectronica.obtenerCertificado() : TFECertificado;
+begin
+    Result:=inherited Certificado;
+end;
+
 // Funcion encargada de llenar el comprobante fiscal EN EL ORDEN que se especifica en el XSD
 // ya que si no es asi, el XML se va llenando en el orden en que se establecen las propiedades de la clase
 // haciendo que el comprobante no pase las validaciones del SAT.
@@ -177,9 +189,14 @@ begin
      //if ValidarCamposNecesarios() = False then
      //    raise Exception.Create('No todos los campos estan llenos.');
 
+     if (fReceptor.RFC = '') then
+        Raise Exception.Create('No hay un receptor configurado');
+     
+
+     fFolio:=iFolio;
      // Especificamos los campos del CFD en el orden especifico
      // ya que de lo contrario no cumplirá con los requisitios del SAT
-     LlenarComprobante(iFolio, fpFormaDePago);
+     LlenarComprobante(fFolio, fpFormaDePago);
 
      // Generamos el archivo
      inherited GuardarEnArchivo(sArchivo);

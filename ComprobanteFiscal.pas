@@ -100,7 +100,7 @@ type
     property SubTotal: Currency read fSubTotal write setSubTotal;
     property CondicionesDePago: String read fCondicionesDePago write setCondicionesDePago;
     property MetodoDePago: String read fMetodoDePago write setMetodoDePago;
-
+    property FechaGeneracion : TDateTime read fFechaGeneracion;
     /// <summary>Asigna el importe total de descuentos aplicados al comprobante asi como su motivo </summary>
     /// <param name="ImporteDescuento">El monto total de descuentos realizados al comprobante</param>
     /// <param name="Motivo">Atributo opcional para indicar el motivo del descuento</param>

@@ -83,6 +83,7 @@ TFEConcepto = record
   NoIdentificacion: String;
   DatosAduana: TFEDatosAduana;
   CuentaPredial: String;
+  Extra: String; 
 public
   function Importe() : Currency;
 end;
