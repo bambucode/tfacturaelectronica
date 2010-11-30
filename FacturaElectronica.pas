@@ -17,6 +17,7 @@ private
   fCertificado: TFECertificado;
   fBloqueFolios: TFEBloqueFolios;
   fTipoComprobante: TFeTipoComprobante;
+  bFacturaGenerada: Boolean;
   fExpedidoEn: TFeExpedidoEn;
   fCondicionesDePago: String;
   fEmisor: TFEContribuyente;
@@ -30,14 +31,18 @@ private
   fArrImpuestosRetenidos: TFEImpuestosRetenidos;
 
   // Totales internos
+  dTotalImpuestosTrasladados : Double;
+  dTotalImpuestosRetenidos : Double;
   dSubtotal: Currency;
   dTotal: Currency;
+  dDescuento : Currency;
 
   // Eventos:
   fOnComprobanteGenerado: TOnComprobanteGenerado;
   // Funciones y procedimientos
   procedure LlenarComprobante(iFolio: Integer; fpFormaDePago: TFEFormaDePago);
   function obtenerCertificado() : TFECertificado;
+  function getTotal() : Currency;
 published
   property FechaGeneracion;
 public
@@ -49,6 +54,7 @@ public
   property CondicionesDePago: String read fCondicionesDePago write fCondicionesDePago;
   property MetodoDePago: String read sMetodoDePago write sMetodoDePago;
   // Propiedades calculadas por esta clase:
+  property Total: Currency read getTotal;
   property SubTotal: Currency read dSubTotal;
   property Conceptos: TFEConceptos read fArrConceptos;
   property ImpuestosRetenidos: TFEImpuestosRetenidos read fArrImpuestosRetenidos;
@@ -106,6 +112,8 @@ begin
     fBloqueFolios:=bfBloqueFolios;
     fCertificado:=cerCertificado;
     fTipoComprobante:=tcTipo;
+    bFacturaGenerada:=False;
+    dDescuento := 0;
 
     // TODO: Implementar CFD 3.0 y usar la version segun sea necesario...
     // Que version de CFD sera usada?
@@ -124,6 +132,7 @@ function TFacturaElectronica.AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoR
 begin
     SetLength(fArrImpuestosRetenidos, Length(fArrImpuestosRetenidos) + 1);
     fArrImpuestosRetenidos[Length(fArrImpuestosRetenidos) - 1] := NuevoImpuesto;
+    dTotalImpuestosRetenidos:=dTotalImpuestosRetenidos + NuevoImpuesto.Importe;
     Result:=Length(fArrImpuestosRetenidos) - 1;
 end;
 
@@ -131,6 +140,7 @@ function TFacturaElectronica.AgregarImpuestoTrasladado(NuevoImpuesto: TFEImpuest
 begin
     SetLength(fArrImpuestosTrasladados, Length(fArrImpuestosTrasladados) + 1);
     fArrImpuestosTrasladados[Length(fArrImpuestosTrasladados) - 1] := NuevoImpuesto;
+    dTotalImpuestosTrasladados:=dTotalImpuestosTrasladados + NuevoImpuesto.Importe;
     Result:=Length(fArrImpuestosTrasladados) - 1;
 end;
 
@@ -144,6 +154,18 @@ begin
     dTotal:=dTotal + NuevoConcepto.Importe;
 
     Result:=Length(fArrConceptos) - 1;
+end;
+
+// Obtiene el total
+function TFacturaElectronica.getTotal() : Currency;
+begin
+   // Si ya generamos la factura, regresamos el total calculado por la Clase ComprobanteFiscal
+   // si no, calculamos nosotros el total en base a los datos ingresados al momento
+   // usado para cuando se esta en modo vista preliminar.
+   if bFacturaGenerada = True then
+      Result:=inherited Total
+   else
+      Result:=dSubTotal + dTotalImpuestosRetenidos + dTotalImpuestosTrasladados - dDescuento;
 end;
 
 // Obtenemos el certificado de la clase padre para obtener el record
@@ -201,6 +223,7 @@ begin
      // Generamos el archivo
      inherited GuardarEnArchivo(sArchivo);
 
+     bFacturaGenerada:=True;
      // Mandamos llamar el evento de que se genero la factura
      if Assigned(fOnComprobanteGenerado) then
         fOnComprobanteGenerado();
