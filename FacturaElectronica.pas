@@ -6,18 +6,17 @@ uses FacturaTipos, ComprobanteFiscal;
 
 type
 
-TOnComprobanteGenerado = procedure() of Object;
+TOnComprobanteGenerado = procedure(Sender: TObject) of Object;
 
 ///<summary>Representa una factura electronica sus metodos para generarla, leerla y validarla
 /// cumpliendo la ley del Codigo Fiscal de la Federacion (CFF) Articulos 29 y 29-A.
 /// (Soporta la version 2.0 de CFD)</summary>
 TFacturaElectronica = class(TFEComprobanteFiscal)
 private
-  fFolio: TFEFolio;
   fCertificado: TFECertificado;
   fBloqueFolios: TFEBloqueFolios;
   fTipoComprobante: TFeTipoComprobante;
-  bFacturaGenerada: Boolean;
+
   fExpedidoEn: TFeExpedidoEn;
   fCondicionesDePago: String;
   fEmisor: TFEContribuyente;
@@ -45,8 +44,9 @@ private
   function getTotal() : Currency;
 published
   property FechaGeneracion;
+  property FacturaGenerada;
+  property Folio;
 public
-  property Folio: TFEFolio read fFolio write fFolio;
   property Receptor: TFEContribuyente read fReceptor write fReceptor;
   property Emisor: TFEContribuyente read fEmisor write fEmisor;
   property Tipo: TFeTipoComprobante read fTipoComprobante write fTipoComprobante;
@@ -112,7 +112,6 @@ begin
     fBloqueFolios:=bfBloqueFolios;
     fCertificado:=cerCertificado;
     fTipoComprobante:=tcTipo;
-    bFacturaGenerada:=False;
     dDescuento := 0;
 
     // TODO: Implementar CFD 3.0 y usar la version segun sea necesario...
@@ -162,7 +161,7 @@ begin
    // Si ya generamos la factura, regresamos el total calculado por la Clase ComprobanteFiscal
    // si no, calculamos nosotros el total en base a los datos ingresados al momento
    // usado para cuando se esta en modo vista preliminar.
-   if bFacturaGenerada = True then
+   if inherited FacturaGenerada = True then
       Result:=inherited Total
    else
       Result:=dSubTotal + dTotalImpuestosRetenidos + dTotalImpuestosTrasladados - dDescuento;
@@ -213,20 +212,17 @@ begin
 
      if (fReceptor.RFC = '') then
         Raise Exception.Create('No hay un receptor configurado');
-     
 
-     fFolio:=iFolio;
      // Especificamos los campos del CFD en el orden especifico
      // ya que de lo contrario no cumplirá con los requisitios del SAT
-     LlenarComprobante(fFolio, fpFormaDePago);
+     LlenarComprobante(iFolio, fpFormaDePago);
 
      // Generamos el archivo
      inherited GuardarEnArchivo(sArchivo);
-
-     bFacturaGenerada:=True;
+     
      // Mandamos llamar el evento de que se genero la factura
      if Assigned(fOnComprobanteGenerado) then
-        fOnComprobanteGenerado();
+        fOnComprobanteGenerado(Self);
 end;
 
 
