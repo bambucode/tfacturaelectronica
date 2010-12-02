@@ -39,6 +39,7 @@ type
 {$ENDIF}
     _CADENA_PAGO_UNA_EXHIBICION: String;
     _CADENA_PAGO_PARCIALIDADES: String;
+    bFacturaGenerada: Boolean;
     fDocumentoXML: TXMLDocument;
     fXmlComprobante: IFEXMLComprobante;
     sCacheCadenaOriginal: TStringCadenaOriginal;
@@ -131,6 +132,7 @@ type
     property TotalImpuestosRetenidos: Currency read fTotalImpuestosRetenidos;
     property TotalImpuestosTrasladados: Currency read fTotalImpuestosTrasladados;
     property Total: Currency read getTotal;
+    property FacturaGenerada: Boolean read bFacturaGenerada;
 
     // Propiedades especificas al comprobante electronico
     property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
@@ -162,6 +164,7 @@ begin
 
   // Establecemos los defaults
   sCacheCadenaOriginal:='';
+  bFacturaGenerada:=False;
 
   {$IFDEF VERSION_DE_PRUEBA}
     _USAR_HORA_REAL := False;
@@ -847,16 +850,20 @@ end;
 // Regresa el XML final del comprobante ya lleno
 function TFEComprobanteFiscal.getXML(): WideString;
 begin
-  // Asignamos el sello digital al XML
-  fXmlComprobante.Sello := Self.SelloDigital;
-  result := fDocumentoXML.XML.Text;
+    // Checamos si ya fue generada previamente la factura
+    if bFacturaGenerada = True then
+        Result:=fDocumentoXML.XML.Text
+    else
+        Raise Exception.Create('No se puede obtener el XML cuando aún no se ha generado el archivo CFD');
 end;
 
+// El metodo que genera el CFD al final...
 procedure TFEComprobanteFiscal.GuardarEnArchivo(sArchivoDestino: String);
 begin
   // Forzamos que se calcule el sello
   fXmlComprobante.Sello := Self.SelloDigital;
   fDocumentoXML.SaveToFile(sArchivoDestino);
+  bFacturaGenerada:=True;
   // TODO: Implementar las diversas fallas que pueden ocurrir
 end;
 
