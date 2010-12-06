@@ -256,14 +256,14 @@ function TOpenSSL.HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String;
 var
   mdctx: EVP_MD_CTX;
   {$IF CompilerVersion >= 20}
-      Inbuf: Array [0..8192] of AnsiChar;
+      Inbuf: Array[0..99999] of AnsiChar; // Antes [0..8192]
       Outbuf: array [0..1024] of AnsiChar;
   {$ELSE}
-      Inbuf: Array [0..8192] of Char;
+      Inbuf: Array[0..99999] of Char;
       Outbuf: array [0..1024] of Char;
   {$IFEND}
 	ekLlavePrivada: pEVP_PKEY;
-  Len: cardinal;
+  Len, Tam: cardinal;
 begin
   fArchivoLlavePrivada:=ArchivoLlavePrivada;
   fClaveLlavePrivada:= ClaveLlavePrivada;
@@ -271,11 +271,14 @@ begin
   Len:=0;
   ekLlavePrivada := ObtenerLlavePrivadaDesencriptada;
 
+  //SetLength(Inbuf, 8192); // StrLen(@sCadena)
+
   // NOTA IMPORTANTE:
   // Esta funcion debe de recibir RawByteString en Delphi 2009 o superior y tipo UTF8String en Delphi 2007
   // de lo contrario no copiara correctamente los datos en memoria regresando sellos invalidos
   //CodeSite.Send('CodePage',StringCodePage(sCadena));
-  StrPCopy(inbuf,sCadena);
+  Tam:=Length(sCadena); // Obtenemos el tamaño de la cadena original
+  StrPLCopy(inbuf, sCadena, Tam);  // Copiamos la cadena original al buffer de entrada 
 
   if not Assigned(ekLlavePrivada) then
     Raise TLlaveLecturaException.Create('No fue posible leer la llave privada');

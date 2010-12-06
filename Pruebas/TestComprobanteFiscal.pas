@@ -28,6 +28,7 @@ type
     procedure setReceptor_Receptor_LoGuardeEnXML;
     procedure setEmisor_Emisor_LoGuardeEnXML;
     procedure AgregarConcepto_Concepto_LoGuardeEnXML;
+    procedure SelloDigital_DeMilConceptos_SeaCorrecto;
     procedure setCertificado_Certificado_GuardeNumeroDeSerieEnEstructuraXML;
     procedure setCertificado_IncluyendoEnXML_GuardeCertificadoBase64EnXML;
     procedure setFolio_Folio_LoGuardeEnXML;
@@ -523,6 +524,44 @@ begin
               'La cadena original no fue generada correctamente');
 end;
 
+procedure TestTFEComprobanteFiscal.SelloDigital_DeMilConceptos_SeaCorrecto;
+var
+     I: Integer;
+     Concepto: TFEConcepto;
+     sSelloDigitalCorrecto: String;
+     Certificado: TFECertificado;
+const
+    _ARCHIVO_LLAVE_PRIVADA = 'comprobante_fiscal/FIFC000101AM1.key';
+    _CLAVE_LLAVE_PRIVADA = '12345678a';
+begin
+     // Leemos el certificado
+      Certificado.Ruta := fRutaFixtures + _RUTA_CERTIFICADO;
+      Certificado.LlavePrivada.Ruta := fRutaFixtures + _ARCHIVO_LLAVE_PRIVADA;
+      Certificado.LlavePrivada.Clave := _CLAVE_LLAVE_PRIVADA;
+
+      // Leemos el comprobante del XML (que no tiene conceptos)
+      sSelloDigitalCorrecto := GenerarComprobanteFiscal(fRutaFixtures +
+                              'comprobante_fiscal/comprobante_para_sello_digital_con_mil_conceptos.xml',
+                              Certificado);
+
+                              
+     // Ahora, agregamos 1000 articulos
+     // para verificar que el buffer aguante...
+     for I := 1 to 1000 do
+     begin
+          Concepto.Cantidad:=1;
+          Concepto.Descripcion:='Articulo ' + IntToStr(I);
+          Concepto.ValorUnitario:=I;
+          Concepto.NoIdentificacion:=IntToStr(I);
+          
+          fComprobanteFiscal.AgregarConcepto(Concepto);
+     end;
+
+     // Verificamos que el sello sea correcto
+     CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
+              'El sello digital no fue calculado correctamente');
+end;
+
 procedure TestTFEComprobanteFiscal.SelloDigital_DeComprobante_SeaCorrecto;
 var
   sSelloDigitalCorrecto: String;
@@ -645,6 +684,8 @@ begin
   CheckEquals(sXMLConCertificado, fComprobanteFiscal.fXmlComprobante.XML,
     'El Contenido XML no incluyo el contenido del certificado o este es incorrecto.');
 end;
+
+
 
 procedure TestTFEComprobanteFiscal.setEmisor_Emisor_LoGuardeEnXML;
 var
