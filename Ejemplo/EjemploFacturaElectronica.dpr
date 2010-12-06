@@ -110,7 +110,7 @@ begin
       // Agregamos el impuesto del concepto 1
       Impuesto1.Nombre:='IVA';
       Impuesto1.Tasa:=16;
-           Impuesto1.Importe:=Concepto1.Importe * (Impuesto1.Tasa/100);
+           Impuesto1.Importe:=(Concepto1.ValorUnitario * Concepto1.Cantidad) * (Impuesto1.Tasa/100);
       Factura.AgregarImpuestoTrasladado(Impuesto1);
 
       Concepto2.Cantidad:=3;
@@ -124,6 +124,7 @@ begin
 
       // Mandamos generar la factura con el siguiente folio disponible
       sArchivo:=GetDesktopFolder() + '\MiFactura.xml';
+
       Factura.GenerarYGuardar(1, fpUnaSolaExhibicion, sArchivo);
 
       WriteLn('La factura ha sido generada y guardada en el escritorio. El archivo es: ' + sArchivo);
