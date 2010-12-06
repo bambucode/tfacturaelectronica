@@ -17,7 +17,11 @@ interface
 
 uses FacturaTipos, FeCFDv2, SysUtils, dialogs, 
   // Unidades especificas de manejo de XML:
-  XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd;
+  XmlDom, XMLIntf, MsXmlDom, XMLDoc,
+  {$IFDEF VER220}
+    CodeSiteLogging,
+  {$ENDIF}
+  XSLProd;
 
 type
 
@@ -61,6 +65,8 @@ type
     fSubTotal: Currency;
     fTotalImpuestosRetenidos: Currency;
     fTotalImpuestosTrasladados: Currency;
+    bHuboRetenciones: Boolean;
+    bHuboTraslados: Boolean;
     fDesglosarTotalesImpuestos: Boolean;
 
     procedure setSubTotal(dMonto: Currency);
@@ -165,6 +171,8 @@ begin
   // Establecemos los defaults
   sCacheCadenaOriginal:='';
   bFacturaGenerada:=False;
+  bHuboRetenciones:=False;
+  bHuboTraslados:=False;
 
   {$IFDEF VERSION_DE_PRUEBA}
     _USAR_HORA_REAL := False;
@@ -406,7 +414,7 @@ begin
             // TODO: Arreglar nodo Complemento segun la regla 10
 
             // 8) Datos de Cada Retención de Impuestos
-            if fTotalImpuestosRetenidos > 0 then // Solo accedemos al nodo XML si hubo retenciones
+            if (bHuboRetenciones = True) then // Solo accedemos al nodo XML si hubo retenciones
               for I := 0 to fXmlComprobante.Impuestos.Retenciones.Count - 1 do
               begin
                 with fXmlComprobante.Impuestos.Retenciones do
@@ -420,7 +428,7 @@ begin
               AgregarAtributo(fXmlComprobante.Impuestos, 'totalImpuestosRetenidos');
 
             // 9) Datos de Cada Traslado de Impuestos
-            if fTotalImpuestosTrasladados > 0 then
+            if (bHuboTraslados = True) then
               for I := 0 to fXmlComprobante.Impuestos.Traslados.Count - 1 do
               begin
                 with fXmlComprobante.Impuestos.Traslados do
@@ -438,6 +446,12 @@ begin
             // 7. Toda la cadena de original se encuentra expresada en el formato de codificación UTF-8.
             // Solo agregamos un PIPE mas porque el ultimo atributo tiene al final su pipe.
             sCacheCadenaOriginal := UTF8Encode(sRes + _PIPE);
+            {$IFDEF VER220}
+                // Si estamos en Delphi XE, mandamos el debug al CodeSite
+                CodeSite.EnterMethod('getCadenaOriginal');
+                CodeSite.Send(sCacheCadenaOriginal,'');
+                 CodeSite.ExitMethod('getCadenaOriginal');
+            {$ENDIF}
             Result:=sCacheCadenaOriginal;
      end;
 end;
@@ -799,6 +813,7 @@ end;
 procedure TFEComprobanteFiscal.AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoRetenido);
 begin
   fTotalImpuestosRetenidos := fTotalImpuestosRetenidos + NuevoImpuesto.Importe;
+  bHuboRetenciones:=True;
   with fXmlComprobante.Impuestos.Retenciones.Add do
   begin
     Impuesto := TFEReglamentacion.ComoCadena(NuevoImpuesto.Nombre);
@@ -809,6 +824,7 @@ end;
 procedure TFEComprobanteFiscal.AgregarImpuestoTrasladado(NuevoImpuesto: TFEImpuestoTrasladado);
 begin
   fTotalImpuestosTrasladados := fTotalImpuestosTrasladados + NuevoImpuesto.Importe;
+  bHuboTraslados:=True;
   with fXmlComprobante.Impuestos.Traslados.Add do
   begin
     Impuesto := TFEReglamentacion.ComoCadena(NuevoImpuesto.Nombre);

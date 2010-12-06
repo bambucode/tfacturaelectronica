@@ -110,14 +110,20 @@ begin
       // Agregamos el impuesto del concepto 1
       Impuesto1.Nombre:='IVA';
       Impuesto1.Tasa:=16;
-           Impuesto1.Importe:=(Concepto1.ValorUnitario * Concepto1.Cantidad) * (Impuesto1.Tasa/100);
+      Impuesto1.Importe:=(Concepto1.ValorUnitario * Concepto1.Cantidad) * (Impuesto1.Tasa/100);
       Factura.AgregarImpuestoTrasladado(Impuesto1);
 
       Concepto2.Cantidad:=3;
       Concepto2.Unidad:='M';
-      Concepto2.Descripcion:='Papel para cuaderno por metro';
+      Concepto2.Descripcion:='Alimento o Medicina';
       Concepto2.ValorUnitario:=10.50;
       Factura.AgregarConcepto(Concepto2);
+
+      // Agregamos el impuesto del concepto 2 con Tasa Cero
+      Impuesto2.Nombre:='IVA';
+      Impuesto2.Tasa:=0;
+      Impuesto2.Importe:=(Concepto2.ValorUnitario * Concepto2.Cantidad) * (Impuesto2.Tasa/100);
+      Factura.AgregarImpuestoTrasladado(Impuesto2);
 
       // Le damos un descuento
       //Factura.AsignarDescuento(5, 'Por pronto pago');
