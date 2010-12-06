@@ -12,7 +12,11 @@ TOnComprobanteGenerado = procedure(Sender: TObject) of Object;
 /// cumpliendo la ley del Codigo Fiscal de la Federacion (CFF) Articulos 29 y 29-A.
 /// (Soporta la version 2.0 de CFD)</summary>
 TFacturaElectronica = class(TFEComprobanteFiscal)
-private
+{$IFDEF VERSION_DE_PRUEBA}
+  public
+{$ELSE}
+  private
+{$ENDIF}
   fCertificado: TFECertificado;
   fBloqueFolios: TFEBloqueFolios;
   fTipoComprobante: TFeTipoComprobante;
@@ -42,6 +46,7 @@ private
   procedure LlenarComprobante(iFolio: Integer; fpFormaDePago: TFEFormaDePago);
   function obtenerCertificado() : TFECertificado;
   function getTotal() : Currency;
+  function ObtenerImporte(Concepto: TFEConcepto) : Currency;
 published
   property FechaGeneracion;
   property FacturaGenerada;
@@ -143,14 +148,19 @@ begin
     Result:=Length(fArrImpuestosTrasladados) - 1;
 end;
 
+function TFacturaElectronica.ObtenerImporte(Concepto: TFEConcepto) : Currency;
+begin
+    Result:=Concepto.ValorUnitario * Concepto.Cantidad;
+end;
+
 function TFacturaElectronica.AgregarConcepto(NuevoConcepto: TFEConcepto) : Integer;
 begin
     SetLength(fArrConceptos, Length(fArrConceptos) + 1);
     fArrConceptos[Length(fArrConceptos) - 1] := NuevoConcepto;
 
     // Se Suma el total
-    dSubtotal := dSubtotal + NuevoConcepto.Importe;
-    dTotal:=dTotal + NuevoConcepto.Importe;
+    dSubtotal := dSubtotal + ObtenerImporte(NuevoConcepto);
+    dTotal:=dTotal + ObtenerImporte(NuevoConcepto);
 
     Result:=Length(fArrConceptos) - 1;
 end;

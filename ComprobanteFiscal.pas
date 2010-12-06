@@ -654,7 +654,7 @@ begin
 
     Descripcion := TFEReglamentacion.ComoCadena(Concepto.Descripcion);
     ValorUnitario := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario);
-    Importe := TFEReglamentacion.ComoMoneda(Concepto.Importe);
+    Importe := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario * Concepto.Cantidad);
 
     // Le fue asignada informacion aduanera??
     if (Concepto.DatosAduana.NumeroDocumento <> '') then

@@ -408,7 +408,7 @@ begin
       Concepto.Descripcion := Descripcion;
       Concepto.ValorUnitario := StrToFloat(ValorUnitario);
       Concepto.CuentaPredial := CuentaPredial.Numero;
-      dSubtotal := dSubtotal + Concepto.Importe;
+      dSubtotal := dSubtotal + (Concepto.ValorUnitario * Concepto.Cantidad);
       // TODO: Leer datos de aduana si acaso los tiene
     end;
     fComprobanteFiscal.AgregarConcepto(Concepto);
@@ -544,7 +544,6 @@ begin
                               'comprobante_fiscal/comprobante_para_sello_digital_con_mil_conceptos.xml',
                               Certificado);
 
-                              
      // Ahora, agregamos 1000 articulos
      // para verificar que el buffer aguante...
      for I := 1 to 1000 do

@@ -30,7 +30,7 @@ TStringCadenaOriginal = UTF8String;
 {$IFEND}
 
 TFEFolio = Integer;
-TFESerie = String;
+TFESerie = String[10];
 
 TFEFormaDePago = (fpUnaSolaExhibicion, fpParcialidades);
 TFETipoComprobante = (tcIngreso, tcEgreso, tcTraslado);
@@ -58,9 +58,11 @@ TFEDocumentoAduanero = record
   Aduana: String;
 end;
 
+TFERFC = String[13];
+
 TFEContribuyente = record
 	Nombre: String;
-	RFC: String[13];
+	RFC: TFERFC;
   Direccion: TFeDireccion;
 end;
 
@@ -83,9 +85,7 @@ TFEConcepto = record
   NoIdentificacion: String;
   DatosAduana: TFEDatosAduana;
   CuentaPredial: String;
-  Extra: String; 
-public
-  function Importe() : Currency;
+  Extra: String;
 end;
 
 TFEConceptos = Array of TFEConcepto;
@@ -126,17 +126,9 @@ end;
 
 TFEImpuestosTrasladados = Array of TFEImpuestoTrasladado;
 
-// La definicion de la interfase de un comprobante comun para todas las versiones
-IComprobanteDigital = Interface(IInterface)
-
-end;
-
+// Usado por la clase ReporteMensual
+TFEPedimentos = Array of TFEDatosAduana;
 
 implementation
-
-function TFEConcepto.Importe : Currency;
-begin
-    Result:=Cantidad * ValorUnitario;
-end;
 
 end.
