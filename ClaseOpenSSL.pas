@@ -15,7 +15,7 @@
 
 interface
 
-uses libeay32, SysUtils, Windows, OpenSSLUtils;
+uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
 
   type
 
@@ -31,6 +31,7 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils;
     TLlaveFormatoIncorrectoException = Exception;
     TLlaveLecturaException = Exception;
     TLlavePrivadaClaveIncorrectaException = Exception;
+    TLlavePareceSerFiel = Exception;
 
     ///<summary>Clase que representa a la liberia OpenSSL y que tiene
     ///  metodos usados para generar el sello digital (digestion md5) y
@@ -49,6 +50,12 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils;
     public
         /// <summary>Crea el objeto, inicializa la liberia OpenSSL, y establece la llave privada a usar</summary>
         constructor Create(); overload;
+        /// <summary>Prueba abrir la llave privada, si tiene exito regresa informacion de la llave, si falla
+        ///  lanza una excepcion segun el tipo de error que se tuvo</summary>
+        /// <param name="Ruta">Ruta completa al archivo de llave privada a usar
+        /// (archivo con extension .key)</param>
+        /// <param name="ClaveLlavePrivada">La clave privada a usar para abrir el archivo de llave privada</param>
+        function AbrirLlavePrivada(Ruta, ClaveLlavePrivada : String) : pPKCS8_Priv_Key_Info;
         /// <summary>Hace una digestion (hashing) de la Cadena segun el Tipo de digestion y regresa el
         /// resultado en formato base64</summary>
         /// <param name="ArchivoLlavePrivada">Ruta completa al archivo de llave privada a usar
@@ -66,7 +73,7 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils;
 
 implementation
 
-uses  StrUtils, libeay32plus;
+uses  StrUtils;
 
 constructor TOpenSSL.Create();
 begin
@@ -138,18 +145,13 @@ begin
   result := StrPas(PAnsiChar(@ErrMsg));
 end;
 
-// Metodo creado por Luis Carrasco (luis@bambucode.com) con ayuda de
-// Marco Ferrante <marco@csita.unige.it>
-// Lee una llave binaria (.key) que tiene formato DER en memoria
-// para ser usada para hacer una digestion MD5, SHA1, etc. sin necesidad
-// de crear y usar un archivo PEM primero
-function TOpenSSL.ObtenerLlavePrivadaDesencriptada() : pEVP_PKEY;
+
+function TOpenSSL.AbrirLlavePrivada(Ruta, ClaveLlavePrivada : String) : pPKCS8_Priv_Key_Info;
 var
     bioArchivoLlave : pBIO;
     sMsgErr: String;
     p8 : pX509_SIG;
     p8inf : pPKCS8_Priv_Key_Info;
-    resLlave   : pEVP_PKEY;
     {$IF CompilerVersion >= 20}
         p8pass: PAnsiChar;
     {$ELSE}
@@ -159,30 +161,34 @@ begin
     // Creamos el objeto en memoria para leer la llave en formato binario .DER (.KEY)
     bioArchivoLlave := BIO_new(BIO_s_file());
 
-    if Not FileExists(fArchivoLlavePrivada) then
+    if Not FileExists(Ruta) then
       Raise TNoExisteArchivoException.Create('El archivo de llave privada no existe.');
 
     // Checamos que la extension de la llave privada sea la correcta
-    if AnsiPos('.PEM', Uppercase(fArchivoLlavePrivada)) > 0 then
+    if AnsiPos('.PEM', Uppercase(Ruta)) > 0 then
       Raise TLlaveFormatoIncorrectoException.Create('La llave privada debe de ser el archivo binario (.key, .cer) y ' +
             'no el formato base64 .pem');
 
     // Leemos el archivo de llave binario en el objeto creado en memoria
     // DIferentes parametros si usa Delphi 2009 o superior...
     {$IF CompilerVersion >= 20}
-        if BIO_read_filename(bioArchivoLlave, PWideChar(AnsiString(fArchivoLlavePrivada))) = 0 then
+        if BIO_read_filename(bioArchivoLlave, PWideChar(AnsiString(Ruta))) = 0 then
     {$ELSE}
-        if BIO_read_filename(bioArchivoLlave, PChar(AnsiString(fArchivoLlavePrivada))) = 0 then
+        if BIO_read_filename(bioArchivoLlave, PChar(AnsiString(Ruta))) = 0 then
     {$IFEND}
           raise TLlaveLecturaException.Create('Error al leer llave privada. Error reportado: '+
                 ObtenerUltimoMensajeDeError);
 
+    // Checamos que la clave no esté vacia
+    if Trim(ClaveLlavePrivada) = '' then
+      raise TLlavePrivadaClaveIncorrectaException.Create('La clave de la llave privada esta vacia');
+
     // Convertimos al tipo adecuado de acuerdo a la version de Delphi...
     {$IF CompilerVersion >= 20}
         // Delphi 2009 o superior
-        p8pass:=PAnsiChar(AnsiString(fClaveLlavePrivada));
+        p8pass:=PAnsiChar(AnsiString(ClaveLlavePrivada));
     {$ELSE}
-        p8pass:=PChar(AnsiString(fClaveLlavePrivada));
+        p8pass:=PChar(AnsiString(ClaveLlavePrivada));
     {$IFEND}
 
     p8:=nil;
@@ -203,24 +209,46 @@ begin
            // TODO: Crear excepciones para los diferentes tipos de error que puede haber al
            // tratar de desencriptar la llave privada
            // Llave incorrecta (Mensaje exacto: 23077074:PKCS12 routines:PKCS12_pbe_crype:pkcs12 cipherfinal error)
-           if ((AnsiPos('cipherfinal error', sMsgErr) > 0) or (AnsiPos('bad decrypt', sMsgErr) > 0)) then
+           if ((AnsiPos('cipherfinal error', sMsgErr) > 0) or // clave incorrecta
+              (AnsiPos('bad decrypt', sMsgErr) > 0))   // clave incorrecta
+           then
               raise TLlavePrivadaClaveIncorrectaException.Create('La clave de la llave privada fue incorrecta')
            else
-              raise TLlaveLecturaException.Create('Error desconocido al desencriptar llave privada. Error reportado: '+
-                    ObtenerUltimoMensajeDeError);
+              if (AnsiPos('unknown pbe algorithm', sMsgErr) > 0) then // Clave vacia o pertenece a la FIEL
+                Raise TLlavePareceSerFiel.Create('Al parecer la llave privada pertenece a la FIEL')
+              else
+                raise TLlaveLecturaException.Create('Error desconocido al desencriptar llave privada. Error reportado: '+
+                      ObtenerUltimoMensajeDeError);
 
-           // No esta dando un certificado de la FIEL??
+           // Nos estan dando un certificado de la FIEL??
            {if AnsiPos('bad decrypt', sMsgErr) > 0 then
               raise TCertificadoLlaveEsFiel.Create('El certificado (archivo de llave) pertenece a la FIEL. + '
               'Use el certificado de Llave Privada')
            else}
-        end;
+        end else
+
     finally
         // Liberamos las variables usadas en memoria
         X509_SIG_free(p8);
 	      BIO_free(bioArchivoLlave);
         EVP_cleanup;
     end;
+
+    Result:=p8inf;
+end;
+
+// Metodo creado por Luis Carrasco (luis@bambucode.com) con ayuda de
+// Marco Ferrante <marco@csita.unige.it>
+// Lee una llave binaria (.key) que tiene formato DER en memoria
+// para ser usada para hacer una digestion MD5, SHA1, etc. sin necesidad
+// de crear y usar un archivo PEM primero
+function TOpenSSL.ObtenerLlavePrivadaDesencriptada() : pEVP_PKEY;
+var
+    p8inf : pPKCS8_Priv_Key_Info;
+    resLlave   : pEVP_PKEY;
+begin
+    // Abrimos la llave privada
+    p8inf:=AbrirLlavePrivada(fArchivoLlavePrivada, fClaveLlavePrivada);
 
     // Convierte la llave de formato PKCS8 a PEM (en memoria)
     resLlave := EVP_PKCS82PKEY(p8inf);
