@@ -9,7 +9,7 @@
  http://bambucode.com/codigoabierto
 
  La licencia de este codigo fuente se encuentra en:
- http://github.com/bambucode/bc_facturaelectronica/blob/master/LICENCIA
+ http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
  ******************************************************************************)
 {$DEFINE VERSION_DE_PRUEBA}
 
@@ -64,4 +64,3 @@ begin
   else
     GUITestRunner.RunRegisteredTests;
 end.
-
