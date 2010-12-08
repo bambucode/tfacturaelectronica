@@ -26,12 +26,12 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
     {$IFEND}
 
     TTipoDigestionOpenSSL = (tdMD5, tdSHA1);
-    TNoExisteArchivoException = Exception;
-    TCertificadoLlaveEsFiel = Exception;
-    TLlaveFormatoIncorrectoException = Exception;
-    TLlaveLecturaException = Exception;
-    TLlavePrivadaClaveIncorrectaException = Exception;
-    TLlavePareceSerFiel = Exception;
+    ENoExisteArchivoException = class(Exception);
+    ECertificadoLlaveEsFiel = class(Exception);
+    ELlaveFormatoIncorrectoException = class(Exception);
+    ELlaveLecturaException = class(Exception);
+    ELlavePrivadaClaveIncorrectaException = class(Exception);
+    ELlavePareceSerFiel = class(Exception);
 
     ///<summary>Clase que representa a la liberia OpenSSL y que tiene
     ///  metodos usados para generar el sello digital (digestion md5) y
@@ -162,11 +162,11 @@ begin
     bioArchivoLlave := BIO_new(BIO_s_file());
 
     if Not FileExists(Ruta) then
-      Raise TNoExisteArchivoException.Create('El archivo de llave privada no existe.');
+      Raise ENoExisteArchivoException.Create('El archivo de llave privada no existe.');
 
     // Checamos que la extension de la llave privada sea la correcta
     if AnsiPos('.PEM', Uppercase(Ruta)) > 0 then
-      Raise TLlaveFormatoIncorrectoException.Create('La llave privada debe de ser el archivo binario (.key, .cer) y ' +
+      Raise ELlaveFormatoIncorrectoException.Create('La llave privada debe de ser el archivo binario (.key, .cer) y ' +
             'no el formato base64 .pem');
 
     // Leemos el archivo de llave binario en el objeto creado en memoria
@@ -176,12 +176,12 @@ begin
     {$ELSE}
         if BIO_read_filename(bioArchivoLlave, PChar(AnsiString(Ruta))) = 0 then
     {$IFEND}
-          raise TLlaveLecturaException.Create('Error al leer llave privada. Error reportado: '+
+          raise ELlaveLecturaException.Create('Error al leer llave privada. Error reportado: '+
                 ObtenerUltimoMensajeDeError);
 
     // Checamos que la clave no esté vacia
     if Trim(ClaveLlavePrivada) = '' then
-      raise TLlavePrivadaClaveIncorrectaException.Create('La clave de la llave privada esta vacia');
+      raise ELlavePrivadaClaveIncorrectaException.Create('La clave de la llave privada esta vacia');
 
     // Convertimos al tipo adecuado de acuerdo a la version de Delphi...
     {$IF CompilerVersion >= 20}
@@ -198,7 +198,7 @@ begin
         //  Leemos la llave en formato binario (PKCS8)
         p8 := d2i_PKCS8_bio(bioArchivoLlave, nil);
         if not Assigned(p8) then
-          raise TLlaveLecturaException.Create('Error al leer llave privada. Error reportado: '+
+          raise ELlaveLecturaException.Create('Error al leer llave privada. Error reportado: '+
                 ObtenerUltimoMensajeDeError);
 
         // Des encriptamos la llave en memoria usando la clave proporcionada
@@ -212,12 +212,12 @@ begin
            if ((AnsiPos('cipherfinal error', sMsgErr) > 0) or // clave incorrecta
               (AnsiPos('bad decrypt', sMsgErr) > 0))   // clave incorrecta
            then
-              raise TLlavePrivadaClaveIncorrectaException.Create('La clave de la llave privada fue incorrecta')
+              raise ELlavePrivadaClaveIncorrectaException.Create('La clave de la llave privada fue incorrecta')
            else
               if (AnsiPos('unknown pbe algorithm', sMsgErr) > 0) then // Clave vacia o pertenece a la FIEL
-                Raise TLlavePareceSerFiel.Create('Al parecer la llave privada pertenece a la FIEL')
+                Raise ELlavePareceSerFiel.Create('Al parecer la llave privada pertenece a la FIEL')
               else
-                raise TLlaveLecturaException.Create('Error desconocido al desencriptar llave privada. Error reportado: '+
+                raise ELlaveLecturaException.Create('Error desconocido al desencriptar llave privada. Error reportado: '+
                       ObtenerUltimoMensajeDeError);
 
            // Nos estan dando un certificado de la FIEL??
@@ -309,7 +309,7 @@ begin
   StrPLCopy(inbuf, sCadena, Tam);  // Copiamos la cadena original al buffer de entrada 
 
   if not Assigned(ekLlavePrivada) then
-    Raise TLlaveLecturaException.Create('No fue posible leer la llave privada');
+    Raise ELlaveLecturaException.Create('No fue posible leer la llave privada');
 
   // Establecemos el tipo de digestion a realizar
   case trTipo of

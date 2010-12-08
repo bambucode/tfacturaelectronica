@@ -156,7 +156,7 @@ begin
   try
     fOpenSSL2.HacerDigestion(fArchivoLlavePrivada, 'claveincorrectaintencional', 'Cadena', tdMD5);
   except
-    On E: TLlavePrivadaClaveIncorrectaException do
+    On E: ELlavePrivadaClaveIncorrectaException do
     begin
       bExcepcionLanzada := True;
     end;

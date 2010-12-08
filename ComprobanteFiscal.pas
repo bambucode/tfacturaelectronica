@@ -26,9 +26,9 @@ uses FacturaTipos, FeCFDv2, SysUtils, dialogs,
 type
 
   // Excepciones que pueden ser generadas
-  TFECertificadoNoExisteException = Exception;
-  TFECertificadoNoVigente = Exception;
-  TFEFolioFueraDeRango = Exception;
+  EFECertificadoNoExisteException = class(Exception);
+  EFECertificadoNoVigente =  class(Exception);
+  EFEFolioFueraDeRango = class(Exception);
 
   /// <summary>Representa la estructura de comprobante fiscal digital (ver2.0) y sus elementos
   /// definidos de acuerdo al XSD del SAT. Esta pensado para ser extendido en las versiones
@@ -613,7 +613,7 @@ begin
   x509Certificado := TX509Certificate.Create;
   try
     if Not FileExists(Certificado.Ruta) then
-      raise TFECertificadoNoExisteException.Create('No existe el archivo del certificado')
+      raise EFECertificadoNoExisteException.Create('No existe el archivo del certificado')
     else
       x509Certificado.LoadFromFile(Certificado.Ruta);
 
@@ -623,7 +623,7 @@ begin
 
     // Checamos que el certificado este dentro de la vigencia
     if Not((Now >= fCertificado.VigenciaInicio) and (Now <= fCertificado.VigenciaFin)) then
-      raise TFECertificadoNoVigente.Create('El certificado no tiene vigencia actual');
+      raise EFECertificadoNoVigente.Create('El certificado no tiene vigencia actual');
 
     fCertificado.NumeroSerie := x509Certificado.SerialNumber;
 
@@ -709,7 +709,7 @@ begin
   if ((fBloqueFolios.FolioInicial > -1) And (fFolio > -1)) then
   begin
     if Not((Folio >= fBloqueFolios.FolioInicial) And (Folio <= fBloqueFolios.FolioFinal)) then
-      raise TFEFolioFueraDeRango.Create('El folio se encuentra fuera del rango autorizado');
+      raise EFEFolioFueraDeRango.Create('El folio se encuentra fuera del rango autorizado');
   end;
 end;
 

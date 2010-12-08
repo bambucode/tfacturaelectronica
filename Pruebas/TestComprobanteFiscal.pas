@@ -118,7 +118,7 @@ begin
   try
     fComprobanteFiscal.BloqueFolios := Bloque;
   except
-    On TFEFolioFueraDeRango do
+    On EFEFolioFueraDeRango do
       bHuboError := True;
   end;
 
