@@ -23,8 +23,6 @@ TFacturaElectronica = class(TFEComprobanteFiscal)
 
   fExpedidoEn: TFeExpedidoEn;
   fCondicionesDePago: String;
-  fEmisor: TFEContribuyente;
-  fReceptor: TFEContribuyente;
   fDescuento: Currency;
   sMotivoDescuento: String;
   sMetodoDePago: String;
@@ -51,6 +49,9 @@ published
   property FechaGeneracion;
   property FacturaGenerada;
   property Folio;
+protected
+  procedure setXML(Valor: WideString); override;
+  function getXML() : WideString;
 public
   property Receptor: TFEContribuyente read fReceptor write fReceptor;
   property Emisor: TFEContribuyente read fEmisor write fEmisor;
@@ -66,6 +67,7 @@ public
   property ImpuestosTrasladados: TFEImpuestosTrasladados read fArrImpuestosTrasladados;
   property Certificado : TFECertificado read obtenerCertificado;
   property BloqueFolios: TFEBloqueFolios read fBloqueFolios;
+  property XML : WideString read getXML write setXML;
 
   /// <summary>Evento que es llamado inemdiatamente después de que el CFD fue generado,
   /// el cual puede ser usado para registrar en su sistema contable el registro de la factura
@@ -182,6 +184,27 @@ end;
 function TFacturaElectronica.obtenerCertificado() : TFECertificado;
 begin
     Result:=inherited Certificado;
+end;
+
+
+function TFacturaElectronica.getXML() : WideString;
+begin
+    Result:=inherited XML;
+end;
+
+procedure TFacturaElectronica.setXML(Valor: WideString);
+var
+  I: Integer;
+  xmlConceptos: IFEXMLConceptos;
+begin
+    // Leemos el XML en el Comprobante
+    inherited XML:=Valor;
+
+    xmlConceptos :
+    // Ahora leemos los conceptos del XML y los almacenamos en la estructura interna de
+    // arreglo de conceptos
+    for I := 0 to List.Count - 1 do
+      
 end;
 
 // Funcion encargada de llenar el comprobante fiscal EN EL ORDEN que se especifica en el XSD

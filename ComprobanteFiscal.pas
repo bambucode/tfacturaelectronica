@@ -41,11 +41,12 @@ type
 {$ELSE}
   private
 {$ENDIF}
-    _CADENA_PAGO_UNA_EXHIBICION: String;
-    _CADENA_PAGO_PARCIALIDADES: String;
+    // Variables internas
     bFacturaGenerada: Boolean;
     fDocumentoXML: TXMLDocument;
     fXmlComprobante: IFEXMLComprobante;
+
+    // Propiedades del comprobante
     sCacheCadenaOriginal: TStringCadenaOriginal;
     fFolio: TFEFolio;
     fSelloDigitalCalculado: String;
@@ -60,14 +61,22 @@ type
     sForma: String;
     fDescuento: Currency;
     sMotivoDescuento: String;
-    bIncluirCertificadoEnXML: Boolean;
+
     fSubTotal: Currency;
     fTotalImpuestosRetenidos: Currency;
     fTotalImpuestosTrasladados: Currency;
+
+    // Variables "cache"
     bHuboRetenciones: Boolean;
     bHuboTraslados: Boolean;
-    fDesglosarTotalesImpuestos: Boolean;
 
+    // Opciones de configuracion
+    _CADENA_PAGO_UNA_EXHIBICION: String;
+    _CADENA_PAGO_PARCIALIDADES: String;
+    fDesglosarTotalesImpuestos: Boolean;
+    bIncluirCertificadoEnXML: Boolean;
+
+    // Getters/Setters:
     procedure setSubTotal(dMonto: Currency);
     procedure setExpedidoEn(ExpedidoEn: TFeExpedidoEn);
     procedure setTipoComprobante(Tipo: TFeTipoComprobante);
@@ -81,16 +90,15 @@ type
     procedure setFolio(Folio: TFEFolio);
     procedure setCondicionesDePago(Condiciones: String);
     function obtenerSerie(): TFESerie;
-    // procedure setCertificado(sContenidoCertificado : WideString);
     procedure setCertificado(Certificado: TFECertificado);
-    function getXML(): WideString;
-    procedure setXML(Valor: WideString);
+
     /// <summary>Obtiene la 'Cadena Original' segun las reglas del Anexo 20</summary>
     function getCadenaOriginal(): TStringCadenaOriginal;
     function getSelloDigital(): String;
     procedure setBloqueFolios(Bloque: TFEBloqueFolios);
     function getTotal() : Currency;
     procedure ValidarQueFolioEsteEnRango;
+    function getConceptos() : IFEXmlConceptos;
  {$IFDEF VERSION_DE_PRUEBA}
   public
     _USAR_HORA_REAL : Boolean;
@@ -99,6 +107,9 @@ type
 {$ENDIF}
     fEmisor: TFEContribuyente;
     fReceptor: TFEContribuyente;
+    function getXML(): WideString; virtual;
+    procedure setXML(Valor: WideString); virtual;
+    
     // Propiedades del comprobante normal
     property Folio: TFEFolio read fFolio write setFolio;
     property Receptor: TFEContribuyente read fReceptor write setReceptor;
@@ -110,6 +121,7 @@ type
     property CondicionesDePago: String read fCondicionesDePago write setCondicionesDePago;
     property MetodoDePago: String read fMetodoDePago write setMetodoDePago;
     property FechaGeneracion : TDateTime read fFechaGeneracion;
+    property Conceptos : IFEXmlConceptos read getConceptos;
     /// <summary>Asigna el importe total de descuentos aplicados al comprobante asi como su motivo </summary>
     /// <param name="ImporteDescuento">El monto total de descuentos realizados al comprobante</param>
     /// <param name="Motivo">Atributo opcional para indicar el motivo del descuento</param>
@@ -880,6 +892,11 @@ begin
       FreeAndNil(SelloDigital);
       result := fSelloDigitalCalculado;
   end;
+end;
+
+function TFEComprobanteFiscal.getConceptos() : IFEXmlConceptos;
+begin
+    Result:=fXmlComprobante.Conceptos;
 end;
 
 // Permite establecer el XML del comprobante (por si se esta leyendo de la BD, etc)
