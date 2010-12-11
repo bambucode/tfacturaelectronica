@@ -27,28 +27,28 @@ TFacturaElectronica = class(TFEComprobanteFiscal)
   sMotivoDescuento: String;
   sMetodoDePago: String;
 
-  fArrConceptos: TFEConceptos;
-  fArrImpuestosTrasladados: TFEImpuestosTrasladados;
-  fArrImpuestosRetenidos: TFEImpuestosRetenidos;
+
 
   // Totales internos
-  dTotalImpuestosTrasladados : Double;
+  {dTotalImpuestosTrasladados : Double;
   dTotalImpuestosRetenidos : Double;
   dSubtotal: Currency;
   dTotal: Currency;
-  dDescuento : Currency;
+  dDescuento : Currency;  }
 
   // Eventos:
   fOnComprobanteGenerado: TOnComprobanteGenerado;
   // Funciones y procedimientos
-  procedure LlenarComprobante(iFolio: Integer; fpFormaDePago: TFEFormaDePago);
+
   function obtenerCertificado() : TFECertificado;
-  function getTotal() : Currency;
-  function ObtenerImporte(Concepto: TFEConcepto) : Currency;
 published
   property FechaGeneracion;
   property FacturaGenerada;
   property Folio;
+  property SubTotal;
+  property Conceptos;
+  property ImpuestosRetenidos;
+  property ImpuestosTrasladados;
 protected
   procedure setXML(Valor: WideString); override;
   function getXML() : WideString;
@@ -61,10 +61,8 @@ public
   property MetodoDePago: String read sMetodoDePago write sMetodoDePago;
   // Propiedades calculadas por esta clase:
   property Total: Currency read getTotal;
-  property SubTotal: Currency read dSubTotal;
-  property Conceptos: TFEConceptos read fArrConceptos;
-  property ImpuestosRetenidos: TFEImpuestosRetenidos read fArrImpuestosRetenidos;
-  property ImpuestosTrasladados: TFEImpuestosTrasladados read fArrImpuestosTrasladados;
+
+
   property Certificado : TFECertificado read obtenerCertificado;
   property BloqueFolios: TFEBloqueFolios read fBloqueFolios;
   property XML : WideString read getXML write setXML;
@@ -76,17 +74,7 @@ public
   constructor Create(cEmisor, cCliente: TFEContribuyente; bfBloqueFolios: TFEBloqueFolios;
                      cerCertificado: TFECertificado; tcTipo: TFETipoComprobante);
   destructor Destroy; override;
-  /// <summary>Agrega un nuevo concepto a la factura, regresa la posicion de dicho concepto en
-  /// el arreglo de 'Conceptos'</summary>
-  /// <param name="NuevoConcepto">Este es el nuevo concepto a agregar a la factura
-  ///   el parametro es un "record" del tipo TFEConcepto.</param>
-  function AgregarConcepto(NuevoConcepto: TFeConcepto) : Integer;
-  /// <summary>Agrega un nuevo impuesto de retención (ISR, IVA) al comprobante</summary>
-  /// <param name="NuevoImpuesto">El nuevo Impuesto con los datos de nombre e importe del mismo</param>
-  function AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoRetenido) : Integer;
-  /// <summary>Agrega un nuevo impuesto de traslado (IVA, IEPS)</summary>
-  /// <param name="NuevoImpuesto">El nuevo Impuesto con los datos de nombre, tasa e importe del mismo</param>
-  function AgregarImpuestoTrasladado(NuevoImpuesto: TFEImpuestoTrasladado) : Integer;
+
 
   //procedure Leer(sRuta: String);
   /// <summary>Genera el archivo XML de la factura electrónica con el sello, certificado, etc</summary>
@@ -112,14 +100,12 @@ constructor TFacturaElectronica.Create(cEmisor, cCliente: TFEContribuyente;
             bfBloqueFolios: TFEBloqueFolios; cerCertificado: TFECertificado; tcTipo: TFETipoComprobante);
 begin
     inherited Create;
-    dSubtotal := 0;
     // Llenamos las variables internas con las de los parametros
     fEmisor:=cEmisor;
     fReceptor:=cCliente;
     fBloqueFolios:=bfBloqueFolios;
     fCertificado:=cerCertificado;
     fTipoComprobante:=tcTipo;
-    dDescuento := 0;
 
     // TODO: Implementar CFD 3.0 y usar la version segun sea necesario...
     // Que version de CFD sera usada?
@@ -132,51 +118,6 @@ end;
 destructor TFacturaElectronica.Destroy();
 begin
    inherited Destroy;
-end;
-
-function TFacturaElectronica.AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoRetenido) : Integer;
-begin
-    SetLength(fArrImpuestosRetenidos, Length(fArrImpuestosRetenidos) + 1);
-    fArrImpuestosRetenidos[Length(fArrImpuestosRetenidos) - 1] := NuevoImpuesto;
-    dTotalImpuestosRetenidos:=dTotalImpuestosRetenidos + NuevoImpuesto.Importe;
-    Result:=Length(fArrImpuestosRetenidos) - 1;
-end;
-
-function TFacturaElectronica.AgregarImpuestoTrasladado(NuevoImpuesto: TFEImpuestoTrasladado) : Integer;
-begin
-    SetLength(fArrImpuestosTrasladados, Length(fArrImpuestosTrasladados) + 1);
-    fArrImpuestosTrasladados[Length(fArrImpuestosTrasladados) - 1] := NuevoImpuesto;
-    dTotalImpuestosTrasladados:=dTotalImpuestosTrasladados + NuevoImpuesto.Importe;
-    Result:=Length(fArrImpuestosTrasladados) - 1;
-end;
-
-function TFacturaElectronica.ObtenerImporte(Concepto: TFEConcepto) : Currency;
-begin
-    Result:=Concepto.ValorUnitario * Concepto.Cantidad;
-end;
-
-function TFacturaElectronica.AgregarConcepto(NuevoConcepto: TFEConcepto) : Integer;
-begin
-    SetLength(fArrConceptos, Length(fArrConceptos) + 1);
-    fArrConceptos[Length(fArrConceptos) - 1] := NuevoConcepto;
-
-    // Se Suma el total
-    dSubtotal := dSubtotal + ObtenerImporte(NuevoConcepto);
-    dTotal:=dTotal + ObtenerImporte(NuevoConcepto);
-
-    Result:=Length(fArrConceptos) - 1;
-end;
-
-// Obtiene el total
-function TFacturaElectronica.getTotal() : Currency;
-begin
-   // Si ya generamos la factura, regresamos el total calculado por la Clase ComprobanteFiscal
-   // si no, calculamos nosotros el total en base a los datos ingresados al momento
-   // usado para cuando se esta en modo vista preliminar.
-   if inherited FacturaGenerada = True then
-      Result:=inherited Total
-   else
-      Result:=dSubTotal + dTotalImpuestosRetenidos + dTotalImpuestosTrasladados - dDescuento;
 end;
 
 // Obtenemos el certificado de la clase padre para obtener el record
@@ -195,47 +136,9 @@ end;
 procedure TFacturaElectronica.setXML(Valor: WideString);
 var
   I: Integer;
-  xmlConceptos: IFEXMLConceptos;
 begin
     // Leemos el XML en el Comprobante
     inherited XML:=Valor;
-
-    xmlConceptos :
-    // Ahora leemos los conceptos del XML y los almacenamos en la estructura interna de
-    // arreglo de conceptos
-    for I := 0 to List.Count - 1 do
-      
-end;
-
-// Funcion encargada de llenar el comprobante fiscal EN EL ORDEN que se especifica en el XSD
-// ya que si no es asi, el XML se va llenando en el orden en que se establecen las propiedades de la clase
-// haciendo que el comprobante no pase las validaciones del SAT.
-procedure TFacturaElectronica.LlenarComprobante(iFolio: Integer; fpFormaDePago: TFEFormaDePago);
-var
-   I: Integer;
-begin
-    inherited Emisor:=fEmisor;
-    inherited Receptor:=fReceptor;
-    // Agregamos todos los conceptos que fueron agregados previamente al arreglo
-    for I := 0 to Length(fArrConceptos) - 1 do
-         inherited AgregarConcepto(fArrConceptos[I]);
-
-    for I := 0 to Length(fArrImpuestosRetenidos) - 1 do
-         inherited AgregarImpuestoRetenido(fArrImpuestosRetenidos[I]);
-
-    for I := 0 to Length(fArrImpuestosTrasladados) - 1 do
-         inherited AgregarImpuestoTrasladado(fArrImpuestosTrasladados[I]);
-
-    // TODO: Asignar aqui los complementos y adendas
-    inherited BloqueFolios:=fBloqueFolios; // Serie, etc.
-    inherited Folio:=iFolio;
-    inherited FormaDePago:=fpFormaDePago;
-    inherited Certificado:=fCertificado;
-    inherited CondicionesDePago:=fCondicionesDePago;
-    inherited Subtotal:=dSubtotal;
-    inherited AsignarDescuento(fDescuento, sMotivoDescuento);
-    inherited MetodoDePago:=sMetodoDePago;
-    inherited Tipo:=fTipoComprobante;
 end;
 
 procedure TFacturaElectronica.GenerarYGuardar(iFolio: Integer; fpFormaDePago: TFEFormaDePago; sArchivo: String);
