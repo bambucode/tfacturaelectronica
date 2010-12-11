@@ -52,7 +52,9 @@ uses
   OpenSSLUtils in '..\OpenSSLUtils.pas',
   ClaseOpenSSL in '..\ClaseOpenSSL.pas',
   LibEay32Plus in '..\LibEay32Plus.pas',
-  ConstantesFixtures in 'ConstantesFixtures.pas';
+  ConstantesFixtures in 'ConstantesFixtures.pas',
+  DocComprobanteFiscal in '..\DocComprobanteFiscal.pas',
+  CadenaOriginal in '..\CadenaOriginal.pas';
 
 {$R *.RES}
 

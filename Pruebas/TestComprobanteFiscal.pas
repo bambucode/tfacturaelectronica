@@ -81,6 +81,7 @@ begin
   Concepto.ValorUnitario := 30.50;
 
   fComprobanteFiscal.AgregarConcepto(Concepto);
+  fComprobanteFiscal.AsignarConceptos;
 
   CheckEquals(sXMLConcepto, fComprobanteFiscal.fXmlComprobante.XML,
     'El concepto no fue almacenado correctamente en la estrucutr XML');
@@ -97,9 +98,14 @@ begin
   Bloque.NumeroAprobacion := 12345;
   Bloque.AnoAprobacion := 2010;
   Bloque.Serie := 'ABC';
+  Bloque.FolioInicial:=1;
+  Bloque.FolioFinal:=10000;
 
   // Asignamos el bloque de folios
+  fComprobanteFiscal.Folio:=1;
   fComprobanteFiscal.BloqueFolios := Bloque;
+  fComprobanteFiscal.AsignarDatosFolios;
+
   // guardarContenido(fComprobanteFiscal.fXmlComprobante.XML, 'comprobante_fiscal/bloque_folios.xml');
   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
     'No se guardo el numero de aprobacion, serie y año de aprobacion en la estructura del XML');
@@ -139,6 +145,7 @@ begin
 
   Folio := 12345678;
   fComprobanteFiscal.Folio := Folio;
+  fComprobanteFiscal.AsignarFolio;
 
   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
     'No se guardo el Folio en la estructura del XML');
@@ -173,6 +180,7 @@ begin
 
   // Especificamos el certificado que usaremos a la clase comprobante
   fComprobanteFiscal.SubTotal := _SUBTOTAL_COMPROBANTE;
+  fComprobanteFiscal.AsignarSubtotal;
 
   // Checamos que sea igual que nuestro Fixture...
   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
@@ -194,6 +202,7 @@ begin
 
   // Agregamos el impuesto en cuestion
   fComprobanteFiscal.AgregarImpuestoRetenido(ImpuestoRetenido);
+  fComprobanteFiscal.AsignarImpuestosRetenidos;
 
   // Comprobamos el XML y el total de impuestos retenidos
   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
@@ -220,7 +229,7 @@ begin
 
   // Agregamos el impuesto en cuestion
   fComprobanteFiscal.AgregarImpuestoTrasladado(ImpuestoTrasladado);
-  // guardarContenido(fComprobanteFiscal.fXmlComprobante.XML, 'comprobante_fiscal/agregarimpuesto_trasladado.xml');
+  fComprobanteFiscal.AsignarImpuestosTrasladados;
 
   // Comprobamos el XML y el total de impuestos retenidos
   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
@@ -255,6 +264,8 @@ begin
   for I := 0 to Length(aImpuestos) - 1 do
     fComprobanteFiscal.AgregarImpuestoRetenido(aImpuestos[I]);
 
+  fComprobanteFiscal.AsignarImpuestosRetenidos;
+
   CheckEquals(dTotalImpuestos, fComprobanteFiscal.TotalImpuestosRetenidos,
     'El total de impuestos retenidos no fue la suma de todos los impuestos agregados');
 
@@ -284,6 +295,8 @@ begin
   // Los agregamos al comprobante
   for I := 0 to Length(aImpuestos) - 1 do
     fComprobanteFiscal.AgregarImpuestoTrasladado(aImpuestos[I]);
+
+  fComprobanteFiscal.AsignarImpuestosTrasladados;
 
   CheckEquals(dTotalImpuestos, fComprobanteFiscal.TotalImpuestosTrasladados,
     'El total de impuestos trasladados no fue la suma de todos los impuestos agregados');
@@ -335,7 +348,7 @@ begin
   ComprobanteDestino.Folio := StrToInt(fXMLComprobantePrueba.Folio);
   // Si es la version de prueba, establecemos la fecha/hora para que coincida
   // con la fecha/hora en que se genero el comprobante usando MicroE
-  ComprobanteDestino.fFechaGeneracion := ConvertirFechaComprobanteADateTime
+  ComprobanteDestino.FechaGeneracion := ConvertirFechaComprobanteADateTime
     (fXMLComprobantePrueba.Fecha);
 
   Bloque.NumeroAprobacion := fXMLComprobantePrueba.NoAprobacion;
@@ -478,6 +491,8 @@ begin
   // Asignamos el subtotal de la factura
   ComprobanteDestino.SubTotal := dSubtotal;
 
+  ComprobanteDestino.LlenarComprobante;
+
   // Asignamos el total de la factura (subtotal + impuestos)
   {ComprobanteDestino.Total := ComprobanteDestino.SubTotal +
     ComprobanteDestino.TotalImpuestosRetenidos + ComprobanteDestino.TotalImpuestosTrasladados; }
@@ -558,6 +573,8 @@ begin
           
           fComprobanteFiscal.AgregarConcepto(Concepto);
      end;
+
+     fComprobanteFiscal.AsignarConceptos;
 
      // Verificamos que el sello sea correcto
      CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
@@ -744,6 +761,7 @@ begin
   fComprobanteFiscal.IncluirCertificadoEnXml:=False;
   // Especificamos el certificado que usaremos a la clase comprobante
   fComprobanteFiscal.Certificado := Certificado;
+  fComprobanteFiscal.AsignarContenidoCertificado;
 
   // Checamos que sea igual que nuestro Fixture...
   CheckEquals(sXMLConNumSerieCertificado, fComprobanteFiscal.fXmlComprobante.XML,
@@ -764,6 +782,8 @@ begin
   fComprobanteFiscal.IncluirCertificadoEnXml:=True;
   // Especificamos el certificado que usaremos a la clase comprobante
   fComprobanteFiscal.Certificado := Certificado;
+  fComprobanteFiscal.AsignarContenidoCertificado;
+
   // Checamos que sea igual que nuestro Fixture...
   CheckEquals(sXMLConCertificado, fComprobanteFiscal.fXmlComprobante.XML,
     'El Contenido XML no incluyo el contenido del certificado o este es incorrecto.');
@@ -794,6 +814,7 @@ begin
 
   // Establecemos el receptor
   fComprobanteFiscal.Emisor := Emisor;
+  fComprobanteFiscal.AsignarEmisor;
 
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
   sXMLConReceptor := leerContenidoDeFixture('comprobante_fiscal/emisor.xml');
@@ -824,6 +845,8 @@ begin
 
   // Establecemos el receptor
   fComprobanteFiscal.Receptor := Receptor;
+  fComprobanteFiscal.AsignarReceptor;
+
   // guardarContenido(fComprobanteFiscal.fXmlComprobante.XML, 'comprobante_fiscal/receptor.xml');
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
   sXMLConReceptor := leerContenidoDeFixture('comprobante_fiscal/receptor.xml');

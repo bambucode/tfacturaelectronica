@@ -2,7 +2,7 @@ unit CadenaOriginal;
 
 interface
 
-uses FacturaTipos, FeCFDv2,
+uses FacturaTipos, FeCFDv2,{$IFDEF VER220} CodeSiteLogging, {$ENDIF}
      XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd;
 
 type
@@ -138,7 +138,7 @@ var
   I: Integer;
 begin
       Resultado := '';
-      {$IFDEF VER220} CodeSite.EnterMethod('Calcular'); {$ENDIF}
+      //{$IFDEF VER220} CodeSite.EnterMethod('Calcular'); {$ENDIF}
 
       // 2. El inicio de la cadena original se encuentra marcado mediante una secuencia de caracteres || (doble “pipe”).
       Resultado := _PIPE + _PIPE;
@@ -165,8 +165,8 @@ begin
       // 3) Datos del domicilio fiscal del emisor
       AgregarUbicacionFiscal(fXmlComprobante.Emisor.DomicilioFiscal);
       // 4) Datos del Domicilio de Expedición del Comprobante
-      if fXmlComprobante.HasAttribute('Emisor') then
-        if fXmlComprobante.Attributes['Emisor'].HasAttribute('ExpedidoEn') then
+      if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor')) then
+        if Assigned(fXmlComprobante.ChildNodes.FindNode('Impuestos').ChildNodes.FindNode('ExpedidoEn')) then
           AgregarUbicacion(fXmlComprobante.Emisor.ExpedidoEn);
 
       // 5) Datos del Receptor
@@ -205,8 +205,9 @@ begin
 
       // 8) Datos de Cada Retención de Impuestos
       // Solo accedemos al nodo XML si hubo retenciones
-      if fXmlComprobante.HasAttribute('Impuestos') then
-          if fXmlComprobante.HasAttribute('Retenciones') then
+      //fXmlComprobante.HasAttribute()
+      if Assigned(fXmlComprobante.ChildNodes.FindNode('Impuestos')) then
+          if Assigned(fXmlComprobante.ChildNodes.FindNode('Impuestos').ChildNodes.FindNode('Retenciones')) then
               for I := 0 to fXmlComprobante.Impuestos.Retenciones.Count - 1 do
               begin
                 with fXmlComprobante.Impuestos.Retenciones do
@@ -220,8 +221,8 @@ begin
         AgregarAtributo(fXmlComprobante.Impuestos, 'totalImpuestosRetenidos');
 
       // 9) Datos de Cada Traslado de Impuestos
-      if fXmlComprobante.HasAttribute('Impuestos') then
-          if fXmlComprobante.HasAttribute('Traslados') then
+      if Assigned(fXmlComprobante.ChildNodes.FindNode('Impuestos')) then
+          if Assigned(fXmlComprobante.ChildNodes.FindNode('Impuestos').ChildNodes.FindNode('Traslados')) then
               for I := 0 to fXmlComprobante.Impuestos.Traslados.Count - 1 do
               begin
                 with fXmlComprobante.Impuestos.Traslados do
@@ -240,7 +241,56 @@ begin
       // Solo agregamos un PIPE mas porque el ultimo atributo tiene al final su pipe.
       Result:=UTF8Encode(Resultado + _PIPE);
       {$IFDEF VER220} CodeSite.Send(Result,'Resultado'); {$ENDIF}
-      {$IFDEF VER220} CodeSite.ExitMethod('getCadenaOriginal'); {$ENDIF}
+      //{$IFDEF VER220} CodeSite.ExitMethod('getCadenaOriginal'); {$ENDIF}
 end;
+
+
+// TODO:
+// Incluimos los archivos XSLT como recursos (.RES) para no tener que distribuirlos
+// manualmente en el EXE
+// Mas Info en: http://delphi.about.com/od/objectpascalide/a/embed_resources.htm
+// Regresamos la Cadena Original de este comprobante fiscal segun las reglas
+// definidas previamente...
+{
+  function TFEComprobanteFiscal.getCadenaOriginalOld(): WideString;
+  var
+  XSLTransformador: TXSLPageProducer;
+  begin
+  // La cadena original tambien puede ser generada usando un componente de transformacion
+  // XSLT y usando los archivos para dicho proposito, sin embargo se decidio
+  // hacerlo manualmente para evitar multiples dependencias de librerias DLL para su funcionamiento
+
+  // Primero, extraemos los archivos XSLT para realizar la transformacion de los archivos .RES
+  // TODO: Extraer de los RES
+
+
+
+  XSLTransformador := TXSLPageProducer.Create(nil);
+  XSLTransformador.ParseOptions := [poResolveExternals, poValidateOnParse];
+  // XMLDocument1.Active := False; // just in case
+  XSLTransformador.FileName :='C:\Delphi\Otros\bc_facturacionelectronica\Resources\cadenaoriginal_2_0_l.xslt';
+  XSLTransformador.XMLData := fDocumentoXML;
+  // XMLDocument1.Active := True;
+  // Al ejecutar la siguiente lienea, el transformador usa la plantilla XSLT del SAT
+  // para convertir el XML en la CadenaOriginal usando precisamente, las reglas de validacion
+  // y presentacion definidas en los documentos XSLT.
+  try
+  sCadenaOriginal := XSLTransformador.Content;
+  // XMLDocument1.Active := False;
+  // TODO: Codificar en UTF8??? o ya viene asi del XSLT????
+  // NOTA: Al obtenerlo para desplegarlo hay que descodificarlo de UTF8, por ejemplo para un Memo edit.
+  Result := sCadenaOriginal;
+  except
+  // Manejar los diversos errores de validacion que se pueden generar...
+  On E: Exception do
+  begin
+  ShowMessage(E.Message);
+  Result := '';
+  end;
+  end;
+
+  FreeAndNil(XSLTransformador);
+  end;
+}
 
 end.
