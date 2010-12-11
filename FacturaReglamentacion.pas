@@ -27,17 +27,34 @@ type
       class function ComoFechaHora(dtFecha: TDateTime) : String;
       class function ComoFechaAduanera(dtFecha: TDateTime) : String;
       class function ComoTasaImpuesto(dTasa: Double) : String;
+      class function ComoDateTime(sFechaISO8601: String): TDateTime;
   end;
 
 implementation
 
-uses SysUtils;
+uses SysUtils, DateUtils;
 
 // Segun las reglas del SAT:
 // "Se expresa en la forma aaaa-mm-ddThh:mm:ss, de acuerdo con la especificación ISO 8601"
 class function TFEReglamentacion.ComoFechaHora(dtFecha: TDateTime) : String;
 begin
   Result := FormatDateTime('yyyy-mm-dd', dtFecha) + 'T' + FormatDateTime('hh:nn:ss', dtFecha);
+end;
+
+// Convierte una fecha de ISO 8601 (formato del XML) a TDateTime usado en Delphi.
+class function TFEReglamentacion.ComoDateTime(sFechaISO8601: String): TDateTime;
+var
+    sAno, sMes, sDia, sHora, sMin, sMs: String;
+begin
+    // Ejemplo: 2009-08-16T16:30:00
+    sAno := Copy(sFechaISO8601, 1, 4);
+    sMes := Copy(sFechaISO8601, 6, 2);
+    sDia := Copy(sFechaISO8601, 9, 2);
+    sHora := Copy(sFechaISO8601, 12, 2);
+    sMin := Copy(sFechaISO8601, 15, 2);
+    sMs := Copy(sFechaISO8601, 18, 2);
+    Result := EncodeDateTime(StrToInt(sAno), StrToInt(sMes), StrToInt(sDia), StrToInt(sHora),
+                              StrToInt(sMin), StrToInt(sMs), 0);
 end;
 
 class function TFEReglamentacion.ComoFechaAduanera(dtFecha: TDateTime) : String;

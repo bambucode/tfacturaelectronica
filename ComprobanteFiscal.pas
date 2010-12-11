@@ -48,6 +48,7 @@ type
     fXmlComprobante: IFEXMLComprobante;
     sCacheCadenaOriginal: TStringCadenaOriginal;
     fFolio: TFEFolio;
+    fSelloDigitalCalculado: String;
     fCertificado: TFECertificado;
     fBloqueFolios: TFEBloqueFolios;
     fFormaDePago: TFEFormaDePago;
@@ -56,8 +57,6 @@ type
     fFechaGeneracion: TDateTime;
     fCondicionesDePago: String;
     fMetodoDePago: String;
-    fEmisor: TFEContribuyente;
-    fReceptor: TFEContribuyente;
     sForma: String;
     fDescuento: Currency;
     sMotivoDescuento: String;
@@ -85,6 +84,7 @@ type
     // procedure setCertificado(sContenidoCertificado : WideString);
     procedure setCertificado(Certificado: TFECertificado);
     function getXML(): WideString;
+    procedure setXML(Valor: WideString);
     /// <summary>Obtiene la 'Cadena Original' segun las reglas del Anexo 20</summary>
     function getCadenaOriginal(): TStringCadenaOriginal;
     function getSelloDigital(): String;
@@ -97,6 +97,8 @@ type
 {$ELSE}
   protected
 {$ENDIF}
+    fEmisor: TFEContribuyente;
+    fReceptor: TFEContribuyente;
     // Propiedades del comprobante normal
     property Folio: TFEFolio read fFolio write setFolio;
     property Receptor: TFEContribuyente read fReceptor write setReceptor;
@@ -143,7 +145,7 @@ type
     // Propiedades especificas al comprobante electronico
     property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
     property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML;
-    property XML: WideString read getXML;
+    property XML: WideString read getXML write setXML;
     property CadenaOriginal: TStringCadenaOriginal read getCadenaOriginal;
     property SelloDigital: String read getSelloDigital;
   end;
@@ -160,7 +162,7 @@ implementation
 // Mas Info en: http://delphi.about.com/od/objectpascalide/a/embed_resources.htm
 
 uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
-  OpenSSLUtils;
+  OpenSSLUtils, Classes;
 
 // Al crear el objeto, comenzamos a "llenar" el XML interno
 constructor TFEComprobanteFiscal.Create();
@@ -279,13 +281,20 @@ var
   end;
 
   procedure AgregarAtributo(NodoPadre: IXMLNode; sNombreAtributo: String);
+  var
+    sValor: String;
   begin
     // 5. Los datos opcionales no expresados, no aparecerán en la cadena original y no tendrán delimitador alguno.
     // Si se nos fue especificado un nodo "padre" checamos si tiene al atributo hijo
     // si no, ni siquiera lo "consultamos" ya que lo agregaria al XML con valores vacios
     if Assigned(NodoPadre) then
       if NodoPadre.HasAttribute(sNombreAtributo) then
-        sRes := sRes + LimpiaCampo(NodoPadre.AttributeNodes[sNombreAtributo].Text) + _PIPE;
+      begin
+        sValor:=LimpiaCampo(NodoPadre.AttributeNodes[sNombreAtributo].Text);
+        // Checamos que no sea vacio el valor...
+        if Trim(sValor) <> '' then
+          sRes := sRes + sValor + _PIPE;
+      end;
   end;
 
   procedure AgregarUbicacion(Ubicacion: IFEXmlT_Ubicacion);
@@ -331,9 +340,11 @@ begin
             if (_USAR_HORA_REAL = True) then
                fFechaGeneracion:=Now;
           {$ELSE}
-            fFechaGeneracion := Now;
+              // Si ya fue generada la factura (por ejemplo cuando se lee)
+              if not bFacturaGenerada then
+                  fFechaGeneracion := Now;
           {$ENDIF}
-            fXmlComprobante.Fecha := TFEReglamentacion.ComoFechaHora(fFechaGeneracion);
+              fXmlComprobante.Fecha := TFEReglamentacion.ComoFechaHora(fFechaGeneracion);
 
             // Agregamos al XML los totales de los diferentes tipos de impuestos usados
             // si asi se desea...
@@ -527,6 +538,7 @@ end;
 // 1. Datos de quien la expide (Emisor) (Art. 29-A, Fraccion I)
 procedure TFEComprobanteFiscal.setEmisor(Emisor: TFEContribuyente);
 begin
+  fEmisor:=Emisor;
   with fXmlComprobante.Emisor do
   begin
     RFC := Emisor.RFC;
@@ -561,6 +573,7 @@ end;
 // 3. Clave del RFC de la persona a favor de quien se expida la factura (29-A, Fraccion IV)
 procedure TFEComprobanteFiscal.setReceptor(Receptor: TFEContribuyente);
 begin
+  fReceptor:=Receptor;
   with fXmlComprobante.Receptor do
   begin
     RFC := Receptor.RFC;
@@ -706,11 +719,12 @@ procedure TFEComprobanteFiscal.ValidarQueFolioEsteEnRango;
 begin
   // Validamos que el folio este dentro del rango definido si ya se nos fue proporcionado
   // el bloque de folios y el numero de folio
-  if ((fBloqueFolios.FolioInicial > -1) And (fFolio > -1)) then
-  begin
-    if Not((Folio >= fBloqueFolios.FolioInicial) And (Folio <= fBloqueFolios.FolioFinal)) then
-      raise EFEFolioFueraDeRango.Create('El folio se encuentra fuera del rango autorizado');
-  end;
+  if not bFacturaGenerada then
+    if ((fBloqueFolios.FolioInicial > -1) And (fFolio > -1)) then
+    begin
+      if Not((Folio >= fBloqueFolios.FolioInicial) And (Folio <= fBloqueFolios.FolioFinal)) then
+        raise EFEFolioFueraDeRango.Create('El folio se encuentra fuera del rango autorizado');
+    end;
 end;
 
 // 8. Numero de folio, el cual debe de ser asignado de manera automatica por el sistema
@@ -838,29 +852,193 @@ function TFEComprobanteFiscal.getSelloDigital(): String;
 var
   TipoDigestion: TTipoDigestionOpenSSL;
   SelloDigital: TSelloDigital;
-  sRes: String;
 begin
-  sRes := '';
-  // Segun la leglislacion vigente si la factura se hace antes del 1 de Enero del 2011, usamos MD5
-  if Now < EncodeDate(2011, 1, 1) then
-    TipoDigestion := tdMD5
-  else // Si es 2011 usamos el algoritmo SHA-1
-    TipoDigestion := tdSHA1;
+  // Si la factura ya fue generada regresamos el sello previamente calculado
+  if (bFacturaGenerada = True) then
+  begin
+      Result:=fSelloDigitalCalculado;
+  end else
+  begin
+      fSelloDigitalCalculado:='';
+      // Segun la leglislacion vigente si la factura se hace antes del 1 de Enero del 2011, usamos MD5
+      if Now < EncodeDate(2011, 1, 1) then
+        TipoDigestion := tdMD5
+      else // Si es 2011 usamos el algoritmo SHA-1
+        TipoDigestion := tdSHA1;
+      try
+        // Creamos la clase SelloDigital que nos ayudara a "sellar" la factura en XML
+        SelloDigital := TSelloDigital.Create(Self.CadenaOriginal, fCertificado, TipoDigestion);
 
-  try
-    // Creamos la clase SelloDigital que nos ayudara a "sellar" la factura en XML
-    SelloDigital := TSelloDigital.Create(Self.CadenaOriginal, fCertificado, TipoDigestion);
-
-    // Finalmente regresamos la factura en XML con todas sus propiedades llenas
-    sRes := SelloDigital.SelloCalculado;
-  except
-    // TODO: Manejar los diferentes tipos de excepciones...
-    on E:Exception do
-       raise E.Create(E.Message);
+        // Finalmente regresamos la factura en XML con todas sus propiedades llenas
+        fSelloDigitalCalculado := SelloDigital.SelloCalculado;
+      except
+        // TODO: Manejar los diferentes tipos de excepciones...
+        on E:Exception do
+           raise E.Create(E.Message);
+      end;
+      // Liberamos la clase de sello usada previamente
+      FreeAndNil(SelloDigital);
+      result := fSelloDigitalCalculado;
   end;
-  // Liberamos la clase de sello usada previamente
-  FreeAndNil(SelloDigital);
-  result := sRes;
+end;
+
+// Permite establecer el XML del comprobante (por si se esta leyendo de la BD, etc)
+procedure TFEComprobanteFiscal.setXML(Valor: WideString);
+var
+  I: Integer;
+  feConcepto: TFEConcepto;
+  iXmlDoc: IXMLDocument;
+  ExpedidoEn: TFEExpedidoEn;
+  ImpuestoTrasladado: TFEImpuestoTrasladado;
+  ImpuestoRetenido: TFEImpuestoRetenido;
+begin
+    try
+        // Leemos el contenido XML en el Documento XML interno
+        iXmlDoc:=LoadXMLData(UTF8Decode(Valor));
+        //fDocumentoXML
+        // Actualizamos el nodo comprobante
+        fXmlComprobante := GetComprobante(iXmlDoc);
+        // Actualizamos todas las variables internas (de la clase) con los valores del XML
+        bFacturaGenerada:=True;
+        
+        with fXmlComprobante do
+        begin
+            fFolio:=StrToInt(Folio);
+            // Datos del certificado
+            fCertificado.NumeroSerie:=Certificado;
+            fBloqueFolios.NumeroAprobacion:=NoAprobacion;
+            fBloqueFolios.AnoAprobacion:=AnoAprobacion;
+            fBloqueFolios.Serie:=Serie;
+            fBloqueFolios.FolioInicial:=fFolio;
+            fBloqueFolios.FolioFinal:=fFolio;
+
+            fFechaGeneracion:=TFEReglamentacion.ComoDateTime(fXmlComprobante.Fecha);
+
+            fCondicionesDePago:=CondicionesDePago;
+            fMetodoDePago:=MetodoDePago;
+
+            // Leemos los datos del emisor
+            fEmisor.Nombre:=Emisor.Nombre;
+            fEmisor.RFC:=Emisor.RFC;
+            with Emisor do
+            begin
+                fEmisor.Direccion.Calle := DomicilioFiscal.Calle;
+                fEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
+                fEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
+                fEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
+                fEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
+                fEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
+                fEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
+                fEmisor.Direccion.Estado := DomicilioFiscal.Estado;
+                fEmisor.Direccion.Pais := DomicilioFiscal.Pais;
+            end;
+
+            // Leemos los datos del receptor
+            fReceptor.Nombre:=Receptor.Nombre;
+            fReceptor.RFC:=Receptor.Rfc;
+            with Receptor do
+            begin
+                fReceptor.Direccion.Calle := Domicilio.Calle;
+                fReceptor.Direccion.NoExterior := Domicilio.NoExterior;
+                fReceptor.Direccion.NoInterior := Domicilio.NoInterior;
+                fReceptor.Direccion.CodigoPostal := Domicilio.CodigoPostal;
+                fReceptor.Direccion.Colonia := Domicilio.Colonia;
+                fReceptor.Direccion.Localidad := Domicilio.Localidad;
+                fReceptor.Direccion.Municipio := Domicilio.Municipio;
+                fReceptor.Direccion.Estado := Domicilio.Estado;
+                fReceptor.Direccion.Pais := Domicilio.Pais;
+            end;
+
+            // Tiene emisor??
+            if (Emisor.ExpedidoEn.Calle <> '') then
+            begin
+                with Emisor.ExpedidoEn do
+                begin
+                    fExpedidoEn.Calle := Calle;
+                    fExpedidoEn.NoExterior := NoExterior;
+                    fExpedidoEn.CodigoPostal := CodigoPostal;
+                    fExpedidoEn.Localidad := Localidad;
+                    fExpedidoEn.Municipio := Municipio;
+                    fExpedidoEn.Colonia := Colonia;
+                    fExpedidoEn.Estado := Estado;
+                    fExpedidoEn.Pais := Pais;
+                end;
+            end;
+
+            // NOTA: No agregamos los conceptos aqui ya que ya se encuentran en el XML
+            // y no se manejan estructuras internas para almacenarlos...
+
+            bHuboRetenciones:=False;
+            // Agregamos las reteneciones
+            for I := 0 to Impuestos.Retenciones.Count - 1 do
+            begin
+              with Impuestos.Retenciones do
+              begin
+                ImpuestoRetenido.Nombre := Retencion[I].Impuesto;
+                ImpuestoRetenido.Importe := StrToFloat(Retencion[I].Importe);
+
+                Self.AgregarImpuestoRetenido(ImpuestoRetenido);
+              end;
+            end;
+
+            // NOTA: Como ya se tienen los impuestos en el XML
+            // solo contamos los totales para tenerlos en las variables internas
+            bHuboTraslados:=False;
+            bHuboRetenciones:=False;
+            fTotalImpuestosRetenidos := 0;
+            fTotalImpuestosTrasladados := 0;
+            
+            // Agregamos los impuestos trasladados
+            for I := 0 to Impuestos.Retenciones.Count - 1 do
+            begin
+              fTotalImpuestosRetenidos:=fTotalImpuestosRetenidos + StrToFloat(Impuestos.Retenciones[I].Importe);
+              bHuboRetenciones:=True;
+            end;
+
+            // Checamos si el XML proveido tiene los totales de impuestos desglosados...
+            for I := 0 to Impuestos.Traslados.Count - 1 do
+            begin
+              fTotalImpuestosTrasladados:=fTotalImpuestosTrasladados + StrToFloat(Impuestos.Traslados[I].Importe);
+              bHuboTraslados:=True;
+            end;
+
+            if (Impuestos.TotalImpuestosTrasladados <> '') then
+                Self.DesglosarTotalesImpuestos := True
+            else
+                Self.DesglosarTotalesImpuestos := False;
+
+            // Que forma de pago tuvo??
+            if AnsiPos('UNA', Uppercase(FormaDePago)) > 0 then
+                fFormaDePago := fpUnaSolaExhibicion
+            else
+                fFormaDePago := fpParcialidades;
+
+            // Tipo de comprobante
+            if TipoDeComprobante = 'ingreso' then
+              fTipoComprobante := tcIngreso;
+
+            if TipoDeComprobante = 'egreso' then
+              fTipoComprobante := tcEgreso;
+
+            if TipoDeComprobante = 'traslado' then
+              fTipoComprobante := tcTraslado;
+
+            // Asignamos el descuento
+            if (Descuento <> '') then
+              Self.AsignarDescuento(StrToFloat(Descuento), '');
+
+            // Asignamos el subtotal de la factura
+            fSubTotal := StrToFloat(Subtotal);
+
+            // Asignamos el sello que trae el XML
+            fSelloDigitalCalculado:=Sello;
+
+            Assert(Self.Total = StrToCurr(Total), 'El total del comprobante no fue igual que el total del XML');
+        end;
+    except
+        On E:Exception do
+          Raise E;
+    end;
 end;
 
 // Regresa el XML final del comprobante ya lleno
