@@ -491,7 +491,7 @@ begin
   // Asignamos el subtotal de la factura
   ComprobanteDestino.SubTotal := dSubtotal;
 
-  ComprobanteDestino.LlenarComprobante;
+  ComprobanteDestino.SelloDigital;
 
   // Asignamos el total de la factura (subtotal + impuestos)
   {ComprobanteDestino.Total := ComprobanteDestino.SubTotal +
@@ -528,7 +528,6 @@ begin
   // Leemos la cadena original generada de ejemplo generada previamente con otra aplicacion
   sCadenaOriginalCorrecta := leerArchivoEnUTF8('comprobante_fiscal/factura_cadena_original_utf8.txt');
 
-
   Certificado.Ruta := fRutaFixtures + _MICROE_ARCHIVO_CERTIFICADO;
   Certificado.LlavePrivada.Ruta := fRutaFixtures + _MICROE_ARCHIVO_LLAVE_PRIVADA;
   Certificado.LlavePrivada.Clave := _MICROE_CLAVE_LLAVE_PRIVADA;
@@ -538,7 +537,8 @@ begin
     Certificado, fComprobanteFiscal);
 
   // Comparamos el resultado del metodo de la clase con el del archivo codificado con la funcion
-  CheckEquals(sCadenaOriginalCorrecta, fComprobanteFiscal.CadenaOriginal,
+  CheckEquals(sCadenaOriginalCorrecta,
+  fComprobanteFiscal.CadenaOriginal,
               'La cadena original no fue generada correctamente');
 end;
 
@@ -546,8 +546,9 @@ procedure TestTFEComprobanteFiscal.SelloDigital_DeMilConceptos_SeaCorrecto;
 var
      I: Integer;
      Concepto: TFEConcepto;
-     sSelloDigitalCorrecto: String;
+     sSelloDigitalCorrecto, sSelloCalculado: String;
      Certificado: TFECertificado;
+     Impuesto: TFEImpuestoTrasladado;
 const
     _ARCHIVO_LLAVE_PRIVADA = 'comprobante_fiscal/FIFC000101AM1.key';
     _CLAVE_LLAVE_PRIVADA = '12345678a';
@@ -564,6 +565,10 @@ begin
 
      // Ahora, agregamos 1000 articulos
      // para verificar que el buffer aguante...
+     fComprobanteFiscal.FacturaGenerada:=False;
+     fComprobanteFiscal.fCadenaOriginalCalculada:='';
+     fComprobanteFiscal.fSelloDigitalCalculado:='';
+
      for I := 1 to 1000 do
      begin
           Concepto.Cantidad:=1;
@@ -574,10 +579,20 @@ begin
           fComprobanteFiscal.AgregarConcepto(Concepto);
      end;
 
-     fComprobanteFiscal.AsignarConceptos;
+     // Agregamos los impuestos
+     Impuesto.Nombre:='IVA';
+     Impuesto.Tasa:=16;
+     Impuesto.Importe:=600;
+     fComprobanteFiscal.AgregarImpuestoTrasladado(Impuesto);
+
+     //fComprobanteFiscal.AsignarConceptos;
+     sSelloCalculado:=fComprobanteFiscal.SelloDigital;
+
+     //guardarContenido(fComprobanteFiscal.CadenaOriginal, 'cadena.txt');
+     //fComprobanteFiscal.GuardarEnArchivo('C:/temp/xml.xml');
 
      // Verificamos que el sello sea correcto
-     CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
+     CheckEquals(sSelloDigitalCorrecto, sSelloCalculado,
               'El sello digital no fue calculado correctamente');
 end;
 
@@ -595,7 +610,7 @@ begin
   sSelloDigitalCorrecto := GenerarComprobanteFiscal
     (fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml',
     Certificado, fComprobanteFiscal);
-
+  
   CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
               'El sello digital no fue calculado correctamente');
 end;

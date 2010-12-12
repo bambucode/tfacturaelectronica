@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Comprobante xmlns="http://www.sat.gob.mx/cfd/2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/cfd/2 http://www.sat.gob.mx/sitio_internet/cfd/2/cfdv2.xsd" version="2.0" serie="A" folio="1" fecha="2009-08-16T16:30:00" noAprobacion="1" anoAprobacion="2009" formaDePago="Una sola exhibición" subTotal="350.00" descuento="5.25" total="397.25" tipoDeComprobante="ingreso" noCertificado="20001000000100000198" sello="Aa85nanBen/XFa3u/x1fXqY+LHlCk5poh/hUf9HwumG6uhFiwARI3OOaLhHe1r3FFx/sGDAQgUS0OXXr4jcWO42oKEWiCe5uTqrIKEZGMvCDHwAoTDLGFvJjWcODN1gTOsuQIFfkj9XUvl/XsEbuB1hzy7KFiNINkumb7tO2/bI=">
+<Comprobante xmlns="http://www.sat.gob.mx/cfd/2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sat.gob.mx/cfd/2 http://www.sat.gob.mx/sitio_internet/cfd/2/cfdv2.xsd" version="2.0" serie="A" folio="1" fecha="2009-08-16T16:30:00" noAprobacion="1" anoAprobacion="2009" formaDePago="Una sola exhibición" subTotal="0" total="0" tipoDeComprobante="ingreso" noCertificado="20001000000100000198" sello="GV+oN/KvI5ZiDzeXnCEFgoDIAW/Cwc4v491LNP+p/ptqpzBzCXrNPCIjHgLjZKelWEs+ePLXfN8vi5uGWToHprEVJcj+w6Hb6AyHOoKxKlj60yBMcfeDp8zKJoWKYVscQGuItc5ByYKOilLMPCJYzy3hE+Q9Z3tGinpoWpYzsyk=">
   <Emisor nombre="Industrias del Sur Poniente, S.A. de C.V." rfc="ISP900909Q88">
     <DomicilioFiscal calle="Alvaro Obregón" codigoPostal="06700" colonia="Col. Roma Norte" estado="Distrito Federal" localidad="México" municipio="Cuauhtémoc" noExterior="37" noInterior="3" pais="México"></DomicilioFiscal>
     <ExpedidoEn calle="Pino Suarez" codigoPostal="95460" colonia="Centro" estado="Nuevo Léon" localidad="Monterrey" municipio="Monterrey" noExterior="23" pais="México"></ExpedidoEn>
@@ -7,9 +7,4 @@
   <Receptor nombre="Rosa María Calderón Uriegas" rfc="CAUR390312S87">
     <Domicilio calle="Topochico" codigoPostal="95465" colonia="Jardines del Valle" estado="Nuevo León" localidad="Monterrey" municipio="Monterrey" noExterior="52" pais="México"></Domicilio>
   </Receptor>
-  <Impuestos>
-    <Traslados>
-      <Traslado impuesto="IVA" tasa="15.00" importe="52.50"></Traslado>
-    </Traslados>
-  </Impuestos>
 </Comprobante>

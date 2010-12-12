@@ -34,6 +34,7 @@ uses SysUtils, StrUtils, FacturaReglamentacion;
 // llenas
 constructor TCadenaOriginal.Create(Comprobante: IFEXMLComprobante; DesglosarImpuestos : Boolean);
 begin
+    inherited Create;
     fXMLComprobante:=Comprobante;
     fDesglosarTotalesImpuestos:=DesglosarImpuestos;
 end;
@@ -177,27 +178,27 @@ begin
       // 7) Datos de Cada Concepto Relacionado en el Comprobante
       for I := 0 to fXmlComprobante.Conceptos.Count - 1 do
       begin
-        with fXmlComprobante.Conceptos do
-        begin
-          AgregarAtributo(Concepto[I], 'cantidad');
-          AgregarAtributo(Concepto[I], 'unidad');
-          AgregarAtributo(Concepto[I], 'noIdentificacion');
-          AgregarAtributo(Concepto[I], 'descripcion');
-          AgregarAtributo(Concepto[I], 'valorUnitario');
-          AgregarAtributo(Concepto[I], 'importe');
+          with fXmlComprobante.Conceptos do
+          begin
+              AgregarAtributo(Concepto[I], 'cantidad');
+              AgregarAtributo(Concepto[I], 'unidad');
+              AgregarAtributo(Concepto[I], 'noIdentificacion');
+              AgregarAtributo(Concepto[I], 'descripcion');
+              AgregarAtributo(Concepto[I], 'valorUnitario');
+              AgregarAtributo(Concepto[I], 'importe');
 
-          // TODO: Agregar soporte para informacion aduanera ya que se repiten los nodos
-          { if Concepto[I].InformacionAduanera.HasAttribute('numero') then
-            AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['numero']);
+              // TODO: Agregar soporte para informacion aduanera ya que se repiten los nodos
+              { if Concepto[I].InformacionAduanera.HasAttribute('numero') then
+                AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['numero']);
 
-            if Concepto[I].InformacionAduanera.HasAttribute('fecha') then
-            AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['fecha']);
+                if Concepto[I].InformacionAduanera.HasAttribute('fecha') then
+                AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['fecha']);
 
-            if Concepto[I].InformacionAduanera.HasAttribute('aduana') then
-            AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['aduana']); }
+                if Concepto[I].InformacionAduanera.HasAttribute('aduana') then
+                AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['aduana']); }
 
-          AgregarAtributo(Concepto[I], 'CuentaPredial.numero');
-        end;
+              AgregarAtributo(Concepto[I], 'CuentaPredial.numero');
+          end;
       end;
 
       // TODO: Agregar los "ComplementoConcepto" regla 9 del Anexo 20

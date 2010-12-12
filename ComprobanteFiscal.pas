@@ -103,6 +103,7 @@ type
     procedure AsignarTipoComprobante;
     procedure AsignarExpedidoEn;
     procedure AsignarTotalesImpuestos;
+    procedure AsignarFechaGeneracion;
 {$IFDEF VERSION_DE_PRUEBA}
   public
     _USAR_HORA_REAL : Boolean;
@@ -315,6 +316,7 @@ var
   I: Integer;
   Concepto: TFEConcepto;
 begin
+     {$IFDEF VER220} CodeSite.EnterMethod('AsignarConceptos'); {$ENDIF}
      // Obtenemos los conceptos agregados al documento previamente
      for I := 0 to Length(inherited Conceptos) - 1 do
      begin
@@ -348,6 +350,7 @@ begin
               CuentaPredial.Numero := TFEReglamentacion.ComoCadena(Concepto.CuentaPredial); // Opcional
           end;
      end;
+     {$IFDEF VER220} CodeSite.ExitMethod('AsignarConceptos'); {$ENDIF}
 end;
 
 procedure TFEComprobanteFiscal.AsignarImpuestosRetenidos;
@@ -406,7 +409,6 @@ var
 begin
   // Ya que tenemos los datos del certificado, lo procesamos para obtener los datos
   // necesarios
-  fCertificado := Certificado;
   x509Certificado := TX509Certificate.Create;
   try
     if Not FileExists(Certificado.Ruta) then
@@ -414,6 +416,8 @@ begin
     else
       x509Certificado.LoadFromFile(Certificado.Ruta);
 
+    fCertificado := Certificado;
+    
     // Llenamos las propiedades
     fCertificado.VigenciaInicio := x509Certificado.NotBefore;
     fCertificado.VigenciaFin := x509Certificado.NotAfter;
@@ -432,7 +436,6 @@ begin
     begin
        // Obtenemos el certificado codificado en Base64 para incluirlo en el comprobante
        fCertificadoTexto:=X509Certificado.AsBase64;
-       //ShowMessage(CertificadoBase64 + '<--');
        fCertificadoTexto:=QuitarCaracteresNoUsadosEnCertificado(X509Certificado.AsBase64);
        //CodeSite.Send('Certificado Base64', CertificadoBase64);
        //CodeSite.Send('length', Length(CertificadoBase64));
@@ -526,26 +529,8 @@ begin
     end;
 end;
 
-// Funcion encargada de llenar el comprobante fiscal EN EL ORDEN que se especifica en el XSD
-// ya que si no es asi, el XML se va llenando en el orden en que se establecen las propiedades de la clase
-// haciendo que el comprobante no pase las validaciones del SAT.
-procedure TFEComprobanteFiscal.LlenarComprobante;
+procedure TFEComprobanteFiscal.AsignarFechaGeneracion;
 begin
-    AsignarEmisor;
-    AsignarExpedidoEn;
-    AsignarReceptor;
-    AsignarConceptos;
-    AsignarDatosFolios;
-    AsignarFolio;
-    AsignarFormaDePago;
-    AsignarContenidoCertificado;
-    AsignarCondicionesDePago;
-    AsignarTotal;
-    AsignarSubtotal;
-    AsignarDescuentos;
-    AsignarMetodoDePago;
-    AsignarTipoComprobante;
-
     // Especificamos la fecha exacta en la que se esta generando el comprobante
     {$IFDEF VERSION_DE_PRUEBA}
       // Si estamos en las pruebas de unidad, dejamos que la prueba
@@ -559,12 +544,47 @@ begin
     {$ENDIF}
     // Almacenamos las propiedades del XML antes de generar la cadena original
     fXmlComprobante.Fecha := TFEReglamentacion.ComoFechaHora(FechaGeneracion);
+end;
 
-    AsignarImpuestosTrasladados;
-    AsignarImpuestosRetenidos;
+// Funcion encargada de llenar el comprobante fiscal EN EL ORDEN que se especifica en el XSD
+// ya que si no es asi, el XML se va llenando en el orden en que se establecen las propiedades de la clase
+// haciendo que el comprobante no pase las validaciones del SAT.
+procedure TFEComprobanteFiscal.LlenarComprobante;
+begin
+    if (FacturaGenerada = False) then
+    begin
+        {$IFDEF VER220} CodeSite.EnterMethod('LlenarComprobante'); {$ENDIF}
+        // Atributos de comprobante
+        AsignarDatosFolios;
+        AsignarFechaGeneracion;
+        AsignarFolio;
+        AsignarFormaDePago;
+        AsignarSubtotal;
+        AsignarDescuentos;
+        AsignarTotal;
+        AsignarTipoComprobante;
+        AsignarContenidoCertificado;
+        AsignarCondicionesDePago;
+        AsignarMetodoDePago;
 
-    if fDesglosarTotalesImpuestos = True then
-       AsignarTotalesImpuestos;
+        // Atributo Emisor
+        AsignarEmisor;
+        AsignarExpedidoEn;
+        // Atributo Receptor
+        AsignarReceptor;
+        // Atributo conceptos
+        //if Trim(fCadenaOriginalCalculada) = '' then
+        AsignarConceptos;
+
+        // Atributo Impuestos
+        AsignarImpuestosTrasladados;
+        AsignarImpuestosRetenidos;
+
+        if (fDesglosarTotalesImpuestos = True) then
+           AsignarTotalesImpuestos;
+
+        {$IFDEF VER220} CodeSite.ExitMethod('LlenarComprobante'); {$ENDIF}
+    end;
 end;
 
 
@@ -611,6 +631,14 @@ begin
   ValidarQueFolioEsteEnRango();
 end;
 
+// El metodo que genera el CFD al final...
+procedure TFEComprobanteFiscal.GuardarEnArchivo(sArchivoDestino: String);
+begin
+  fXmlComprobante.Sello:=Self.SelloDigital;
+  fDocumentoXML.SaveToFile(sArchivoDestino);
+  // TODO: Implementar las diversas fallas que pueden ocurrir
+end;
+
 // Calculamos el sello digital para la cadena original de la factura
 function TFEComprobanteFiscal.getSelloDigital(): String;
 var
@@ -625,7 +653,6 @@ begin
   begin
       // Si aun no ha sido generada la factura la "llenamos"
       LlenarComprobante;
-
       fSelloDigitalCalculado:='';
       // Segun la leglislacion vigente si la factura se hace antes del 1 de Enero del 2011, usamos MD5
       if Now < EncodeDate(2011, 1, 1) then
@@ -645,6 +672,7 @@ begin
       end;
       // Liberamos la clase de sello usada previamente
       FreeAndNil(SelloDigital);
+      FacturaGenerada:=True;
       result := fSelloDigitalCalculado;
   end;
 end;
@@ -816,16 +844,6 @@ begin
         Result:=fDocumentoXML.XML.Text
     else
         Raise Exception.Create('No se puede obtener el XML cuando aún no se ha generado el archivo CFD');
-end;
-
-// El metodo que genera el CFD al final...
-procedure TFEComprobanteFiscal.GuardarEnArchivo(sArchivoDestino: String);
-begin
-  // Forzamos que se calcule el sello
-  fXmlComprobante.Sello := Self.SelloDigital;
-  fDocumentoXML.SaveToFile(sArchivoDestino);
-  FacturaGenerada:=True;
-  // TODO: Implementar las diversas fallas que pueden ocurrir
 end;
 
 end.
