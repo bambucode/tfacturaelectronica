@@ -619,7 +619,6 @@ procedure TestTFEComprobanteFiscal.SelloDigital_DespuesDeVariosSegundos_SeaElMis
 var
   sSelloDigitalCorrecto: String;
   Certificado: TFECertificado;
-  CadenaOriginal, CadenaOriginalPostSello :  TStringCadenaOriginal;
 begin
   // Llenamos los datos que fueron usados para generar dicho comprobante
   Certificado.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.cer';

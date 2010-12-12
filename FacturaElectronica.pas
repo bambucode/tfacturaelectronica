@@ -17,29 +17,7 @@ TFacturaElectronica = class(TFEComprobanteFiscal)
 {$ELSE}
   private
 {$ENDIF}
-  fCertificado: TFECertificado;
-  fBloqueFolios: TFEBloqueFolios;
-  fTipoComprobante: TFeTipoComprobante;
-
-  fExpedidoEn: TFeExpedidoEn;
-  fCondicionesDePago: String;
-  fDescuento: Currency;
-  sMotivoDescuento: String;
-  sMetodoDePago: String;
-
-
-
-  // Totales internos
-  {dTotalImpuestosTrasladados : Double;
-  dTotalImpuestosRetenidos : Double;
-  dSubtotal: Currency;
-  dTotal: Currency;
-  dDescuento : Currency;  }
-
-  // Eventos:
   fOnComprobanteGenerado: TOnComprobanteGenerado;
-  // Funciones y procedimientos
-
   function obtenerCertificado() : TFECertificado;
 published
   property FechaGeneracion;
@@ -53,16 +31,6 @@ protected
   procedure setXML(Valor: WideString); override;
   function getXML() : WideString;
 public
-  property Receptor: TFEContribuyente read fReceptor write fReceptor;
-  property Emisor: TFEContribuyente read fEmisor write fEmisor;
-  property Tipo: TFeTipoComprobante read fTipoComprobante write fTipoComprobante;
-  property ExpedidoEn: TFeDireccion read fExpedidoEn write fExpedidoEn;
-  property CondicionesDePago: String read fCondicionesDePago write fCondicionesDePago;
-  property MetodoDePago: String read sMetodoDePago write sMetodoDePago;
-  // Propiedades calculadas por esta clase:
-  property Total: Currency read getTotal;
-
-
   property Certificado : TFECertificado read obtenerCertificado;
   property BloqueFolios: TFEBloqueFolios read fBloqueFolios;
   property XML : WideString read getXML write setXML;
@@ -101,11 +69,14 @@ constructor TFacturaElectronica.Create(cEmisor, cCliente: TFEContribuyente;
 begin
     inherited Create;
     // Llenamos las variables internas con las de los parametros
-    fEmisor:=cEmisor;
-    fReceptor:=cCliente;
-    fBloqueFolios:=bfBloqueFolios;
-    fCertificado:=cerCertificado;
-    fTipoComprobante:=tcTipo;
+    inherited Emisor:=cEmisor;
+    inherited Receptor:=cCliente;
+
+    // REWRITE: Validamos aqui el bloque de folios que sea valido
+    inherited BloqueFolios:=bfBloqueFolios;
+    // REWRITE: Validamos aqui que el certificado sea valido
+    inherited Certificado:=cerCertificado;
+    inherited Tipo:=tcTipo;
 
     // TODO: Implementar CFD 3.0 y usar la version segun sea necesario...
     // Que version de CFD sera usada?
@@ -146,13 +117,15 @@ begin
      //if ValidarCamposNecesarios() = False then
      //    raise Exception.Create('No todos los campos estan llenos.');
 
-     if (fReceptor.RFC = '') then
+     if (inherited Receptor.RFC = '') then
         Raise Exception.Create('No hay un receptor configurado');
 
      // Especificamos los campos del CFD en el orden especifico
      // ya que de lo contrario no cumplirá con los requisitios del SAT
-     LlenarComprobante(iFolio, fpFormaDePago);
+     inherited Folio:=iFolio;
+     inherited FormaDePago:=fpFormaDePago;
 
+     
      // Generamos el archivo
      inherited GuardarEnArchivo(sArchivo);
      

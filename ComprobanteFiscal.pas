@@ -678,6 +678,7 @@ begin
 end;
 
 // Permite establecer el XML del comprobante (por si se esta leyendo de la BD, etc)
+// y almacena todo en la estructura interna de datos y XML
 procedure TFEComprobanteFiscal.setXML(Valor: WideString);
 var
   I: Integer;
@@ -687,13 +688,13 @@ var
   ImpuestoTrasladado: TFEImpuestoTrasladado;
   ImpuestoRetenido: TFEImpuestoRetenido;
 begin
-    {try
+    try
         // Leemos el contenido XML en el Documento XML interno
-        iXmlDoc:=LoadXMLData(UTF8Decode(Valor));
-        //fDocumentoXML
-        // Actualizamos el nodo comprobante
+        iXmlDoc:=LoadXMLData(UTF8ToString(Valor));
+        // Asignamos el XML a la variable interna del componnente
         fXmlComprobante := GetComprobante(iXmlDoc);
-        // Actualizamos todas las variables internas (de la clase) con los valores del XML
+
+        // Ahora, actualizamos todas las variables internas (de la clase) con los valores del XML
         FacturaGenerada:=True;
         
         with fXmlComprobante do
@@ -760,10 +761,19 @@ begin
                 end;
             end;
 
-            // NOTA: No agregamos los conceptos aqui ya que ya se encuentran en el XML
-            // y no se manejan estructuras internas para almacenarlos...
+            for I := 0 to Conceptos.Count - 1 do
+            begin
+                feConcepto.Cantidad:=StrToFloat(Conceptos[I].Cantidad);
+                feConcepto.Unidad:=Conceptos[I].Unidad;
+                feConcepto.Descripcion:=Conceptos[I].Descripcion;
+                feConcepto.ValorUnitario:=StrToFloat(Conceptos[I].ValorUnitario);
+                feConcepto.NoIdentificacion:=Conceptos[I].NoIdentificacion;
+
+                inherited AgregarConcepto(feConcepto);
+            end;
 
             bHuboRetenciones:=False;
+
             // Agregamos las reteneciones
             for I := 0 to Impuestos.Retenciones.Count - 1 do
             begin
@@ -772,29 +782,21 @@ begin
                 ImpuestoRetenido.Nombre := Retencion[I].Impuesto;
                 ImpuestoRetenido.Importe := StrToFloat(Retencion[I].Importe);
 
-                Self.AgregarImpuestoRetenido(ImpuestoRetenido);
+                inherited AgregarImpuestoRetenido(ImpuestoRetenido);
               end;
             end;
 
-            // NOTA: Como ya se tienen los impuestos en el XML
-            // solo contamos los totales para tenerlos en las variables internas
-            bHuboTraslados:=False;
-            bHuboRetenciones:=False;
-            fTotalImpuestosRetenidos := 0;
-            fTotalImpuestosTrasladados := 0;
-            
-            // Agregamos los impuestos trasladados
-            for I := 0 to Impuestos.Retenciones.Count - 1 do
-            begin
-              fTotalImpuestosRetenidos:=fTotalImpuestosRetenidos + StrToFloat(Impuestos.Retenciones[I].Importe);
-              bHuboRetenciones:=True;
-            end;
-
-            // Checamos si el XML proveido tiene los totales de impuestos desglosados...
+            // Agregamos los traslados
             for I := 0 to Impuestos.Traslados.Count - 1 do
             begin
-              fTotalImpuestosTrasladados:=fTotalImpuestosTrasladados + StrToFloat(Impuestos.Traslados[I].Importe);
-              bHuboTraslados:=True;
+              with Impuestos.Traslados do
+              begin
+                ImpuestoTrasladado.Nombre := Traslado[I].Impuesto;
+                ImpuestoTrasladado.Tasa:= StrToFloat(Traslado[I].Tasa);
+                ImpuestoTrasladado.Importe := StrToFloat(Traslado[I].Importe);
+
+                inherited AgregarImpuestoTrasladado(ImpuestoTrasladado);
+              end;
             end;
 
             if (Impuestos.TotalImpuestosTrasladados <> '') then
@@ -820,7 +822,7 @@ begin
 
             // Asignamos el descuento
             if (Descuento <> '') then
-              Self.AsignarDescuento(StrToFloat(Descuento), '');
+              Self.AsignarDescuento(StrToFloat(Descuento), MotivoDescuento);
 
             // Asignamos el subtotal de la factura
             fSubTotal := StrToFloat(Subtotal);
@@ -833,7 +835,7 @@ begin
     except
         On E:Exception do
           Raise E;
-    end;}
+    end;
 end;
 
 // Regresa el XML final del comprobante ya lleno
