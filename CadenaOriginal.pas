@@ -166,7 +166,7 @@ begin
       AgregarUbicacionFiscal(fXmlComprobante.Emisor.DomicilioFiscal);
       // 4) Datos del Domicilio de Expedición del Comprobante
       if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor')) then
-        if Assigned(fXmlComprobante.ChildNodes.FindNode('Impuestos').ChildNodes.FindNode('ExpedidoEn')) then
+        if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor').ChildNodes.FindNode('ExpedidoEn')) then
           AgregarUbicacion(fXmlComprobante.Emisor.ExpedidoEn);
 
       // 5) Datos del Receptor

@@ -51,6 +51,7 @@ RAZON PARA CAMBIAR:
 
         // Funcion usada para obtener el importe de un concepto 
         function ObtenerImporte(Concepto: TFEConcepto) : Currency;
+        function getTotal() : Currency;
     public
         constructor Create;
         // Propiedades del comprobante normal
@@ -62,7 +63,7 @@ RAZON PARA CAMBIAR:
         property ExpedidoEn: TFeDireccion read fExpedidoEn write fExpedidoEn;
         property FormaDePago: TFEFormaDePago read fFormaDePago write fFormaDePago;
         property Tipo: TFeTipoComprobante read fTipoComprobante write fTipoComprobante;
-        property Total: Currency read fTotal write fTotal;
+        property Total: Currency read getTotal;
         property SubTotal: Currency read fSubTotal write fSubTotal;
         property CondicionesDePago: String read fCondicionesDePago write fCondicionesDePago;
         property MetodoDePago: String read fMetodoDePago write fMetodoDePago;
@@ -138,6 +139,11 @@ procedure TDocumentoComprobanteFiscal.AsignarDescuento(ImporteDescuento: Currenc
 begin
   fDescuento := ImporteDescuento;
   fMotivoDescuento := Motivo;
+end;
+
+function TDocumentoComprobanteFiscal.getTotal() : Currency;
+begin
+    Result:=fSubTotal + fTotalImpuestosRetenidos + fTotalImpuestosTrasladados - fDescuento;
 end;
 
 function TDocumentoComprobanteFiscal.ObtenerImporte(Concepto: TFEConcepto) : Currency;
