@@ -27,13 +27,11 @@ published
   property Conceptos;
   property ImpuestosRetenidos;
   property ImpuestosTrasladados;
-protected
+{protected
   procedure setXML(Valor: WideString); override;
-  function getXML() : WideString;
+  function getXML() : WideString;  }
 public
-  property Certificado : TFECertificado read obtenerCertificado;
-  property BloqueFolios: TFEBloqueFolios read fBloqueFolios;
-  property XML : WideString read getXML write setXML;
+  //property XML : WideString read getXML write setXML;
 
   /// <summary>Evento que es llamado inemdiatamente después de que el CFD fue generado,
   /// el cual puede ser usado para registrar en su sistema contable el registro de la factura
@@ -98,7 +96,7 @@ begin
     Result:=inherited Certificado;
 end;
 
-
+{
 function TFacturaElectronica.getXML() : WideString;
 begin
     Result:=inherited XML;
@@ -111,7 +109,7 @@ begin
     // Leemos el XML en el Comprobante
     inherited XML:=Valor;
 end;
-
+ }
 procedure TFacturaElectronica.GenerarYGuardar(iFolio: Integer; fpFormaDePago: TFEFormaDePago; sArchivo: String);
 begin
      //if ValidarCamposNecesarios() = False then

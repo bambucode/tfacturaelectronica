@@ -59,33 +59,11 @@ type
     bIncluirCertificadoEnXML: Boolean;
 
     procedure LlenarComprobante;
-
-    // Getters/Setters:
-    {procedure setSubTotal(dMonto: Currency);
-    procedure setExpedidoEn(ExpedidoEn: TFeExpedidoEn);
-    procedure setTipoComprobante(Tipo: TFeTipoComprobante);
-    procedure setFormaDePago(FormaDePago: TFEFormaDePago);
-    /// <summary>Establece la forma de pago, para expresar el método de pago de los bienes o servicios amparados por el
-    /// comprobante. Se entiende como método de pago leyendas tales como: cheque, tarjeta de crédito o debito, depósito
-    // en cuenta, etc.</summary>
-    procedure setMetodoDePago(sFormaDePago: String);
-    procedure setReceptor(Receptor: TFEContribuyente);
-    procedure setEmisor(Emisor: TFEContribuyente);
-    procedure setFolio(Folio: TFEFolio);
-    procedure setCondicionesDePago(Condiciones: String);}
-    function obtenerSerie(): TFESerie;
     procedure setCertificado(Certificado: TFECertificado);
-
-    /// <summary>Obtiene la 'Cadena Original' segun las reglas del Anexo 20</summary>
     function getCadenaOriginal(): TStringCadenaOriginal;
     function getSelloDigital(): String;
     procedure setBloqueFolios(Bloque: TFEBloqueFolios);
-    //function getTotal() : Currency;
     procedure ValidarQueFolioEsteEnRango;
-
-    function getXML(): WideString; virtual;
-    procedure setXML(Valor: WideString); virtual;
-
     procedure AsignarCondicionesDePago;
     procedure AsignarEmisor;
     procedure AsignarReceptor;
@@ -104,6 +82,9 @@ type
     procedure AsignarExpedidoEn;
     procedure AsignarTotalesImpuestos;
     procedure AsignarFechaGeneracion;
+  protected
+    function getXML(): WideString; virtual;
+    procedure setXML(Valor: WideString); virtual;
 {$IFDEF VERSION_DE_PRUEBA}
   public
     _USAR_HORA_REAL : Boolean;
@@ -128,7 +109,6 @@ type
     procedure GuardarEnArchivo(sArchivoDestino: String);
     property CertificadoTexto : WideString read fCertificadoTexto write fCertificadoTexto;
     property Certificado: TFECertificado read fCertificado write setCertificado;
-
   end;
 
 implementation
@@ -250,25 +230,29 @@ end;
 // 2. Lugar y fecha de expedicion (29-A, Fraccion III) - En caso de ser sucursal
 procedure TFEComprobanteFiscal.AsignarExpedidoEn;
 begin
-    with fXmlComprobante.Emisor.ExpedidoEn do
+    // Checamos si tiene direccion de expedicion...
+    if (inherited ExpedidoEn.Calle <> '') then
     begin
-        Calle := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Calle);
-        if Trim((inherited ExpedidoEn).NoExterior) <> '' then
-          NoExterior := (inherited ExpedidoEn).NoExterior; // Opcional
+        with fXmlComprobante.Emisor.ExpedidoEn do
+        begin
+            Calle := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Calle);
+            if Trim((inherited ExpedidoEn).NoExterior) <> '' then
+              NoExterior := (inherited ExpedidoEn).NoExterior; // Opcional
 
-        if Trim((inherited ExpedidoEn).NoInterior) <> '' then
-          NoInterior := (inherited ExpedidoEn).NoInterior; // Opcional
+            if Trim((inherited ExpedidoEn).NoInterior) <> '' then
+              NoInterior := (inherited ExpedidoEn).NoInterior; // Opcional
 
-        if Trim((inherited ExpedidoEn).Colonia) <> '' then
-          Colonia := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Colonia); // Opcional
-        if Trim((inherited ExpedidoEn).Localidad) <> '' then
-          Localidad := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Localidad); // Opcional
-        if Trim((inherited ExpedidoEn).Referencia) <> '' then
-          Referencia := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Referencia); // Opcional
-        Municipio := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Municipio);
-        Estado := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Estado);
-        Pais := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Pais);
-        CodigoPostal := (inherited ExpedidoEn).CodigoPostal;
+            if Trim((inherited ExpedidoEn).Colonia) <> '' then
+              Colonia := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Colonia); // Opcional
+            if Trim((inherited ExpedidoEn).Localidad) <> '' then
+              Localidad := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Localidad); // Opcional
+            if Trim((inherited ExpedidoEn).Referencia) <> '' then
+              Referencia := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Referencia); // Opcional
+            Municipio := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Municipio);
+            Estado := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Estado);
+            Pais := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Pais);
+            CodigoPostal := (inherited ExpedidoEn).CodigoPostal;
+        end;
     end;
 end;
 
@@ -429,6 +413,7 @@ begin
     fCertificado.NumeroSerie := x509Certificado.SerialNumber;
 
     // Ya procesado llenamos su propiedad en el XML
+    Assert(Assigned(fXmlComprobante), 'El Nodo comprobante no est asignado!');
     fXmlComprobante.NoCertificado := fCertificado.NumeroSerie;
 
     // Incluir el certificado en el XML?
@@ -618,17 +603,15 @@ begin
     end;
 end;
 
-// Acceso rapido a la serie de la factura
-function TFEComprobanteFiscal.obtenerSerie(): TFESerie;
-begin
-  result := fBloqueFolios.Serie;
-end;
-
 procedure TFEComprobanteFiscal.setBloqueFolios(Bloque: TFEBloqueFolios);
 begin
   // Asignamos el bloque a la variable interna y validamos que este dentro del rango...
   fBloqueFolios := Bloque;
-  ValidarQueFolioEsteEnRango();
+  // Establecemos la serie
+  inherited Serie := fBloqueFolios.Serie;
+  // Si esta asignado el folio
+  if Folio > 0 then
+    ValidarQueFolioEsteEnRango();
 end;
 
 // El metodo que genera el CFD al final...
@@ -682,84 +665,88 @@ end;
 procedure TFEComprobanteFiscal.setXML(Valor: WideString);
 var
   I: Integer;
+  ValorEmisor, ValorReceptor: TFEContribuyente;
   feConcepto: TFEConcepto;
   iXmlDoc: IXMLDocument;
-  ExpedidoEn: TFEExpedidoEn;
+  ValorExpedidoEn: TFEExpedidoEn;
   ImpuestoTrasladado: TFEImpuestoTrasladado;
   ImpuestoRetenido: TFEImpuestoRetenido;
 begin
     try
         // Leemos el contenido XML en el Documento XML interno
-        iXmlDoc:=LoadXMLData(UTF8ToString(Valor));
+        iXmlDoc:=LoadXMLData(UTF8Decode(Valor));
         // Asignamos el XML a la variable interna del componnente
         fXmlComprobante := GetComprobante(iXmlDoc);
-
-        // Ahora, actualizamos todas las variables internas (de la clase) con los valores del XML
-        FacturaGenerada:=True;
         
+        // Ahora, actualizamos todas las variables internas (de la clase) con los valores del XML
         with fXmlComprobante do
         begin
-            fFolio:=StrToInt(Folio);
+            inherited Folio:=StrToInt(Folio);
             // Datos del certificado
-            fCertificado.NumeroSerie:=Certificado;
+            fCertificado.NumeroSerie:=NoCertificado;
+            fCertificadoTexto := Certificado;
             fBloqueFolios.NumeroAprobacion:=NoAprobacion;
             fBloqueFolios.AnoAprobacion:=AnoAprobacion;
             fBloqueFolios.Serie:=Serie;
-            fBloqueFolios.FolioInicial:=fFolio;
-            fBloqueFolios.FolioFinal:=fFolio;
+            inherited Serie:=Serie;
+            fBloqueFolios.FolioInicial:=inherited Folio;
+            fBloqueFolios.FolioFinal:=inherited Folio;
 
-            fFechaGeneracion:=TFEReglamentacion.ComoDateTime(fXmlComprobante.Fecha);
+            FechaGeneracion:=TFEReglamentacion.ComoDateTime(fXmlComprobante.Fecha);
 
-            fCondicionesDePago:=CondicionesDePago;
-            fMetodoDePago:=MetodoDePago;
+            inherited CondicionesDePago:=CondicionesDePago;
+            inherited MetodoDePago:=MetodoDePago;
 
             // Leemos los datos del emisor
-            fEmisor.Nombre:=Emisor.Nombre;
-            fEmisor.RFC:=Emisor.RFC;
+            ValorEmisor.Nombre:=Emisor.Nombre;
+            ValorEmisor.RFC:=Emisor.RFC;
             with Emisor do
             begin
-                fEmisor.Direccion.Calle := DomicilioFiscal.Calle;
-                fEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
-                fEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
-                fEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
-                fEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
-                fEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
-                fEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
-                fEmisor.Direccion.Estado := DomicilioFiscal.Estado;
-                fEmisor.Direccion.Pais := DomicilioFiscal.Pais;
+                ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
+                ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
+                ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
+                ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
+                ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
+                ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
+                ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
+                ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
+                ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
             end;
+            inherited Emisor:=ValorEmisor;
 
             // Leemos los datos del receptor
-            fReceptor.Nombre:=Receptor.Nombre;
-            fReceptor.RFC:=Receptor.Rfc;
+            ValorReceptor.Nombre:=Receptor.Nombre;
+            ValorReceptor.RFC:=Receptor.Rfc;
             with Receptor do
             begin
-                fReceptor.Direccion.Calle := Domicilio.Calle;
-                fReceptor.Direccion.NoExterior := Domicilio.NoExterior;
-                fReceptor.Direccion.NoInterior := Domicilio.NoInterior;
-                fReceptor.Direccion.CodigoPostal := Domicilio.CodigoPostal;
-                fReceptor.Direccion.Colonia := Domicilio.Colonia;
-                fReceptor.Direccion.Localidad := Domicilio.Localidad;
-                fReceptor.Direccion.Municipio := Domicilio.Municipio;
-                fReceptor.Direccion.Estado := Domicilio.Estado;
-                fReceptor.Direccion.Pais := Domicilio.Pais;
+                ValorReceptor.Direccion.Calle := Domicilio.Calle;
+                ValorReceptor.Direccion.NoExterior := Domicilio.NoExterior;
+                ValorReceptor.Direccion.NoInterior := Domicilio.NoInterior;
+                ValorReceptor.Direccion.CodigoPostal := Domicilio.CodigoPostal;
+                ValorReceptor.Direccion.Colonia := Domicilio.Colonia;
+                ValorReceptor.Direccion.Localidad := Domicilio.Localidad;
+                ValorReceptor.Direccion.Municipio := Domicilio.Municipio;
+                ValorReceptor.Direccion.Estado := Domicilio.Estado;
+                ValorReceptor.Direccion.Pais := Domicilio.Pais;
             end;
+            inherited Receptor:=ValorReceptor;
 
             // Tiene emisor??
             if (Emisor.ExpedidoEn.Calle <> '') then
             begin
                 with Emisor.ExpedidoEn do
                 begin
-                    fExpedidoEn.Calle := Calle;
-                    fExpedidoEn.NoExterior := NoExterior;
-                    fExpedidoEn.CodigoPostal := CodigoPostal;
-                    fExpedidoEn.Localidad := Localidad;
-                    fExpedidoEn.Municipio := Municipio;
-                    fExpedidoEn.Colonia := Colonia;
-                    fExpedidoEn.Estado := Estado;
-                    fExpedidoEn.Pais := Pais;
+                    ValorExpedidoEn.Calle := Calle;
+                    ValorExpedidoEn.NoExterior := NoExterior;
+                    ValorExpedidoEn.CodigoPostal := CodigoPostal;
+                    ValorExpedidoEn.Localidad := Localidad;
+                    ValorExpedidoEn.Municipio := Municipio;
+                    ValorExpedidoEn.Colonia := Colonia;
+                    ValorExpedidoEn.Estado := Estado;
+                    ValorExpedidoEn.Pais := Pais;
                 end;
             end;
+            inherited ExpedidoEn:=ValorExpedidoEn;
 
             for I := 0 to Conceptos.Count - 1 do
             begin
@@ -771,8 +758,6 @@ begin
 
                 inherited AgregarConcepto(feConcepto);
             end;
-
-            bHuboRetenciones:=False;
 
             // Agregamos las reteneciones
             for I := 0 to Impuestos.Retenciones.Count - 1 do
@@ -806,29 +791,35 @@ begin
 
             // Que forma de pago tuvo??
             if AnsiPos('UNA', Uppercase(FormaDePago)) > 0 then
-                fFormaDePago := fpUnaSolaExhibicion
+                inherited FormaDePago := fpUnaSolaExhibicion
             else
-                fFormaDePago := fpParcialidades;
+                inherited FormaDePago := fpParcialidades;
 
             // Tipo de comprobante
             if TipoDeComprobante = 'ingreso' then
-              fTipoComprobante := tcIngreso;
+              inherited Tipo := tcIngreso;
 
             if TipoDeComprobante = 'egreso' then
-              fTipoComprobante := tcEgreso;
+              inherited Tipo := tcEgreso;
 
             if TipoDeComprobante = 'traslado' then
-              fTipoComprobante := tcTraslado;
+              inherited Tipo := tcTraslado;
 
             // Asignamos el descuento
             if (Descuento <> '') then
               Self.AsignarDescuento(StrToFloat(Descuento), MotivoDescuento);
 
             // Asignamos el subtotal de la factura
-            fSubTotal := StrToFloat(Subtotal);
+            inherited SubTotal := StrToFloat(Subtotal);
 
             // Asignamos el sello que trae el XML
             fSelloDigitalCalculado:=Sello;
+
+            // Ahora hacemos que se calcule la cadena original de nuevo
+            fCadenaOriginalCalculada:=getCadenaOriginal;
+            
+            // Finalmente indicamos que la factura ya fue generada
+            FacturaGenerada:=True;
 
             Assert(Self.Total = StrToCurr(Total), 'El total del comprobante no fue igual que el total del XML');
         end;

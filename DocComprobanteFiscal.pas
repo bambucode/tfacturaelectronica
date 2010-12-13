@@ -51,6 +51,7 @@ RAZON PARA CAMBIAR:
 
         // Funcion usada para obtener el importe de un concepto 
         function ObtenerImporte(Concepto: TFEConcepto) : Currency;
+        function obtenerNumArticulos() : Integer;
         function getTotal() : Currency;
     public
         constructor Create;
@@ -69,6 +70,7 @@ RAZON PARA CAMBIAR:
         property MetodoDePago: String read fMetodoDePago write fMetodoDePago;
         property FechaGeneracion : TDateTime read fFechaGeneracion write fFechaGeneracion;
         property Conceptos: TFEConceptos read fArrConceptos;
+        property NumeroArticulos: Integer read obtenerNumArticulos;
         property ImpuestosRetenidos: TFEImpuestosRetenidos read fArrImpuestosRetenidos;
         property ImpuestosTrasladados: TFEImpuestosTrasladados read fArrImpuestosTrasladados;
         property TotalImpuestosRetenidos: Currency read fTotalImpuestosRetenidos;
@@ -105,6 +107,11 @@ begin
     bFacturaGenerada := False;
     bHuboRetenciones:=False;
     bHuboTraslados:=False; }
+end;
+
+function TDocumentoComprobanteFiscal.obtenerNumArticulos() : Integer;
+begin
+  Result:=Length(fArrConceptos);
 end;
 
 function TDocumentoComprobanteFiscal.AgregarConcepto(NuevoConcepto: TFEConcepto) : Integer;
