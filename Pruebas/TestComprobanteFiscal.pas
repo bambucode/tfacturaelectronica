@@ -47,6 +47,7 @@ type
     procedure SelloDigital_DeComprobante_SeaCorrecto;
     procedure XML_DeComprobanteHecho_GenereXMLCorrectamente;
     procedure setXML_DeComprobanteExistente_EstablezcaLasPropiedadesCorrectamente;
+    procedure GuardarEnArchivo_ComprobanteDeXML_LoGuarde;
   end;
 
 implementation
@@ -637,6 +638,23 @@ begin
   // Verificamos obtener el sello digital de nuevo y que sea el mismo
   CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
               'El sello digital no fue calculado correctamente la segunda ocasion');
+end;
+
+procedure TestTFEComprobanteFiscal.GuardarEnArchivo_ComprobanteDeXML_LoGuarde;
+var
+  sContenidoXML: WideString;
+  sArchivo: String;
+begin
+   // Leemos el XML de nuestro Fixture en memoria
+    sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/comprobante_correcto.xml');
+    fComprobanteFiscal.XML:=sContenidoXML;
+
+    // Ahora guardamos el archivo
+    Randomize;
+    sArchivo:=fDirTemporal + '/' + IntToStr(Random(9999999)) + '.xml';
+    fComprobanteFiscal.GuardarEnArchivo(sArchivo);
+
+    CheckTrue(FileExists(sArchivo), 'No se guardo el archivo XML del comprobante leido de una cadena XML');
 end;
 
 procedure TestTFEComprobanteFiscal.setXML_DeComprobanteExistente_EstablezcaLasPropiedadesCorrectamente;

@@ -98,17 +98,20 @@ type
     destructor Destroy(); override;
     procedure Cancelar();
 
-    property BloqueFolios: TFEBloqueFolios read fBloqueFolios write setBloqueFolios;
-
     // Propiedades especificas al comprobante electronico
-    property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
-    property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML;
+    property BloqueFolios: TFEBloqueFolios read fBloqueFolios write setBloqueFolios;
     property XML: WideString read getXML write setXML;
     property CadenaOriginal: TStringCadenaOriginal read getCadenaOriginal;
     property SelloDigital: String read getSelloDigital;
-    procedure GuardarEnArchivo(sArchivoDestino: String);
     property CertificadoTexto : WideString read fCertificadoTexto write fCertificadoTexto;
     property Certificado: TFECertificado read fCertificado write setCertificado;
+    property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
+    property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML;
+    
+    /// <summary>Guarda una copia del XML en el archivo indicado</summary>
+    /// <param name="ArchivoFacturaXML">Ruta completa con nombre de archivo en el que se
+    /// almacenara el XML del comprobante</param>
+    procedure GuardarEnArchivo(sArchivoDestino: String);
   end;
   
 implementation
@@ -683,8 +686,12 @@ begin
     try
         // Leemos el contenido XML en el Documento XML interno
         iXmlDoc:=LoadXMLData(UTF8Decode(Valor));
+        // Creamos el documento "dueño" del comprobante
+        fDocumentoXML:=TXmlDocument.Create(nil);
+        // Pasamos el XML para poder usarlo en la clase
+        fDocumentoXML.XML:=iXmlDoc.XML;
         // Asignamos el XML a la variable interna del componnente
-        fXmlComprobante := GetComprobante(iXmlDoc);
+        fXmlComprobante := GetComprobante(fDocumentoXML);
         
         // Ahora, actualizamos todas las variables internas (de la clase) con los valores del XML
         with fXmlComprobante do
