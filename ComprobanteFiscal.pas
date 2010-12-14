@@ -110,7 +110,7 @@ type
     property CertificadoTexto : WideString read fCertificadoTexto write fCertificadoTexto;
     property Certificado: TFECertificado read fCertificado write setCertificado;
   end;
-
+  
 implementation
 
 uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
@@ -259,33 +259,41 @@ end;
 // 3. Clave del RFC de la persona a favor de quien se expida la factura (29-A, Fraccion IV)
 procedure TFEComprobanteFiscal.AsignarReceptor;
 begin
-
   with fXmlComprobante.Receptor do
   begin
-    RFC := (inherited Receptor).RFC;
-    Nombre := TFEReglamentacion.ComoCadena((inherited Receptor).Nombre);
-
-    with Domicilio do
+    RFC := Trim((inherited Receptor).RFC);
+    
+    // Si es un CFD de venta al publico en general no incluimos nombre ni direccion
+    if (RFC <>_RFC_VENTA_PUBLICO_EN_GENERAL) then
     begin
-      Calle := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Calle);
+        Nombre := TFEReglamentacion.ComoCadena((inherited Receptor).Nombre);
 
-      if Trim((inherited Receptor).Direccion.NoExterior) <> '' then
-        NoExterior := (inherited Receptor).Direccion.NoExterior; // Opcional
+        with Domicilio do
+        begin
+          Calle := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Calle);
 
-      if Trim((inherited Receptor).Direccion.NoInterior) <> '' then
-        NoInterior := (inherited Receptor).Direccion.NoInterior; // Opcional
+          if Trim((inherited Receptor).Direccion.NoExterior) <> '' then
+            NoExterior := (inherited Receptor).Direccion.NoExterior; // Opcional
 
-      if Trim((inherited Receptor).Direccion.Colonia) <> '' then
-        Colonia := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Colonia); // Opcional
-      if Trim((inherited Receptor).Direccion.Localidad) <> '' then
-        Localidad := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Localidad); // Opcional
-      if Trim((inherited Receptor).Direccion.Referencia) <> '' then
-        Referencia := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Referencia); // Opcional
-      Municipio := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Municipio);
-      Estado := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Estado);
-      Pais := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Pais);
-      CodigoPostal := (inherited Receptor).Direccion.CodigoPostal;
-    end; { with CFD.Receptor.Domicilio }
+          if Trim((inherited Receptor).Direccion.NoInterior) <> '' then
+            NoInterior := (inherited Receptor).Direccion.NoInterior; // Opcional
+
+          if Trim((inherited Receptor).Direccion.Colonia) <> '' then
+            Colonia := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Colonia); // Opcional
+          if Trim((inherited Receptor).Direccion.Localidad) <> '' then
+            Localidad := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Localidad); // Opcional
+          if Trim((inherited Receptor).Direccion.Referencia) <> '' then
+            Referencia := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Referencia); // Opcional
+          Municipio := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Municipio);
+          Estado := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Estado);
+          Pais := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Pais);
+          CodigoPostal := (inherited Receptor).Direccion.CodigoPostal;
+        end; { with CFD.Receptor.Domicilio }
+    end else
+        // Si es Publico en General solo agregamos el pais al nodo Direccion
+        // cualquier otra cosa generara un CFD invalido.
+        Domicilio.Pais:='México';
+        
   end; { with CFD.Receptor }
 end;
 

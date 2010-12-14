@@ -129,6 +129,10 @@ TFEImpuestosTrasladados = Array of TFEImpuestoTrasladado;
 // Usado por la clase ReporteMensual
 TFEPedimentos = Array of TFEDatosAduana;
 
+const
+	_RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';
+	_RFC_VENTA_EXTRANJEROS        = 'XEXX010101000';
+
 implementation
 
 end.

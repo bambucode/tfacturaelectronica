@@ -172,9 +172,15 @@ begin
 
       // 5) Datos del Receptor
       AgregarAtributo(fXmlComprobante.Receptor, 'rfc');
-      AgregarAtributo(fXmlComprobante.Receptor, 'nombre');
+
+      // Checamos si es una factura al publico en general
+      // si lo es, NO incluimos el nombre
+      if (fXmlComprobante.Receptor.Rfc <> _RFC_VENTA_PUBLICO_EN_GENERAL) then
+          AgregarAtributo(fXmlComprobante.Receptor, 'nombre');
+      
       // 6) Datos del domicilio fiscal del Receptor
       AgregarUbicacion(fXmlComprobante.Receptor.Domicilio);
+
       // 7) Datos de Cada Concepto Relacionado en el Comprobante
       for I := 0 to fXmlComprobante.Conceptos.Count - 1 do
       begin

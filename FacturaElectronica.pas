@@ -54,10 +54,6 @@ public
   // function Cancelar;
 end;
 
-const
-	_RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';
-	_RFC_VENTA_EXTRANJEROS        = 'XEXX010101000';
-
 implementation
 
 uses sysutils, Classes;

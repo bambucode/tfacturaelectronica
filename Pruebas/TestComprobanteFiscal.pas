@@ -549,14 +549,11 @@ var
      sSelloDigitalCorrecto, sSelloCalculado: String;
      Certificado: TFECertificado;
      Impuesto: TFEImpuestoTrasladado;
-const
-    _ARCHIVO_LLAVE_PRIVADA = 'comprobante_fiscal/FIFC000101AM1.key';
-    _CLAVE_LLAVE_PRIVADA = '12345678a';
 begin
-     // Leemos el certificado
-      Certificado.Ruta := fRutaFixtures + _RUTA_CERTIFICADO;
-      Certificado.LlavePrivada.Ruta := fRutaFixtures + _ARCHIVO_LLAVE_PRIVADA;
-      Certificado.LlavePrivada.Clave := _CLAVE_LLAVE_PRIVADA;
+      // Llenamos los datos que fueron usados para generar dicho comprobante
+      Certificado.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.cer';
+      Certificado.LlavePrivada.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.key';
+      Certificado.LlavePrivada.Clave := '12345678a';
 
       // Leemos el comprobante del XML (que no tiene conceptos)
       sSelloDigitalCorrecto := GenerarComprobanteFiscal(fRutaFixtures +
@@ -587,13 +584,11 @@ begin
 
      //fComprobanteFiscal.AsignarConceptos;
      sSelloCalculado:=fComprobanteFiscal.SelloDigital;
-
      //guardarContenido(fComprobanteFiscal.CadenaOriginal, 'cadena.txt');
      //fComprobanteFiscal.GuardarEnArchivo('C:/temp/xml.xml');
 
      // Verificamos que el sello sea correcto
-     CheckEquals(sSelloDigitalCorrecto, sSelloCalculado,
-              'El sello digital no fue calculado correctamente');
+     CheckEquals(sSelloDigitalCorrecto, sSelloCalculado, 'El sello digital no fue calculado correctamente');
 end;
 
 procedure TestTFEComprobanteFiscal.SelloDigital_DeComprobante_SeaCorrecto;
