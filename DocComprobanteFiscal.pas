@@ -1,4 +1,4 @@
-unit DocComprobanteFiscal;
+﻿unit DocComprobanteFiscal;
 
 interface
 
@@ -82,7 +82,7 @@ RAZON PARA CAMBIAR:
         /// <param name="NuevoConcepto">Este es el nuevo concepto a agregar a la factura
         ///   el parametro es un "record" del tipo TFEConcepto.</param>
         function AgregarConcepto(NuevoConcepto: TFeConcepto) : Integer;
-        /// <summary>Agrega un nuevo impuesto de retenci�n (ISR, IVA) al comprobante</summary>
+        /// <summary>Agrega un nuevo impuesto de retención (ISR, IVA) al comprobante</summary>
         /// <param name="NuevoImpuesto">El nuevo Impuesto con los datos de nombre e importe del mismo</param>
         function AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoRetenido) : Integer;
         /// <summary>Agrega un nuevo impuesto de traslado (IVA, IEPS)</summary>
@@ -150,7 +150,10 @@ end;
 
 function TDocumentoComprobanteFiscal.getTotal() : Currency;
 begin
-    Result:=fSubTotal + fTotalImpuestosRetenidos + fTotalImpuestosTrasladados - fDescuento;
+    // Anexo 20:
+    // Atributo requerido para representar la suma del subtotal, menos los descuentos aplicables,
+    // más los impuestos trasladados, menos los impuestos retenidos.
+    Result:=fSubTotal - fDescuento + fTotalImpuestosTrasladados - fTotalImpuestosRetenidos;
 end;
 
 function TDocumentoComprobanteFiscal.ObtenerImporte(Concepto: TFEConcepto) : Currency;
