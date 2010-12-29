@@ -175,8 +175,9 @@ begin
 
       // Checamos si es una factura al publico en general
       // si lo es, NO incluimos el nombre
-      if (fXmlComprobante.Receptor.Rfc <> _RFC_VENTA_PUBLICO_EN_GENERAL) then
-          AgregarAtributo(fXmlComprobante.Receptor, 'nombre');
+      if ((fXmlComprobante.Receptor.Rfc <> _RFC_VENTA_PUBLICO_EN_GENERAL)
+          And (fXmlComprobante.Receptor.Rfc <> _RFC_VENTA_EXTRANJEROS)) then
+              AgregarAtributo(fXmlComprobante.Receptor, 'nombre');
       
       // 6) Datos del domicilio fiscal del Receptor
       AgregarUbicacion(fXmlComprobante.Receptor.Domicilio);
