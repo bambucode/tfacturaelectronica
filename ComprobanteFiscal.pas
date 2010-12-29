@@ -158,7 +158,7 @@ destructor TFEComprobanteFiscal.Destroy();
 begin
   // Al ser una interface el objeto TXMLDocument se libera automaticamente por Delphi al dejar de ser usado
   // aunque para asegurarnos hacemos lo siguiente:
-  fXmlComprobante := nil;
+  //fXmlComprobante := nil;
   inherited;
 end;
 
@@ -266,8 +266,8 @@ begin
   begin
     RFC := Trim((inherited Receptor).RFC);
     
-    // Si es un CFD de venta al publico en general no incluimos nombre ni direccion
-    if (RFC <>_RFC_VENTA_PUBLICO_EN_GENERAL) then
+    // Si es un CFD de venta al publico en general o extranjeros no incluimos nombre ni direccion
+    if ((Rfc <> _RFC_VENTA_PUBLICO_EN_GENERAL) And (Rfc <> _RFC_VENTA_EXTRANJEROS)) then
     begin
         Nombre := TFEReglamentacion.ComoCadena((inherited Receptor).Nombre);
 
@@ -295,7 +295,10 @@ begin
     end else
         // Si es Publico en General solo agregamos el pais al nodo Direccion
         // cualquier otra cosa generara un CFD invalido.
-        Domicilio.Pais:='México';
+        if (Rfc = _RFC_VENTA_PUBLICO_EN_GENERAL) then
+          Domicilio.Pais:='México'
+        else // Si es el RFC de extranjero ahi si obtenemos el pais del que se nos haya asignado...
+          fXmlComprobante.Receptor.Domicilio.Pais := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Pais);
         
   end; { with CFD.Receptor }
 end;
@@ -311,6 +314,7 @@ var
   I: Integer;
   Concepto: TFEConcepto;
 begin
+
      {$IFDEF VER220} CodeSite.EnterMethod('AsignarConceptos'); {$ENDIF}
      // Obtenemos los conceptos agregados al documento previamente
      for I := 0 to Length(inherited Conceptos) - 1 do
