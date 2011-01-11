@@ -28,7 +28,9 @@ uses
   LibEay32Plus in '..\LibEay32Plus.pas',
   OpenSSLUtils in '..\OpenSSLUtils.pas',
   SelloDigital in '..\SelloDigital.pas',
-  FeCFDv2 in '..\CFD\FeCFDv2.pas';
+  FeCFDv2 in '..\CFD\FeCFDv2.pas',
+  DocComprobanteFiscal in '..\DocComprobanteFiscal.pas',
+  CadenaOriginal in '..\CadenaOriginal.pas';
 
 var
    sArchivo: String;

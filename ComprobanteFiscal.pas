@@ -652,11 +652,19 @@ begin
       // Si aun no ha sido generada la factura la "llenamos"
       LlenarComprobante;
       fSelloDigitalCalculado:='';
-      // Segun la leglislacion vigente si la factura se hace antes del 1 de Enero del 2011, usamos MD5
-      if Now < EncodeDate(2011, 1, 1) then
+
+      {$IFDEF VERSION_DE_PRUEBA}
+              Assert(FechaGeneracion > EncodeDate(2010, 1, 1),
+                     'La fecha de generacion debe ser en el 2010 o superior!!');
+      {$ENDIF}
+
+      // Segun la leglislacion vigente si la factura se hace
+      // antes del 1 de Enero del 2011, usamos MD5
+      if (FechaGeneracion < EncodeDate(2011, 1, 1)) then
         TipoDigestion := tdMD5
       else // Si es 2011 usamos el algoritmo SHA-1
         TipoDigestion := tdSHA1;
+
       try
         // Creamos la clase SelloDigital que nos ayudara a "sellar" la factura en XML
         SelloDigital := TSelloDigital.Create(Self.CadenaOriginal, fCertificado, TipoDigestion);
