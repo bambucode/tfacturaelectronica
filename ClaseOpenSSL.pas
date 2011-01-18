@@ -32,6 +32,7 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
     ELlaveLecturaException = class(Exception);
     ELlavePrivadaClaveIncorrectaException = class(Exception);
     ELlavePareceSerFiel = class(Exception);
+    ELongitudBufferPequenoException = class(Exception);
 
     ///<summary>Clase que representa a la liberia OpenSSL y que tiene
     ///  metodos usados para generar el sello digital (digestion md5) y
@@ -73,7 +74,7 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
 
 implementation
 
-uses  StrUtils;
+uses  StrUtils, dialogs;
 
 constructor TOpenSSL.Create();
 begin
@@ -284,10 +285,10 @@ function TOpenSSL.HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String;
 var
   mdctx: EVP_MD_CTX;
   {$IF CompilerVersion >= 20}
-      Inbuf: Array[0..99999] of AnsiChar; // Antes [0..8192]
+      Inbuf: Array[0..999999] of AnsiChar; // Antes [0..8192]
       Outbuf: array [0..1024] of AnsiChar;
   {$ELSE}
-      Inbuf: Array[0..99999] of Char;
+      Inbuf: Array[0..999999] of Char;
       Outbuf: array [0..1024] of Char;
   {$IFEND}
 	ekLlavePrivada: pEVP_PKEY;
@@ -306,7 +307,16 @@ begin
   // de lo contrario no copiara correctamente los datos en memoria regresando sellos invalidos
   //CodeSite.Send('CodePage',StringCodePage(sCadena));
   Tam:=Length(sCadena); // Obtenemos el tamaño de la cadena original
-  StrPLCopy(inbuf, sCadena, Tam);  // Copiamos la cadena original al buffer de entrada 
+  try
+      StrPLCopy(inbuf, sCadena, Tam);  // Copiamos la cadena original al buffer de entrada
+  except
+      On E:Exception do
+      begin
+          if Pos('Access', E.Message) > 0 then
+             Raise ELongitudBufferPequenoException.Create('Error de sellado digital: La cadena original fue mas grande que el tamaño del buffer,' +
+                                                          'por favor intente aumentando el tamaño del buffer.');
+      end;
+  end;
 
   if not Assigned(ekLlavePrivada) then
     Raise ELlaveLecturaException.Create('No fue posible leer la llave privada');

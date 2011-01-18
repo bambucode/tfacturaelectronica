@@ -5,7 +5,7 @@
   Esta clase representa un Comprobante Fiscal Digital en su Version 2.0 asi como
   los metodos para generarla.
 
-  Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
+  Este archivo pertenece al proyecto de codigo abierto de Bambu Code:                                                      
   http://bambucode.com/codigoabierto
 
   La licencia de este codigo fuente se encuentra en:
@@ -29,6 +29,7 @@ type
   EFECertificadoNoExisteException = class(Exception);
   EFECertificadoNoVigente =  class(Exception);
   EFEFolioFueraDeRango = class(Exception);
+  EXMLVacio = class(Exception);
 
   /// <summary>Representa la estructura de comprobante fiscal digital (ver2.0) y sus elementos
   /// definidos de acuerdo al XSD del SAT. Esta pensado para ser extendido en las versiones
@@ -654,8 +655,8 @@ begin
       fSelloDigitalCalculado:='';
 
       {$IFDEF VERSION_DE_PRUEBA}
-              Assert(FechaGeneracion > EncodeDate(2010, 1, 1),
-                     'La fecha de generacion debe ser en el 2010 o superior!!');
+              Assert(FechaGeneracion > EncodeDate(2009, 1, 1),
+                     'La fecha de generacion debe ser en el 2010 o superior!! fue' + DateTimeToStr(FechaGeneracion));
       {$ENDIF}
 
       // Segun la leglislacion vigente si la factura se hace
@@ -694,7 +695,25 @@ var
   ValorExpedidoEn: TFEExpedidoEn;
   ImpuestoTrasladado: TFEImpuestoTrasladado;
   ImpuestoRetenido: TFEImpuestoRetenido;
+  sMotivoDescuento: String;
+
+  function TieneAtributo(NodoPadre: IXMLNode; NombreAtributo: String) : Boolean;
+  begin
+    // Checamos que el XML que estamos leyendo tenga dicho atributo ya que si esta vacio
+    // y lo tratamos de "leer" se agregara al XML leido con valores nulos
+    if Assigned(NodoPadre) then
+      Result:=NodoPadre.HasAttribute(NombreAtributo)
+    else
+      Result:=False;
+  end;
+
 begin
+    if (Trim(Valor) = '') then
+    begin
+        Raise EXMLVacio.Create('El valor proveido al XML esta vacio. Imposible crear comprobante.');
+        Exit;
+    end;
+
     try
         // Leemos el contenido XML en el Documento XML interno
         iXmlDoc:=LoadXMLData(UTF8Decode(Valor));
@@ -704,6 +723,8 @@ begin
         fDocumentoXML.XML:=iXmlDoc.XML;
         // Asignamos el XML a la variable interna del componnente
         fXmlComprobante := GetComprobante(fDocumentoXML);
+
+        Assert(fXmlComprobante.Version <> '', 'El comprobante no fue leido correctamente.');
         
         // Ahora, actualizamos todas las variables internas (de la clase) con los valores del XML
         with fXmlComprobante do
@@ -721,97 +742,142 @@ begin
 
             FechaGeneracion:=TFEReglamentacion.ComoDateTime(fXmlComprobante.Fecha);
 
-            inherited CondicionesDePago:=CondicionesDePago;
-            inherited MetodoDePago:=MetodoDePago;
+            if TieneAtributo(fXmlComprobante, 'condicionesDePago') then
+              inherited CondicionesDePago:=CondicionesDePago;
+
+            if TieneAtributo(fXmlComprobante, 'metodoDePago') then
+              inherited MetodoDePago:=MetodoDePago;
 
             // Leemos los datos del emisor
-            ValorEmisor.Nombre:=Emisor.Nombre;
-            ValorEmisor.RFC:=Emisor.RFC;
+            if TieneAtributo(Emisor, 'nombre') then
+              ValorEmisor.Nombre:=Emisor.Nombre;
+              
+            if TieneAtributo(Emisor, 'rfc') then
+              ValorEmisor.RFC:=Emisor.RFC;
+              
             with Emisor do
             begin
-                ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
-                ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
-                ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
-                ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
-                ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
-                ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
-                ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
-                ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
-                ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
+                if TieneAtributo(DomicilioFiscal, 'calle') then
+                  ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
+                if TieneAtributo(DomicilioFiscal, 'noExterior') then
+                  ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
+                if TieneAtributo(DomicilioFiscal, 'noInterior') then
+                  ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
+                if TieneAtributo(DomicilioFiscal, 'codigoPostal') then
+                  ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
+                if TieneAtributo(DomicilioFiscal, 'colonia') then
+                  ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
+                if TieneAtributo(DomicilioFiscal, 'localidad') then
+                  ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
+                if TieneAtributo(DomicilioFiscal, 'municipio') then
+                  ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
+                if TieneAtributo(DomicilioFiscal, 'estado') then
+                  ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
+                if TieneAtributo(DomicilioFiscal, 'pais') then
+                  ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
             end;
             inherited Emisor:=ValorEmisor;
 
-            // Leemos los datos del receptor
-            ValorReceptor.Nombre:=Receptor.Nombre;
             ValorReceptor.RFC:=Receptor.Rfc;
-            with Receptor do
+            
+            // Leemos los datos del receptor solo si no es publico en general o extranjero
+            if ((Uppercase(ValorReceptor.RFC) <> _RFC_VENTA_PUBLICO_EN_GENERAL) And
+                (Uppercase(ValorReceptor.RFC) <> _RFC_VENTA_EXTRANJEROS)) then
             begin
-                ValorReceptor.Direccion.Calle := Domicilio.Calle;
-                ValorReceptor.Direccion.NoExterior := Domicilio.NoExterior;
-                ValorReceptor.Direccion.NoInterior := Domicilio.NoInterior;
-                ValorReceptor.Direccion.CodigoPostal := Domicilio.CodigoPostal;
-                ValorReceptor.Direccion.Colonia := Domicilio.Colonia;
-                ValorReceptor.Direccion.Localidad := Domicilio.Localidad;
-                ValorReceptor.Direccion.Municipio := Domicilio.Municipio;
-                ValorReceptor.Direccion.Estado := Domicilio.Estado;
-                ValorReceptor.Direccion.Pais := Domicilio.Pais;
+                  if TieneAtributo(Receptor, 'nombre') then
+                      ValorReceptor.Nombre:=Receptor.Nombre;
+
+                  with Receptor do
+                  begin
+                      if TieneAtributo(Domicilio, 'calle') then
+                        ValorReceptor.Direccion.Calle := Domicilio.Calle;
+                      if TieneAtributo(Domicilio, 'noExterior') then
+                        ValorReceptor.Direccion.NoExterior := Domicilio.NoExterior;
+                      if TieneAtributo(Domicilio, 'noInterior') then
+                        ValorReceptor.Direccion.NoInterior := Domicilio.NoInterior;
+                      if TieneAtributo(Domicilio, 'codigoPostal') then
+                       ValorReceptor.Direccion.CodigoPostal := Domicilio.CodigoPostal;
+                      if TieneAtributo(Domicilio, 'colonia') then
+                        ValorReceptor.Direccion.Colonia := Domicilio.Colonia;
+                      if TieneAtributo(Domicilio, 'localidad') then
+                        ValorReceptor.Direccion.Localidad := Domicilio.Localidad;
+                      if TieneAtributo(Domicilio, 'municipio') then
+                        ValorReceptor.Direccion.Municipio := Domicilio.Municipio;
+                      if TieneAtributo(Domicilio, 'estado') then
+                        ValorReceptor.Direccion.Estado := Domicilio.Estado;
+                      if TieneAtributo(Domicilio, 'pais') then
+                        ValorReceptor.Direccion.Pais := Domicilio.Pais;
+                  end;
             end;
             inherited Receptor:=ValorReceptor;
 
             // Tiene emisor??
-            if (Emisor.ExpedidoEn.Calle <> '') then
+            if TieneAtributo(Emisor, 'ExpedidoEn') then
             begin
-                with Emisor.ExpedidoEn do
-                begin
-                    ValorExpedidoEn.Calle := Calle;
-                    ValorExpedidoEn.NoExterior := NoExterior;
-                    ValorExpedidoEn.CodigoPostal := CodigoPostal;
-                    ValorExpedidoEn.Localidad := Localidad;
-                    ValorExpedidoEn.Municipio := Municipio;
-                    ValorExpedidoEn.Colonia := Colonia;
-                    ValorExpedidoEn.Estado := Estado;
-                    ValorExpedidoEn.Pais := Pais;
-                end;
+                  with Emisor.ExpedidoEn do
+                  begin
+                      if TieneAtributo(Emisor.ExpedidoEn, 'calle') then
+                        ValorExpedidoEn.Calle := Calle;
+                      if TieneAtributo(Emisor.ExpedidoEn, 'NoExterior') then
+                        ValorExpedidoEn.NoExterior := NoExterior;
+                      if TieneAtributo(Emisor.ExpedidoEn, 'codigoPostal') then
+                        ValorExpedidoEn.CodigoPostal := CodigoPostal;
+                      if TieneAtributo(Emisor.ExpedidoEn, 'localidad') then
+                        ValorExpedidoEn.Localidad := Localidad;
+                      if TieneAtributo(Emisor.ExpedidoEn, 'municipio') then
+                        ValorExpedidoEn.Municipio := Municipio;
+                      if TieneAtributo(Emisor.ExpedidoEn, 'colonia') then
+                        ValorExpedidoEn.Colonia := Colonia;
+                      if TieneAtributo(Emisor.ExpedidoEn, 'estado') then
+                        ValorExpedidoEn.Estado := Estado;
+                      if TieneAtributo(Emisor.ExpedidoEn, 'pais') then
+                        ValorExpedidoEn.Pais := Pais;
+                  end;
             end;
             inherited ExpedidoEn:=ValorExpedidoEn;
 
             for I := 0 to Conceptos.Count - 1 do
             begin
                 feConcepto.Cantidad:=StrToFloat(Conceptos[I].Cantidad);
-                feConcepto.Unidad:=Conceptos[I].Unidad;
+                if TieneAtributo(Conceptos[I], 'unidad') then
+                  feConcepto.Unidad:=Conceptos[I].Unidad;
                 feConcepto.Descripcion:=Conceptos[I].Descripcion;
                 feConcepto.ValorUnitario:=StrToFloat(Conceptos[I].ValorUnitario);
-                feConcepto.NoIdentificacion:=Conceptos[I].NoIdentificacion;
+                if TieneAtributo(Conceptos[I], 'noIdentificacion') then
+                  feConcepto.NoIdentificacion:=Conceptos[I].NoIdentificacion;
 
                 inherited AgregarConcepto(feConcepto);
             end;
 
             // Agregamos las reteneciones
-            for I := 0 to Impuestos.Retenciones.Count - 1 do
-            begin
-              with Impuestos.Retenciones do
-              begin
-                ImpuestoRetenido.Nombre := Retencion[I].Impuesto;
-                ImpuestoRetenido.Importe := StrToFloat(Retencion[I].Importe);
-
-                inherited AgregarImpuestoRetenido(ImpuestoRetenido);
-              end;
-            end;
+            if Assigned(ChildNodes.FindNode('Impuestos')) then
+              if Assigned(ChildNodes.FindNode('Impuestos').ChildNodes.FindNode('Retenciones')) then
+                for I := 0 to fXmlComprobante.Impuestos.Retenciones.Count - 1 do
+                begin
+                    ImpuestoRetenido.Nombre := fXmlComprobante.Impuestos.Retenciones.Retencion[I].Impuesto;
+                    ImpuestoRetenido.Importe := StrToFloat(fXmlComprobante.Impuestos.Retenciones.Retencion[I].Importe);
+                    inherited AgregarImpuestoRetenido(ImpuestoRetenido);
+                end;
 
             // Agregamos los traslados
-            for I := 0 to Impuestos.Traslados.Count - 1 do
+            if Assigned(ChildNodes.FindNode('Impuestos')) then
             begin
-              with Impuestos.Traslados do
-              begin
-                ImpuestoTrasladado.Nombre := Traslado[I].Impuesto;
-                ImpuestoTrasladado.Tasa:= StrToFloat(Traslado[I].Tasa);
-                ImpuestoTrasladado.Importe := StrToFloat(Traslado[I].Importe);
-
-                inherited AgregarImpuestoTrasladado(ImpuestoTrasladado);
-              end;
+              if Assigned(ChildNodes.FindNode('Impuestos').ChildNodes.FindNode('Traslados')) then
+                for I := 0 to Impuestos.Traslados.Count - 1 do
+                begin
+                  with Impuestos.Traslados do
+                  begin
+                    ImpuestoTrasladado.Nombre := Traslado[I].Impuesto;
+                    ImpuestoTrasladado.Tasa:= StrToFloat(Traslado[I].Tasa);
+                    ImpuestoTrasladado.Importe := StrToFloat(Traslado[I].Importe);
+                    inherited AgregarImpuestoTrasladado(ImpuestoTrasladado);
+                  end;
+                end;
+                //AsignarImpuestosTrasladados;
             end;
 
-            if (Impuestos.TotalImpuestosTrasladados <> '') then
+
+            if TieneAtributo(Impuestos, 'totalImpuestosTraslados') then
                 Self.DesglosarTotalesImpuestos := True
             else
                 Self.DesglosarTotalesImpuestos := False;
@@ -833,8 +899,15 @@ begin
               inherited Tipo := tcTraslado;
 
             // Asignamos el descuento
-            if (Descuento <> '') then
-              Self.AsignarDescuento(StrToFloat(Descuento), MotivoDescuento);
+            if TieneAtributo(fXmlComprobante, 'descuento') then
+            begin
+              if TieneAtributo(fXmlComprobante, 'motivoDescuento') then
+                sMotivoDescuento:=MotivoDescuento
+              else
+                sMotivoDescuento:='';
+
+              Self.AsignarDescuento(StrToFloat(Descuento), sMotivoDescuento);
+            end;
 
             // Asignamos el subtotal de la factura
             inherited SubTotal := StrToFloat(Subtotal);
@@ -852,7 +925,12 @@ begin
         end;
     except
         On E:Exception do
-          Raise E;
+        begin
+          {$IFDEF DEBUG}
+              ShowMessage(E.Message);
+          {$ENDIF}
+          Raise Exception.Create(E.Message);
+        end;
     end;
 end;
 
