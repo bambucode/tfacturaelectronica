@@ -136,7 +136,7 @@ end;
 
 function TCadenaOriginal.Calcular(): TStringCadenaOriginal;
 var
-  I: Integer;
+  I, J: Integer;
 begin
       Resultado := '';
       //{$IFDEF VER220} CodeSite.EnterMethod('Calcular'); {$ENDIF}
@@ -194,15 +194,20 @@ begin
               AgregarAtributo(Concepto[I], 'valorUnitario');
               AgregarAtributo(Concepto[I], 'importe');
 
-              // TODO: Agregar soporte para informacion aduanera ya que se repiten los nodos
-              { if Concepto[I].InformacionAduanera.HasAttribute('numero') then
-                AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['numero']);
-
-                if Concepto[I].InformacionAduanera.HasAttribute('fecha') then
-                AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['fecha']);
-
-                if Concepto[I].InformacionAduanera.HasAttribute('aduana') then
-                AgregarAtributo(Concepto[I].InformacionAduanera.Attributes['aduana']); }
+              // Agregamos la informacion aduanera a la cadena original
+              // Codigo agregado por usuario pimentelflores - https://github.com/pimentelflores
+              if Assigned(Concepto[I].ChildNodes.FindNode('InformacionAduanera')) then
+              begin
+                for J := 0 to Concepto[i].InformacionAduanera.Count - 1 do
+                begin
+                    with Concepto[i].InformacionAduanera do
+                    begin
+                      agregaratributo(Concepto[i].InformacionAduanera[J],'numero');
+                      agregaratributo(Concepto[i].InformacionAduanera[J],'fecha');
+                      agregaratributo(Concepto[i].InformacionAduanera[J],'aduana');
+                    end;
+                end;
+              end;
 
               AgregarAtributo(Concepto[I], 'CuentaPredial.numero');
           end;
