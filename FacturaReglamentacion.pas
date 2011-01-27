@@ -28,6 +28,7 @@ type
       class function ComoFechaAduanera(dtFecha: TDateTime) : String;
       class function ComoTasaImpuesto(dTasa: Double) : String;
       class function ComoDateTime(sFechaISO8601: String): TDateTime;
+      class function ComoFechaHoraInforme(dtFecha: TDateTime) : String;
   end;
 
 implementation
@@ -39,6 +40,15 @@ uses SysUtils, DateUtils;
 class function TFEReglamentacion.ComoFechaHora(dtFecha: TDateTime) : String;
 begin
   Result := FormatDateTime('yyyy-mm-dd', dtFecha) + 'T' + FormatDateTime('hh:nn:ss', dtFecha);
+end;
+
+// Regresa la fecha/hora en el formato del Informe Mensual
+class function TFEReglamentacion.ComoFechaHoraInforme(dtFecha: TDateTime) : String;
+begin
+  Result := FormatDateTime('dd/mm/yyyy', dtFecha) + ' ' + FormatDateTime('hh:nn:ss', dtFecha);
+  {$IFDEF DEBUG}
+      Assert(Length(Result) = 19, 'La longitud de la fecha del informe no fue de 19 caracteres!');
+  {$ENDIF}
 end;
 
 // Convierte una fecha de ISO 8601 (formato del XML) a TDateTime usado en Delphi.

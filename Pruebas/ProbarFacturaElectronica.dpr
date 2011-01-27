@@ -54,7 +54,8 @@ uses
   LibEay32Plus in '..\LibEay32Plus.pas',
   ConstantesFixtures in 'ConstantesFixtures.pas',
   DocComprobanteFiscal in '..\DocComprobanteFiscal.pas',
-  CadenaOriginal in '..\CadenaOriginal.pas';
+  CadenaOriginal in '..\CadenaOriginal.pas',
+  TestInformeMensual in 'TestInformeMensual.pas';
 
 {$R *.RES}
 
