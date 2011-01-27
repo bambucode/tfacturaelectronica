@@ -30,7 +30,7 @@ las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/b
 - Manejo y pruebas de articulos con cuenta predial.
 - Implementar la version 3 de los CFD (o comprobantes digitales en linea).
 - Implementar la lectura de un CFD y que al mismo tiempo verifique si es válido o no. <- Completado 12 Dic 2010>
-- Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT.
+- Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT. < Completado 26 Ene 2011 >
 
 ¿Cómo puedo colaborar?
 -------------
