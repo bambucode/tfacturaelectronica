@@ -25,8 +25,9 @@ type
     fRfc: TFERFC;
     iMes: Integer;
     iAno: Integer;
+    fEmisor: TFEContribuyente;
     comprobante1, comprobanteCancelado: TComprobanteInformeMensual;
-    aComprobantes: TAComprobanteInformeMensual;
+    aComprobantes: TArrComprobanteInformeMensual;
   private
 
   public
@@ -55,8 +56,10 @@ begin
   iMes := 12;
   iAno := 2010;
 
+  fEmisor.RFC:=fRFC;
+
   // Creamos el objeto TInformeMensual
-  fInformeMensual := TInformeMensual.Create(fRfc, iMes, iAno);
+  fInformeMensual := TInformeMensual.Create(fEmisor, iMes, iAno);
 end;
 
 procedure TestTInformeMensual.TearDown;
@@ -84,7 +87,7 @@ var
 begin
   // Creamos un nuevo objeto OpenSSL con una clave incorrecta a proposito
   bExcepcionLanzada := False;
-  comprobante.ReceptorRFC := 'AAA010101A';
+  comprobante.Receptor.RFC := 'AAA010101A';
   comprobante.Serie := 'A';
   comprobante.Folio := 1;
   comprobante.NumAprobacion := 1111;
@@ -119,7 +122,7 @@ var
 begin
   // Creamos un nuevo objeto OpenSSL con una clave incorrecta a proposito
   bExcepcionLanzada := False;
-  comprobante.ReceptorRFC := 'AAA010101AAA';
+  comprobante.Receptor.RFC := 'AAA010101AAA';
   comprobante.Serie := 'A';
   comprobante.Folio := 1;
   comprobante.NumAprobacion := 1111;
@@ -154,7 +157,7 @@ var
 begin
   // Creamos un nuevo objeto OpenSSL con una clave incorrecta a proposito
   bExcepcionLanzada := False;
-  comprobante.ReceptorRFC := 'AAA010101AAA';
+  comprobante.Receptor.RFC := 'AAA010101AAA';
   comprobante.Serie := 'A';
   comprobante.Folio := 1;
   comprobante.NumAprobacion := 1111;
@@ -189,7 +192,7 @@ var
 begin
   // Creamos un nuevo objeto OpenSSL con una clave incorrecta a proposito
   bExcepcionLanzada := False;
-  comprobante.ReceptorRFC := 'AAA010101AAA';
+  comprobante.Receptor.RFC := 'AAA010101AAA';
   comprobante.Serie := 'A';
   comprobante.Folio := 1;
   comprobante.NumAprobacion := 1111;
@@ -201,7 +204,7 @@ begin
   comprobante.Impuestos := 10000000000;
   comprobante.Estado := ecVigente;
   comprobante.Efecto := efEgreso;
-  
+
   try
       fInformeMensual.Agregar(comprobante);
       fInformeMensual.GenerarContenidoDeInforme;
@@ -224,9 +227,9 @@ begin
   // Agregamos el comprobante con la fecha de hoy
   fFechaGeneracion := EncodeDateTime(2011, 1, 26, 17, 30, 20, 0);
   DecodeDate(fFechaGeneracion, y, m, d);
-  InformeMensual := TInformeMensual.Create(fRfc, m, y);
+  InformeMensual := TInformeMensual.Create(fEmisor, m, y);
   
-  comprobante1.ReceptorRFC := 'AAA010101AAA';
+  comprobante1.Receptor.RFC := 'AAA010101AAA';
   comprobante1.Serie := 'A';
   comprobante1.Folio := 1;
   comprobante1.NumAprobacion := 1111;
@@ -254,9 +257,9 @@ begin
   // Agregamos el comprobante con la fecha de hoy
   fFechaGeneracion := EncodeDateTime(2011, 1, 26, 17, 30, 20, 0);
   DecodeDate(fFechaGeneracion, y, m, d);
-  InformeMensual := TInformeMensual.Create(fRfc, m, y);
+  InformeMensual := TInformeMensual.Create(fEmisor, m, y);
   
-  comprobanteCancelado.ReceptorRFC := 'AAA010101AAA';
+  comprobanteCancelado.Receptor.RFC := 'AAA010101AAA';
   comprobanteCancelado.Serie := 'A';
   comprobanteCancelado.Folio := 1;
   comprobanteCancelado.NumAprobacion := 1111;

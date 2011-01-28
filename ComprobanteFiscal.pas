@@ -58,7 +58,8 @@ type
     _CADENA_PAGO_PARCIALIDADES: String;
     fDesglosarTotalesImpuestos: Boolean;
     bIncluirCertificadoEnXML: Boolean;
-
+    fAutoAsignarFechaGeneracion: Boolean;
+    
     procedure LlenarComprobante;
     procedure setCertificado(Certificado: TFECertificado);
     function getCadenaOriginal(): TStringCadenaOriginal;
@@ -108,7 +109,7 @@ type
     property Certificado: TFECertificado read fCertificado write setCertificado;
     property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
     property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML;
-    
+    property AutoAsignarFechaGeneracion : Boolean read fAutoAsignarFechaGeneracion write fAutoAsignarFechaGeneracion;
     /// <summary>Guarda una copia del XML en el archivo indicado</summary>
     /// <param name="ArchivoFacturaXML">Ruta completa con nombre de archivo en el que se
     /// almacenara el XML del comprobante</param>
@@ -134,6 +135,7 @@ begin
   // Establecemos como default que SI queremos incluir el certificado en el XML
   // ya que presenta la ventaja de poder validar el comprobante con solo el archivo
   // XML.
+  fAutoAsignarFechaGeneracion:=True;
   bIncluirCertificadoEnXML := True;
   fDesglosarTotalesImpuestos := True;
   fCadenaOriginalCalculada:='';
@@ -541,7 +543,8 @@ begin
          FechaGeneracion:=Now;
     {$ELSE}
         // Si ya fue generada la factura (por ejemplo cuando se lee)
-        FechaGeneracion := Now;
+        if fAutoAsignarFechaGeneracion = False then
+          FechaGeneracion := Now;
     {$ENDIF}
     // Almacenamos las propiedades del XML antes de generar la cadena original
     fXmlComprobante.Fecha := TFEReglamentacion.ComoFechaHora(FechaGeneracion);

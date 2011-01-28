@@ -10,7 +10,7 @@ type
   TEfectoComprobante = (efIngreso, efEgreso, efTraslado);
 
   TComprobanteInformeMensual = record
-       ReceptorRFC: TFERFC;
+       Receptor: TFEContribuyente;
        Serie: TFESerie;
        Folio: TFEFolio;
        NumAprobacion: Integer;
@@ -20,9 +20,10 @@ type
        Estado: TEstadoComprobante;
        Efecto: TEfectoComprobante;
        Pedimentos: TFEPedimentos;
+       Extra: String;
   end;
 
-  TAComprobanteInformeMensual = Array of  TComprobanteInformeMensual;
+  TArrComprobanteInformeMensual = Array of  TComprobanteInformeMensual;
 
   ERFCInvalido = class(Exception);
   EFolioInvalido = class(Exception);
@@ -43,7 +44,7 @@ type
       // Variable para guardar el contenido del reporte para despues guardarlo en un archivo fisico
       sContenido: WideString;
       fRFC: TFERFC;
-      fComprobantes: TAComprobanteInformeMensual;
+      fComprobantes: TArrComprobanteInformeMensual;
 
       // El nombre del archivo debe empezar con 1 si se usan CFDs, 2 si fueron solicitados a un
       // establecimiento autorizado..
@@ -51,38 +52,44 @@ type
 
       function ConvertirComprobanteEstadoACadena(Estado: TEstadoComprobante): String;
       function ConvertirComprobanteEfectoACadena(Efecto: TEfectoComprobante): String;
-
-      function GetComprobantes(): TAComprobanteInformeMensual;
       function QuitarPipes(Cadena: String) : String;
       function obtenerNombreArchivo(): String;
       /// <summary>Agrega una linea a la variable temporal del reporte mensual para poder generar el archivo del informe</param>
       /// <param name="Comprobante">Comprobante que se va a agregar</param>
       function AgregarLinea(Comprobante: TComprobanteInformeMensual): String;
-      procedure GenerarContenidoDeInforme;
+  {$IFDEF VERSION_DE_PRUEBA}
+  public
+  {$ELSE}
   protected
+  {$ENDIF}
       fMes: Integer;
       fAno: Integer;
+      fGenerado: Boolean;
+      fEmisor: TFEContribuyente;
+      function GetComprobantes(): TArrComprobanteInformeMensual;
+      procedure setContenido(Valor: WideString);
+      procedure GenerarContenidoDeInforme;
   public
-      property RFC: TFERFC read fRFC;
+      property Emisor  : TFEContribuyente read fEmisor;
       property Mes: Integer read fMes;
       property Ano: Integer read fAno;
-      //property Comprobante[Index: Integer]: TComprobanteInformeMensual read GetComprobante write SetComprobante;
+      property Comprobantes  : TArrComprobanteInformeMensual read GetComprobantes;
       /// <summary>Crea la clase InformeMensual para el Emisor, Mes y Año correspondientes</summary>
-      /// <param name="EmisorRFC">El RFC del contribuyente que envia el informe</param>
+      /// <param name="Emisor">El Emisor al cual pertenece el informe</param>
       /// <param name="Mes">Numero del mes del informe</param>
       /// <param name="Ano">Año del informe (4 digitos), Ej: 2010</param>
-      constructor Create(EmisorRFC: TFERFC; Mes, Ano: Integer); overload;
+      constructor Create(Emisor: TFEContribuyente; Mes, Ano: Integer); overload;
       /// <summary>Agrega el Comprobante para el informe mensual a incluir en el archivo de texto</param>
       /// <param name="Comprobante">Datos del CFD en el formato de ComprobanteInformeMensual</param>
       /// <summary>Genera el informe en formato de Texto con el nombre que debe llegar definido por el SAT
       /// en el Anexo 20</param>
       /// <param name="DirectorioDestino">Directorio donde se guardara el archivo del informe</param>
-      procedure GuardarReporte(DirectorioDestino: String);
+      procedure GuardarReporte(DirectorioDestino: String); virtual;
       /// <summary>Agrega una linea a la variable temporal del reporte mensual para poder generar el archivo del informe</param>
       /// <param name="Comprobante">Comprobante que se va a agregar</param>
       procedure Agregar(Comprobante: TComprobanteInformeMensual);
       /// Regresa el contenido del informe
-      property Contenido : WideString read sContenido;
+      property Contenido : WideString read sContenido write setContenido;
   end;
 
 implementation
@@ -94,18 +101,19 @@ begin
        // Regresamos el nombre que debe tener el archivo de reporte de acuerdo
        // al Anexo 20
        Result:=IntToStr(NUMERO_ESQUEMA) +
-               fRFC +
+               fEmisor.RFC +
                Format('%.2d', [fMes]) +
                IntToStr(fAno) +
                '.txt';
 end;
 
-constructor TInformeMensual.Create(EmisorRFC: TFERFC; Mes, Ano: Integer);
+constructor TInformeMensual.Create(Emisor: TFEContribuyente; Mes, Ano: Integer);
 begin
      inherited Create;
-     fRFC := EmisorRFC;
+     fEmisor := Emisor;
      fMes := Mes;
      fAno := Ano;
+     fGenerado:=False;
 
      sContenido := '';
 end;
@@ -123,7 +131,7 @@ var
    d, m, y: word;
    nueva_linea: String;
 begin
-  if (Length(Comprobante.ReceptorRFC) < 12) then
+  if (Length(Comprobante.Receptor.RFC) < 12) then
     raise ERFCInvalido.create('El rfc de la factura añadida no es valido, el rfc debe ser de 12 o 13 caracteres');
 
   // No es necesario validarlo, esta limitado por el tipo de dato LongInt
@@ -160,7 +168,7 @@ begin
         raise Exception.Create('La informacion aduanera/pedimentos aun no esta implementado en esta clase!');
 
     // |PLW750114XP1|PPP|47|200401|24/02/2004 16:16:52|26314.00|0.00|1|
-    nueva_linea := '|' + QuitarPipes(Comprobante.ReceptorRFC) + '|' +
+    nueva_linea := '|' + QuitarPipes(Comprobante.Receptor.RFC) + '|' +
               QuitarPipes(Comprobante.Serie)  + '|' +
               IntToStr(Comprobante.Folio)  + '|' +
               IntToStr(fAno) + IntToStr(Comprobante.NumAprobacion) + '|' + //  4. Año y Num de Aprobacion
@@ -199,16 +207,26 @@ procedure TInformeMensual.GenerarContenidoDeInforme;
 var
       I: Integer;
 begin
-      sContenido:='';
+     // Solo generamos el contenido si no fue generado previamente
+     if (fGenerado = False) then
+     begin
+         sContenido:='';
+         // Agregamos cada comprobante al archivo...
+         for I := 0 to Length(fComprobantes) - 1 do
+            AgregarLinea(fComprobantes[I]);
 
-     // Agregamos cada comprobante al archivo...
-     for I := 0 to Length(fComprobantes) - 1 do
-        AgregarLinea(fComprobantes[I]);
+         {$IFDEF DEBUG}
+            if Length(fComprobantes) > 0 then
+              Assert(sContenido <> '', 'No hubo lineas de informe cuando si se agregaron comprobante al informe.');
+         {$ENDIF}
+         fGenerado:=True;
+     end;
+end;
 
-     {$IFDEF DEBUG}
-        if Length(fComprobantes) > 0 then
-          Assert(sContenido <> '', 'No hubo lineas de informe cuando si se agregaron comprobante al informe.');
-     {$ENDIF}
+procedure TInformeMensual.setContenido(Valor: WideString);
+begin
+    fGenerado:=True;
+    sContenido:=Valor;
 end;
 
 procedure TInformeMensual.GuardarReporte(DirectorioDestino: String);
@@ -236,7 +254,7 @@ begin
     fComprobantes[Length(fComprobantes) - 1] := Comprobante;
 end;
 
-function TInformeMensual.GetComprobantes(): TAComprobanteInformeMensual;
+function TInformeMensual.GetComprobantes(): TArrComprobanteInformeMensual;
 begin
   Result := fComprobantes;
 end;
