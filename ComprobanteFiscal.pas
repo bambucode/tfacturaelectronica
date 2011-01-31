@@ -108,8 +108,8 @@ type
     property CertificadoTexto : WideString read fCertificadoTexto write fCertificadoTexto;
     property Certificado: TFECertificado read fCertificado write setCertificado;
     property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
-    property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML;
-    property AutoAsignarFechaGeneracion : Boolean read fAutoAsignarFechaGeneracion write fAutoAsignarFechaGeneracion;
+    property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML default true;
+    property AutoAsignarFechaGeneracion : Boolean read fAutoAsignarFechaGeneracion write fAutoAsignarFechaGeneracion default true;
     /// <summary>Guarda una copia del XML en el archivo indicado</summary>
     /// <param name="ArchivoFacturaXML">Ruta completa con nombre de archivo en el que se
     /// almacenara el XML del comprobante</param>
@@ -533,6 +533,8 @@ begin
 end;
 
 procedure TFEComprobanteFiscal.AsignarFechaGeneracion;
+  var
+    d,m,a: Word;
 begin
     // Especificamos la fecha exacta en la que se esta generando el comprobante
     {$IFDEF VERSION_DE_PRUEBA}
@@ -543,9 +545,15 @@ begin
          FechaGeneracion:=Now;
     {$ELSE}
         // Si ya fue generada la factura (por ejemplo cuando se lee)
-        if fAutoAsignarFechaGeneracion = False then
+        if (fAutoAsignarFechaGeneracion = True) then
           FechaGeneracion := Now;
     {$ENDIF}
+
+    // Verificamos que la fecha sea valida
+    DecodeDate(FechaGeneracion, a, m, d);
+    If (a <= 2004) then
+      Raise Exception.Create('La fecha de generacion del comprobante no fue asignada correctamente. No es posible generar factura');
+
     // Almacenamos las propiedades del XML antes de generar la cadena original
     fXmlComprobante.Fecha := TFEReglamentacion.ComoFechaHora(FechaGeneracion);
 end;
