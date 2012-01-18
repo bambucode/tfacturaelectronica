@@ -1,7 +1,7 @@
 (******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
 
- Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2011-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
 
  Proyecto que concentra todas las pruebas de unidad de la libreria.
 
@@ -45,7 +45,7 @@ uses
   ComprobanteFiscal in '..\ComprobanteFiscal.pas',
   TestComprobanteFiscal in 'TestComprobanteFiscal.pas',
   SelloDigital in '..\SelloDigital.pas',
-  TestFacturaElectronica in 'TestFacturaElectronica.pas',
+  //TestFacturaElectronica in 'TestFacturaElectronica.pas',
   FacturaElectronica in '..\FacturaElectronica.pas',
   TestPrueba in 'TestPrueba.pas',
   libeay32 in '..\libeay32.pas',
