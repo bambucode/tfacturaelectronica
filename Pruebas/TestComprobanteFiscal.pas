@@ -19,6 +19,8 @@ type
   TestTFEComprobanteFiscal = class(TTestPrueba)
   strict private
     fComprobanteFiscal: TFEComprobanteFiscal;
+  private
+    procedure ConfigurarCertificadoDePrueba(var Certificado: TFECertificado);
   public
     procedure SetUp; override;
     procedure TearDown; override;
@@ -502,6 +504,17 @@ begin
   Result := fXMLComprobantePrueba.Sello;
 end;
 
+procedure TestTFEComprobanteFiscal.ConfigurarCertificadoDePrueba(var Certificado: TFECertificado);
+const
+  _MICROE_ARCHIVO_CERTIFICADO = 'comprobante_fiscal\aaa010101aaa_csd_01.cer';
+  _MICROE_ARCHIVO_LLAVE_PRIVADA = 'comprobante_fiscal\aaa010101aaa_csd_01.key';
+  _MICROE_CLAVE_LLAVE_PRIVADA = 'a0123456789';
+begin
+  Certificado.Ruta := fRutaFixtures + _MICROE_ARCHIVO_CERTIFICADO;
+  Certificado.LlavePrivada.Ruta := fRutaFixtures + _MICROE_ARCHIVO_LLAVE_PRIVADA;
+  Certificado.LlavePrivada.Clave := _MICROE_CLAVE_LLAVE_PRIVADA;
+end;
+
 procedure TestTFEComprobanteFiscal.CadenaOriginal_DeComprobante_SeaCorrecta;
 var
   sCadenaOriginalCorrecta: TStringCadenaOriginal;
@@ -521,17 +534,10 @@ var
      Result:=Buffer;
   end;
 
-const
-  _MICROE_ARCHIVO_CERTIFICADO = 'comprobante_fiscal\FIFC000101AM1.cer';
-  _MICROE_ARCHIVO_LLAVE_PRIVADA = 'comprobante_fiscal\FIFC000101AM1.key';
-  _MICROE_CLAVE_LLAVE_PRIVADA = '12345678a';
 begin
   // Leemos la cadena original generada de ejemplo generada previamente con otra aplicacion
   sCadenaOriginalCorrecta := leerArchivoEnUTF8('comprobante_fiscal/factura_cadena_original_utf8.txt');
-
-  Certificado.Ruta := fRutaFixtures + _MICROE_ARCHIVO_CERTIFICADO;
-  Certificado.LlavePrivada.Ruta := fRutaFixtures + _MICROE_ARCHIVO_LLAVE_PRIVADA;
-  Certificado.LlavePrivada.Clave := _MICROE_CLAVE_LLAVE_PRIVADA;
+  ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
   GenerarComprobanteFiscal(fRutaFixtures + 'comprobante_fiscal/comprobante_cadena_original.xml',
@@ -543,6 +549,7 @@ begin
               'La cadena original no fue generada correctamente');
 end;
 
+
 procedure TestTFEComprobanteFiscal.SelloDigital_DeMilConceptos_SeaCorrecto;
 var
      I: Integer;
@@ -551,10 +558,7 @@ var
      Certificado: TFECertificado;
      Impuesto: TFEImpuestoTrasladado;
 begin
-      // Llenamos los datos que fueron usados para generar dicho comprobante
-      Certificado.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.cer';
-      Certificado.LlavePrivada.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.key';
-      Certificado.LlavePrivada.Clave := '12345678a';
+      ConfigurarCertificadoDePrueba(Certificado);
 
       // Leemos el comprobante del XML (que no tiene conceptos)
       sSelloDigitalCorrecto := GenerarComprobanteFiscal(fRutaFixtures +
@@ -597,10 +601,7 @@ var
   sSelloDigitalCorrecto: String;
   Certificado: TFECertificado;
 begin
-  // Llenamos los datos que fueron usados para generar dicho comprobante
-  Certificado.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.cer';
-  Certificado.LlavePrivada.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.key';
-  Certificado.LlavePrivada.Clave := '12345678a';
+  ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
   sSelloDigitalCorrecto := GenerarComprobanteFiscal
@@ -616,10 +617,7 @@ var
   sSelloDigitalCorrecto: String;
   Certificado: TFECertificado;
 begin
-  // Llenamos los datos que fueron usados para generar dicho comprobante
-  Certificado.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.cer';
-  Certificado.LlavePrivada.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.key';
-  Certificado.LlavePrivada.Clave := '12345678a';
+  ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
   GenerarComprobanteFiscal(fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml',
@@ -688,10 +686,7 @@ var
     end;
 
 begin
-    // Llenamos los datos que fueron usados para generar el comprobante de prueba
-    Certificado.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.cer';
-    Certificado.LlavePrivada.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.key';
-    Certificado.LlavePrivada.Clave := '12345678a';
+    ConfigurarCertificadoDePrueba(Certificado);
 
     // Leemos el XML de nuestro Fixture en memoria
     sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/comprobante_correcto.xml');
@@ -746,10 +741,7 @@ var
   sSelloDigitalCorrecto: String;
   Certificado: TFECertificado;
 begin
-  // Llenamos los datos que fueron usados para generar dicho comprobante
-  Certificado.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.cer';
-  Certificado.LlavePrivada.Ruta := fRutaFixtures + 'comprobante_fiscal/FIFC000101AM1.key';
-  Certificado.LlavePrivada.Clave := '12345678a';
+  ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
   sSelloDigitalCorrecto := GenerarComprobanteFiscal
