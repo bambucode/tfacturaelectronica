@@ -51,7 +51,11 @@ begin
     n := 0;
     for I := 1 to Length(s) do
     begin
-      if (s[I] in [#10, #13, #32]) then
+      {$IF Compilerversion >= 20}
+       if CharInSet(S[I], [#10, #13, #32]) then
+      {$ELSE}
+       if (s[I] in [#10, #13, #32]) then
+      {$IFEND}
       begin
         if (n < 1) or (result[n] <> #32) then
         begin

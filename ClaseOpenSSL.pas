@@ -142,8 +142,10 @@ var
       ErrMsg: array [0..160] of Char;
   {$IFEND}
 begin
+  {$WARNINGS OFF}
   ERR_error_string(ERR_get_error, @ErrMsg);
   result := StrPas(PAnsiChar(@ErrMsg));
+  {$WARNINGS ON}
 end;
 
 
