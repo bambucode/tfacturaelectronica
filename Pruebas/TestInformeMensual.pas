@@ -27,7 +27,7 @@ type
     iAno: Integer;
     fEmisor: TFEContribuyente;
     comprobante1, comprobanteCancelado: TComprobanteInformeMensual;
-    aComprobantes: TArrComprobanteInformeMensual;
+    //aComprobantes: TArrComprobanteInformeMensual;
   private
 
   public

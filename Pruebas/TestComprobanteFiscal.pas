@@ -24,9 +24,8 @@ type
   public
     procedure SetUp; override;
     procedure TearDown; override;
-    function GenerarComprobanteFiscal(DeArchivoXML: String;
-                                      Certificado: TFECertificado;
-                                      var ComprobanteDestino: TFEComprobanteFiscal): String;
+    function LeerXMLEnComprobante(DeArchivoXML: String; Certificado:
+        TFECertificado; var ComprobanteDestino: TFEComprobanteFiscal): String;
   published
     procedure Create_NuevoComprobante_GenereEstructuraXMLBasica;
     procedure setReceptor_Receptor_LoGuardeEnXML;
@@ -307,8 +306,9 @@ end;
 
 // Funcion comun para generar el comprobante fiscal con los mismos datos
 // que el XML especificado como parametro, regresa el Sello
-function TestTFEComprobanteFiscal.GenerarComprobanteFiscal(DeArchivoXML: String;
-  Certificado: TFECertificado; var ComprobanteDestino: TFEComprobanteFiscal): String;
+function TestTFEComprobanteFiscal.LeerXMLEnComprobante(DeArchivoXML: String;
+    Certificado: TFECertificado; var ComprobanteDestino: TFEComprobanteFiscal):
+    String;
 var
   Bloque: TFEBloqueFolios;
   I: Integer;
@@ -342,6 +342,39 @@ var
     sMs := Copy(sFechaHora, 18, 2);
     Result := EncodeDateTime(StrToInt(sAno), StrToInt(sMes), StrToInt(sDia), StrToInt(sHora),
       StrToInt(sMin), StrToInt(sMs), 0);
+  end;
+
+  // Se encarga de recalcular el sello basado en el archivo de llave privada
+  // especificado
+  function RecalcularSello(aArchivoLlavePrivada, aClaveLlavePrivada, aCadenaOriginal: String) : String;
+  var
+    _ARCHIVO_CADENA_TEMPORAL : String;
+    _ARCHIVO_LLAVE_PEM : String;
+    _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL : String;
+  begin
+      _ARCHIVO_CADENA_TEMPORAL := 'cadena.txt';
+      _ARCHIVO_LLAVE_PEM := 'x.pem';
+      _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL := 'res.txt';
+
+      // Convertimos la llave privada a archivo PEM
+      EjecutarComandoOpenSSL('pkcs8 -inform DER -in ' + aArchivoLlavePrivada +
+                         ' -passin pass:' + aClaveLlavePrivada +
+                         ' -out ' + fDirTemporal + _ARCHIVO_LLAVE_PEM);
+
+      // Guardamos la cadena original en un archivo
+      guardarArchivoEnUTF8(UTF8Encode(aCadenaOriginal), _ARCHIVO_CADENA_TEMPORAL);
+
+      // Mandamos generar el sello usando OpenSSL
+      EjecutarComandoOpenSSL('dgst -md5 -sign "' + fDirTemporal + _ARCHIVO_LLAVE_PEM +
+        '" -out "' + fDirTemporal +
+        'md5_cadena_de_prueba.bin" "' + fDirTemporal + _ARCHIVO_CADENA_TEMPORAL + '"');
+
+      // Convertimos el resultado (archivo binario) a base64
+      EjecutarComandoOpenSSL(' enc -base64 -in "' + fDirTemporal +
+        'md5_cadena_de_prueba.bin" -out "' + fDirTemporal +
+        _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL + '"');
+
+      Result := QuitarRetornos(leerContenidoDeArchivo(fDirTemporal + _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL));
   end;
 
 begin
@@ -494,14 +527,13 @@ begin
   // Asignamos el subtotal de la factura
   ComprobanteDestino.SubTotal := dSubtotal;
 
-  ComprobanteDestino.SelloDigital;
+  // Regresamos el sello re-calculado usando OpenSSL y el certificado indicado.
+  {Result := RecalcularSello(Certificado.LlavePrivada.Ruta,
+                            Certificado.LlavePrivada.Clave,
+                            ComprobanteDestino.CadenaOriginal);    }
 
-  // Asignamos el total de la factura (subtotal + impuestos)
-  {ComprobanteDestino.Total := ComprobanteDestino.SubTotal +
-    ComprobanteDestino.TotalImpuestosRetenidos + ComprobanteDestino.TotalImpuestosTrasladados; }
 
-  // Regresamos el sello del XML leido
-  Result := fXMLComprobantePrueba.Sello;
+  Result:=fXMLComprobantePrueba.Sello;
 end;
 
 procedure TestTFEComprobanteFiscal.ConfigurarCertificadoDePrueba(var Certificado: TFECertificado);
@@ -540,12 +572,20 @@ begin
   ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
-  GenerarComprobanteFiscal(fRutaFixtures + 'comprobante_fiscal/comprobante_cadena_original.xml',
-    Certificado, fComprobanteFiscal);
+  LeerXMLEnComprobante(fRutaFixtures + 'comprobante_fiscal/comprobante_cadena_original.xml',
+                       Certificado,
+                       fComprobanteFiscal);
+
+  // Mandamos que calcule el sello digital para que se genere la cadena original
+  //ComprobanteDestino.SelloDigital;
+  // Quitamos la cadena original y sellos del XML para re-calcularlos
+  fComprobanteFiscal.FacturaGenerada:=False;
+  fComprobanteFiscal.fCadenaOriginalCalculada:='';
+  fComprobanteFiscal.fSelloDigitalCalculado:='';
 
   // Comparamos el resultado del metodo de la clase con el del archivo codificado con la funcion
   CheckEquals(sCadenaOriginalCorrecta,
-  fComprobanteFiscal.CadenaOriginal,
+              fComprobanteFiscal.CadenaOriginal,
               'La cadena original no fue generada correctamente');
 end;
 
@@ -554,46 +594,30 @@ procedure TestTFEComprobanteFiscal.SelloDigital_DeMilConceptos_SeaCorrecto;
 var
      I: Integer;
      Concepto: TFEConcepto;
-     sSelloDigitalCorrecto, sSelloCalculado: String;
+     sSelloDigitalDelXML, sSelloCalculado: String;
      Certificado: TFECertificado;
      Impuesto: TFEImpuestoTrasladado;
 begin
       ConfigurarCertificadoDePrueba(Certificado);
 
       // Leemos el comprobante del XML (que no tiene conceptos)
-      sSelloDigitalCorrecto := GenerarComprobanteFiscal(fRutaFixtures +
+      sSelloDigitalDelXML := LeerXMLEnComprobante(fRutaFixtures +
                               'comprobante_fiscal/comprobante_para_sello_digital_con_mil_conceptos.xml',
-                              Certificado, fComprobanteFiscal);
+                              Certificado,
+                              fComprobanteFiscal);
 
-     // Ahora, agregamos 1000 articulos
-     // para verificar que el buffer aguante...
+     // Quitamos la cadena original y sellos del XML para re-calcularlos
      fComprobanteFiscal.FacturaGenerada:=False;
      fComprobanteFiscal.fCadenaOriginalCalculada:='';
      fComprobanteFiscal.fSelloDigitalCalculado:='';
 
-     for I := 1 to 1000 do
-     begin
-          Concepto.Cantidad:=1;
-          Concepto.Descripcion:='Articulo ' + IntToStr(I);
-          Concepto.ValorUnitario:=I;
-          Concepto.NoIdentificacion:=IntToStr(I);
-          
-          fComprobanteFiscal.AgregarConcepto(Concepto);
-     end;
-
-     // Agregamos los impuestos
-     Impuesto.Nombre:='IVA';
-     Impuesto.Tasa:=16;
-     Impuesto.Importe:=600;
-     fComprobanteFiscal.AgregarImpuestoTrasladado(Impuesto);
-
-     //fComprobanteFiscal.AsignarConceptos;
+     // Mandamos calcular el sello digital del XML el cual ya tiene mil artículos
      sSelloCalculado:=fComprobanteFiscal.SelloDigital;
-     //guardarContenido(fComprobanteFiscal.CadenaOriginal, 'cadena.txt');
-     //fComprobanteFiscal.GuardarEnArchivo('C:/temp/xml.xml');
 
      // Verificamos que el sello sea correcto
-     CheckEquals(sSelloDigitalCorrecto, sSelloCalculado, 'El sello digital no fue calculado correctamente');
+     CheckEquals(sSelloDigitalDelXML,
+                 sSelloCalculado,
+                 'El sello digital no fue calculado correctamente');
 end;
 
 procedure TestTFEComprobanteFiscal.SelloDigital_DeComprobante_SeaCorrecto;
@@ -604,7 +628,7 @@ begin
   ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
-  sSelloDigitalCorrecto := GenerarComprobanteFiscal
+  sSelloDigitalCorrecto := LeerXMLEnComprobante
     (fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml',
     Certificado, fComprobanteFiscal);
   
@@ -620,7 +644,7 @@ begin
   ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
-  GenerarComprobanteFiscal(fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml',
+  LeerXMLEnComprobante(fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml',
                            Certificado, fComprobanteFiscal);
 
   // Establecemos la propiedad de DEBUG solamente para que use la fecha/hora actual
@@ -694,7 +718,7 @@ begin
 
     // Leemos el comprobante de ejemplo con el metodo alternativo usado en las pruebas
     fComprobanteComparacion:=TFEComprobanteFiscal.Create;
-    GenerarComprobanteFiscal(fRutaFixtures + 'comprobante_fiscal/comprobante_correcto.xml',
+    LeerXMLEnComprobante(fRutaFixtures + 'comprobante_fiscal/comprobante_correcto.xml',
                            Certificado, fComprobanteComparacion);
 
     // Comparamos algunas de sus propiedades las cuales deben de ser las mismas
@@ -744,7 +768,7 @@ begin
   ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
-  sSelloDigitalCorrecto := GenerarComprobanteFiscal
+  sSelloDigitalCorrecto := LeerXMLEnComprobante
     (fRutaFixtures + 'comprobante_fiscal/comprobante_correcto.xml',
     Certificado, fComprobanteFiscal);
 

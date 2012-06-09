@@ -19,7 +19,7 @@ TFacturaElectronica = class(TFEComprobanteFiscal)
 {$ENDIF}
   fOnComprobanteGenerado: TOnComprobanteGenerado;
   function obtenerCertificado() : TFECertificado;
-published
+public
   property FechaGeneracion;
   property FacturaGenerada;
   property Folio;

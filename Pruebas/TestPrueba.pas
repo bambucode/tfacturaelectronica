@@ -13,7 +13,8 @@ unit TestPrueba;
 interface
 
 uses
-  TestFramework;
+  TestFramework,
+  FacturaTipos;
 
 type
 
@@ -28,20 +29,72 @@ type
      function leerContenidoDeArchivo(sNombreArchivo: String): WideString;
      procedure guardarContenido(sContenido: Widestring; sArchivo: String);
      procedure guardarArchivoTemporal(sContenido: Widestring; sArchivo: String);
+     procedure EjecutarComandoOpenSSL(sComando: String);
      procedure SetUp; override;
+     procedure guardarArchivoEnUTF8(sContenido: TStringCadenaOriginal; sArchivo: String);
+     procedure BorrarArchivoTempSiExiste(sNombre: String);
+     function QuitarRetornos(sCad: WideString): WideString;
   end;
+
+const
+  // Configura tu propia ruta a OpenSSL.exe
+  _RUTA_OPENSSL_EXE = '\Release\Win32\openssl.exe';
 
 implementation
 
 uses
-  Windows, SysUtils, Classes, Forms;
+  Windows, SysUtils, Classes, Forms,
+  CodeSiteLogging,
+  ShellApi;
 
 procedure TTestPrueba.SetUp;
 begin
    inherited;
    fDirTemporal:=GetEnvironmentVariable('TEMP') + '\';
    fRutaEXE := ExtractFilePath(Application.ExeName);
-   fRutaFixtures:=fRutaEXE + 'fixtures\';
+   // Asumimos que se va a ejecutar en subdirectorio Release\Win32 de la carpeta
+   // donde se guarda el proyecto
+   fRutaFixtures:=fRutaEXE + '\..\..\Pruebas\fixtures\';
+end;
+
+function TTestPrueba.QuitarRetornos(sCad: WideString): WideString;
+begin
+    Result := StringReplace(sCad, #13#10, '', [rfReplaceAll, rfIgnoreCase]);
+end;
+
+procedure TTestPrueba.EjecutarComandoOpenSSL(sComando: String);
+var
+  ComandoUsado : String;
+begin
+  ComandoUsado := '/c ' + _RUTA_OPENSSL_EXE + ' ' + sComando;
+  CodeSite.Send('Comando', ComandoUsado);
+
+  {$IF CompilerVersion >= 20}
+      ShellExecute(Application.Handle,nil,PChar('cmd.exe'),
+               PWideChar(ComandoUsado),nil,SW_HIDE);
+  {$ELSE}
+      ShellExecute(Application.Handle,nil,PChar('cmd.exe'),
+               PChar(ComandoUsado),nil,SW_HIDE);
+  {$IFEND}
+
+  // Hacemos esperar 1 segundo para que termine openssl.exe.
+  Sleep(1000);
+end;
+
+procedure TTestPrueba.guardarArchivoEnUTF8(sContenido: TStringCadenaOriginal; sArchivo: String);
+var
+  txt : TextFile;
+begin
+  AssignFile(txt, fDirTemporal + sArchivo);
+  Rewrite(txt);
+  Write(txt, sContenido);
+  CloseFile(txt);
+end;
+
+procedure TTestPrueba.BorrarArchivoTempSiExiste(sNombre: String);
+begin
+    if FileExists(fDirTemporal + sNombre) then
+      DeleteFile(fDirTemporal + sNombre);
 end;
 
 function TTestPrueba.leerContenidoDeArchivo(sNombreArchivo: String): WideString;
@@ -50,7 +103,11 @@ var
 begin
   slArchivo := TStringList.Create;
   slArchivo.LoadFromFile(sNombreArchivo);
+  {$IF Compilerversion >= 20}
   Result:=Trim(slArchivo.Text);
+  {$ELSE}
+  Result:=Trim(UTF8Encode(slArchivo.Text));
+  {$IFEND}
   FreeAndNil(slArchivo);
 end;
 
