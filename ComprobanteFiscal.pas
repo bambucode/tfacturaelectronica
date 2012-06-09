@@ -189,6 +189,8 @@ begin
     end else
     begin
         try
+            // Si aun no ha sido generada la factura la "llenamos"
+            LlenarComprobante;
             CadenaOriginal := TCadenaOriginal.Create(fXmlComprobante, fDesglosarTotalesImpuestos);
             fCadenaOriginalCalculada:=CadenaOriginal.Calcular;
             Result:=fCadenaOriginalCalculada;
@@ -661,8 +663,6 @@ begin
       Result:=fSelloDigitalCalculado;
   end else
   begin
-      // Si aun no ha sido generada la factura la "llenamos"
-      LlenarComprobante;
       fSelloDigitalCalculado:='';
 
       {$IFDEF VERSION_DE_PRUEBA}
@@ -727,7 +727,12 @@ begin
 
     try
         // Leemos el contenido XML en el Documento XML interno
+        {$IF Compilerversion >= 20}
+        // Usamos esta nueva funcion ya que UTF8Decode esta depreciada en Delphi XE2 y superiores
+        iXmlDoc:=LoadXMLData(UTF8ToString(Valor));
+        {$ELSE}
         iXmlDoc:=LoadXMLData(UTF8Decode(Valor));
+        {$IFEND}
         // Creamos el documento "dueño" del comprobante
         fDocumentoXML:=TXmlDocument.Create(nil);
         // Pasamos el XML para poder usarlo en la clase
