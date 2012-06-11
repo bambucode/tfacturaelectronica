@@ -1,5 +1,5 @@
 (* *****************************************************************************
-  Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+  Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
 
   Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
   http://bambucode.com/codigoabierto
@@ -13,7 +13,12 @@ unit TestInformeMensual;
 interface
 
 uses
-  TestFramework, TestPrueba, FacturaTipos, InformeMensual, FeCFDv2, FacturaReglamentacion;
+  TestFramework,
+  TestPrueba,
+  FacturaTipos,
+  InformeMensual,
+  FeCFDv22,
+  FacturaReglamentacion;
 
 type
 

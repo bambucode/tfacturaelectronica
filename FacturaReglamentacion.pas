@@ -1,6 +1,6 @@
 ﻿(******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
- Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
 
  Metodos para validar los diferentes tipos de datos y como deben de estar
  especificados en el archivo XML.

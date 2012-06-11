@@ -1,6 +1,6 @@
 ﻿{* *****************************************************************************
   PROYECTO FACTURACION ELECTRONICA
-  Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+  Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
 
   Esta clase representa un Comprobante Fiscal Digital en su Version 2.0 asi como
   los metodos para generarla.
@@ -332,7 +332,7 @@ begin
             Cantidad := TFEReglamentacion.ComoCantidad(Concepto.Cantidad);
 
             if Trim(Concepto.Unidad) <> '' then
-              Unidad := Concepto.Unidad; // Opcional
+              Unidad := Concepto.Unidad; // Requerido a partir de la v2.2
 
             if Trim(Concepto.NoIdentificacion) <> '' then
               NoIdentificacion := TFEReglamentacion.ComoCadena(Concepto.NoIdentificacion); // Opcional

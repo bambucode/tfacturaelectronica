@@ -1,6 +1,6 @@
 (******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
- Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
 
  Libreria usada para interactuar con la libreria OpenSSL y exportar sus metodos
  de hashing/digestion usando una llave privada.
