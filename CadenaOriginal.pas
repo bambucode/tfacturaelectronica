@@ -2,7 +2,7 @@ unit CadenaOriginal;
 
 interface
 
-uses FacturaTipos, FeCFDv2,{$IFDEF VER220} CodeSiteLogging, {$ENDIF}
+uses FacturaTipos, FeCFDv22,{$IFDEF VER220} CodeSiteLogging, {$ENDIF}
      XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd;
 
 type

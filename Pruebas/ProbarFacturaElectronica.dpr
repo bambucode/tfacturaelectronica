@@ -39,13 +39,11 @@ uses
   TextTestRunner,
   TestClaseOpenSSL in 'TestClaseOpenSSL.pas',
   TestSelloDigital in 'TestSelloDigital.pas',
-  FeCFDv2 in '..\CFD\FeCFDv2.pas',
   FacturaTipos in '..\FacturaTipos.pas',
   FacturaReglamentacion in '..\FacturaReglamentacion.pas',
   ComprobanteFiscal in '..\ComprobanteFiscal.pas',
   TestComprobanteFiscal in 'TestComprobanteFiscal.pas',
   SelloDigital in '..\SelloDigital.pas',
-  //TestFacturaElectronica in 'TestFacturaElectronica.pas',
   FacturaElectronica in '..\FacturaElectronica.pas',
   TestPrueba in 'TestPrueba.pas',
   libeay32 in '..\libeay32.pas',
@@ -55,7 +53,8 @@ uses
   ConstantesFixtures in 'ConstantesFixtures.pas',
   DocComprobanteFiscal in '..\DocComprobanteFiscal.pas',
   CadenaOriginal in '..\CadenaOriginal.pas',
-  TestInformeMensual in 'TestInformeMensual.pas';
+  TestInformeMensual in 'TestInformeMensual.pas',
+  FeCFDv22 in '..\CFD\FeCFDv22.pas';
 
 {$R *.RES}
 

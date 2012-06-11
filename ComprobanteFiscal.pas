@@ -15,7 +15,7 @@ unit ComprobanteFiscal;
 
 interface
 
-uses FacturaTipos, FeCFDv2, SysUtils, dialogs,
+uses FacturaTipos, FeCFDv22, SysUtils, dialogs,
   // Unidades especificas de manejo de XML:
   XmlDom, XMLIntf, MsXmlDom, XMLDoc, DocComprobanteFiscal,
   {$IFDEF VER220}
@@ -94,7 +94,7 @@ type
   protected
 {$ENDIF}
   public
-    const VERSION = '2'; // Version del CFD que implementa este código
+    const VERSION = '2.2'; // Version del CFD que implementa este código
 
     constructor Create();
     destructor Destroy(); override;
