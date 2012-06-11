@@ -1,5 +1,5 @@
 (* *****************************************************************************
-  Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+  Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
 
   Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
   http://bambucode.com/codigoabierto
@@ -22,6 +22,9 @@ type
     fOpenSSL: TOpenSSL;
     fArchivoLlavePrivada: String;
     fClaveLlavePrivada: String;
+  private
+    function EncriptarUsandoOpenSSL(aCadena: String; aTipoEncripcion:
+        TTipoDigestionOpenSSL): string;
   public
     procedure SetUp; override;
     procedure TearDown; override;
@@ -39,6 +42,7 @@ uses
   ConstantesFixtures,
   CodeSiteLogging;
 
+
 procedure TestTOpenSSL.SetUp;
 begin
   inherited;
@@ -53,10 +57,55 @@ begin
   FreeAndNil(fOpenSSL);
 end;
 
+function TestTOpenSSL.EncriptarUsandoOpenSSL(aCadena: String; aTipoEncripcion:
+    TTipoDigestionOpenSSL): string;
+var
+  sResultadoMD5OpenSSL: WideString;
+  TipoEncripcion: String;
+const
+  _ARCHIVO_CERTIFICADO = 'aaa010101aaa_CSD_01.cer';
+  _ARCHIVO_LLAVE_PEM = 'aaa010101aaa_CSD_01.pem';
+  _ARCHIVO_CADENA_TEMPORAL = 'cadena_hacerdigestion.txt';
+  _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL = 'cadena_hacerdigestion.txt';
+begin
+  case aTipoEncripcion of
+    tdMD5: TipoEncripcion:='md5';
+    tdSHA1: TipoEncripcion:='sha1';
+  end;
+
+  // Borramos los archivos temporales que vamos a usar si acaso existen (de pruebas pasadas)
+  BorrarArchivoTempSiExiste(_ARCHIVO_CADENA_TEMPORAL);
+  BorrarArchivoTempSiExiste(_ARCHIVO_TEMPORAL_RESULTADO_OPENSSL);
+  BorrarArchivoTempSiExiste(TipoEncripcion + '_cadena_de_prueba.bin');
+
+  // Guardamos el contenido de la cadena de prueba a un archivo temporal
+  guardarArchivoEnUTF8(UTF8Encode(aCadena),
+                                  _ARCHIVO_CADENA_TEMPORAL);
+
+  // Generamos el archivo PEM de la llave privada para usarla con OpenSSL
+  EjecutarComandoOpenSSL('pkcs8 -inform DER -in ' + fArchivoLlavePrivada +
+                         ' -passin pass:' + fClaveLlavePrivada +
+                         ' -out ' + fDirTemporal + _ARCHIVO_LLAVE_PEM);
+
+  // Primero hacemos la digestion usando openssl.exe y la linea de comandos
+  EjecutarComandoOpenSSL('dgst -' + TipoEncripcion + ' -sign "' + fDirTemporal + _ARCHIVO_LLAVE_PEM +
+    '" -out "' + fDirTemporal + '\' + TipoEncripcion + '_cadena_de_prueba.bin" "' + fDirTemporal +
+    _ARCHIVO_CADENA_TEMPORAL + '"');
+
+  // Convertimos el resultado (archivo binario) a base64
+  EjecutarComandoOpenSSL(' enc -base64 -in "' + fDirTemporal +
+    TipoEncripcion + '_cadena_de_prueba.bin" -out "' + fDirTemporal +
+    _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL + '"');
+
+  // Quitamos los retornos de carro ya que la codificacion Base64 de OpenSSL la regresa con ENTERs
+  sResultadoMD5OpenSSL := QuitarRetornos(leerContenidoDeArchivo(fDirTemporal + _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL));
+  CodeSite.Send(TipoEncripcion + ' OpenSSL', sResultadoMD5OpenSSL);
+  Result := sResultadoMD5OpenSSL;
+end;
+
 procedure TestTOpenSSL.HacerDigestion_TipoMD5_FuncioneCorrectamente;
 var
   sResultadoMD5DeClase, sResultadoMD5OpenSSL: WideString;
-
 const
   // Se puede probar la efectividad del metodo cambiando la siguiente cadena
   // la cual debe ser la misma entre el resultado de la clase y de comandos manuales de Openssl.exe
@@ -65,39 +114,9 @@ const
                ' SA DE CV|AV HIDALGO|77|GUERRERO|DISTRITO FEDERAL|México|06300|1.00|PZ|1|Mac Book Air|10000.00|10000.00|3.00|PZ|2|Magic Mouse|900.00' +
                '|2700.00|5.50|HRS|3|Servicio de soporte técnico|120.00|660.00|IVA|16.00|1600.00|IVA|16.00|432.00|IVA|16.00|105.60|2137.60||';
 
-  _ARCHIVO_CERTIFICADO = 'aaa010101aaa_CSD_01.cer';
-  _ARCHIVO_LLAVE_PEM = 'aaa010101aaa_CSD_01.pem';
-  _ARCHIVO_CADENA_TEMPORAL = 'cadena_hacerdigestion.txt';
-  _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL = 'md5_cadena_hacerdigestion.txt';
-
 begin
-  // Borramos los archivos temporales que vamos a usar si acaso existen (de pruebas pasadas)
-  BorrarArchivoTempSiExiste(_ARCHIVO_CADENA_TEMPORAL);
-  BorrarArchivoTempSiExiste(_ARCHIVO_TEMPORAL_RESULTADO_OPENSSL);
-  BorrarArchivoTempSiExiste('md5_cadena_de_prueba.bin');
-
-  // Guardamos el contenido de la cadena de prueba a un archivo temporal
-  guardarArchivoEnUTF8(UTF8Encode(_CADENA_DE_PRUEBA), _ARCHIVO_CADENA_TEMPORAL);
-
-  // Generamos el archivo PEM de la llave privada para usarla con OpenSSL
-  EjecutarComandoOpenSSL('pkcs8 -inform DER -in ' + fArchivoLlavePrivada +
-                         ' -passin pass:' + fClaveLlavePrivada +
-                         ' -out ' + fDirTemporal + _ARCHIVO_LLAVE_PEM);
-
-  // Primero hacemos la digestion usando openssl.exe y la linea de comandos
-  EjecutarComandoOpenSSL('dgst -md5 -sign "' + fDirTemporal + _ARCHIVO_LLAVE_PEM +
-    '" -out "' + fDirTemporal +
-    'md5_cadena_de_prueba.bin" "' + fDirTemporal +
-    _ARCHIVO_CADENA_TEMPORAL + '"');
-
-  // Convertimos el resultado (archivo binario) a base64
-  EjecutarComandoOpenSSL(' enc -base64 -in "' + fDirTemporal +
-    'md5_cadena_de_prueba.bin" -out "' + fDirTemporal +
-    _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL + '"');
- 
-  // Quitamos los retornos de carro ya que la codificacion Base64 de OpenSSL la regresa con ENTERs
-  sResultadoMD5OpenSSL := QuitarRetornos(leerContenidoDeArchivo(fDirTemporal + _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL));
-  CodeSite.Send('MD5 OpenSSL', sResultadoMD5OpenSSL);
+  // Encriptamos la cadena de prueba usando OpenSSL para comparar los resultados
+  sResultadoMD5OpenSSL:=EncriptarUsandoOpenSSL(_CADENA_DE_PRUEBA, tdMD5);
 
   {$IF Compilerversion < 20}
   // Si es Delphi 2009 o menor codificamos el String usando la funcion de UTF8Encode
@@ -120,9 +139,34 @@ begin
 end;
 
 procedure TestTOpenSSL.HacerDigestion_TipoSHA1_FuncioneCorrectamente;
+var
+  sResultadoSHADeClase, sResultadoSHAOpenSSL: WideString;
+const
+  _CADENA_DE_PRUEBA = '||2.0|AA|2|2010-11-03T13:36:23|35|2008|ingreso|UNA SOLA EXHIBICIÓN|13360.00|0.00|15497.60|FIFC000101AM1|CONTRIBUYENTE DE PRUEBA' +
+               ' FICTICIO FICTICIO|1|99|CENTRO|SAN MIGUEL XOXTLA|SAN MIGUEL XOXTLA|PUEBLA|MÉXICO|72620|CPC400101CM9|CONTRIBUYENTE DE PRUEBA CUATRO' +
+               ' SA DE CV|AV HIDALGO|77|GUERRERO|DISTRITO FEDERAL|México|06300|1.00|PZ|1|Mac Book Air|10000.00|10000.00|3.00|PZ|2|Magic Mouse|900.00' +
+               '|2700.00|5.50|HRS|3|Servicio de soporte técnico|120.00|660.00|IVA|16.00|1600.00|IVA|16.00|432.00|IVA|16.00|105.60|2137.60||';
+
 begin
-  // TODO: Implementar pruebas y validaciones de SHA1
-  CheckTrue(False, 'Prueba aun no implementada');
+  // Encriptamos la cadena de prueba usando OpenSSL para comparar los resultados
+  sResultadoSHAOpenSSL:=EncriptarUsandoOpenSSL(_CADENA_DE_PRUEBA, tdSHA1);
+
+  {$IF Compilerversion < 20}
+  // Si es Delphi 2009 o menor codificamos el String usando la funcion de UTF8Encode
+  // en Delphi XE2 la cadena ya viene como tipo String que es igual que UnicodeString
+  _CADENA_DE_PRUEBA := UTF8Encode(_CADENA_DE_PRUEBA);
+  {$IFEND}
+
+  // Ahora, hacemos la digestion con la libreria
+  sResultadoSHADeClase := fOpenSSL.HacerDigestion(fArchivoLlavePrivada,
+                                                  fClaveLlavePrivada,
+                                                  _CADENA_DE_PRUEBA,
+                                                  tdSHA1);
+
+  // Comparamos los resultados (sin retornos de carro), los cuales deben de ser los mismos
+  CheckEquals(sResultadoSHAOpenSSL,
+              sResultadoSHADeClase,
+              'La digestion SHA1 de la clase no fue la misma que la de OpenSSL');
 end;
 
 procedure TestTOpenSSL.HacerDigestion_ConClaveIncorrecta_CauseExcepcion;

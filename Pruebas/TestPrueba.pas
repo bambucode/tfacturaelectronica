@@ -1,6 +1,6 @@
 (******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
- Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
 
  Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
  http://bambucode.com/codigoabierto
@@ -25,6 +25,7 @@ type
      fRutaFixtures: String;
      fDirTemporal: String;
      fRutaEXE: String;
+     fOpenSSL: String;
      function leerContenidoDeFixture(sNombreFixture: String): WideString;
      function leerContenidoDeArchivo(sNombreArchivo: String): WideString;
      procedure guardarContenido(sContenido: Widestring; sArchivo: String);
@@ -35,10 +36,6 @@ type
      procedure BorrarArchivoTempSiExiste(sNombre: String);
      function QuitarRetornos(sCad: WideString): WideString;
   end;
-
-const
-  // Configura tu propia ruta a OpenSSL.exe
-  _RUTA_OPENSSL_EXE = '\Release\Win32\openssl.exe';
 
 implementation
 
@@ -52,6 +49,7 @@ begin
    inherited;
    fDirTemporal:=GetEnvironmentVariable('TEMP') + '\';
    fRutaEXE := ExtractFilePath(Application.ExeName);
+   fOpenSSL := ExtractFilePath(Application.ExeName) + 'openssl.exe';
    // Asumimos que se va a ejecutar en subdirectorio Release\Win32 de la carpeta
    // donde se guarda el proyecto
    fRutaFixtures:=fRutaEXE + '\..\..\Pruebas\fixtures\';
@@ -66,8 +64,8 @@ procedure TTestPrueba.EjecutarComandoOpenSSL(sComando: String);
 var
   ComandoUsado : String;
 begin
-  ComandoUsado := '/c ' + _RUTA_OPENSSL_EXE + ' ' + sComando;
-  CodeSite.Send('Comando', ComandoUsado);
+  ComandoUsado := '/c ' + fOpenSSL + ' ' + sComando;
+  //CodeSite.Send('Comando', ComandoUsado);
 
   {$IF CompilerVersion >= 20}
       ShellExecute(Application.Handle,nil,PChar('cmd.exe'),
