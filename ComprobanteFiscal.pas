@@ -31,7 +31,7 @@ type
   EFEFolioFueraDeRango = class(Exception);
   EXMLVacio = class(Exception);
 
-  /// <summary>Representa la estructura de comprobante fiscal digital (ver2.0) y sus elementos
+  /// <summary>Representa la estructura de comprobante fiscal digital (ver2.2) y sus elementos
   /// definidos de acuerdo al XSD del SAT. Esta pensado para ser extendido en las versiones
   /// posteriores que el SAT publique (ver3.0, ver4.0, etc.).
   /// Se encarga de validar y formatear todos los datos de la factura que le sean proporcionados
@@ -84,6 +84,7 @@ type
     procedure AsignarExpedidoEn;
     procedure AsignarTotalesImpuestos;
     procedure AsignarFechaGeneracion;
+    procedure AsignarLugarExpedicion;
   protected
     function getXML(): WideString; virtual;
     procedure setXML(Valor: WideString); virtual;
@@ -119,7 +120,8 @@ type
 implementation
 
 uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
-  OpenSSLUtils, Classes, CadenaOriginal;
+  OpenSSLUtils, Classes, CadenaOriginal,
+  DateUtils;
 
 // Al crear el objeto, comenzamos a "llenar" el XML interno
 constructor TFEComprobanteFiscal.Create();
@@ -150,8 +152,8 @@ begin
   // De acuerdo a los articulos 29 y 29-A del CFF - Referencia: Revista "IDC Factura electronica" (Sept/2010) - Pag 49
   fXmlComprobante.SetAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
   fXmlComprobante.SetAttribute('xsi:schemaLocation',
-    'http://www.sat.gob.mx/cfd/2 http://www.sat.gob.mx/sitio_internet/cfd/2/cfdv2.xsd');
-  fXmlComprobante.Version := '2.0';
+    'http://www.sat.gob.mx/cfd/2 http://www.sat.gob.mx/sitio_internet/cfd/2/cfdv22.xsd');
+  fXmlComprobante.Version := VERSION;
 
   fDocumentoXML.Version := '1.0';
   fDocumentoXML.Encoding := 'UTF-8';
@@ -202,6 +204,21 @@ end;
 
 // 1. Datos de quien la expide (Emisor) (Art. 29-A, Fraccion I)
 procedure TFEComprobanteFiscal.AsignarEmisor;
+
+  procedure AsignarRegimenesFiscales;
+  var
+      I: Integer;
+      NombreRegimenFiscal : String;
+  begin
+     // Agregamos cada regimen fiscal del emisor al comprobante
+     for I := 0 to Length(inherited Emisor.Regimenes) - 1 do
+     begin
+          NombreRegimenFiscal:=(inherited Emisor.Regimenes)[I];
+          with fXmlComprobante.Emisor.RegimenFiscal.Add do
+              Regimen:=NombreRegimenFiscal;
+     end;
+  end;
+
 begin
 
   with fXmlComprobante.Emisor do
@@ -233,6 +250,11 @@ begin
       CodigoPostal := (inherited Emisor).Direccion.CodigoPostal;
     end;
   end;
+
+  // Agregamos el nuevo campo requerido Regimen Fiscal (implementado en 2.2)
+  Assert(Length(inherited Emisor.Regimenes) > 0,
+         'Se debe especificar al menos un régimen del cliente');
+  AsignarRegimenesFiscales;
 end;
 
 // 2. Lugar y fecha de expedicion (29-A, Fraccion III) - En caso de ser sucursal
@@ -560,6 +582,11 @@ begin
     fXmlComprobante.Fecha := TFEReglamentacion.ComoFechaHora(FechaGeneracion);
 end;
 
+procedure TFEComprobanteFiscal.AsignarLugarExpedicion;
+begin
+   fXmlComprobante.LugarExpedicion := (inherited LugarDeExpedicion);
+end;
+
 // Funcion encargada de llenar el comprobante fiscal EN EL ORDEN que se especifica en el XSD
 // ya que si no es asi, el XML se va llenando en el orden en que se establecen las propiedades de la clase
 // haciendo que el comprobante no pase las validaciones del SAT.
@@ -580,8 +607,12 @@ begin
         AsignarContenidoCertificado;
         AsignarCondicionesDePago;
         AsignarMetodoDePago;
+        // Nuevas propiedades de CFD 2.2:
+        AsignarLugarExpedicion;
+        // Por implementar: AsignarNumeroCuentaDePago;
+        // Por implementar: AsignarTipoDeCambioYMoneda;
+        // Por implementar: AsignarMontoFolioFiscalOriginal;
 
-        // Atributo Emisor
         AsignarEmisor;
         AsignarExpedidoEn;
         // Atributo Receptor
@@ -656,6 +687,9 @@ function TFEComprobanteFiscal.getSelloDigital(): String;
 var
   TipoDigestion: TTipoDigestionOpenSSL;
   SelloDigital: TSelloDigital;
+  // Es importante que en cualquier variable que almacenemos la cadena original
+  // sea del tipo TStringCadenaOriginal para no perder la codificacion UTF8
+  CadenaOriginal: TStringCadenaOriginal;
 begin
   // Si la factura ya fue generada regresamos el sello previamente calculado
   if (FacturaGenerada = True) then
@@ -670,6 +704,9 @@ begin
                      'La fecha de generacion debe ser en el 2010 o superior!! fue' + DateTimeToStr(FechaGeneracion));
       {$ENDIF}
 
+      // Obtenemos la cadena Original del CFD primero
+      CadenaOriginal := Self.CadenaOriginal;
+
       // Segun la leglislacion vigente si la factura se hace
       // antes del 1 de Enero del 2011, usamos MD5
       if (FechaGeneracion < EncodeDate(2011, 1, 1)) then
@@ -679,7 +716,7 @@ begin
 
       try
         // Creamos la clase SelloDigital que nos ayudara a "sellar" la factura en XML
-        SelloDigital := TSelloDigital.Create(Self.CadenaOriginal, fCertificado, TipoDigestion);
+        SelloDigital := TSelloDigital.Create(CadenaOriginal, fCertificado, TipoDigestion);
 
         // Finalmente regresamos la factura en XML con todas sus propiedades llenas
         fSelloDigitalCalculado := SelloDigital.SelloCalculado;

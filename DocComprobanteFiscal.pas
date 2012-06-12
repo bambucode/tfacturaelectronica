@@ -48,6 +48,7 @@ RAZON PARA CAMBIAR:
         fArrConceptos: TFEConceptos;
         fArrImpuestosTrasladados: TFEImpuestosTrasladados;
         fArrImpuestosRetenidos: TFEImpuestosRetenidos;
+        FLugarDeExpedicion: String;
 
         // Funcion usada para obtener el importe de un concepto 
         function ObtenerImporte(Concepto: TFEConcepto) : Currency;
@@ -77,6 +78,8 @@ RAZON PARA CAMBIAR:
         property TotalImpuestosTrasladados: Currency read fTotalImpuestosTrasladados;
         property DescuentoMonto: Currency read fDescuento;
         property DescuentoMotivo: String read fMotivoDescuento;
+        property LugarDeExpedicion: String read FLugarDeExpedicion write
+            FLugarDeExpedicion;
         /// <summary>Agrega un nuevo concepto a la factura, regresa la posicion de dicho concepto en
         /// el arreglo de 'Conceptos'</summary>
         /// <param name="NuevoConcepto">Este es el nuevo concepto a agregar a la factura

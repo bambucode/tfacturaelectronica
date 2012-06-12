@@ -1,6 +1,6 @@
 (******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
- Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
 
  Proyecto de consola que genera una Factura Electronica de ejemplo
 
@@ -28,7 +28,7 @@ uses
   LibEay32Plus in '..\LibEay32Plus.pas',
   OpenSSLUtils in '..\OpenSSLUtils.pas',
   SelloDigital in '..\SelloDigital.pas',
-  FeCFDv2 in '..\CFD\FeCFDv2.pas',
+  DateUtils,
   DocComprobanteFiscal in '..\DocComprobanteFiscal.pas',
   CadenaOriginal in '..\CadenaOriginal.pas';
 
@@ -74,6 +74,10 @@ begin
       Emisor.Direccion.Estado:='Distrito Federal';
       Emisor.Direccion.Pais:='México';
 
+      // 2. Agregamos los régimenes fiscales (requerido en el CFD 2.2)
+      SetLength(Emisor.Regimenes, 1);
+      Emisor.Regimenes[0] := 'Profesionista con Actividad Empresarial';
+
       Receptor.RFC:='FIFC000101AM1';
       Receptor.Nombre:='Contribuyente de Pruebas Ficticio';
       Receptor.Direccion.Calle:='Av. Hidalgo';
@@ -84,27 +88,31 @@ begin
       Receptor.Direccion.Estado:='Distrito Federal';
       Receptor.Direccion.Pais:='México';
 
-      // 2. Definimos los datos de los folios que nos autorizo el SAT
+      // 3. Definimos los datos de los folios que nos autorizo el SAT
       BloqueFolios.NumeroAprobacion:=1;
       BloqueFolios.AnoAprobacion:=2010;
       BloqueFolios.Serie:='A';
       BloqueFolios.FolioInicial:=1;
       BloqueFolios.FolioFinal:=1000;
 
-      //3. Definimos el certificado junto con su llave privada
-      Certificado.Ruta:=ExtractFilePath(Application.ExeName) + '/aaa010101aaa_CSD_02.cer';
-      Certificado.LlavePrivada.Ruta:=ExtractFilePath(Application.ExeName) + '/aaa010101aaa_CSD_02.key';
+      // 4. Definimos el certificado junto con su llave privada
+      Certificado.Ruta:=ExtractFilePath(Application.ExeName) + '/aaa010101aaa_CSD_01.cer';
+      Certificado.LlavePrivada.Ruta:=ExtractFilePath(Application.ExeName) + '\aaa010101aaa_CSD_01.key';
       Certificado.LlavePrivada.Clave:='a0123456789';
 
-      // 4. Creamos la clase Factura con los parametros minimos.
+      // 5. Creamos la clase Factura con los parametros minimos.
       Factura:=TFacturaElectronica.Create(Emisor, Receptor, BloqueFolios, Certificado, tcIngreso);
+      //Factura.AutoAsignarFechaGeneracion := False;
+      //Factura.FechaGeneracion := EncodeDateTime(2012, 06, 12, 11, 32, 50, 0);
       //Factura.OnComprobanteGenerado:=onComprobanteGenerado;
 
       Factura.MetodoDePago:='efectivo';
+      // Asignamos el lugar de expedición (requerido en la CFD 2.2)
+      Factura.LugarDeExpedicion:='Chihuahua, Chihuahua';
 
       // Definimos todos los conceptos que incluyo la factura
       Concepto1.Cantidad:=1;
-      Concepto1.Unidad:='PZ';
+      Concepto1.Unidad:='PZA';
       Concepto1.Descripcion:='Lapiz Numero 2';
       Concepto1.ValorUnitario:=10;
       Factura.AgregarConcepto(Concepto1);
@@ -132,7 +140,6 @@ begin
 
       // Mandamos generar la factura con el siguiente folio disponible
       sArchivo:=GetDesktopFolder() + '\MiFactura.xml';
-
       Factura.GenerarYGuardar(1, fpUnaSolaExhibicion, sArchivo);
 
       WriteLn('La factura ha sido generada y guardada en el escritorio. El archivo es: ' + sArchivo);

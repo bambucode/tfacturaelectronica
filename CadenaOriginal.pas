@@ -2,7 +2,7 @@ unit CadenaOriginal;
 
 interface
 
-uses FacturaTipos, FeCFDv22,{$IFDEF VER220} CodeSiteLogging, {$ENDIF}
+uses FacturaTipos, FeCFDv22,{$IF Compilerversion >= 22} CodeSiteLogging, {$IFEND}
      XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd;
 
 type
@@ -13,11 +13,26 @@ type
   private
       fXMLComprobante: IFEXMLComprobante;
       fDesglosarTotalesImpuestos : Boolean;
-      Resultado: TStringCadenaOriginal;
+      fResultado: TStringCadenaOriginal;
       const _PIPE = '|';
       function RemoverExcesoEspacios(const s: string): String;
       function LimpiaCampo(sTexto: String): String;
+
+      {$REGION 'Documentation'}
+      ///	<summary>
+      ///	  Se encarga de agregar un atributo del XML a la cadena original de
+      ///	  acuerdo a la especificación.
+      ///	</summary>
+      ///	<param name="NodoPadre">
+      ///	  Nodo padre de donde obtendremos el atributo
+      ///	</param>
+      ///	<param name="sNombreAtributo">
+      ///	  Nombre del atributo a obtener
+      ///	</param>
+      {$ENDREGION}
       procedure AgregarAtributo(NodoPadre: IXMLNode; sNombreAtributo: String);
+      procedure AgregarRegimenesFiscales(const aRegimenesFiscales:
+          IXMLComprobante_Emisor_RegimenFiscalList);
       procedure AgregarUbicacion(Ubicacion: IFEXmlT_Ubicacion);
       procedure AgregarUbicacionFiscal(Ubicacion: IFEXmlT_UbicacionFiscal);
   public
@@ -106,8 +121,21 @@ begin
       sValor:=LimpiaCampo(NodoPadre.AttributeNodes[sNombreAtributo].Text);
       // Checamos que no sea vacio el valor...
       if Trim(sValor) <> '' then
-        Resultado := Resultado + sValor + _PIPE;
+        // Lo agregamos a la variable interna de la clase
+        fResultado := fResultado + sValor + _PIPE;
     end;
+end;
+
+procedure TCadenaOriginal.AgregarRegimenesFiscales(const aRegimenesFiscales:
+    IXMLComprobante_Emisor_RegimenFiscalList);
+var
+  I: Integer;
+  NombreRegimen: String;
+begin
+  for I := 0 to fXmlComprobante.Emisor.RegimenFiscal.Count - 1 do
+  begin
+      AgregarAtributo(fXmlComprobante.Emisor.RegimenFiscal[I], 'Regimen');
+  end;
 end;
 
 procedure TCadenaOriginal.AgregarUbicacion(Ubicacion: IFEXmlT_Ubicacion);
@@ -142,11 +170,11 @@ function TCadenaOriginal.Calcular(): TStringCadenaOriginal;
 var
   I, J: Integer;
 begin
-      Resultado := '';
+      fResultado := '';
       //{$IFDEF VER220} CodeSite.EnterMethod('Calcular'); {$ENDIF}
 
       // 2. El inicio de la cadena original se encuentra marcado mediante una secuencia de caracteres || (doble “pipe”).
-      Resultado := _PIPE + _PIPE;
+      fResultado := _PIPE + _PIPE;
       // 1) Datos del comprobante
 
       // NOTA IMPORTANTE: El parametro nombre de atributo tiene que ser exactamente igual que el de la definicion
@@ -164,6 +192,13 @@ begin
       AgregarAtributo(fXmlComprobante, 'subTotal');
       AgregarAtributo(fXmlComprobante, 'descuento');
       AgregarAtributo(fXmlComprobante, 'total');
+      // Nuevos atributos requeridos de la v2.2:
+      AgregarAtributo(fXmlComprobante, 'metodoDePago');  // Requerido
+      AgregarAtributo(fXmlComprobante, 'LugarExpedicion'); // Requerido
+      AgregarAtributo(fXmlComprobante, 'NumCtaPago');
+      AgregarAtributo(fXmlComprobante, 'TipoCambio');
+      AgregarAtributo(fXmlComprobante, 'Moneda');
+
       // 2) Datos del emisor
       AgregarAtributo(fXmlComprobante.Emisor, 'rfc');
       AgregarAtributo(fXmlComprobante.Emisor, 'nombre');
@@ -174,7 +209,13 @@ begin
         if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor').ChildNodes.FindNode('ExpedidoEn')) then
           AgregarUbicacion(fXmlComprobante.Emisor.ExpedidoEn);
 
-      // 5) Datos del Receptor
+      // 5) Datos del Regimen Fiscal
+      {Assert(Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor').ChildNodes.FindNode('RegimenFiscal')),
+             'El Emisor debe tener asignado al menos un regimen fiscal'); }
+      if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor').ChildNodes.FindNode('RegimenFiscal')) then
+          AgregarRegimenesFiscales(fXmlComprobante.Emisor.RegimenFiscal);
+
+      // 6) Datos del Receptor
       AgregarAtributo(fXmlComprobante.Receptor, 'rfc');
 
       // Checamos si es una factura al publico en general
@@ -183,10 +224,10 @@ begin
           And (fXmlComprobante.Receptor.Rfc <> _RFC_VENTA_EXTRANJEROS)) then
               AgregarAtributo(fXmlComprobante.Receptor, 'nombre');
       
-      // 6) Datos del domicilio fiscal del Receptor
+      // 7) Datos del domicilio fiscal del Receptor
       AgregarUbicacion(fXmlComprobante.Receptor.Domicilio);
 
-      // 7) Datos de Cada Concepto Relacionado en el Comprobante
+      // 8) Datos de Cada Concepto Relacionado en el Comprobante
       for I := 0 to fXmlComprobante.Conceptos.Count - 1 do
       begin
           with fXmlComprobante.Conceptos do
@@ -220,7 +261,7 @@ begin
       // TODO: Agregar los "ComplementoConcepto" regla 9 del Anexo 20
       // TODO: Arreglar nodo Complemento segun la regla 10
 
-      // 8) Datos de Cada Retención de Impuestos
+      // 9) Datos de Cada Retención de Impuestos
       // Solo accedemos al nodo XML si hubo retenciones
       //fXmlComprobante.HasAttribute()
       if Assigned(fXmlComprobante.ChildNodes.FindNode('Impuestos')) then
@@ -237,7 +278,7 @@ begin
       if fDesglosarTotalesImpuestos = True then
         AgregarAtributo(fXmlComprobante.Impuestos, 'totalImpuestosRetenidos');
 
-      // 9) Datos de Cada Traslado de Impuestos
+      // 10) Datos de Cada Traslado de Impuestos
       if Assigned(fXmlComprobante.ChildNodes.FindNode('Impuestos')) then
           if Assigned(fXmlComprobante.ChildNodes.FindNode('Impuestos').ChildNodes.FindNode('Traslados')) then
               for I := 0 to fXmlComprobante.Impuestos.Traslados.Count - 1 do
@@ -256,8 +297,9 @@ begin
       // 6. El final de la cadena original será expresado mediante una cadena de caracteres || (doble “pipe”).
       // 7. Toda la cadena de original se encuentra expresada en el formato de codificación UTF-8.
       // Solo agregamos un PIPE mas porque el ultimo atributo tiene al final su pipe.
-      Result:=UTF8Encode(Resultado + _PIPE);
-      {$IFDEF VER220} CodeSite.Send(Result,'Resultado'); {$ENDIF}
+      Result:=UTF8Encode(fResultado + _PIPE);
+      //{$IF Compilerversion >= 22} CodeSite.Send(Result,'fResultado'); {$IFEND}
+      {$IF Compilerversion >= 22} CodeSite.Send(Result,'fResultado'); {$IFEND}
       //{$IFDEF VER220} CodeSite.ExitMethod('getCadenaOriginal'); {$ENDIF}
 end;
 

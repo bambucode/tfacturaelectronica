@@ -1,6 +1,6 @@
 (******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
- Copyright (C) 2010 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2010-2012 - Bambu Code SA de CV
 
  Define las estructuras usadas como parametros para generar la factura
  electrónica. Pensado por si en el futuro el SAT cambia las estructuras
@@ -60,10 +60,15 @@ end;
 
 TFERFC = String[13];
 
+// Un regimen es una cadena
+TFERegimenes = Array of String;
+
 TFEContribuyente = record
 	Nombre: String;
 	RFC: TFERFC;
   Direccion: TFeDireccion;
+  // Un contribuyente puede tener muchos regímenes fiscales
+  Regimenes : TFERegimenes;
 end;
 
 // Pre-definimos los tipos de contribuyentes de Publico en General y Extranjero

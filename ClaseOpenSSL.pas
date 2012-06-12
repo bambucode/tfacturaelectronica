@@ -57,13 +57,35 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
         /// (archivo con extension .key)</param>
         /// <param name="ClaveLlavePrivada">La clave privada a usar para abrir el archivo de llave privada</param>
         function AbrirLlavePrivada(Ruta, ClaveLlavePrivada : String) : pPKCS8_Priv_Key_Info;
-        /// <summary>Hace una digestion (hashing) de la Cadena segun el Tipo de digestion y regresa el
-        /// resultado en formato base64</summary>
-        /// <param name="ArchivoLlavePrivada">Ruta completa al archivo de llave privada a usar
-        /// (archivo con extension .key)</param>
-        /// <param name="ClaveLlavePrivada">La clave privada a usar para abrir el archivo de llave privada</param>
-        /// <param name="sCadena">Cadena a la cual se va a hacer la digestion (pre-codificada en UTF8)</param>
-        /// <param name="trTipo">Tipo de digestion a realizar (tdMD5, tdSHA1)</param>
+
+        {$REGION 'Documentation'}
+        ///	<summary>
+        ///	  Hace una digestion (hashing) de la Cadena segun el Tipo de
+        ///	  digestion y regresa el resultado en formato base64
+        ///	</summary>
+        ///	<param name="ArchivoLlavePrivada">
+        ///	  Ruta completa al archivo de llave privada a usar (archivo con
+        ///	  extension .key)
+        ///	</param>
+        ///	<param name="ClaveLlavePrivada">
+        ///	  La clave privada a usar para abrir el archivo de llave privada
+        ///	</param>
+        ///	<param name="sCadena">
+        ///	  Cadena a la cual se va a hacer la digestion (pre-codificada en
+        ///	  UTF8)
+        ///	</param>
+        ///	<param name="trTipo">
+        ///	  Tipo de digestion a realizar (tdMD5, tdSHA1)
+        ///	</param>
+        ///	<remarks>
+        ///	  <note type="warning">
+        ///	    Esta funcion debe de recibir RawByteString en Delphi 2009 o
+        ///	    superior y tipo UTF8String en Delphi 2007 de lo contrario no
+        ///	    copiara correctamente los datos en memoria regresando sellos
+        ///	    invalidos.
+        ///	  </note>
+        ///	</remarks>
+        {$ENDREGION}
         function HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String; sCadena: TCadenaUTF8;
                  trTipo: TTipoDigestionOpenSSL) : String;
         /// <summary>Obtiene un certificado con sus propiedades llenas</summary>
@@ -74,7 +96,7 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
 
 implementation
 
-uses  StrUtils, dialogs;
+uses  StrUtils;
 
 constructor TOpenSSL.Create();
 begin
@@ -303,11 +325,8 @@ begin
   ekLlavePrivada := ObtenerLlavePrivadaDesencriptada;
 
   //SetLength(Inbuf, 8192); // StrLen(@sCadena)
+  //SetCodePage(sCadena, 0, False); // Forzamos a eliminar el "Code Page" de la cadena
 
-  // NOTA IMPORTANTE:
-  // Esta funcion debe de recibir RawByteString en Delphi 2009 o superior y tipo UTF8String en Delphi 2007
-  // de lo contrario no copiara correctamente los datos en memoria regresando sellos invalidos
-  //CodeSite.Send('CodePage',StringCodePage(sCadena));
   Tam:=Length(sCadena); // Obtenemos el tamaño de la cadena original
   try
       StrPLCopy(inbuf, sCadena, Tam);  // Copiamos la cadena original al buffer de entrada
@@ -335,9 +354,8 @@ begin
 	EVP_SignFinal(@mdctx,@outbuf,Len,ekLlavePrivada);
   // Liberamos el puntero a la llave privada usada previamente
   EVP_PKEY_free(ekLlavePrivada);
-
   // Regresa los resultados en formato Base64
-	Result := BinToBase64(@outbuf,Len);
+  Result := BinToBase64(@outbuf,Len);
 end;
 
 end.
