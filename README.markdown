@@ -1,4 +1,4 @@
-﻿TFACTURACIONELECTRONICA (Beta)
+﻿TFACTURACIONELECTRONICA (Beta) 
 =====================================
 Esta es una librería que sirve para generar una factura electrónica de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
@@ -15,7 +15,7 @@ Algunos aspectos que busca tener esta libreria:
 - Esconder los detalles de implementación/técnicos al usuario final (el programador que use la clase).
 
 Más información sobre este proyecto en:
-<http://www.bambucode.com/codigoabierto>
+<http://bambucode.com/codigoabierto>
 
 Requerimientos técnicos
 ------------
@@ -29,13 +29,16 @@ las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/b
 - Manejo y pruebas de conceptos con datos aduanales.
 - Manejo y pruebas de articulos con cuenta predial.
 - Implementar la version 3 de los CFD (o comprobantes digitales en linea).
+
+Completado
+-------------
+- Implementar soporte para la versión 2.2 de CFD - Completado Junio 2012.
 - Implementar la lectura de un CFD y que al mismo tiempo verifique si es válido o no. <- Completado 12 Dic 2010>
 - Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT. < Completado 26 Ene 2011 >
 
 ¿Cómo puedo colaborar?
 -------------
-Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí puedes obtener más información sobre como hacerlo en la siguiente página:
-<http://www.bambucode.com/codigoabierto/facturacion_electronica_delphi.php>
+Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacton a mi correo: <luis@bambucode.com>
 
 Notas adicionales
 ------------
@@ -45,7 +48,7 @@ final.
 
 Compatibilidad con versiones
 ------------
-La libreria está siendo probada con las versiones de Delphi 2007 y Delphi XE.
+La libreria ha sido probada solamente con Delphi XE2 aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 2007 si se encuentra algún error favor de reportarlo a la brevedad.
 
 Colaboradores actuales.
 -------------
