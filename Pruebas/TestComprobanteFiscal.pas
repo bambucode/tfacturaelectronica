@@ -55,7 +55,7 @@ implementation
 
 uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
-  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFDv2;
+  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFDv22;
 
 procedure TestTFEComprobanteFiscal.SetUp;
 begin
@@ -318,6 +318,7 @@ var
   ImpuestoTrasladado: TFEImpuestoTrasladado;
   ImpuestoRetenido: TFEImpuestoRetenido;
   dSubtotal: Double;
+  sSello: String;
 
   fXMLPrueba: TXMLDocument;
   fXMLComprobantePrueba: IFEXMLComprobante;
@@ -398,6 +399,12 @@ begin
   // 2. Establecemos el certificado a usar
   ComprobanteDestino.Certificado := Certificado;
 
+  // Leemos el metodo de pago
+  ComprobanteDestino.MetodoDePago := fXMLComprobantePrueba.MetodoDePago;
+  ComprobanteDestino.LugarDeExpedicion := fXMLComprobantePrueba.LugarExpedicion;
+  Assert(Trim(ComprobanteDestino.MetodoDePago) <> '', 'El CFD debe tener un metodo de pago');
+  Assert(Trim(ComprobanteDestino.LugarDeExpedicion) <> '', 'El CFD debe tener un lugar de expedicion');
+
   // 3. Establecemos el Emisor y Receptor
   with fXMLComprobantePrueba.Emisor do
   begin
@@ -412,6 +419,12 @@ begin
     Emisor.Direccion.Municipio := DomicilioFiscal.Municipio;
     Emisor.Direccion.Estado := DomicilioFiscal.Estado;
     Emisor.Direccion.Pais := DomicilioFiscal.Pais;
+
+    // Leemos los régimenes que contiene el CFD del XML
+    SetLength(Emisor.Regimenes, RegimenFiscal.Count);
+    for I := 0 to RegimenFiscal.Count - 1 do
+        Emisor.Regimenes[I] := RegimenFiscal[I].Regimen;
+
     ComprobanteDestino.Emisor := Emisor;
   end;
 
@@ -520,6 +533,8 @@ begin
   if fXMLComprobantePrueba.TipoDeComprobante = 'traslado' then
     ComprobanteDestino.Tipo := tcTraslado;
 
+  sSello := fXMLComprobantePrueba.Sello;
+
   // Asignamos el descuento
   if fXMLComprobantePrueba.Descuento <> '' then
     ComprobanteDestino.AsignarDescuento(StrToFloat(fXMLComprobantePrueba.Descuento), '');
@@ -533,7 +548,7 @@ begin
                             ComprobanteDestino.CadenaOriginal);    }
 
 
-  Result:=fXMLComprobantePrueba.Sello;
+  Result:=sSello;
 end;
 
 procedure TestTFEComprobanteFiscal.ConfigurarCertificadoDePrueba(var Certificado: TFECertificado);
@@ -576,8 +591,6 @@ begin
                        Certificado,
                        fComprobanteFiscal);
 
-  // Mandamos que calcule el sello digital para que se genere la cadena original
-  //ComprobanteDestino.SelloDigital;
   // Quitamos la cadena original y sellos del XML para re-calcularlos
   fComprobanteFiscal.FacturaGenerada:=False;
   fComprobanteFiscal.fCadenaOriginalCalculada:='';
@@ -852,7 +865,11 @@ begin
     Referencia := '';
   end;
 
-  // Establecemos el receptor
+  // Establecemos el regimen fiscal (requerido) desde el CFD 2.2
+  SetLength(Emisor.Regimenes, 1);
+  Emisor.Regimenes[0]:='Persona Fisica con Actividades Empresariales';
+
+  // Establecemos el emisor
   fComprobanteFiscal.Emisor := Emisor;
   fComprobanteFiscal.AsignarEmisor;
 
