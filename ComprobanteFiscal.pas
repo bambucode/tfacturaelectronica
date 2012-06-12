@@ -190,9 +190,9 @@ begin
         Result:=fCadenaOriginalCalculada;
     end else
     begin
+        // Si aun no ha sido generada la factura la "llenamos"
+        LlenarComprobante;
         try
-            // Si aun no ha sido generada la factura la "llenamos"
-            LlenarComprobante;
             CadenaOriginal := TCadenaOriginal.Create(fXmlComprobante, fDesglosarTotalesImpuestos);
             fCadenaOriginalCalculada:=CadenaOriginal.Calcular;
             Result:=fCadenaOriginalCalculada;
@@ -584,6 +584,7 @@ end;
 
 procedure TFEComprobanteFiscal.AsignarLugarExpedicion;
 begin
+   
    fXmlComprobante.LugarExpedicion := (inherited LugarDeExpedicion);
 end;
 
