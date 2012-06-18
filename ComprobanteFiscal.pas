@@ -740,6 +740,7 @@ var
   I: Integer;
   ValorEmisor, ValorReceptor: TFEContribuyente;
   feConcepto: TFEConcepto;
+  feRegimen: String;
   iXmlDoc: IXMLDocument;
   ValorExpedidoEn: TFEExpedidoEn;
   ImpuestoTrasladado: TFEImpuestoTrasladado;
@@ -808,7 +809,9 @@ begin
               
             if TieneAtributo(Emisor, 'rfc') then
               ValorEmisor.RFC:=Emisor.RFC;
-              
+
+
+
             with Emisor do
             begin
                 if TieneAtributo(DomicilioFiscal, 'calle') then
@@ -829,6 +832,14 @@ begin
                   ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
                 if TieneAtributo(DomicilioFiscal, 'pais') then
                   ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
+
+                // Copiamos los régimenes fiscales del emisor
+                SetLength(ValorEmisor.Regimenes, RegimenFiscal.Count);
+                for I := 0 to RegimenFiscal.Count - 1 do
+                begin
+                     feRegimen := RegimenFiscal[I].Regimen;
+                     ValorEmisor.Regimenes[I]:=feRegimen;
+                end;
             end;
             inherited Emisor:=ValorEmisor;
 
