@@ -795,6 +795,9 @@ begin
             fBloqueFolios.FolioInicial:=inherited Folio;
             fBloqueFolios.FolioFinal:=inherited Folio;
 
+            // CFD 2.2
+            inherited LugarDeExpedicion:=LugarExpedicion;
+
             FechaGeneracion:=TFEReglamentacion.ComoDateTime(fXmlComprobante.Fecha);
 
             if TieneAtributo(fXmlComprobante, 'condicionesDePago') then
