@@ -49,13 +49,14 @@ type
     procedure XML_DeComprobanteHecho_GenereXMLCorrectamente;
     procedure setXML_DeComprobanteExistente_EstablezcaLasPropiedadesCorrectamente;
     procedure GuardarEnArchivo_ComprobanteDeXML_LoGuarde;
+    procedure setXML_DeComprobanteV2_EstablezcaLasPropiedadesCorrectamente;
   end;
 
 implementation
 
 uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
-  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFDv22;
+  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv2;
 
 procedure TestTFEComprobanteFiscal.SetUp;
 begin
@@ -322,12 +323,25 @@ var
 
   fXMLPrueba: TXMLDocument;
   fXMLComprobantePrueba: IFEXMLComprobante;
+  VersionCFD: TFEVersionComprobante;
 
   procedure leerComprobanteXML();
   begin
     fXMLPrueba := TXMLDocument.Create(nil);
     fXMLPrueba.LoadFromFile(DeArchivoXML);
-    fXMLComprobantePrueba := GetComprobante(fXMLPrueba);
+
+    // Que version de CFD estamos leyendo?
+    if AnsiPos('version="2.0"', fXMLPrueba.XML.Text) > 0 then
+    begin
+      fXMLComprobantePrueba := GetComprobante(fXMLPrueba);
+      VersionCFD:=fev20;
+    end;
+
+    if AnsiPos('version="2.2"', fXMLPrueba.XML.Text) > 0 then
+    begin
+      fXMLComprobantePrueba := GetComprobanteV22(fXMLPrueba);
+      VersionCFD:=fev22;
+    end;
   end;
 
   function ConvertirFechaComprobanteADateTime(sFechaHora: String): TDateTime;
@@ -401,32 +415,58 @@ begin
 
   // Leemos el metodo de pago
   ComprobanteDestino.MetodoDePago := fXMLComprobantePrueba.MetodoDePago;
-  ComprobanteDestino.LugarDeExpedicion := fXMLComprobantePrueba.LugarExpedicion;
-  Assert(Trim(ComprobanteDestino.MetodoDePago) <> '', 'El CFD debe tener un metodo de pago');
-  Assert(Trim(ComprobanteDestino.LugarDeExpedicion) <> '', 'El CFD debe tener un lugar de expedicion');
+
+  // Solo si es la v2.2 leemos el lugar de expedicion
+  if VersionCFD = fev22 then
+  begin
+    ComprobanteDestino.LugarDeExpedicion := IFEXMLComprobanteV22(fXMLComprobantePrueba).LugarExpedicion;
+    Assert(Trim(ComprobanteDestino.MetodoDePago) <> '', 'El CFD debe tener un metodo de pago');
+    Assert(Trim(ComprobanteDestino.LugarDeExpedicion) <> '', 'El CFD debe tener un lugar de expedicion');
+  end;
 
   // 3. Establecemos el Emisor y Receptor
-  with fXMLComprobantePrueba.Emisor do
-  begin
-    Emisor.Nombre := Nombre;
-    Emisor.RFC := RFC;
-    Emisor.Direccion.Calle := DomicilioFiscal.Calle;
-    Emisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
-    Emisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
-    Emisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
-    Emisor.Direccion.Colonia := DomicilioFiscal.Colonia;
-    Emisor.Direccion.Localidad := DomicilioFiscal.Localidad;
-    Emisor.Direccion.Municipio := DomicilioFiscal.Municipio;
-    Emisor.Direccion.Estado := DomicilioFiscal.Estado;
-    Emisor.Direccion.Pais := DomicilioFiscal.Pais;
+  case VersionCFD of
+    fev20:
+    begin
+        with IFEXMLComprobanteV2(fXMLComprobantePrueba).Emisor do
+        begin
+          Emisor.Nombre := Nombre;
+          Emisor.RFC := RFC;
+          Emisor.Direccion.Calle := DomicilioFiscal.Calle;
+          Emisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
+          Emisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
+          Emisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
+          Emisor.Direccion.Colonia := DomicilioFiscal.Colonia;
+          Emisor.Direccion.Localidad := DomicilioFiscal.Localidad;
+          Emisor.Direccion.Municipio := DomicilioFiscal.Municipio;
+          Emisor.Direccion.Estado := DomicilioFiscal.Estado;
+          Emisor.Direccion.Pais := DomicilioFiscal.Pais;
+        end;
+    end;
+    fev22:
+    begin
+        with IFEXMLComprobanteV22(fXMLComprobantePrueba).Emisor do
+        begin
+          Emisor.Nombre := Nombre;
+          Emisor.RFC := RFC;
+          Emisor.Direccion.Calle := DomicilioFiscal.Calle;
+          Emisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
+          Emisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
+          Emisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
+          Emisor.Direccion.Colonia := DomicilioFiscal.Colonia;
+          Emisor.Direccion.Localidad := DomicilioFiscal.Localidad;
+          Emisor.Direccion.Municipio := DomicilioFiscal.Municipio;
+          Emisor.Direccion.Estado := DomicilioFiscal.Estado;
+          Emisor.Direccion.Pais := DomicilioFiscal.Pais;
 
-    // Leemos los régimenes que contiene el CFD del XML
-    SetLength(Emisor.Regimenes, RegimenFiscal.Count);
-    for I := 0 to RegimenFiscal.Count - 1 do
-        Emisor.Regimenes[I] := RegimenFiscal[I].Regimen;
-
-    ComprobanteDestino.Emisor := Emisor;
+          // Leemos los régimenes que contiene el CFD del XML
+          SetLength(Emisor.Regimenes, RegimenFiscal.Count);
+          for I := 0 to RegimenFiscal.Count - 1 do
+            Emisor.Regimenes[I] := RegimenFiscal[I].Regimen;
+        end;
+    end;
   end;
+  ComprobanteDestino.Emisor := Emisor;
 
   with fXMLComprobantePrueba.Receptor do
   begin
@@ -444,20 +484,43 @@ begin
   end;
 
   // Tiene direccion de "Expedido En" ??
-  if fXMLComprobantePrueba.Emisor.ExpedidoEn.Calle <> '' then
-  begin
-    with fXMLComprobantePrueba.Emisor.ExpedidoEn do
+  case VersionCFD of
+    fev20:
     begin
-      ExpedidoEn.Calle := Calle;
-      ExpedidoEn.NoExterior := NoExterior;
-      ExpedidoEn.CodigoPostal := CodigoPostal;
-      ExpedidoEn.Localidad := Localidad;
-      ExpedidoEn.Municipio := Municipio;
-      ExpedidoEn.Colonia := Colonia;
-      ExpedidoEn.Estado := Estado;
-      ExpedidoEn.Pais := Pais;
+        if IFEXMLComprobanteV2(fXMLComprobantePrueba).Emisor.ExpedidoEn.Calle <> '' then
+        begin
+          with IFEXMLComprobanteV2(fXMLComprobantePrueba).Emisor.ExpedidoEn do
+          begin
+            ExpedidoEn.Calle := Calle;
+            ExpedidoEn.NoExterior := NoExterior;
+            ExpedidoEn.CodigoPostal := CodigoPostal;
+            ExpedidoEn.Localidad := Localidad;
+            ExpedidoEn.Municipio := Municipio;
+            ExpedidoEn.Colonia := Colonia;
+            ExpedidoEn.Estado := Estado;
+            ExpedidoEn.Pais := Pais;
+          end;
+          ComprobanteDestino.ExpedidoEn := ExpedidoEn;
+        end;
     end;
-    ComprobanteDestino.ExpedidoEn := ExpedidoEn;
+    fev22:
+    begin
+        if IFEXMLComprobanteV22(fXMLComprobantePrueba).Emisor.ExpedidoEn.Calle <> '' then
+        begin
+          with IFEXMLComprobanteV22(fXMLComprobantePrueba).Emisor.ExpedidoEn do
+          begin
+            ExpedidoEn.Calle := Calle;
+            ExpedidoEn.NoExterior := NoExterior;
+            ExpedidoEn.CodigoPostal := CodigoPostal;
+            ExpedidoEn.Localidad := Localidad;
+            ExpedidoEn.Municipio := Municipio;
+            ExpedidoEn.Colonia := Colonia;
+            ExpedidoEn.Estado := Estado;
+            ExpedidoEn.Pais := Pais;
+          end;
+          ComprobanteDestino.ExpedidoEn := ExpedidoEn;
+        end;
+    end;
   end;
 
   // 4. Agregamos los conceptos
@@ -674,11 +737,13 @@ end;
 
 procedure TestTFEComprobanteFiscal.GuardarEnArchivo_ComprobanteDeXML_LoGuarde;
 var
-  sContenidoXML: WideString;
+  sContenidoXML: UnicodeString;
   sArchivo: String;
 begin
    // Leemos el XML de nuestro Fixture en memoria
     sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/comprobante_correcto.xml');
+    Assert(AnsiPos('version="2.2"', sContenidoXML) > 0,
+          'El XML de pruebas tiene que ser un CFD 2.2 para poder ejecutar la prueba');
     fComprobanteFiscal.XML:=sContenidoXML;
 
     // Ahora guardamos el archivo
@@ -693,7 +758,7 @@ procedure TestTFEComprobanteFiscal.setXML_DeComprobanteExistente_EstablezcaLasPr
 var
     sContenidoXML: WideString;
     Certificado: TFECertificado;
-    fComprobanteComparacion: TFEComprobanteFiscal;
+    fComprobanteComparacion:  TFEComprobanteFiscal;
 
     procedure CompararDireccionContribuyente(Direccion1, Direccion2 : TFEDireccion; Nombre: String);
     begin
@@ -724,7 +789,10 @@ begin
 
     // Leemos el XML de nuestro Fixture en memoria
     sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/comprobante_correcto.xml');
-    fComprobanteFiscal.XML:=sContenidoXML;
+    Assert(AnsiPos('version="2.2"', sContenidoXML) > 0,
+          'El XML de pruebas tiene que ser un CFD 2.2 para poder ejecutar la prueba');
+
+    fComprobanteFiscal.XML:=UTF8ToString(sContenidoXML);
 
     // Leemos el comprobante de ejemplo con el metodo alternativo usado en las pruebas
     fComprobanteComparacion:=TFEComprobanteFiscal.Create;
@@ -759,12 +827,9 @@ begin
     CompararDireccionContribuyente(fComprobanteComparacion.Receptor.Direccion,
                                     fComprobanteFiscal.Receptor.Direccion, 'Receptor');
 
-    // Comparar conceptos
-    // Comparar impuestos
-    //
-    {CheckEquals(fComprobanteComparacion.Serie, fComprobanteFiscal.Serie, 'La serie no fue la misma');
-    CheckEquals(fComprobanteComparacion.Serie, fComprobanteFiscal.Serie, 'La serie no fue la misma');
-    CheckEquals(fComprobanteComparacion.Serie, fComprobanteFiscal.Serie, 'La serie no fue la misma'); }
+    //Check(False,'Comparar lugar de expedicion');
+    //Check(False,'Comparar metodo de pago');
+    //Check(False,'Comparar regimenes');
 
     FreeAndNil(fComprobanteComparacion);
 end;
@@ -909,6 +974,84 @@ begin
   sXMLConReceptor := leerContenidoDeFixture('comprobante_fiscal/receptor.xml');
   CheckEquals(sXMLConReceptor, fComprobanteFiscal.fXmlComprobante.XML,
     'El Contenido XML del Comprobante no almaceno correctamente los datos del receptor (es diferente al fixture receptor.xml)');
+end;
+
+procedure
+    TestTFEComprobanteFiscal.setXML_DeComprobanteV2_EstablezcaLasPropiedadesCorrectamente;
+var
+    sContenidoXML: WideString;
+    Certificado: TFECertificado;
+    fComprobanteComparacion:  TFEComprobanteFiscal;
+
+    procedure CompararDireccionContribuyente(Direccion1, Direccion2 : TFEDireccion; Nombre: String);
+    begin
+         CheckEquals(Direccion1.Calle,
+                     Direccion2.Calle, 'La Calle del ' + Nombre + 'no fue el mismo');
+         CheckEquals(Direccion1.NoExterior ,
+                     Direccion2.NoExterior, 'El No Ext del ' + Nombre + 'no fue el mismo');
+         CheckEquals(Direccion1.NoInterior ,
+                     Direccion2.NoInterior, 'El No Interior del ' + Nombre + 'no fue el mismo');
+         CheckEquals(Direccion1.CodigoPostal ,
+                     Direccion2.CodigoPostal, 'El CP de ' + Nombre + 'no fue el mismo');
+         CheckEquals(Direccion1.Colonia ,
+                     Direccion2.Colonia, 'La Colonia del ' + Nombre + 'no fue el mismo');
+         CheckEquals(Direccion1.Municipio ,
+                     Direccion2.Municipio, 'El Municipio del ' + Nombre + 'no fue el mismo');
+         CheckEquals(Direccion1.Estado ,
+                     Direccion2.Estado, 'El Estado del ' + Nombre + 'no fue el mismo');
+         CheckEquals(Direccion1.Pais ,
+                     Direccion2.Pais, 'El Pais del ' + Nombre + 'no fue el mismo');
+         CheckEquals(Direccion1.Localidad ,
+                     Direccion2.Localidad, 'La Localidad del ' + Nombre + 'no fue el mismo');
+         CheckEquals(Direccion1.Referencia ,
+                     Direccion2.Referencia, 'La Referencia del ' + Nombre + 'no fue el mismo');
+    end;
+
+begin
+    ConfigurarCertificadoDePrueba(Certificado);
+
+    // Leemos el XML de nuestro Fixture en memoria
+    sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/comprobante_ver2.0.xml');
+    Assert(AnsiPos('version="2.0"', sContenidoXML) > 0,
+          'El XML de la prueba tiene que ser un CFD 2.0');
+
+    fComprobanteFiscal.XML:=UTF8ToString(sContenidoXML);
+
+    // Leemos el comprobante de ejemplo con el metodo alternativo usado en las pruebas
+    fComprobanteComparacion:=TFEComprobanteFiscal.Create;
+    LeerXMLEnComprobante(fRutaFixtures + 'comprobante_fiscal/comprobante_ver2.0.xml',
+                           Certificado, fComprobanteComparacion);
+
+    // Comparamos algunas de sus propiedades las cuales deben de ser las mismas
+    CheckTrue(fev20 = fComprobanteFiscal.fVersion, 'La version del CFD debio haber sido 2.0');
+    CheckEquals(fComprobanteComparacion.Folio, fComprobanteFiscal.Folio, 'Los folios no fueron los mismos');
+    CheckEquals(fComprobanteComparacion.Serie, fComprobanteFiscal.Serie, 'La serie no fue la misma');
+    CheckTrue(CompareDate(fComprobanteComparacion.FechaGeneracion,
+                          fComprobanteFiscal.FechaGeneracion) = 0, 'Las fechas de generacion no fueron las mismas');
+
+    CheckEquals(fComprobanteComparacion.BloqueFolios.NumeroAprobacion,
+                fComprobanteFiscal.BloqueFolios.NumeroAprobacion, 'El num de aprobacion del certificado no fue el mismo');
+
+    CheckEquals(fComprobanteComparacion.BloqueFolios.AnoAprobacion,
+                fComprobanteFiscal.BloqueFolios.AnoAprobacion, 'El año de aprobacion no fue el mismo');
+
+    CheckTrue(fComprobanteComparacion.Tipo = fComprobanteFiscal.Tipo, 'El tipo no fue el mismo');
+    CheckTrue(fComprobanteComparacion.FormaDePago = fComprobanteFiscal.FormaDePago, 'La forma de pago no fue la misma');
+    CheckEquals(fComprobanteComparacion.CondicionesDePago, fComprobanteFiscal.CondicionesDePago, 'Las condiciones de pago no fueron las mismas');
+    CheckEquals(fComprobanteComparacion.Subtotal, fComprobanteFiscal.Subtotal, 'El subtotal no fue el mismo');
+    CheckEquals(fComprobanteComparacion.Total, fComprobanteFiscal.Total, 'El total no fue el mismo');
+
+    CheckEquals(fComprobanteComparacion.Emisor.RFC, fComprobanteFiscal.Emisor.RFC, 'El RFC del Emisor no fue el mismo');
+    CheckEquals(fComprobanteComparacion.Emisor.Nombre, fComprobanteFiscal.Emisor.Nombre, 'El Nombre del Emisor no fue el mismo');
+    CompararDireccionContribuyente(fComprobanteComparacion.Emisor.Direccion,
+                                    fComprobanteFiscal.Emisor.Direccion, 'Emisor');
+
+    CheckEquals(fComprobanteComparacion.Receptor.RFC, fComprobanteFiscal.Receptor.RFC, 'El RFC del Receptor no fue el mismo');
+    CheckEquals(fComprobanteComparacion.Receptor.Nombre, fComprobanteFiscal.Receptor.Nombre, 'El Nombre del Receptor no fue el mismo');
+    CompararDireccionContribuyente(fComprobanteComparacion.Receptor.Direccion,
+                                    fComprobanteFiscal.Receptor.Direccion, 'Receptor');
+
+    FreeAndNil(fComprobanteComparacion);
 end;
 
 initialization

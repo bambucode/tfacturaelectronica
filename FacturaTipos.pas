@@ -34,6 +34,7 @@ TFESerie = String[10];
 
 TFEFormaDePago = (fpUnaSolaExhibicion, fpParcialidades);
 TFETipoComprobante = (tcIngreso, tcEgreso, tcTraslado);
+TFEVersionComprobante = (fev20, fev22);
 
 TFEDireccion = record
   Calle: String;

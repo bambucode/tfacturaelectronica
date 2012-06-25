@@ -30,7 +30,9 @@ uses
   SelloDigital in '..\SelloDigital.pas',
   DateUtils,
   DocComprobanteFiscal in '..\DocComprobanteFiscal.pas',
-  CadenaOriginal in '..\CadenaOriginal.pas';
+  CadenaOriginal in '..\CadenaOriginal.pas',
+  FeCFDv22 in '..\CFD\FeCFDv22.pas',
+  FeCFD in '..\CFD\FeCFD.pas';
 
 var
    sArchivo: String;
