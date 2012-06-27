@@ -29,6 +29,7 @@ type
   // Excepciones que pueden ser generadas
   EFECertificadoNoExisteException = class(Exception);
   EFECertificadoNoVigente =  class(Exception);
+  EFECertificadoNoFueLeidoException = class(Exception);
   EFEFolioFueraDeRango = class(Exception);
   EXMLVacio = class(Exception);
 
@@ -491,6 +492,7 @@ procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
 const
     _CADENA_INICIO_CERTIFICADO = '-----BEGIN CERTIFICATE-----';
     _CADENA_FIN_CERTIFICADO    = '-----END CERTIFICATE-----';
+    _ERROR_LECTURA_CERTIFICADO = 'Unable to read certificate';
 var
   x509Certificado: TX509Certificate;
 
@@ -546,7 +548,11 @@ begin
      On E: Exception do
      begin
         FreeAndNil(x509Certificado);
-        raise Exception.Create(E.Message);
+        // Checamos los posibles errores
+        if AnsiPos(_ERROR_LECTURA_CERTIFICADO, E.Message) > 0 then
+            raise EFECertificadoNoFueLeidoException.Create('No fue posible leer el certificado.')
+        else
+            raise Exception.Create(E.Message);
      end;
   end;
   FreeAndNil(x509Certificado);

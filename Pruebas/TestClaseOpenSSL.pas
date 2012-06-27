@@ -253,6 +253,9 @@ var
 begin
   BorrarArchivoTempSiExiste(fDirTemporal + 'VigenciaInicio.txt');
 
+  Assert(FileExists(fRutaFixtures + _RUTA_CERTIFICADO),
+        'Debe existir el certificado antes de poder ejecutar la prueba');
+
   // Procesamos el certificado con el OpenSSL.exe para obtener los datos y
   // poder corroborarlos...
   EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _RUTA_CERTIFICADO +
@@ -272,6 +275,7 @@ begin
 
   Certificado := fOpenSSL.ObtenerCertificado(fRutaFixtures + _RUTA_CERTIFICADO);
 
+  CheckTrue(Certificado <> nil, 'Se debio haber obtenido una instancia al certificado');
   // Checamos las propiedades que nos interesan
   CheckEquals(dtInicioVigencia, Certificado.NotBefore, 'El inicio de vigencia del certificado no fue el mismo que regreso OpenSSL');
   CheckEquals(dtFinVigencia, Certificado.NotAfter, 'El fin de vigencia del certificado no fue el mismo que regreso OpenSSL');
