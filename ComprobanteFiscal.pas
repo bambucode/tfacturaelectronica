@@ -18,9 +18,6 @@ interface
 uses FacturaTipos, SysUtils, dialogs,
   // Unidades especificas de manejo de XML:
   XmlDom, XMLIntf, MsXmlDom, XMLDoc, DocComprobanteFiscal,
-  {$IFDEF VER220}
-    CodeSiteLogging,
-  {$ENDIF}
   FeCFDv22, FeCFDv2, feCFD,
   XSLProd;
 
@@ -416,7 +413,6 @@ var
   I: Integer;
   Concepto: TFEConcepto;
 begin
-     {$IFDEF VER220} CodeSite.EnterMethod('AsignarConceptos'); {$ENDIF}
      // Obtenemos los conceptos agregados al documento previamente
      for I := 0 to Length(inherited Conceptos) - 1 do
      begin
@@ -450,7 +446,6 @@ begin
               CuentaPredial.Numero := TFEReglamentacion.ComoCadena(Concepto.CuentaPredial); // Opcional
           end;
      end;
-     {$IFDEF VER220} CodeSite.ExitMethod('AsignarConceptos'); {$ENDIF}
 end;
 
 procedure TFEComprobanteFiscal.AsignarImpuestosRetenidos;
@@ -673,7 +668,6 @@ procedure TFEComprobanteFiscal.LlenarComprobante;
 begin
     if (fComprobanteLleno = False) then
     begin
-        {$IFDEF VER220} CodeSite.EnterMethod('LlenarComprobante'); {$ENDIF}
         // Atributos de comprobante
         AsignarDatosFolios;
         AsignarFechaGeneracion;
@@ -709,7 +703,6 @@ begin
         if (fDesglosarTotalesImpuestos = True) then
            AsignarTotalesImpuestos;
 
-        {$IFDEF VER220} CodeSite.ExitMethod('LlenarComprobante'); {$ENDIF}
         fComprobanteLleno:=True;
     end;
 end;
@@ -851,7 +844,6 @@ var
   end;
 
 begin
-    CodeSite.EnterMethod('setXML');
     if (Trim(Valor) = '') then
     begin
         Raise EXMLVacio.Create('El valor proveido al XML esta vacio. Imposible crear comprobante.');
@@ -1081,7 +1073,6 @@ begin
             end;
             inherited ExpedidoEn:=ValorExpedidoEn;
 
-            CodeSite.Send('Guardando conceptos...', Conceptos.Count);
             for I := 0 to Conceptos.Count - 1 do
             begin
                 feConcepto.Cantidad:=StrToFloat(Conceptos[I].Cantidad);
@@ -1181,8 +1172,6 @@ begin
           Raise Exception.Create(E.Message);
         end;
     end;
-
-    CodeSite.ExitMethod('setXML');
 end;
 
 // Regresa el XML final del comprobante ya lleno

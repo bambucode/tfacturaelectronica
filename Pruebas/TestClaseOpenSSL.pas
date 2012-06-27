@@ -39,8 +39,7 @@ implementation
 
 uses
   Windows, SysUtils, Classes, FacturaTipos, Forms, OpenSSLUtils, DateUtils,
-  ConstantesFixtures,
-  CodeSiteLogging;
+  ConstantesFixtures;
 
 
 procedure TestTOpenSSL.SetUp;
@@ -99,7 +98,7 @@ begin
 
   // Quitamos los retornos de carro ya que la codificacion Base64 de OpenSSL la regresa con ENTERs
   sResultadoMD5OpenSSL := QuitarRetornos(leerContenidoDeArchivo(fDirTemporal + _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL));
-  CodeSite.Send(TipoEncripcion + ' OpenSSL', sResultadoMD5OpenSSL);
+  //CodeSite.Send(TipoEncripcion + ' OpenSSL', sResultadoMD5OpenSSL);
   Result := sResultadoMD5OpenSSL;
 end;
 
@@ -130,7 +129,7 @@ begin
                                                   _CADENA_DE_PRUEBA,
                                                   tdMD5);
 
-  CodeSite.Send('MD5 TFacturacion', sResultadoMD5DeClase);
+  //CodeSite.Send('MD5 TFacturacion', sResultadoMD5DeClase);
 
   // Comparamos los resultados (sin retornos de carro), los cuales deben de ser los mismos
   CheckEquals(sResultadoMD5OpenSSL,

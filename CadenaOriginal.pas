@@ -2,7 +2,7 @@ unit CadenaOriginal;
 
 interface
 
-uses FacturaTipos, FeCFD, FeCFDv22, FeCFDv2, {$IF Compilerversion >= 22} CodeSiteLogging, {$IFEND}
+uses FacturaTipos, FeCFD, FeCFDv22, FeCFDv2,
      XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd;
 
 type
@@ -314,8 +314,6 @@ begin
       // 7. Toda la cadena de original se encuentra expresada en el formato de codificación UTF-8.
       // Solo agregamos un PIPE mas porque el ultimo atributo tiene al final su pipe.
       Result:=UTF8Encode(fResultado + _PIPE);
-      {$IF Compilerversion >= 22} CodeSite.Send(Result,'fResultado'); {$IFEND}
-      {$IFDEF VER220} CodeSite.ExitMethod('getCadenaOriginal'); {$ENDIF}
 end;
 
 
