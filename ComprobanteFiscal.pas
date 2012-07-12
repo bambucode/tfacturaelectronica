@@ -88,6 +88,7 @@ type
     procedure AsignarTotalesImpuestos;
     procedure AsignarFechaGeneracion;
     procedure AsignarLugarExpedicion;
+    procedure AsignarNumeroDeCuenta;
     procedure EstablecerVersionDelComprobante;
   protected
     function getXML: WideString; virtual;
@@ -121,7 +122,10 @@ type
     /// almacenara el XML del comprobante</param>
     procedure GuardarEnArchivo(sArchivoDestino: String);
   end;
-  
+
+const
+   _CADENA_METODO_PAGO_NO_DISPONIBLE = 'No identificado';
+
 implementation
 
 uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
@@ -545,7 +549,7 @@ begin
         FreeAndNil(x509Certificado);
         // Checamos los posibles errores
         if AnsiPos(_ERROR_LECTURA_CERTIFICADO, E.Message) > 0 then
-            raise EFECertificadoNoFueLeidoException.Create('No fue posible leer el certificado.')
+            raise EFECertificadoNoFueLeidoException.Create('No fue posible leer el certificado: ' + E.Message)
         else
             raise Exception.Create(E.Message);
      end;
@@ -595,8 +599,11 @@ end;
 
 procedure TFEComprobanteFiscal.AsignarMetodoDePago;
 begin
+  // Asignamos el metodo de pago
   if (Trim(inherited MetodoDePago) <> '') then
-     fXmlComprobante.MetodoDePago:=TFEReglamentacion.ComoCadena(inherited MetodoDePago);
+     fXmlComprobante.MetodoDePago:=TFEReglamentacion.ComoCadena(inherited MetodoDePago)
+  else
+     fXmlComprobante.MetodoDePago:=_CADENA_METODO_PAGO_NO_DISPONIBLE;
 end;
 
 procedure TFEComprobanteFiscal.AsignarTipoComprobante;
@@ -661,6 +668,19 @@ begin
    IFEXMLComprobanteV22(fXmlComprobante).LugarExpedicion := (inherited LugarDeExpedicion);
 end;
 
+procedure TFEComprobanteFiscal.AsignarNumeroDeCuenta;
+begin
+  // En CFD 2.2 agregamos el Num Cta Pago (al menos los 4 ultimos digitos) el cual
+  // es un nodo opcional
+  case fVersion of
+    fev22:
+    begin
+         if Trim(inherited NumeroDeCuenta) <> '' then
+            IFEXMLComprobanteV22(fXmlComprobante).NumCtaPago:=inherited NumeroDeCuenta;
+    end;
+  end;
+end;
+
 // Funcion encargada de llenar el comprobante fiscal EN EL ORDEN que se especifica en el XSD
 // ya que si no es asi, el XML se va llenando en el orden en que se establecen las propiedades de la clase
 // haciendo que el comprobante no pase las validaciones del SAT.
@@ -682,9 +702,10 @@ begin
         AsignarMetodoDePago;
         // Nuevas propiedades de CFD 2.2:
         if (fVersion = fev22) then
+        begin
           AsignarLugarExpedicion;
-
-        // Por implementar: AsignarNumeroCuentaDePago;
+          AsignarNumeroDeCuenta;
+        end;
         // Por implementar: AsignarTipoDeCambioYMoneda;
         // Por implementar: AsignarMontoFolioFiscalOriginal;
 
@@ -898,7 +919,12 @@ begin
 
             // CFD 2.2
             if (fVersion = fev22) then
+            begin
                 inherited LugarDeExpedicion:=IFEXMLComprobanteV22(fXmlComprobante).LugarExpedicion;
+
+                if TieneAtributo(fXmlComprobante, 'NumCtaPago') then
+                  inherited NumeroDeCuenta:=IFEXMLComprobanteV22(fXmlComprobante).NumCtaPago;
+            end;
 
             FechaGeneracion:=TFEReglamentacion.ComoDateTime(fXmlComprobante.Fecha);
 
@@ -907,6 +933,7 @@ begin
 
             if TieneAtributo(fXmlComprobante, 'metodoDePago') then
               inherited MetodoDePago:=MetodoDePago;
+
 
             // Leemos los datos del emisor
             case fVersion of
@@ -1161,7 +1188,7 @@ begin
             // Indicamos que la factura ya fue generada
             FacturaGenerada:=True;
 
-            Assert(Self.Total = StrToCurr(Total), 'El total del comprobante no fue igual que el total del XML');
+            //Assert(CurrToStr(Self.Total) = Total, 'El total del comprobante no fue igual que el total del XML');
         end;
     except
         On E:Exception do

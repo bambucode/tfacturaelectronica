@@ -213,9 +213,13 @@ begin
         begin
            AgregarAtributo(fXmlComprobante, 'metodoDePago');  // Requerido
            AgregarAtributo(fXmlComprobante, 'LugarExpedicion'); // Requerido
-           //AgregarAtributo(fXmlComprobante, 'NumCtaPago');
-           //AgregarAtributo(fXmlComprobante, 'TipoCambio');
-           //AgregarAtributo(fXmlComprobante, 'Moneda');
+           AgregarAtributo(IFEXmlComprobanteV22(fXmlComprobante), 'NumCtaPago');
+
+          { if Assigned(fXmlComprobante.ChildNodes.FindNode('TipoCambio')) then
+              AgregarAtributo(IFEXmlComprobanteV22(fXmlComprobante), 'TipoCambio');
+
+           if Assigned(fXmlComprobante.ChildNodes.FindNode('Moneda')) then
+              AgregarAtributo(IFEXmlComprobanteV22(fXmlComprobante), 'Moneda'); }
 
            AgregarAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor, 'rfc');
            AgregarAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor, 'nombre');
