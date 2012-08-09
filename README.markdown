@@ -1,4 +1,4 @@
-﻿TFACTURACIONELECTRONICA (Beta) 
+﻿TFACTURACIONELECTRONICA (Beta)   
 =====================================
 Esta es una librería que sirve para generar una factura electrónica de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
