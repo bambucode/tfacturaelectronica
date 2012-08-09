@@ -33,6 +33,10 @@ program ProbarFacturaElectronica;
 {$ENDIF}
 
 uses
+  EMemLeaks,
+  EResLeaks,
+  EDebugExports,
+  ExceptionLog7,
   Forms,
   TestFramework,
   GUITestRunner,

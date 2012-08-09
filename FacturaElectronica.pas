@@ -10,7 +10,7 @@ TOnComprobanteGenerado = procedure(Sender: TObject) of Object;
 
 ///<summary>Representa una factura electronica sus metodos para generarla, leerla y validarla
 /// cumpliendo la ley del Codigo Fiscal de la Federacion (CFF) Articulos 29 y 29-A.
-/// (Soporta la version 2.0 de CFD)</summary>
+/// (Soporta la version 2.0/2.2 de CFD)</summary>
 TFacturaElectronica = class(TFEComprobanteFiscal)
 {$IFDEF VERSION_DE_PRUEBA}
   public
@@ -32,13 +32,12 @@ public
   function getXML() : WideString;  }
 public
   //property XML : WideString read getXML write setXML;
-
   /// <summary>Evento que es llamado inemdiatamente después de que el CFD fue generado,
   /// el cual puede ser usado para registrar en su sistema contable el registro de la factura
   // el cual es un requisito del SAT (Art 29, Fraccion VI)</summary>
   property OnComprobanteGenerado : TOnComprobanteGenerado read fOnComprobanteGenerado write fOnComprobanteGenerado;
   constructor Create(cEmisor, cCliente: TFEContribuyente; bfBloqueFolios: TFEBloqueFolios;
-                     cerCertificado: TFECertificado; tcTipo: TFETipoComprobante);
+                     cerCertificado: TFECertificado; tcTipo: TFETipoComprobante);  overload;
   destructor Destroy; override;
 
 
@@ -52,11 +51,18 @@ public
   //function esValida() : Boolean;
   /// <summary>Genera la factura en formato cancelado</summary>
   // function Cancelar;
+published
+  constructor Create; overload;
 end;
 
 implementation
 
 uses sysutils, Classes;
+
+constructor TFacturaElectronica.Create;
+begin
+  inherited Create;
+end;
 
 constructor TFacturaElectronica.Create(cEmisor, cCliente: TFEContribuyente;
             bfBloqueFolios: TFEBloqueFolios; cerCertificado: TFECertificado; tcTipo: TFETipoComprobante);

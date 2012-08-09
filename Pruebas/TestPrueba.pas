@@ -41,7 +41,6 @@ implementation
 
 uses
   Windows, SysUtils, Classes, Forms,
-  CodeSiteLogging,
   ShellApi;
 
 procedure TTestPrueba.SetUp;

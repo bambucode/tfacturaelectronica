@@ -1,4 +1,4 @@
-﻿TFACTURACIONELECTRONICA (Beta)   
+﻿TFACTURACIONELECTRONICA (Beta)     
 =====================================
 Esta es una librería que sirve para generar una factura electrónica de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
@@ -38,7 +38,7 @@ Completado
 
 ¿Cómo puedo colaborar?
 -------------
-Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacton a mi correo: <luis@bambucode.com>
+Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a mi correo: <luis@bambucode.com>
 
 Notas adicionales
 ------------

@@ -30,7 +30,9 @@ uses
   SelloDigital in '..\SelloDigital.pas',
   DateUtils,
   DocComprobanteFiscal in '..\DocComprobanteFiscal.pas',
-  CadenaOriginal in '..\CadenaOriginal.pas';
+  CadenaOriginal in '..\CadenaOriginal.pas',
+  FeCFDv22 in '..\CFD\FeCFDv22.pas',
+  FeCFD in '..\CFD\FeCFD.pas';
 
 var
    sArchivo: String;
@@ -102,13 +104,16 @@ begin
 
       // 5. Creamos la clase Factura con los parametros minimos.
       Factura:=TFacturaElectronica.Create(Emisor, Receptor, BloqueFolios, Certificado, tcIngreso);
+
       //Factura.AutoAsignarFechaGeneracion := False;
-      //Factura.FechaGeneracion := EncodeDateTime(2012, 06, 12, 11, 32, 50, 0);
+      //Factura.FechaGeneracion := EncodeDateTime(2012, 07, 12, 11, 30, 40, 0);
       //Factura.OnComprobanteGenerado:=onComprobanteGenerado;
 
-      Factura.MetodoDePago:='efectivo';
+      Factura.MetodoDePago:='Deposito en Cuenta Bancaria';
+      Factura.NumeroDeCuenta:='1234';
+
       // Asignamos el lugar de expedición (requerido en la CFD 2.2)
-      Factura.LugarDeExpedicion:='Chihuahua, Chihuahua';
+      Factura.LugarDeExpedicion:='Dirección de mi negocio, Chihuahua, Chihuahua';
 
       // Definimos todos los conceptos que incluyo la factura
       Concepto1.Cantidad:=1;

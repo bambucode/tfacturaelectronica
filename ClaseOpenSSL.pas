@@ -28,6 +28,7 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
     TTipoDigestionOpenSSL = (tdMD5, tdSHA1);
     ENoExisteArchivoException = class(Exception);
     ECertificadoLlaveEsFiel = class(Exception);
+    ECertificadoFallaLecturaException = class(Exception);
     ELlaveFormatoIncorrectoException = class(Exception);
     ELlaveLecturaException = class(Exception);
     ELlavePrivadaClaveIncorrectaException = class(Exception);
@@ -288,21 +289,24 @@ end;
 function TOpenSSL.ObtenerCertificado(sArchivo: String) : TX509Certificate;
 var
   CertX509: TX509Certificate;
+const
+  _ERROR_LECTURA_CERTIFICADO = 'Unable to read certificate';
 begin
   CertX509:=TX509Certificate.Create;
   try
       CertX509.LoadFromFile(sArchivo, DER);
+      Result:=CertX509;
   except
       On E:Exception do
       begin
-         // TODO: CHecar los posibles errores generados
-         // "Unable to read certificate file"
+          if AnsiPos(_ERROR_LECTURA_CERTIFICADO, E.Message) > 0 then
+          begin
+              raise ECertificadoFallaLecturaException.Create('No fue posible leer certificado');
+          end;
+          Result:=nil;
       end;
   end;
-
-  Result:=CertX509;
 end;
-
 
 function TOpenSSL.HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String; sCadena: TCadenaUTF8;
          trTipo: TTipoDigestionOpenSSL) : String;
