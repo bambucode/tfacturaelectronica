@@ -43,7 +43,9 @@ type
 
 implementation
 
-uses SysUtils, StrUtils, FacturaReglamentacion;
+uses SysUtils, StrUtils, 
+ {$IFDEF VER220} CodeSiteLogging,{$ENDIF}
+FacturaReglamentacion;
 
 // Debemos de recibir el XML del comprobante con todas sus propiedades debidamente
 // llenas
