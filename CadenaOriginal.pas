@@ -21,7 +21,7 @@ type
       {$REGION 'Documentation'}
       ///	<summary>
       ///	  Se encarga de agregar un atributo del XML a la cadena original de
-      ///	  acuerdo a la especificaciï¿½n.
+      ///	  acuerdo a la especificación.
       ///	</summary>
       ///	<param name="NodoPadre">
       ///	  Nodo padre de donde obtendremos el atributo
@@ -43,9 +43,7 @@ type
 
 implementation
 
-uses SysUtils, StrUtils, 
- {$IFDEF VER220} CodeSiteLogging,{$ENDIF}
-FacturaReglamentacion;
+uses SysUtils, StrUtils, FacturaReglamentacion;
 
 // Debemos de recibir el XML del comprobante con todas sus propiedades debidamente
 // llenas
@@ -98,8 +96,8 @@ end;
 
 function TCadenaOriginal.LimpiaCampo(sTexto: String): String;
 begin
-    // 1. Ninguno de los atributos que conforman al comprobante fiscal digital deberï¿½ contener el caracter | (ï¿½pipeï¿½)
-    // debido a que este serï¿½ utilizado como caracter de control en la formaciï¿½n de la cadena original.
+    // 1. Ninguno de los atributos que conforman al comprobante fiscal digital deberá contener el caracter | (“pipe”)
+    // debido a que este será utilizado como caracter de control en la formación de la cadena original.
     sTexto := AnsiReplaceStr(sTexto, _PIPE, '');
     // Quitamos los retornos de carro
     // Reemplazamos los TABs, retornos de carro por espacios  (Regla 5.a) del Anexo 20
@@ -115,7 +113,7 @@ procedure TCadenaOriginal.AgregarAtributo(NodoPadre: IXMLNode; sNombreAtributo: 
 var
   sValor: String;
 begin
-  // 5. Los datos opcionales no expresados, no aparecerï¿½n en la cadena original y no tendrï¿½n delimitador alguno.
+  // 5. Los datos opcionales no expresados, no aparecerán en la cadena original y no tendrán delimitador alguno.
   // Si se nos fue especificado un nodo "padre" checamos si tiene al atributo hijo
   // si no, ni siquiera lo "consultamos" ya que lo agregaria al XML con valores vacios
   if Assigned(NodoPadre) then
@@ -175,9 +173,8 @@ var
   I, J: Integer;
 begin
       fResultado := '';
-      {$IFDEF VER230} CodeSite.EnterMethod('Calcular'); {$ENDIF}
-
-      // 2. El inicio de la cadena original se encuentra marcado mediante una secuencia de caracteres || (doble ï¿½pipeï¿½).
+  
+      // 2. El inicio de la cadena original se encuentra marcado mediante una secuencia de caracteres || (doble “pipe”).
       fResultado := _PIPE + _PIPE;
       // 1) Datos del comprobante
 
@@ -206,7 +203,7 @@ begin
            AgregarAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor, 'nombre');
            // 3) Datos del domicilio fiscal del emisor
            AgregarUbicacionFiscal(IFEXmlComprobanteV2(fXmlComprobante).Emisor.DomicilioFiscal);
-           // 4) Datos del Domicilio de Expediciï¿½n del Comprobante
+           // 4) Datos del Domicilio de Expedición del Comprobante
            if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor')) then
              if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor').ChildNodes.FindNode('ExpedidoEn')) then
                AgregarUbicacion(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn);
@@ -227,7 +224,7 @@ begin
            AgregarAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor, 'nombre');
            // 3) Datos del domicilio fiscal del emisor
            AgregarUbicacionFiscal(IFEXmlComprobanteV22(fXmlComprobante).Emisor.DomicilioFiscal);
-           // 4) Datos del Domicilio de Expediciï¿½n del Comprobante
+           // 4) Datos del Domicilio de Expedición del Comprobante
            if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor')) then
              if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor').ChildNodes.FindNode('ExpedidoEn')) then
                AgregarUbicacion(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn);
@@ -284,7 +281,7 @@ begin
       // TODO: Agregar los "ComplementoConcepto" regla 9 del Anexo 20
       // TODO: Arreglar nodo Complemento segun la regla 10
 
-      // 9) Datos de Cada Retenciï¿½n de Impuestos
+      // 9) Datos de Cada Retención de Impuestos
       // Solo accedemos al nodo XML si hubo retenciones
       //fXmlComprobante.HasAttribute()
       if Assigned(fXmlComprobante.ChildNodes.FindNode('Impuestos')) then
@@ -316,8 +313,8 @@ begin
 
      AgregarAtributo(fXmlComprobante.Impuestos, 'totalImpuestosTrasladados');
 
-      // 6. El final de la cadena original serï¿½ expresado mediante una cadena de caracteres || (doble ï¿½pipeï¿½).
-      // 7. Toda la cadena de original se encuentra expresada en el formato de codificaciï¿½n UTF-8.
+      // 6. El final de la cadena original será expresado mediante una cadena de caracteres || (doble “pipe”).
+      // 7. Toda la cadena de original se encuentra expresada en el formato de codificación UTF-8.
       // Solo agregamos un PIPE mas porque el ultimo atributo tiene al final su pipe.
       Result:=UTF8Encode(fResultado + _PIPE);
 end;
