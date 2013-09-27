@@ -18,8 +18,7 @@ interface
 uses FacturaTipos, SysUtils, dialogs,
   // Unidades especificas de manejo de XML:
   XmlDom, XMLIntf, MsXmlDom, XMLDoc, DocComprobanteFiscal,
-  FeCFDv22, FeCFDv2, feCFD,
-  XSLProd;
+  FeCFDv22, FeCFDv2, feCFD;
 
 type
 
