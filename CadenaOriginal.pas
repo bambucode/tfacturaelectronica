@@ -3,7 +3,7 @@ unit CadenaOriginal;
 interface
 
 uses FacturaTipos, FeCFD, FeCFDv22, FeCFDv2,
-     XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd;
+     XmlDom, XMLIntf, MsXmlDom, XMLDoc;
 
 type
 
