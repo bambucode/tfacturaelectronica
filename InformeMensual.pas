@@ -234,24 +234,24 @@ var
     slArchivo: TStrings;
     sNombreArchivo: String;
 begin
-    slArchivo:= TStringList.Create;
-    sNombreArchivo:=obtenerNombreArchivo();
+  slArchivo:= TStringList.Create;
+  sNombreArchivo:=obtenerNombreArchivo();
 
-    try
-       GenerarContenidoDeInforme;
-       slArchivo.Text:=sContenido;
+  try
+    GenerarContenidoDeInforme;
+    slArchivo.Text:=sContenido;
 
-       // Guardamos el archivo en el directorio destino
-       slArchivo.SaveToFile(DirectorioDestino + '\' + sNombreArchivo);
-    finally
-       FreeAndNil(slArchivo);
-    end;
+    // Guardamos el archivo en el directorio destino
+    slArchivo.SaveToFile(DirectorioDestino + '\' + sNombreArchivo);
+  finally
+    FreeAndNil(slArchivo);
+  end;
 end;
 
 procedure TInformeMensual.Agregar(Comprobante: TComprobanteInformeMensual);
 begin
-    SetLength(fComprobantes, Length(fComprobantes) + 1);
-    fComprobantes[Length(fComprobantes) - 1] := Comprobante;
+  SetLength(fComprobantes, Length(fComprobantes) + 1);
+  fComprobantes[Length(fComprobantes) - 1] := Comprobante;
 end;
 
 function TInformeMensual.GetComprobantes(): TArrComprobanteInformeMensual;

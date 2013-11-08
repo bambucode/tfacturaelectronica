@@ -827,15 +827,22 @@ begin
 
         // Finalmente regresamos la factura en XML con todas sus propiedades llenas
         fSelloDigitalCalculado := SelloDigital.SelloCalculado;
+
+        result := fSelloDigitalCalculado;
+        // Liberamos la clase de sello usada previamente
+        FreeAndNil(SelloDigital);
+        FacturaGenerada:=True;
       except
         // TODO: Manejar los diferentes tipos de excepciones...
         on E:Exception do
-           raise E.Create(E.Message);
+        begin
+          {$IFDEF DEBUG}
+            ShowMessage(E.Message);
+          {$ENDIF}
+          raise E.Create(E.Message);
+          FacturaGenerada := False;
+        end;
       end;
-      // Liberamos la clase de sello usada previamente
-      FreeAndNil(SelloDigital);
-      FacturaGenerada:=True;
-      result := fSelloDigitalCalculado;
   end;
 end;
 
