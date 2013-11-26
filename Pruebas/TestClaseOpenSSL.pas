@@ -1,5 +1,5 @@
 (* *****************************************************************************
-  Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
+  Copyright (C) 2010-2014 - Bambu Code SA de CV - Ing. Luis Carrasco
 
   Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
   http://bambucode.com/codigoabierto
@@ -45,8 +45,8 @@ uses
 procedure TestTOpenSSL.SetUp;
 begin
   inherited;
-  fArchivoLlavePrivada := fRutaFixtures + '\openssl\aaa010101aaa_CSD_01.key';
-  fClaveLlavePrivada := 'a0123456789';
+  fArchivoLlavePrivada := fRutaFixtures + '\openssl\aaa010101aaa_csd_01.key';
+  fClaveLlavePrivada := '12345678a';
   // Creamos el objeto OpenSSL
   fOpenSSL := TOpenSSL.Create();
 end;
@@ -67,6 +67,8 @@ const
   _ARCHIVO_CADENA_TEMPORAL = 'cadena_hacerdigestion.txt';
   _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL = 'cadena_hacerdigestion.txt';
 begin
+  Assert(FileExists(fArchivoLlavePrivada), 'No existio el archivo de llave privada:' + fArchivoLlavePrivada);
+
   case aTipoEncripcion of
     tdMD5: TipoEncripcion:='md5';
     tdSHA1: TipoEncripcion:='sha1';
@@ -249,6 +251,8 @@ var
     Result:=NumSerie;
   end;
 
+const
+  _LONGITUD_NUMERO_SERIE_CERTIFICADO = 20;
 begin
   BorrarArchivoTempSiExiste(fDirTemporal + 'VigenciaInicio.txt');
 
@@ -273,15 +277,19 @@ begin
   sNumSerie:= ValidarSerieDeOpenSSL(leerContenidoDeArchivo(fDirTemporal + 'Serial.txt'));
 
   Certificado := fOpenSSL.ObtenerCertificado(fRutaFixtures + _RUTA_CERTIFICADO);
-
-  CheckTrue(Certificado <> nil, 'Se debio haber obtenido una instancia al certificado');
-  // Checamos las propiedades que nos interesan
-  CheckEquals(dtInicioVigencia, Certificado.NotBefore, 'El inicio de vigencia del certificado no fue el mismo que regreso OpenSSL');
-  CheckEquals(dtFinVigencia, Certificado.NotAfter, 'El fin de vigencia del certificado no fue el mismo que regreso OpenSSL');
-  CheckEquals(sNumSerie, Certificado.SerialNumber, 'El numero de serie del certificado no fue el mismo que regreso OpenSSL');
-  // Checamos que la longitud del Numero de Serie sea de 20 (especificada en el RFC 3280 de la especificacion X509)
-  CheckEquals(20, Length(Certificado.SerialNumber), 'La longitud del numero de serie no fue la correcta');
-  FreeAndNil(Certificado);
+  try
+    CheckTrue(Certificado <> nil, 'Se debio haber obtenido una instancia al certificado');
+    // Checamos las propiedades que nos interesan
+    CheckEquals(dtInicioVigencia, Certificado.NotBefore, 'El inicio de vigencia del certificado no fue el mismo que regreso OpenSSL');
+    CheckEquals(dtFinVigencia, Certificado.NotAfter, 'El fin de vigencia del certificado no fue el mismo que regreso OpenSSL');
+    CheckEquals(sNumSerie, Certificado.SerialNumber, 'El numero de serie del certificado no fue el mismo que regreso OpenSSL');
+    // Checamos que la longitud del Numero de Serie sea de 20 (especificada en el RFC 3280 de la especificacion X509)
+    CheckEquals(_LONGITUD_NUMERO_SERIE_CERTIFICADO,
+                Length(Certificado.SerialNumber),
+                'La longitud del numero de serie no fue la correcta');
+  finally
+     FreeAndNil(Certificado);
+  end;
 end;
 
 initialization
