@@ -49,6 +49,9 @@ begin
    fDirTemporal:=GetEnvironmentVariable('TEMP') + '\';
    fRutaEXE := ExtractFilePath(Application.ExeName);
    fOpenSSL := ExtractFilePath(Application.ExeName) + 'openssl.exe';
+
+   Assert(FileExists(fOpenSSL), 'No existe el ejecutable OpenSSL.exe necesario para las pruebas en:' + fRutaEXE);
+
    // Asumimos que se va a ejecutar en subdirectorio Release\Win32 de la carpeta
    // donde se guarda el proyecto
    fRutaFixtures:=fRutaEXE + '\..\..\Pruebas\fixtures\';
