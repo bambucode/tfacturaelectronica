@@ -1,6 +1,6 @@
 (******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
- Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2010-2014 - Bambu Code SA de CV - Ing. Luis Carrasco
 
  Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
  http://bambucode.com/codigoabierto
@@ -50,8 +50,6 @@ begin
    fRutaEXE := ExtractFilePath(Application.ExeName);
    fOpenSSL := ExtractFilePath(Application.ExeName) + 'openssl.exe';
 
-   Assert(FileExists(fOpenSSL), 'No existe el ejecutable OpenSSL.exe necesario para las pruebas en:' + fRutaEXE);
-
    // Asumimos que se va a ejecutar en subdirectorio Release\Win32 de la carpeta
    // donde se guarda el proyecto
    fRutaFixtures:=fRutaEXE + '\..\..\Pruebas\fixtures\';
@@ -66,6 +64,8 @@ procedure TTestPrueba.EjecutarComandoOpenSSL(sComando: String);
 var
   ComandoUsado : String;
 begin
+  Assert(FileExists(fOpenSSL), 'No existe el ejecutable OpenSSL.exe necesario para las pruebas en:' + fRutaEXE);
+
   ComandoUsado := '/c ' + fOpenSSL + ' ' + sComando;
   //CodeSite.Send('Comando', ComandoUsado);
 

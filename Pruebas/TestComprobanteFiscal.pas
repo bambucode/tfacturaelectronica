@@ -56,7 +56,7 @@ implementation
 
 uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
-  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv2;
+  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv32, FeCFDv2;
 
 procedure TestTFEComprobanteFiscal.SetUp;
 begin
@@ -342,6 +342,12 @@ var
       fXMLComprobantePrueba := GetComprobanteV22(fXMLPrueba);
       VersionCFD:=fev22;
     end;
+
+    if AnsiPos('version="3.2"', fXMLPrueba.XML.Text) > 0 then
+    begin
+      fXMLComprobantePrueba := GetComprobanteV32(fXMLPrueba);
+      VersionCFD:=fev22;
+    end;
   end;
 
   function ConvertirFechaComprobanteADateTime(sFechaHora: String): TDateTime;
@@ -402,8 +408,8 @@ begin
   ComprobanteDestino.FechaGeneracion := ConvertirFechaComprobanteADateTime
     (fXMLComprobantePrueba.Fecha);
 
-  Bloque.NumeroAprobacion := fXMLComprobantePrueba.NoAprobacion;
-  Bloque.AnoAprobacion := fXMLComprobantePrueba.AnoAprobacion;
+  Bloque.NumeroAprobacion := ((fXMLComprobantePrueba As IFEXMLComprobanteV22).NoAprobacion);
+  Bloque.AnoAprobacion := ((fXMLComprobantePrueba As IFEXMLComprobanteV22).AnoAprobacion);
   Bloque.Serie := fXMLComprobantePrueba.Serie;
   Bloque.FolioInicial := 1;
   // Indicamos que el folio final es el folio del comprobante + 1 para que siempre este "en reango"

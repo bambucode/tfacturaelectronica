@@ -32,7 +32,7 @@ type
 implementation
 
 uses
-  Windows, SysUtils, Classes, ClaseOpenSSL;
+  Windows, SysUtils, Classes, ClaseOpenSSL, CodeSiteLogging;
 
 procedure TestTSelloDigital.SetUp;
 begin
@@ -40,8 +40,8 @@ begin
    // Leemos la cadena original que vamos a usar en las pruebas
    fCadenaOriginalAProbar:=leerContenidoDeFixture('sello_digital/cadena_original_validada_en_utf8.txt');
    // Especificamos la llave privada de pruebas del SAT usadas en las pruebas
-   fCertificado.LlavePrivada.Ruta:=fRutaFixtures + 'openssl\aaa010101aaa_CSD_02.key';
-   fCertificado.LlavePrivada.Clave:=leerContenidoDeFixture('openssl\aaa010101aaa_CSD_02_clave.txt');
+   fCertificado.LlavePrivada.Ruta:=fRutaFixtures + 'openssl\aaa010101aaa_CSD_01.key';
+   fCertificado.LlavePrivada.Clave:=leerContenidoDeFixture('openssl\aaa010101aaa_CSD_01_clave.txt');
 end;
 
 procedure TestTSelloDigital.SelloCalcualado_DeCadenaOriginalConMD5_SeaCorrecto;
@@ -56,12 +56,21 @@ begin
     // Creamos el objeto de Sello Digital
     fSelloDigital := TSelloDigital.Create(fCadenaOriginalAProbar,fCertificado, tdMD5);
 
-    // Hacemos que calcule el Sello Digital para la cadena original proveida
-    ResultadoSelloCalculado:=fSelloDigital.SelloCalculado;
+    try
+      // Hacemos que calcule el Sello Digital para la cadena original proveida
+      ResultadoSelloCalculado:=fSelloDigital.SelloCalculado;
 
-    CheckEquals(SelloDigitalCorrecto, ResultadoSelloCalculado, 'El procedimiento para calcular el sello digital fallo, el resultado no fue el mismo que el ejemplo del SAT');
-    CheckEquals(_LONGITUD_SELLO_DIGITAL, Length(ResultadoSelloCalculado), 'La longitud del sello digital no fue la correcta, debe de ser siempre de  ' + IntToStr(_LONGITUD_SELLO_DIGITAL));
-    FreeAndNil(fSelloDigital);
+      CodeSite.Send(ResultadoSelloCalculado);
+
+      CheckEquals(SelloDigitalCorrecto, ResultadoSelloCalculado,
+                  'El procedimiento para calcular el sello digital fallo, el resultado no fue el mismo que el ejemplo del SAT');
+
+      CheckEquals(_LONGITUD_SELLO_DIGITAL, Length(ResultadoSelloCalculado),
+                  'La longitud del sello digital no fue la correcta, debe de ser siempre de  ' +
+                  IntToStr(_LONGITUD_SELLO_DIGITAL));
+    finally
+       FreeAndNil(fSelloDigital);
+    end;
 end;
 
 initialization
