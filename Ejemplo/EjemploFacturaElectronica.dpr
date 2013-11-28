@@ -214,34 +214,7 @@ begin
       Factura.Guardar(archivoFacturaXML);
 
       // Para la representación gráfica debemos generar el Codigo de Barras Bidimensional (CBB)
-      {generadorCBB := TGeneradorCBB.Create();
-      try
-        generadorCBB.Generar(300, 300,
-                             '?re='+Emisor.RFC+'&rr='+Receptor.RFC+'&tt='+FloatToStrF(Factura.Total,ffFixed,17,6)+'&id='+TimbreFiscal.UUID,
-                             sCBB);
-      finally
-        generadorCBB.Free;
-      end; }
-
-      {if Copy(Trim(Timbre),1,4)='<tfd' then
-       Begin
-        GenerateCode(300,300,0,'?re='+Emisor.RFC+'&rr='+Receptor.RFC+'&tt='+FloatToStrF(Factura.Total,ffFixed,17,6)+'&id='+TimbreFiscal.UUID,sCBB);
-        WriteLn(Timbre+ sXML);
-        WriteLn('La factura ha sido generada y guardada en el escritorio. El archivo es: ' + sXML);
-        WriteLn('UUID ='+TimbreFiscal.UUID);
-        WriteLn('');
-        WriteLn('Sello='+Factura.SelloDigital);
-        WriteLn('');
-        WriteLn('Sello Sat='+TimbreFiscal.SelloSat);
-        WriteLn('');
-        WriteLn('Sello CFDI='+TimbreFiscal.SelloCFD);
-        WriteLn('');
-        WriteLn('CBB='+sCBB);
-       End
-      Else
-       WriteLn(Timbre);
-
-      FreeAndNil(TimbreFiscal);}
+      // TODO: Implementar generacion de CBB con libreria que no dependa de Google Charts.
 
       WriteLn('CFDI generado con éxito en ' + archivoFacturaXML + '. Presiona cualquier tecla para salir');
       Readln;

@@ -408,8 +408,8 @@ begin
   ComprobanteDestino.FechaGeneracion := ConvertirFechaComprobanteADateTime
     (fXMLComprobantePrueba.Fecha);
 
-  Bloque.NumeroAprobacion := ((fXMLComprobantePrueba As IFEXMLComprobanteV22).NoAprobacion);
-  Bloque.AnoAprobacion := ((fXMLComprobantePrueba As IFEXMLComprobanteV22).AnoAprobacion);
+  //Bloque.NumeroAprobacion := ((IFEXMLComprobanteV32(fXMLComprobantePrueba).NoAprobacion);
+  //Bloque.AnoAprobacion := ((fXMLComprobantePrueba As IFEXMLComprobanteV22).AnoAprobacion);
   Bloque.Serie := fXMLComprobantePrueba.Serie;
   Bloque.FolioInicial := 1;
   // Indicamos que el folio final es el folio del comprobante + 1 para que siempre este "en reango"
