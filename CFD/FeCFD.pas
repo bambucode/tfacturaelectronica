@@ -33,63 +33,69 @@ type
   IFEXmlComprobante = interface(IXMLNode)
     ['{37DBD685-76E6-4BB3-A891-9B8DB6E382E1}']
     { Property Accessors }
-    function GetVersion: UnicodeString;
-    function GetSerie: UnicodeString;
-    function GetFolio: UnicodeString;
-    function GetFecha: UnicodeString;
-    function GetSello: UnicodeString;
-    function GetNoAprobacion: Integer;
-    function GetAnoAprobacion: Integer;
-    function GetFormaDePago: UnicodeString;
-    function GetNoCertificado: UnicodeString;
-    function GetCertificado: UnicodeString;
-    function GetCondicionesDePago: UnicodeString;
-    function GetSubTotal: UnicodeString;
-    function GetDescuento: UnicodeString;
-    function GetMotivoDescuento: UnicodeString;
-    function GetTotal: UnicodeString;
-    function GetMetodoDePago: UnicodeString;
-    function GetTipoDeComprobante: UnicodeString;
+    function GetVersion: String;
+    function GetSerie: String;
+    function GetFolio: String;
+    function GetFecha: String;
+    function GetSello: String;
+    {$ifdef V22}
+     function GetNoAprobacion: Integer;
+     function GetAnoAprobacion: Integer;
+    {$endif}
+    function GetFormaDePago: String;
+    function GetNoCertificado: String;
+    function GetCertificado: String;
+    function GetCondicionesDePago: String;
+    function GetSubTotal: String;
+    function GetDescuento: String;
+    function GetMotivoDescuento: String;
+    function GetTotal: String;
+    function GetMetodoDePago: String;
+    function GetTipoDeComprobante: String;
     function GetReceptor: IFEXmlReceptor;
     function GetConceptos: IFEXmlConceptos;
     function GetImpuestos: IFEXmlImpuestos;
     function GetComplemento: IFEXmlComplemento;
     function GetAddenda: IFEXmlAddenda;
-    procedure SetVersion(Value: UnicodeString);
-    procedure SetSerie(Value: UnicodeString);
-    procedure SetFolio(Value: UnicodeString);
-    procedure SetFecha(Value: UnicodeString);
-    procedure SetSello(Value: UnicodeString);
-    procedure SetNoAprobacion(Value: Integer);
-    procedure SetAnoAprobacion(Value: Integer);
-    procedure SetFormaDePago(Value: UnicodeString);
-    procedure SetNoCertificado(Value: UnicodeString);
-    procedure SetCertificado(Value: UnicodeString);
-    procedure SetCondicionesDePago(Value: UnicodeString);
-    procedure SetSubTotal(Value: UnicodeString);
-    procedure SetDescuento(Value: UnicodeString);
-    procedure SetMotivoDescuento(Value: UnicodeString);
-    procedure SetTotal(Value: UnicodeString);
-    procedure SetMetodoDePago(Value: UnicodeString);
-    procedure SetTipoDeComprobante(Value: UnicodeString);
+    procedure SetVersion(Value: String);
+    procedure SetSerie(Value: String);
+    procedure SetFolio(Value: String);
+    procedure SetFecha(Value: String);
+    procedure SetSello(Value: String);
+    {$ifdef V22}
+     procedure SetNoAprobacion(Value: Integer);
+     procedure SetAnoAprobacion(Value: Integer);
+    {$endif}
+    procedure SetFormaDePago(Value: String);
+    procedure SetNoCertificado(Value: String);
+    procedure SetCertificado(Value: String);
+    procedure SetCondicionesDePago(Value: String);
+    procedure SetSubTotal(Value: String);
+    procedure SetDescuento(Value: String);
+    procedure SetMotivoDescuento(Value: String);
+    procedure SetTotal(Value: String);
+    procedure SetMetodoDePago(Value: String);
+    procedure SetTipoDeComprobante(Value: String);
     { Methods & Properties }
-    property Version: UnicodeString read GetVersion write SetVersion;
-    property Serie: UnicodeString read GetSerie write SetSerie;
-    property Folio: UnicodeString read GetFolio write SetFolio;
-    property Fecha: UnicodeString read GetFecha write SetFecha;
-    property Sello: UnicodeString read GetSello write SetSello;
-    property NoAprobacion: Integer read GetNoAprobacion write SetNoAprobacion;
-    property AnoAprobacion: Integer read GetAnoAprobacion write SetAnoAprobacion;
-    property FormaDePago: UnicodeString read GetFormaDePago write SetFormaDePago;
-    property NoCertificado: UnicodeString read GetNoCertificado write SetNoCertificado;
-    property Certificado: UnicodeString read GetCertificado write SetCertificado;
-    property CondicionesDePago: UnicodeString read GetCondicionesDePago write SetCondicionesDePago;
-    property SubTotal: UnicodeString read GetSubTotal write SetSubTotal;
-    property Descuento: UnicodeString read GetDescuento write SetDescuento;
-    property MotivoDescuento: UnicodeString read GetMotivoDescuento write SetMotivoDescuento;
-    property Total: UnicodeString read GetTotal write SetTotal;
-    property MetodoDePago: UnicodeString read GetMetodoDePago write SetMetodoDePago;
-    property TipoDeComprobante: UnicodeString read GetTipoDeComprobante write SetTipoDeComprobante;
+    property Version: String read GetVersion write SetVersion;
+    property Serie: String read GetSerie write SetSerie;
+    property Folio: String read GetFolio write SetFolio;
+    property Fecha: String read GetFecha write SetFecha;
+    property Sello: String read GetSello write SetSello;
+    {$ifdef V22}
+      property NoAprobacion: Integer read GetNoAprobacion write SetNoAprobacion;
+      property AnoAprobacion: Integer read GetAnoAprobacion write SetAnoAprobacion;
+    {$endif}
+    property FormaDePago: String read GetFormaDePago write SetFormaDePago;
+    property NoCertificado: String read GetNoCertificado write SetNoCertificado;
+    property Certificado: String read GetCertificado write SetCertificado;
+    property CondicionesDePago: String read GetCondicionesDePago write SetCondicionesDePago;
+    property SubTotal: String read GetSubTotal write SetSubTotal;
+    property Descuento: String read GetDescuento write SetDescuento;
+    property MotivoDescuento: String read GetMotivoDescuento write SetMotivoDescuento;
+    property Total: String read GetTotal write SetTotal;
+    property MetodoDePago: String read GetMetodoDePago write SetMetodoDePago;
+    property TipoDeComprobante: String read GetTipoDeComprobante write SetTipoDeComprobante;
     property Receptor: IFEXmlReceptor read GetReceptor;
     property Conceptos: IFEXmlConceptos read GetConceptos;
     property Impuestos: IFEXmlImpuestos read GetImpuestos;
@@ -103,37 +109,37 @@ type
   IFEXmlT_UbicacionFiscal = interface(IXMLNode)
     ['{58F864FD-BBF7-4AA6-A4E5-095B220A88A9}']
     { Property Accessors }
-    function GetCalle: UnicodeString;
-    function GetNoExterior: UnicodeString;
-    function GetNoInterior: UnicodeString;
-    function GetColonia: UnicodeString;
-    function GetLocalidad: UnicodeString;
-    function GetReferencia: UnicodeString;
-    function GetMunicipio: UnicodeString;
-    function GetEstado: UnicodeString;
-    function GetPais: UnicodeString;
-    function GetCodigoPostal: UnicodeString;
-    procedure SetCalle(Value: UnicodeString);
-    procedure SetNoExterior(Value: UnicodeString);
-    procedure SetNoInterior(Value: UnicodeString);
-    procedure SetColonia(Value: UnicodeString);
-    procedure SetLocalidad(Value: UnicodeString);
-    procedure SetReferencia(Value: UnicodeString);
-    procedure SetMunicipio(Value: UnicodeString);
-    procedure SetEstado(Value: UnicodeString);
-    procedure SetPais(Value: UnicodeString);
-    procedure SetCodigoPostal(Value: UnicodeString);
+    function GetCalle: String;
+    function GetNoExterior: String;
+    function GetNoInterior: String;
+    function GetColonia: String;
+    function GetLocalidad: String;
+    function GetReferencia: String;
+    function GetMunicipio: String;
+    function GetEstado: String;
+    function GetPais: String;
+    function GetCodigoPostal: String;
+    procedure SetCalle(Value: String);
+    procedure SetNoExterior(Value: String);
+    procedure SetNoInterior(Value: String);
+    procedure SetColonia(Value: String);
+    procedure SetLocalidad(Value: String);
+    procedure SetReferencia(Value: String);
+    procedure SetMunicipio(Value: String);
+    procedure SetEstado(Value: String);
+    procedure SetPais(Value: String);
+    procedure SetCodigoPostal(Value: String);
     { Methods & Properties }
-    property Calle: UnicodeString read GetCalle write SetCalle;
-    property NoExterior: UnicodeString read GetNoExterior write SetNoExterior;
-    property NoInterior: UnicodeString read GetNoInterior write SetNoInterior;
-    property Colonia: UnicodeString read GetColonia write SetColonia;
-    property Localidad: UnicodeString read GetLocalidad write SetLocalidad;
-    property Referencia: UnicodeString read GetReferencia write SetReferencia;
-    property Municipio: UnicodeString read GetMunicipio write SetMunicipio;
-    property Estado: UnicodeString read GetEstado write SetEstado;
-    property Pais: UnicodeString read GetPais write SetPais;
-    property CodigoPostal: UnicodeString read GetCodigoPostal write SetCodigoPostal;
+    property Calle: String read GetCalle write SetCalle;
+    property NoExterior: String read GetNoExterior write SetNoExterior;
+    property NoInterior: String read GetNoInterior write SetNoInterior;
+    property Colonia: String read GetColonia write SetColonia;
+    property Localidad: String read GetLocalidad write SetLocalidad;
+    property Referencia: String read GetReferencia write SetReferencia;
+    property Municipio: String read GetMunicipio write SetMunicipio;
+    property Estado: String read GetEstado write SetEstado;
+    property Pais: String read GetPais write SetPais;
+    property CodigoPostal: String read GetCodigoPostal write SetCodigoPostal;
   end;
 
 { IFEXmlT_Ubicacion }
@@ -141,37 +147,37 @@ type
   IFEXmlT_Ubicacion = interface(IXMLNode)
     ['{1B11BFDF-10CE-4528-ABD0-B8FA8B12457B}']
     { Property Accessors }
-    function GetCalle: UnicodeString;
-    function GetNoExterior: UnicodeString;
-    function GetNoInterior: UnicodeString;
-    function GetColonia: UnicodeString;
-    function GetLocalidad: UnicodeString;
-    function GetReferencia: UnicodeString;
-    function GetMunicipio: UnicodeString;
-    function GetEstado: UnicodeString;
-    function GetPais: UnicodeString;
-    function GetCodigoPostal: UnicodeString;
-    procedure SetCalle(Value: UnicodeString);
-    procedure SetNoExterior(Value: UnicodeString);
-    procedure SetNoInterior(Value: UnicodeString);
-    procedure SetColonia(Value: UnicodeString);
-    procedure SetLocalidad(Value: UnicodeString);
-    procedure SetReferencia(Value: UnicodeString);
-    procedure SetMunicipio(Value: UnicodeString);
-    procedure SetEstado(Value: UnicodeString);
-    procedure SetPais(Value: UnicodeString);
-    procedure SetCodigoPostal(Value: UnicodeString);
+    function GetCalle: String;
+    function GetNoExterior: String;
+    function GetNoInterior: String;
+    function GetColonia: String;
+    function GetLocalidad: String;
+    function GetReferencia: String;
+    function GetMunicipio: String;
+    function GetEstado: String;
+    function GetPais: String;
+    function GetCodigoPostal: String;
+    procedure SetCalle(Value: String);
+    procedure SetNoExterior(Value: String);
+    procedure SetNoInterior(Value: String);
+    procedure SetColonia(Value: String);
+    procedure SetLocalidad(Value: String);
+    procedure SetReferencia(Value: String);
+    procedure SetMunicipio(Value: String);
+    procedure SetEstado(Value: String);
+    procedure SetPais(Value: String);
+    procedure SetCodigoPostal(Value: String);
     { Methods & Properties }
-    property Calle: UnicodeString read GetCalle write SetCalle;
-    property NoExterior: UnicodeString read GetNoExterior write SetNoExterior;
-    property NoInterior: UnicodeString read GetNoInterior write SetNoInterior;
-    property Colonia: UnicodeString read GetColonia write SetColonia;
-    property Localidad: UnicodeString read GetLocalidad write SetLocalidad;
-    property Referencia: UnicodeString read GetReferencia write SetReferencia;
-    property Municipio: UnicodeString read GetMunicipio write SetMunicipio;
-    property Estado: UnicodeString read GetEstado write SetEstado;
-    property Pais: UnicodeString read GetPais write SetPais;
-    property CodigoPostal: UnicodeString read GetCodigoPostal write SetCodigoPostal;
+    property Calle: String read GetCalle write SetCalle;
+    property NoExterior: String read GetNoExterior write SetNoExterior;
+    property NoInterior: String read GetNoInterior write SetNoInterior;
+    property Colonia: String read GetColonia write SetColonia;
+    property Localidad: String read GetLocalidad write SetLocalidad;
+    property Referencia: String read GetReferencia write SetReferencia;
+    property Municipio: String read GetMunicipio write SetMunicipio;
+    property Estado: String read GetEstado write SetEstado;
+    property Pais: String read GetPais write SetPais;
+    property CodigoPostal: String read GetCodigoPostal write SetCodigoPostal;
   end;
 
 { IFEXmlReceptor }
@@ -179,14 +185,14 @@ type
   IFEXmlReceptor = interface(IXMLNode)
     ['{217A478E-BE6B-4F1A-BDD5-B1F4746D2DF1}']
     { Property Accessors }
-    function GetRfc: UnicodeString;
-    function GetNombre: UnicodeString;
+    function GetRfc: String;
+    function GetNombre: String;
     function GetDomicilio: IFEXmlT_Ubicacion;
-    procedure SetRfc(Value: UnicodeString);
-    procedure SetNombre(Value: UnicodeString);
+    procedure SetRfc(Value: String);
+    procedure SetNombre(Value: String);
     { Methods & Properties }
-    property Rfc: UnicodeString read GetRfc write SetRfc;
-    property Nombre: UnicodeString read GetNombre write SetNombre;
+    property Rfc: String read GetRfc write SetRfc;
+    property Nombre: String read GetNombre write SetNombre;
     property Domicilio: IFEXmlT_Ubicacion read GetDomicilio;
   end;
 
@@ -207,29 +213,29 @@ type
   IFEXmlConcepto = interface(IXMLNode)
     ['{75132185-7289-40F9-A1F7-467D9E032722}']
     { Property Accessors }
-    function GetCantidad: UnicodeString;
-    function GetUnidad: UnicodeString;
-    function GetNoIdentificacion: UnicodeString;
-    function GetDescripcion: UnicodeString;
-    function GetValorUnitario: UnicodeString;
-    function GetImporte: UnicodeString;
+    function GetCantidad: String;
+    function GetUnidad: String;
+    function GetNoIdentificacion: String;
+    function GetDescripcion: String;
+    function GetValorUnitario: String;
+    function GetImporte: String;
     function GetInformacionAduanera: IFEXmlT_InformacionAduaneraList;
     function GetCuentaPredial: IFEXmlCuentaPredial;
     function GetComplementoConcepto: IFEXmlComplementoConcepto;
     function GetParte: IFEXmlParteList;
-    procedure SetCantidad(Value: UnicodeString);
-    procedure SetUnidad(Value: UnicodeString);
-    procedure SetNoIdentificacion(Value: UnicodeString);
-    procedure SetDescripcion(Value: UnicodeString);
-    procedure SetValorUnitario(Value: UnicodeString);
-    procedure SetImporte(Value: UnicodeString);
+    procedure SetCantidad(Value: String);
+    procedure SetUnidad(Value: String);
+    procedure SetNoIdentificacion(Value: String);
+    procedure SetDescripcion(Value: String);
+    procedure SetValorUnitario(Value: String);
+    procedure SetImporte(Value: String);
     { Methods & Properties }
-    property Cantidad: UnicodeString read GetCantidad write SetCantidad;
-    property Unidad: UnicodeString read GetUnidad write SetUnidad;
-    property NoIdentificacion: UnicodeString read GetNoIdentificacion write SetNoIdentificacion;
-    property Descripcion: UnicodeString read GetDescripcion write SetDescripcion;
-    property ValorUnitario: UnicodeString read GetValorUnitario write SetValorUnitario;
-    property Importe: UnicodeString read GetImporte write SetImporte;
+    property Cantidad: String read GetCantidad write SetCantidad;
+    property Unidad: String read GetUnidad write SetUnidad;
+    property NoIdentificacion: String read GetNoIdentificacion write SetNoIdentificacion;
+    property Descripcion: String read GetDescripcion write SetDescripcion;
+    property ValorUnitario: String read GetValorUnitario write SetValorUnitario;
+    property Importe: String read GetImporte write SetImporte;
     property InformacionAduanera: IFEXmlT_InformacionAduaneraList read GetInformacionAduanera;
     property CuentaPredial: IFEXmlCuentaPredial read GetCuentaPredial;
     property ComplementoConcepto: IFEXmlComplementoConcepto read GetComplementoConcepto;
@@ -241,16 +247,16 @@ type
   IFEXmlT_InformacionAduanera = interface(IXMLNode)
     ['{1C4E19E8-6933-4C24-B002-C90BE03BB0B9}']
     { Property Accessors }
-    function GetNumero: UnicodeString;
-    function GetFecha: UnicodeString;
-    function GetAduana: UnicodeString;
-    procedure SetNumero(Value: UnicodeString);
-    procedure SetFecha(Value: UnicodeString);
-    procedure SetAduana(Value: UnicodeString);
+    function GetNumero: String;
+    function GetFecha: String;
+    function GetAduana: String;
+    procedure SetNumero(Value: String);
+    procedure SetFecha(Value: String);
+    procedure SetAduana(Value: String);
     { Methods & Properties }
-    property Numero: UnicodeString read GetNumero write SetNumero;
-    property Fecha: UnicodeString read GetFecha write SetFecha;
-    property Aduana: UnicodeString read GetAduana write SetAduana;
+    property Numero: String read GetNumero write SetNumero;
+    property Fecha: String read GetFecha write SetFecha;
+    property Aduana: String read GetAduana write SetAduana;
   end;
 
 { IFEXmlT_InformacionAduaneraList }
@@ -269,10 +275,10 @@ type
   IFEXmlCuentaPredial = interface(IXMLNode)
     ['{89DBAAA1-4287-4264-8C4F-6C41703459E4}']
     { Property Accessors }
-    function GetNumero: UnicodeString;
-    procedure SetNumero(Value: UnicodeString);
+    function GetNumero: String;
+    procedure SetNumero(Value: String);
     { Methods & Properties }
-    property Numero: UnicodeString read GetNumero write SetNumero;
+    property Numero: String read GetNumero write SetNumero;
   end;
 
 { IFEXmlComplementoConcepto }
@@ -286,28 +292,28 @@ type
   IFEXmlParte = interface(IXMLNodeCollection)
     ['{C693D039-BA69-4BA9-96AD-E3D6D6F2FAF0}']
     { Property Accessors }
-    function GetCantidad: UnicodeString;
-    function GetUnidad: UnicodeString;
-    function GetNoIdentificacion: UnicodeString;
-    function GetDescripcion: UnicodeString;
-    function GetValorUnitario: UnicodeString;
-    function GetImporte: UnicodeString;
+    function GetCantidad: String;
+    function GetUnidad: String;
+    function GetNoIdentificacion: String;
+    function GetDescripcion: String;
+    function GetValorUnitario: String;
+    function GetImporte: String;
     function GetInformacionAduanera(Index: Integer): IFEXmlT_InformacionAduanera;
-    procedure SetCantidad(Value: UnicodeString);
-    procedure SetUnidad(Value: UnicodeString);
-    procedure SetNoIdentificacion(Value: UnicodeString);
-    procedure SetDescripcion(Value: UnicodeString);
-    procedure SetValorUnitario(Value: UnicodeString);
-    procedure SetImporte(Value: UnicodeString);
+    procedure SetCantidad(Value: String);
+    procedure SetUnidad(Value: String);
+    procedure SetNoIdentificacion(Value: String);
+    procedure SetDescripcion(Value: String);
+    procedure SetValorUnitario(Value: String);
+    procedure SetImporte(Value: String);
     { Methods & Properties }
     function Add: IFEXmlT_InformacionAduanera;
     function Insert(const Index: Integer): IFEXmlT_InformacionAduanera;
-    property Cantidad: UnicodeString read GetCantidad write SetCantidad;
-    property Unidad: UnicodeString read GetUnidad write SetUnidad;
-    property NoIdentificacion: UnicodeString read GetNoIdentificacion write SetNoIdentificacion;
-    property Descripcion: UnicodeString read GetDescripcion write SetDescripcion;
-    property ValorUnitario: UnicodeString read GetValorUnitario write SetValorUnitario;
-    property Importe: UnicodeString read GetImporte write SetImporte;
+    property Cantidad: String read GetCantidad write SetCantidad;
+    property Unidad: String read GetUnidad write SetUnidad;
+    property NoIdentificacion: String read GetNoIdentificacion write SetNoIdentificacion;
+    property Descripcion: String read GetDescripcion write SetDescripcion;
+    property ValorUnitario: String read GetValorUnitario write SetValorUnitario;
+    property Importe: String read GetImporte write SetImporte;
     property InformacionAduanera[Index: Integer]: IFEXmlT_InformacionAduanera read GetInformacionAduanera; default;
   end;
 
@@ -327,15 +333,15 @@ type
   IFEXmlImpuestos = interface(IXMLNode)
     ['{2E9F64E1-2840-424F-A72C-5C4EDB296019}']
     { Property Accessors }
-    function GetTotalImpuestosRetenidos: UnicodeString;
-    function GetTotalImpuestosTrasladados: UnicodeString;
+    function GetTotalImpuestosRetenidos: String;
+    function GetTotalImpuestosTrasladados: String;
     function GetRetenciones: IFEXmlRetenciones;
     function GetTraslados: IFEXmlTraslados;
-    procedure SetTotalImpuestosRetenidos(Value: UnicodeString);
-    procedure SetTotalImpuestosTrasladados(Value: UnicodeString);
+    procedure SetTotalImpuestosRetenidos(Value: String);
+    procedure SetTotalImpuestosTrasladados(Value: String);
     { Methods & Properties }
-    property TotalImpuestosRetenidos: UnicodeString read GetTotalImpuestosRetenidos write SetTotalImpuestosRetenidos;
-    property TotalImpuestosTrasladados: UnicodeString read GetTotalImpuestosTrasladados write SetTotalImpuestosTrasladados;
+    property TotalImpuestosRetenidos: String read GetTotalImpuestosRetenidos write SetTotalImpuestosRetenidos;
+    property TotalImpuestosTrasladados: String read GetTotalImpuestosTrasladados write SetTotalImpuestosTrasladados;
     property Retenciones: IFEXmlRetenciones read GetRetenciones;
     property Traslados: IFEXmlTraslados read GetTraslados;
   end;
@@ -357,13 +363,13 @@ type
   IFEXmlRetencion = interface(IXMLNode)
     ['{89D6E172-CCEA-4444-95E0-55A9CE71F125}']
     { Property Accessors }
-    function GetImpuesto: UnicodeString;
-    function GetImporte: UnicodeString;
-    procedure SetImpuesto(Value: UnicodeString);
-    procedure SetImporte(Value: UnicodeString);
+    function GetImpuesto: String;
+    function GetImporte: String;
+    procedure SetImpuesto(Value: String);
+    procedure SetImporte(Value: String);
     { Methods & Properties }
-    property Impuesto: UnicodeString read GetImpuesto write SetImpuesto;
-    property Importe: UnicodeString read GetImporte write SetImporte;
+    property Impuesto: String read GetImpuesto write SetImpuesto;
+    property Importe: String read GetImporte write SetImporte;
   end;
 
 { IFEXmlTraslados }
@@ -383,16 +389,16 @@ type
   IFEXmlTraslado = interface(IXMLNode)
     ['{00633C3F-5D1A-4AB4-B34C-EF310B227AA1}']
     { Property Accessors }
-    function GetImpuesto: UnicodeString;
-    function GetTasa: UnicodeString;
-    function GetImporte: UnicodeString;
-    procedure SetImpuesto(Value: UnicodeString);
-    procedure SetTasa(Value: UnicodeString);
-    procedure SetImporte(Value: UnicodeString);
+    function GetImpuesto: String;
+    function GetTasa: String;
+    function GetImporte: String;
+    procedure SetImpuesto(Value: String);
+    procedure SetTasa(Value: String);
+    procedure SetImporte(Value: String);
     { Methods & Properties }
-    property Impuesto: UnicodeString read GetImpuesto write SetImpuesto;
-    property Tasa: UnicodeString read GetTasa write SetTasa;
-    property Importe: UnicodeString read GetImporte write SetImporte;
+    property Impuesto: String read GetImpuesto write SetImpuesto;
+    property Tasa: String read GetTasa write SetTasa;
+    property Importe: String read GetImporte write SetImporte;
   end;
 
 { IFEXmlComplemento }

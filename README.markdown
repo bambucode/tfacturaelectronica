@@ -28,10 +28,11 @@ las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/b
 - Manejo de Adendas.
 - Manejo y pruebas de conceptos con datos aduanales.
 - Manejo y pruebas de articulos con cuenta predial.
-- Implementar la version 3 de los CFD (o comprobantes digitales en linea).
+
 
 Completado
 -------------
+- Implementar la version 3.2 de los CFD (o comprobantes digitales en linea). <Completado en Diciembre 2013> con colaboración de Ing. Pablo 
 - Implementar soporte para la versión 2.2 de CFD - Completado Junio 2012.
 - Implementar la lectura de un CFD y que al mismo tiempo verifique si es válido o no. <- Completado 12 Dic 2010>
 - Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT. < Completado 26 Ene 2011 >
@@ -53,4 +54,4 @@ La libreria ha sido probada solamente con Delphi XE2 aunque se ha tratado de man
 Colaboradores actuales.
 -------------
 * Ing. Luis Carrasco - Bambu Code SA de CV - <http://github.com/lcarrasco>
-
+*  Ing. Pablo Torres - <http://www.tecsisnet.net>

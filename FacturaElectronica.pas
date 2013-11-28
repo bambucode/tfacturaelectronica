@@ -10,13 +10,15 @@ TOnComprobanteGenerado = procedure(Sender: TObject) of Object;
 
 ///<summary>Representa una factura electronica sus metodos para generarla, leerla y validarla
 /// cumpliendo la ley del Codigo Fiscal de la Federacion (CFF) Articulos 29 y 29-A.
-/// (Soporta la version 2.0/2.2 de CFD)</summary>
+/// (Soporta la version 2.0/2.2/3.2 de CFD)</summary>
 TFacturaElectronica = class(TFEComprobanteFiscal)
 {$IFDEF VERSION_DE_PRUEBA}
   public
 {$ELSE}
   private
 {$ENDIF}
+  fFueTimbrada: Boolean;
+  fComprobanteGenerado : Boolean;
   fOnComprobanteGenerado: TOnComprobanteGenerado;
   function obtenerCertificado() : TFECertificado;
 public
@@ -39,8 +41,6 @@ public
   constructor Create(cEmisor, cCliente: TFEContribuyente; bfBloqueFolios: TFEBloqueFolios;
                      cerCertificado: TFECertificado; tcTipo: TFETipoComprobante);  overload;
   destructor Destroy; override;
-
-
   //procedure Leer(sRuta: String);
   /// <summary>Genera el archivo XML de la factura electrónica con el sello, certificado, etc</summary>
   /// <param name="Folio">Este es el numero de folio que tendrá esta factura. Si
@@ -51,6 +51,10 @@ public
   //function esValida() : Boolean;
   /// <summary>Genera la factura en formato cancelado</summary>
   // function Cancelar;
+  procedure Generar(const aFolio: Integer; aFormaDePago: TFEFormaDePago);
+  procedure Guardar(const aArchivoDestino: String);
+  procedure AsignarTimbre(const aTimbre: TFETimbre);
+
 published
   constructor Create; overload;
 end;
@@ -78,7 +82,7 @@ begin
     inherited Certificado:=cerCertificado;
     inherited Tipo:=tcTipo;
 
-    // TODO: Implementar CFD 3.0 y usar la version segun sea necesario...
+    // TODO: Implementar CFD 3.02 y usar la version segun sea necesario...
     // Que version de CFD sera usada?
     {if (Now < EncodeDate(2011,1,1)) then
       fComprobante := TFEComprobanteFiscal.Create;
@@ -112,26 +116,62 @@ begin
     inherited XML:=Valor;
 end;
  }
+
+procedure TFacturaElectronica.AsignarTimbre(const aTimbre: TFETimbre);
+var
+  facturaPrevioTimbrado, facturaPostTimbrado: WideString;
+begin
+  Assert(FacturaGenerada, 'Se debio haber tenido generada la factura antes de asignarle el timbre');
+  Assert(Not fFueTimbrada, 'No es posible asignar un timbre a una factura timbrada previamente');
+  Assert(aTimbre.XML <> '', 'El contenido del timbre fue nulo');
+
+  facturaPrevioTimbrado := getXML;
+  facturaPostTimbrado := UTF8Encode(StringReplace(facturaPrevioTimbrado,
+                                                  '</cfdi:Comprobante>',
+                                                  '<cfdi:Complemento>' + aTimbre.XML +
+                                                  '</cfdi:Complemento></cfdi:Comprobante>',
+                                                  [rfReplaceAll]));
+
+  // Asignamos el nuevo XML ya con el timbre incluido
+  setXML(facturaPostTimbrado);
+
+   // Mandamos llamar el evento de que se asigno el timbrado
+   {if Assigned(fOnTimbradoAsignado) then
+      fOnTimbradoAsignado(Self);  }
+end;
+
+procedure TFacturaElectronica.Generar(const aFolio: Integer; aFormaDePago: TFEFormaDePago);
+begin
+  if (inherited Receptor.RFC = '') then
+      Raise Exception.Create('No hay un receptor configurado');
+
+   // Especificamos los campos del CFD en el orden especifico
+   // ya que de lo contrario no cumplirá con los requisitios del SAT
+   inherited Folio:=aFolio;
+   inherited FormaDePago:=aFormaDePago;
+
+   // Generamos la factura solo en memoria
+   inherited GenerarComprobante;
+
+   fComprobanteGenerado := True;
+
+   // Mandamos llamar el evento de que se genero la factura
+   if Assigned(fOnComprobanteGenerado) then
+      fOnComprobanteGenerado(Self);
+end;
+
+procedure TFacturaElectronica.Guardar(const aArchivoDestino: String);
+begin
+   if Not fComprobanteGenerado then
+     raise Exception.Create('Es necesario se mande generar la factura antes de ser guardada');
+
+   inherited GuardarEnArchivo(aArchivoDestino);
+end;
+
 procedure TFacturaElectronica.GenerarYGuardar(iFolio: Integer; fpFormaDePago: TFEFormaDePago; sArchivo: String);
 begin
-     //if ValidarCamposNecesarios() = False then
-     //    raise Exception.Create('No todos los campos estan llenos.');
-
-     if (inherited Receptor.RFC = '') then
-        Raise Exception.Create('No hay un receptor configurado');
-
-     // Especificamos los campos del CFD en el orden especifico
-     // ya que de lo contrario no cumplirá con los requisitios del SAT
-     inherited Folio:=iFolio;
-     inherited FormaDePago:=fpFormaDePago;
-
-     
-     // Generamos el archivo
-     inherited GuardarEnArchivo(sArchivo);
-     
-     // Mandamos llamar el evento de que se genero la factura
-     if Assigned(fOnComprobanteGenerado) then
-        fOnComprobanteGenerado(Self);
+     Generar(iFolio, fpFormaDePago);
+     Guardar(sArchivo);
 end;
 
 

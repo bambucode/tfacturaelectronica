@@ -1,26 +1,12 @@
-{****************************************************************************************}
-{                                                                                        }
-{                                    XML Data Binding                                    }
-{                                                                                        }
-{                                                                                        }
-{       Generated from: http://www.sat.gob.mx/sitio_internet/cfd/2/cfdv22.xsd            }
-{                                                                                        }
-{****************************************************************************************}
-
-unit FeCFDv22;
+unit FeCFDv32;
 
 interface
 
-uses xmldom, XMLDoc, XMLIntf, FeCFDv2,FeCFD;
+uses xmldom, XMLDoc, XMLIntf, FeCFD,FeCFDv22,FeCFDv2,FETimbreFiscalDigital;
 
 type
-
-  IXMLComprobante_Emisor_RegimenFiscal = interface;
-  IXMLComprobante_Emisor_RegimenFiscalList = interface;
-  IFEXmlEmisorV22 = Interface;
-
   // Creamos el comprobante que hereda la v2.0
-  IFEXMLComprobanteV22 = interface(IFEXMLComprobante)
+  IFEXMLComprobanteV32 = interface(IFEXMLComprobante)
   ['{8795E283-4283-4904-B6BD-D730D24AE80A}']
     { Property Accessors }
     function GetVersion: String;
@@ -28,10 +14,6 @@ type
     function GetFolio: String;
     function GetFecha: String;
     function GetSello: String;
-    {$ifdef V22}
-     function GetNoAprobacion: Integer;
-     function GetAnoAprobacion: Integer;
-    {$endif}
     function GetFormaDePago: String;
     function GetNoCertificado: String;
     function GetCertificado: String;
@@ -61,10 +43,6 @@ type
     procedure SetFolio(Value: String);
     procedure SetFecha(Value: String);
     procedure SetSello(Value: String);
-    {$ifdef V22}
-     procedure SetNoAprobacion(Value: Integer);
-     procedure SetAnoAprobacion(Value: Integer);
-    {$endif}
     procedure SetFormaDePago(Value: String);
     procedure SetNoCertificado(Value: String);
     procedure SetCertificado(Value: String);
@@ -89,10 +67,6 @@ type
     property Folio: String read GetFolio write SetFolio;
     property Fecha: String read GetFecha write SetFecha;
     property Sello: String read GetSello write SetSello;
-    {$ifdef V22}
-      property NoAprobacion: Integer read GetNoAprobacion write SetNoAprobacion;
-      property AnoAprobacion: Integer read GetAnoAprobacion write SetAnoAprobacion;
-    {$endif}
     property FormaDePago: String read GetFormaDePago write SetFormaDePago;
     property NoCertificado: String read GetNoCertificado write SetNoCertificado;
     property Certificado: String read GetCertificado write SetCertificado;
@@ -119,56 +93,16 @@ type
     property Addenda: IFEXmlAddenda read GetAddenda;
   end;
 
-{ IFEXmlEmisorV22 }
-  IFEXmlEmisorV22 = interface(IFEXmlEmisorV2)
-  ['{FCAB82C8-71A2-427D-97F4-82719291344E}']
-    function GetRegimenFiscal: IXMLComprobante_Emisor_RegimenFiscalList;
-    property RegimenFiscal: IXMLComprobante_Emisor_RegimenFiscalList read GetRegimenFiscal;
-  end;
-
-{ IXMLComprobante_Emisor_RegimenFiscal }
-  IXMLComprobante_Emisor_RegimenFiscal = interface(IXMLNode)
-    ['{A6293FB5-7AA2-42F0-8D41-13D8FC3EA731}']
-    { Property Accessors }
-    function GetRegimen: String;
-    procedure SetRegimen(Value: String);
-    { Methods & Properties }
-    property Regimen: String read GetRegimen write SetRegimen;
-  end;
-
-{ IXMLComprobante_Emisor_RegimenFiscalList }
-  IXMLComprobante_Emisor_RegimenFiscalList = interface(IXMLNodeCollection)
-    ['{F0D8DAEC-18CC-40CC-AA35-43690BBCEFFA}']
-    { Methods & Properties }
-    function Add: IXMLComprobante_Emisor_RegimenFiscal;
-    function Insert(const Index: Integer): IXMLComprobante_Emisor_RegimenFiscal;
-
-    function GetItem(Index: Integer): IXMLComprobante_Emisor_RegimenFiscal;
-    property Items[Index: Integer]: IXMLComprobante_Emisor_RegimenFiscal read GetItem; default;
-  end;
-
-{ IXMLComprobante_Conceptos_Concepto_Parte }
-  TXMLIFEXMLComprobanteV22 = class;
-  TXMLIFEXMLComprobanteEmisorV22 = class;
-  TXMLT_UbicacionFiscal = class;
-  TXMLT_Ubicacion = class;
-  TXMLComprobante_Emisor_RegimenFiscal = class;
-  TXMLComprobante_Emisor_RegimenFiscalList = class;
-
 { TXMLIFEXMLComprobante }
-
-  TXMLIFEXMLComprobanteV22 = class(TXMLNode, IFEXMLComprobanteV22)
+  TXMLIFEXMLComprobanteV32 = class(TXMLNode, IFEXMLComprobanteV32)
   protected
-    { IFEXMLComprobanteV22 }
+
+    { IFEXMLComprobanteV32 }
     function GetVersion: String;
     function GetSerie: String;
     function GetFolio: String;
     function GetFecha: String;
     function GetSello: String;
-    {$ifdef V22}
-     function GetNoAprobacion: Integer;
-     function GetAnoAprobacion: Integer;
-    {$endif}
     function GetFormaDePago: String;
     function GetNoCertificado: String;
     function GetCertificado: String;
@@ -198,10 +132,6 @@ type
     procedure SetFolio(Value: String);
     procedure SetFecha(Value: String);
     procedure SetSello(Value: String);
-    {$ifdef V22}
-     procedure SetNoAprobacion(Value: Integer);
-     procedure SetAnoAprobacion(Value: Integer);
-    {$endif}
     procedure SetFormaDePago(Value: String);
     procedure SetNoCertificado(Value: String);
     procedure SetCertificado(Value: String);
@@ -224,22 +154,6 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TXMLIFEXMLComprobanteEmisorV22 }
-  TXMLIFEXMLComprobanteEmisorV22 = class(TXMLNode, IFEXmlEmisorV22)
-  private
-    FRegimenFiscal: IXMLComprobante_Emisor_RegimenFiscalList;
-  protected
-    { IFEXmlEmisorV22 }
-    function GetRfc: String;
-    function GetNombre: String;
-    function GetDomicilioFiscal: IFEXMLT_UbicacionFiscal;
-    function GetExpedidoEn: IFEXmlT_Ubicacion;
-    function GetRegimenFiscal: IXMLComprobante_Emisor_RegimenFiscalList;
-    procedure SetRfc(Value: String);
-    procedure SetNombre(Value: String);
-  public
-    procedure AfterConstruction; override;
-  end;
 
 { TXMLT_UbicacionFiscal }
 
@@ -295,6 +209,8 @@ type
     procedure SetCodigoPostal(Value: String);
   end;
 
+
+
 { TXMLComprobante_Emisor_RegimenFiscal }
   TXMLComprobante_Emisor_RegimenFiscal = class(TXMLNode, IXMLComprobante_Emisor_RegimenFiscal)
   protected
@@ -313,372 +229,304 @@ type
     function GetItem(Index: Integer): IXMLComprobante_Emisor_RegimenFiscal;
   end;
 
-function GetComprobanteV22(Doc: IXMLDocument): IFEXMLComprobanteV22;
-function LoadComprobanteV22(const FileName: string): IFEXMLComprobanteV22;
-function NewComprobanteV22: IFEXMLComprobanteV22;
+function GetComprobanteV32(Doc: IXMLDocument): IFEXMLComprobanteV32;
+function LoadComprobanteV32(const FileName: string): IFEXMLComprobanteV32;
+function NewComprobanteV32: IFEXMLComprobanteV32;
 
 const
-  TargetNamespace = 'http://www.sat.gob.mx/cfd/2';
+  TargetNamespace = 'http://www.sat.gob.mx/cfd/3';
 
 implementation
 
 { Global Functions }
 
-function GetComprobanteV22(Doc: IXMLDocument): IFEXMLComprobanteV22;
+function GetComprobanteV32(Doc: IXMLDocument): IFEXMLComprobanteV32;
 begin
-  Result := Doc.GetDocBinding('Comprobante', TXMLIFEXMLComprobanteV22, TargetNamespace) as IFEXMLComprobanteV22;
+  Result := Doc.GetDocBinding('cfdi:Comprobante', TXMLIFEXMLComprobanteV32, TargetNamespace) as IFEXMLComprobanteV32;
 end;
 
-function LoadComprobanteV22(const FileName: string): IFEXMLComprobanteV22;
+function LoadComprobanteV32(const FileName: string): IFEXMLComprobanteV32;
 begin
-  Result := LoadXMLDocument(FileName).GetDocBinding('Comprobante', TXMLIFEXMLComprobanteV22, TargetNamespace) as IFEXMLComprobanteV22;
+  Result := LoadXMLDocument(FileName).GetDocBinding('Comprobante', TXMLIFEXMLComprobanteV32, TargetNamespace) as IFEXMLComprobanteV32;
 end;
 
-function NewComprobanteV22: IFEXMLComprobanteV22;
+function NewComprobanteV32: IFEXMLComprobanteV32;
 begin
-  Result := NewXMLDocument.GetDocBinding('Comprobante', TXMLIFEXMLComprobanteV22, TargetNamespace) as IFEXMLComprobanteV22;
+  Result := NewXMLDocument.GetDocBinding('Comprobante', TXMLIFEXMLComprobanteV32, TargetNamespace) as IFEXMLComprobanteV32;
 end;
 
 { TXMLIFEXMLComprobante }
 
-procedure TXMLIFEXMLComprobanteV22.AfterConstruction;
+procedure TXMLIFEXMLComprobanteV32.AfterConstruction;
 begin
   RegisterChildNode('Emisor', TXMLIFEXMLComprobanteEmisorV22);
   RegisterChildNode('Receptor', TFEXmlReceptor);
   RegisterChildNode('Conceptos', TFEXmlConceptos);
   RegisterChildNode('Impuestos', TFEXmlImpuestos);
   RegisterChildNode('Complemento', TFEXmlComplemento);
+
   RegisterChildNode('Addenda', TFEXmlAddenda);
   inherited;
 end;
 
-function TXMLIFEXMLComprobanteV22.GetVersion: String;
+function TXMLIFEXMLComprobanteV32.GetVersion: String;
 begin
   Result := AttributeNodes['version'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetVersion(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetVersion(Value: String);
 begin
   SetAttribute('version', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetSerie: String;
+function TXMLIFEXMLComprobanteV32.GetSerie: String;
 begin
   Result := AttributeNodes['serie'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetSerie(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetSerie(Value: String);
 begin
   SetAttribute('serie', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetFolio: String;
+function TXMLIFEXMLComprobanteV32.GetFolio: String;
 begin
   Result := AttributeNodes['folio'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetFolio(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetFolio(Value: String);
 begin
   SetAttribute('folio', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetFecha: String;
+function TXMLIFEXMLComprobanteV32.GetFecha: String;
 begin
   Result := AttributeNodes['fecha'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetFecha(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetFecha(Value: String);
 begin
   SetAttribute('fecha', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetSello: String;
+function TXMLIFEXMLComprobanteV32.GetSello: String;
 begin
   Result := AttributeNodes['sello'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetSello(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetSello(Value: String);
 begin
   SetAttribute('sello', Value);
 end;
-{$ifdef V22}
-function TXMLIFEXMLComprobanteV22.GetNoAprobacion: Integer;
-begin
-  Result := AttributeNodes['noAprobacion'].NodeValue;
-end;
 
-procedure TXMLIFEXMLComprobanteV22.SetNoAprobacion(Value: Integer);
-begin
-  SetAttribute('noAprobacion', Value);
-end;
-
-function TXMLIFEXMLComprobanteV22.GetAnoAprobacion: Integer;
-begin
-  Result := AttributeNodes['anoAprobacion'].NodeValue;
-end;
-
-procedure TXMLIFEXMLComprobanteV22.SetAnoAprobacion(Value: Integer);
-begin
-  SetAttribute('anoAprobacion', Value);
-end;
-{$endif}
-
-function TXMLIFEXMLComprobanteV22.GetFormaDePago: String;
+function TXMLIFEXMLComprobanteV32.GetFormaDePago: String;
 begin
   Result := AttributeNodes['formaDePago'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetFormaDePago(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetFormaDePago(Value: String);
 begin
   SetAttribute('formaDePago', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetNoCertificado: String;
+function TXMLIFEXMLComprobanteV32.GetNoCertificado: String;
 begin
   Result := AttributeNodes['noCertificado'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetNoCertificado(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetNoCertificado(Value: String);
 begin
   SetAttribute('noCertificado', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetCertificado: String;
+function TXMLIFEXMLComprobanteV32.GetCertificado: String;
 begin
   Result := AttributeNodes['certificado'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetCertificado(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetCertificado(Value: String);
 begin
   SetAttribute('certificado', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetCondicionesDePago: String;
+function TXMLIFEXMLComprobanteV32.GetCondicionesDePago: String;
 begin
   Result := AttributeNodes['condicionesDePago'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetCondicionesDePago(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetCondicionesDePago(Value: String);
 begin
   SetAttribute('condicionesDePago', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetSubTotal: String;
+function TXMLIFEXMLComprobanteV32.GetSubTotal: String;
 begin
   Result := AttributeNodes['subTotal'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetSubTotal(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetSubTotal(Value: String);
 begin
   SetAttribute('subTotal', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetDescuento: String;
+function TXMLIFEXMLComprobanteV32.GetDescuento: String;
 begin
   Result := AttributeNodes['descuento'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetDescuento(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetDescuento(Value: String);
 begin
   SetAttribute('descuento', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetMotivoDescuento: String;
+function TXMLIFEXMLComprobanteV32.GetMotivoDescuento: String;
 begin
   Result := AttributeNodes['motivoDescuento'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetMotivoDescuento(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetMotivoDescuento(Value: String);
 begin
   SetAttribute('motivoDescuento', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetTipoCambio: String;
+function TXMLIFEXMLComprobanteV32.GetTipoCambio: String;
 begin
   Result := AttributeNodes['TipoCambio'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetTipoCambio(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetTipoCambio(Value: String);
 begin
   SetAttribute('TipoCambio', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetMoneda: String;
+function TXMLIFEXMLComprobanteV32.GetMoneda: String;
 begin
   Result := AttributeNodes['Moneda'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetMoneda(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetMoneda(Value: String);
 begin
   SetAttribute('Moneda', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetTotal: String;
+function TXMLIFEXMLComprobanteV32.GetTotal: String;
 begin
   Result := AttributeNodes['total'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetTotal(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetTotal(Value: String);
 begin
   SetAttribute('total', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetTipoDeComprobante: String;
+function TXMLIFEXMLComprobanteV32.GetTipoDeComprobante: String;
 begin
   Result := AttributeNodes['tipoDeComprobante'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetTipoDeComprobante(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetTipoDeComprobante(Value: String);
 begin
   SetAttribute('tipoDeComprobante', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetMetodoDePago: String;
+function TXMLIFEXMLComprobanteV32.GetMetodoDePago: String;
 begin
   Result := AttributeNodes['metodoDePago'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetMetodoDePago(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetMetodoDePago(Value: String);
 begin
   SetAttribute('metodoDePago', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetLugarExpedicion: String;
+function TXMLIFEXMLComprobanteV32.GetLugarExpedicion: String;
 begin
   Result := AttributeNodes['LugarExpedicion'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetLugarExpedicion(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetLugarExpedicion(Value: String);
 begin
   SetAttribute('LugarExpedicion', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetNumCtaPago: String;
+function TXMLIFEXMLComprobanteV32.GetNumCtaPago: String;
 begin
   Result := AttributeNodes['NumCtaPago'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetNumCtaPago(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetNumCtaPago(Value: String);
 begin
   SetAttribute('NumCtaPago', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetFolioFiscalOrig: String;
+function TXMLIFEXMLComprobanteV32.GetFolioFiscalOrig: String;
 begin
   Result := AttributeNodes['FolioFiscalOrig'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetFolioFiscalOrig(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetFolioFiscalOrig(Value: String);
 begin
   SetAttribute('FolioFiscalOrig', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetSerieFolioFiscalOrig: String;
+function TXMLIFEXMLComprobanteV32.GetSerieFolioFiscalOrig: String;
 begin
   Result := AttributeNodes['SerieFolioFiscalOrig'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetSerieFolioFiscalOrig(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetSerieFolioFiscalOrig(Value: String);
 begin
   SetAttribute('SerieFolioFiscalOrig', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetFechaFolioFiscalOrig: String;
+function TXMLIFEXMLComprobanteV32.GetFechaFolioFiscalOrig: String;
 begin
   Result := AttributeNodes['FechaFolioFiscalOrig'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetFechaFolioFiscalOrig(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetFechaFolioFiscalOrig(Value: String);
 begin
   SetAttribute('FechaFolioFiscalOrig', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetMontoFolioFiscalOrig: String;
+function TXMLIFEXMLComprobanteV32.GetMontoFolioFiscalOrig: String;
 begin
   Result := AttributeNodes['MontoFolioFiscalOrig'].Text;
 end;
 
-procedure TXMLIFEXMLComprobanteV22.SetMontoFolioFiscalOrig(Value: String);
+procedure TXMLIFEXMLComprobanteV32.SetMontoFolioFiscalOrig(Value: String);
 begin
   SetAttribute('MontoFolioFiscalOrig', Value);
 end;
 
-function TXMLIFEXMLComprobanteV22.GetEmisor: IFEXmlEmisorV22;
+function TXMLIFEXMLComprobanteV32.GetEmisor: IFEXmlEmisorV22;
 begin
   Result := ChildNodes['Emisor'] as IFEXmlEmisorV22;
 end;
 
-function TXMLIFEXMLComprobanteV22.GetReceptor: IFEXmlReceptor;
+function TXMLIFEXMLComprobanteV32.GetReceptor: IFEXmlReceptor;
 begin
   Result := ChildNodes['Receptor'] as IFEXmlReceptor;
 end;
 
-function TXMLIFEXMLComprobanteV22.GetConceptos: IFEXmlConceptos;
+function TXMLIFEXMLComprobanteV32.GetConceptos: IFEXmlConceptos;
 begin
   Result := ChildNodes['Conceptos'] as IFEXmlConceptos;
 end;
 
-function TXMLIFEXMLComprobanteV22.GetImpuestos: IFEXmlImpuestos;
+function TXMLIFEXMLComprobanteV32.GetImpuestos: IFEXmlImpuestos;
 begin
   Result := ChildNodes['Impuestos'] as IFEXmlImpuestos;
 end;
 
-function TXMLIFEXMLComprobanteV22.GetComplemento: IFEXmlComplemento;
+function TXMLIFEXMLComprobanteV32.GetComplemento: IFEXmlComplemento;
 begin
   Result := ChildNodes['Complemento'] as IFEXmlComplemento;
 end;
 
-function TXMLIFEXMLComprobanteV22.GetAddenda: IFEXmlAddenda;
+function TXMLIFEXMLComprobanteV32.GetAddenda: IFEXmlAddenda;
 begin
   Result := ChildNodes['Addenda'] as IFEXmlAddenda;
-end;
-
-{ TXMLIFEXMLComprobanteEmisorV22 }
-
-procedure TXMLIFEXMLComprobanteEmisorV22.AfterConstruction;
-begin
-  RegisterChildNode('DomicilioFiscal', TXMLT_UbicacionFiscal);
-  RegisterChildNode('ExpedidoEn', TXMLT_Ubicacion);
-  RegisterChildNode('RegimenFiscal', TXMLComprobante_Emisor_RegimenFiscal);
-  FRegimenFiscal := CreateCollection(TXMLComprobante_Emisor_RegimenFiscalList,
-                                     IXMLComprobante_Emisor_RegimenFiscal,
-                                     'RegimenFiscal') as IXMLComprobante_Emisor_RegimenFiscalList;
-  inherited;
-end;
-
-function TXMLIFEXMLComprobanteEmisorV22.GetRfc: String;
-begin
-  Result := AttributeNodes['rfc'].Text;
-end;
-
-procedure TXMLIFEXMLComprobanteEmisorV22.SetRfc(Value: String);
-begin
-  SetAttribute('rfc', Value);
-end;
-
-function TXMLIFEXMLComprobanteEmisorV22.GetNombre: String;
-begin
-  Result := AttributeNodes['nombre'].Text;
-end;
-
-procedure TXMLIFEXMLComprobanteEmisorV22.SetNombre(Value: String);
-begin
-  SetAttribute('nombre', Value);
-end;
-
-function TXMLIFEXMLComprobanteEmisorV22.GetDomicilioFiscal: IFEXMLT_UbicacionFiscal;
-begin
-  Result := ChildNodes['DomicilioFiscal'] as IFEXMLT_UbicacionFiscal;
-end;
-
-function TXMLIFEXMLComprobanteEmisorV22.GetExpedidoEn: IFEXmlT_Ubicacion;
-begin
-  Result := ChildNodes['ExpedidoEn'] as IFEXmlT_Ubicacion;
-end;
-
-function TXMLIFEXMLComprobanteEmisorV22.GetRegimenFiscal: IXMLComprobante_Emisor_RegimenFiscalList;
-begin
-  Result := FRegimenFiscal;
 end;
 
 { TXMLT_UbicacionFiscal }

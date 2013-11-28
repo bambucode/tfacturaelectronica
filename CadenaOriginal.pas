@@ -2,7 +2,7 @@ unit CadenaOriginal;
 
 interface
 
-uses FacturaTipos, FeCFD, FeCFDv22, FeCFDv2,
+uses FacturaTipos, FeCFD, FeCFDv32,FeCFDv22, FeCFDv2,
      XmlDom, XMLIntf, MsXmlDom, XMLDoc;
 
 type
@@ -43,7 +43,12 @@ type
 
 implementation
 
-uses SysUtils, StrUtils, FacturaReglamentacion;
+uses SysUtils,
+     StrUtils,
+     {$IFDEF CODESITE}
+     CodeSiteLogging,
+     {$ENDIF}
+     FacturaReglamentacion;
 
 // Debemos de recibir el XML del comprobante con todas sus propiedades debidamente
 // llenas
@@ -135,8 +140,8 @@ var
 begin
   //Assert(fXmlComprobante Is IFEXMLComprobanteV22, 'El CFD debe ser v2.2 para soportar regimenes');
   for I := 0 to IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal.Count - 1 do
-  begin
-      AgregarAtributo(IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal[I], 'Regimen');
+   begin
+    AgregarAtributo(IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal[I], 'Regimen');
   end;
 end;
 
@@ -184,12 +189,15 @@ begin
       AgregarAtributo(fXmlComprobante, 'serie');
       AgregarAtributo(fXmlComprobante, 'folio');
       AgregarAtributo(fXmlComprobante, 'fecha');
-      AgregarAtributo(fXmlComprobante, 'noAprobacion');
-      AgregarAtributo(fXmlComprobante, 'anoAprobacion');
+      if fVersionCFD <> fev32 then
+      begin
+        AgregarAtributo(fXmlComprobante, 'noAprobacion');
+        AgregarAtributo(fXmlComprobante, 'anoAprobacion');
+      end;
+
       AgregarAtributo(fXmlComprobante, 'tipoDeComprobante');
       AgregarAtributo(fXmlComprobante, 'formaDePago');
       AgregarAtributo(fXmlComprobante, 'condicionesDePago');
-
       AgregarAtributo(fXmlComprobante, 'subTotal');
       AgregarAtributo(fXmlComprobante, 'descuento');
       AgregarAtributo(fXmlComprobante, 'total');
@@ -232,6 +240,30 @@ begin
            // 5) Datos del Regimen Fiscal
            if Assigned(IFEXmlComprobanteV22(fXmlComprobante).ChildNodes.FindNode('Emisor').ChildNodes.FindNode('RegimenFiscal')) then
               AgregarRegimenesFiscales(IFEXmlComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal);
+        end;
+        fev32:
+        begin
+           AgregarAtributo(fXmlComprobante, 'metodoDePago');  // Requerido
+           AgregarAtributo(fXmlComprobante, 'LugarExpedicion'); // Requerido
+           AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante), 'NumCtaPago');
+
+          { if Assigned(fXmlComprobante.ChildNodes.FindNode('TipoCambio')) then
+              AgregarAtributo(IFEXmlComprobanteV22(fXmlComprobante), 'TipoCambio');
+
+           if Assigned(fXmlComprobante.ChildNodes.FindNode('Moneda')) then
+              AgregarAtributo(IFEXmlComprobanteV22(fXmlComprobante), 'Moneda'); }
+
+           AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'rfc');
+           AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'nombre');
+           // 3) Datos del domicilio fiscal del emisor
+           AgregarUbicacionFiscal(IFEXmlComprobanteV32(fXmlComprobante).Emisor.DomicilioFiscal);
+           // 4) Datos del Domicilio de Expedición del Comprobante
+           if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor')) then
+             if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor').ChildNodes.FindNode('ExpedidoEn')) then
+               AgregarUbicacion(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn);
+           // 5) Datos del Regimen Fiscal
+           if Assigned(IFEXmlComprobanteV32(fXmlComprobante).ChildNodes.FindNode('Emisor').ChildNodes.FindNode('RegimenFiscal')) then
+              AgregarRegimenesFiscales(IFEXmlComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal);
         end;
       end;
 
@@ -317,6 +349,10 @@ begin
       // 7. Toda la cadena de original se encuentra expresada en el formato de codificación UTF-8.
       // Solo agregamos un PIPE mas porque el ultimo atributo tiene al final su pipe.
       Result:=UTF8Encode(fResultado + _PIPE);
+
+      {$IFDEF CODESITE}
+      CodeSite.Send('Cadena Original Calculada', Result);
+      {$ENDIF}
 end;
 
 

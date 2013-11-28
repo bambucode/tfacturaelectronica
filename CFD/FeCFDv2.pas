@@ -6,7 +6,6 @@ unit FeCFDv2;
 {                                                                                 }
 {         Generated on: 11/10/2010 12:27:18 p.m.                                  }
 {       Generated from: http://www.sat.gob.mx/sitio_internet/cfd/2/cfdv2.xsd      }
-{   Settings stored in: bc_facturacionelectronica\CFD\CFDv2.xsd   }
 {                                                                                 }
 {*********************************************************************************}
 
@@ -29,15 +28,15 @@ type
   IFEXmlEmisorV2 = interface(IXMLNode)
   ['{C084D8B6-04E3-4DC8-94F3-584CD358CBC2}']
     { Property Accessors }
-    function GetRfc: UnicodeString;
-    function GetNombre: UnicodeString;
+    function GetRfc: String;
+    function GetNombre: String;
     function GetDomicilioFiscal: IFEXmlT_UbicacionFiscal;
     function GetExpedidoEn: IFEXmlT_Ubicacion;
-    procedure SetRfc(Value: UnicodeString);
-    procedure SetNombre(Value: UnicodeString);
+    procedure SetRfc(Value: String);
+    procedure SetNombre(Value: String);
     { Methods & Properties }
-    property Rfc: UnicodeString read GetRfc write SetRfc;
-    property Nombre: UnicodeString read GetNombre write SetNombre;
+    property Rfc: String read GetRfc write SetRfc;
+    property Nombre: String read GetNombre write SetNombre;
     property DomicilioFiscal: IFEXmlT_UbicacionFiscal read GetDomicilioFiscal;
     property ExpedidoEn: IFEXmlT_Ubicacion read GetExpedidoEn;
   end;
@@ -50,46 +49,50 @@ type
   TFEXmlComprobanteV2 = class(TXMLNode, IFEXmlComprobanteV2)
   protected
     { IFEXmlComprobanteV2 }
-    function GetVersion: UnicodeString;
-    function GetSerie: UnicodeString;
-    function GetFolio: UnicodeString;
-    function GetFecha: UnicodeString;
-    function GetSello: UnicodeString;
-    function GetNoAprobacion: Integer;
-    function GetAnoAprobacion: Integer;
-    function GetFormaDePago: UnicodeString;
-    function GetNoCertificado: UnicodeString;
-    function GetCertificado: UnicodeString;
-    function GetCondicionesDePago: UnicodeString;
-    function GetSubTotal: UnicodeString;
-    function GetDescuento: UnicodeString;
-    function GetMotivoDescuento: UnicodeString;
-    function GetTotal: UnicodeString;
-    function GetMetodoDePago: UnicodeString;
-    function GetTipoDeComprobante: UnicodeString;
+    function GetVersion: String;
+    function GetSerie: String;
+    function GetFolio: String;
+    function GetFecha: String;
+    function GetSello: String;
+    {$ifdef V22}
+     function GetNoAprobacion: Integer;
+     function GetAnoAprobacion: Integer;
+    {$endif}
+    function GetFormaDePago: String;
+    function GetNoCertificado: String;
+    function GetCertificado: String;
+    function GetCondicionesDePago: String;
+    function GetSubTotal: String;
+    function GetDescuento: String;
+    function GetMotivoDescuento: String;
+    function GetTotal: String;
+    function GetMetodoDePago: String;
+    function GetTipoDeComprobante: String;
     function GetEmisor: IFEXmlEmisorV2;
     function GetReceptor: IFEXmlReceptor;
     function GetConceptos: IFEXmlConceptos;
     function GetImpuestos: IFEXmlImpuestos;
     function GetComplemento: IFEXmlComplemento;
     function GetAddenda: IFEXmlAddenda;
-    procedure SetVersion(Value: UnicodeString);
-    procedure SetSerie(Value: UnicodeString);
-    procedure SetFolio(Value: UnicodeString);
-    procedure SetFecha(Value: UnicodeString);
-    procedure SetSello(Value: UnicodeString);
-    procedure SetNoAprobacion(Value: Integer);
-    procedure SetAnoAprobacion(Value: Integer);
-    procedure SetFormaDePago(Value: UnicodeString);
-    procedure SetNoCertificado(Value: UnicodeString);
-    procedure SetCertificado(Value: UnicodeString);
-    procedure SetCondicionesDePago(Value: UnicodeString);
-    procedure SetSubTotal(Value: UnicodeString);
-    procedure SetDescuento(Value: UnicodeString);
-    procedure SetMotivoDescuento(Value: UnicodeString);
-    procedure SetTotal(Value: UnicodeString);
-    procedure SetMetodoDePago(Value: UnicodeString);
-    procedure SetTipoDeComprobante(Value: UnicodeString);
+    procedure SetVersion(Value: String);
+    procedure SetSerie(Value: String);
+    procedure SetFolio(Value: String);
+    procedure SetFecha(Value: String);
+    procedure SetSello(Value: String);
+    {$ifdef V22}
+     procedure SetNoAprobacion(Value: Integer);
+     procedure SetAnoAprobacion(Value: Integer);
+    {$endif}
+    procedure SetFormaDePago(Value: String);
+    procedure SetNoCertificado(Value: String);
+    procedure SetCertificado(Value: String);
+    procedure SetCondicionesDePago(Value: String);
+    procedure SetSubTotal(Value: String);
+    procedure SetDescuento(Value: String);
+    procedure SetMotivoDescuento(Value: String);
+    procedure SetTotal(Value: String);
+    procedure SetMetodoDePago(Value: String);
+    procedure SetTipoDeComprobante(Value: String);
   public
     procedure AfterConstruction; override;
   end;
@@ -99,12 +102,12 @@ type
   TFEXmlEmisorV2 = class(TXMLNode, IFEXmlEmisorV2)
   protected
     { IFEXmlEmisorV2 }
-    function GetRfc: UnicodeString;
-    function GetNombre: UnicodeString;
+    function GetRfc: String;
+    function GetNombre: String;
     function GetDomicilioFiscal: IFEXmlT_UbicacionFiscal;
     function GetExpedidoEn: IFEXmlT_Ubicacion;
-    procedure SetRfc(Value: UnicodeString);
-    procedure SetNombre(Value: UnicodeString);
+    procedure SetRfc(Value: String);
+    procedure SetNombre(Value: String);
   public
     procedure AfterConstruction; override;
   end;
@@ -114,26 +117,26 @@ type
   TFEXmlT_UbicacionFiscal = class(TXMLNode, IFEXmlT_UbicacionFiscal)
   protected
     { IFEXmlT_UbicacionFiscal }
-    function GetCalle: UnicodeString;
-    function GetNoExterior: UnicodeString;
-    function GetNoInterior: UnicodeString;
-    function GetColonia: UnicodeString;
-    function GetLocalidad: UnicodeString;
-    function GetReferencia: UnicodeString;
-    function GetMunicipio: UnicodeString;
-    function GetEstado: UnicodeString;
-    function GetPais: UnicodeString;
-    function GetCodigoPostal: UnicodeString;
-    procedure SetCalle(Value: UnicodeString);
-    procedure SetNoExterior(Value: UnicodeString);
-    procedure SetNoInterior(Value: UnicodeString);
-    procedure SetColonia(Value: UnicodeString);
-    procedure SetLocalidad(Value: UnicodeString);
-    procedure SetReferencia(Value: UnicodeString);
-    procedure SetMunicipio(Value: UnicodeString);
-    procedure SetEstado(Value: UnicodeString);
-    procedure SetPais(Value: UnicodeString);
-    procedure SetCodigoPostal(Value: UnicodeString);
+    function GetCalle: String;
+    function GetNoExterior: String;
+    function GetNoInterior: String;
+    function GetColonia: String;
+    function GetLocalidad: String;
+    function GetReferencia: String;
+    function GetMunicipio: String;
+    function GetEstado: String;
+    function GetPais: String;
+    function GetCodigoPostal: String;
+    procedure SetCalle(Value: String);
+    procedure SetNoExterior(Value: String);
+    procedure SetNoInterior(Value: String);
+    procedure SetColonia(Value: String);
+    procedure SetLocalidad(Value: String);
+    procedure SetReferencia(Value: String);
+    procedure SetMunicipio(Value: String);
+    procedure SetEstado(Value: String);
+    procedure SetPais(Value: String);
+    procedure SetCodigoPostal(Value: String);
   end;
 
 { TFEXmlT_Ubicacion }
@@ -141,26 +144,26 @@ type
   TFEXmlT_Ubicacion = class(TXMLNode, IFEXmlT_Ubicacion)
   protected
     { IFEXmlT_Ubicacion }
-    function GetCalle: UnicodeString;
-    function GetNoExterior: UnicodeString;
-    function GetNoInterior: UnicodeString;
-    function GetColonia: UnicodeString;
-    function GetLocalidad: UnicodeString;
-    function GetReferencia: UnicodeString;
-    function GetMunicipio: UnicodeString;
-    function GetEstado: UnicodeString;
-    function GetPais: UnicodeString;
-    function GetCodigoPostal: UnicodeString;
-    procedure SetCalle(Value: UnicodeString);
-    procedure SetNoExterior(Value: UnicodeString);
-    procedure SetNoInterior(Value: UnicodeString);
-    procedure SetColonia(Value: UnicodeString);
-    procedure SetLocalidad(Value: UnicodeString);
-    procedure SetReferencia(Value: UnicodeString);
-    procedure SetMunicipio(Value: UnicodeString);
-    procedure SetEstado(Value: UnicodeString);
-    procedure SetPais(Value: UnicodeString);
-    procedure SetCodigoPostal(Value: UnicodeString);
+    function GetCalle: String;
+    function GetNoExterior: String;
+    function GetNoInterior: String;
+    function GetColonia: String;
+    function GetLocalidad: String;
+    function GetReferencia: String;
+    function GetMunicipio: String;
+    function GetEstado: String;
+    function GetPais: String;
+    function GetCodigoPostal: String;
+    procedure SetCalle(Value: String);
+    procedure SetNoExterior(Value: String);
+    procedure SetNoInterior(Value: String);
+    procedure SetColonia(Value: String);
+    procedure SetLocalidad(Value: String);
+    procedure SetReferencia(Value: String);
+    procedure SetMunicipio(Value: String);
+    procedure SetEstado(Value: String);
+    procedure SetPais(Value: String);
+    procedure SetCodigoPostal(Value: String);
   end;
 
 { TFEXmlReceptor }
@@ -168,11 +171,11 @@ type
   TFEXmlReceptor = class(TXMLNode, IFEXmlReceptor)
   protected
     { IFEXmlReceptor }
-    function GetRfc: UnicodeString;
-    function GetNombre: UnicodeString;
+    function GetRfc: String;
+    function GetNombre: String;
     function GetDomicilio: IFEXmlT_Ubicacion;
-    procedure SetRfc(Value: UnicodeString);
-    procedure SetNombre(Value: UnicodeString);
+    procedure SetRfc(Value: String);
+    procedure SetNombre(Value: String);
   public
     procedure AfterConstruction; override;
   end;
@@ -197,22 +200,22 @@ type
     FParte: IFEXmlParteList;
   protected
     { IFEXmlConcepto }
-    function GetCantidad: UnicodeString;
-    function GetUnidad: UnicodeString;
-    function GetNoIdentificacion: UnicodeString;
-    function GetDescripcion: UnicodeString;
-    function GetValorUnitario: UnicodeString;
-    function GetImporte: UnicodeString;
+    function GetCantidad: String;
+    function GetUnidad: String;
+    function GetNoIdentificacion: String;
+    function GetDescripcion: String;
+    function GetValorUnitario: String;
+    function GetImporte: String;
     function GetInformacionAduanera: IFEXmlT_InformacionAduaneraList;
     function GetCuentaPredial: IFEXmlCuentaPredial;
     function GetComplementoConcepto: IFEXmlComplementoConcepto;
     function GetParte: IFEXmlParteList;
-    procedure SetCantidad(Value: UnicodeString);
-    procedure SetUnidad(Value: UnicodeString);
-    procedure SetNoIdentificacion(Value: UnicodeString);
-    procedure SetDescripcion(Value: UnicodeString);
-    procedure SetValorUnitario(Value: UnicodeString);
-    procedure SetImporte(Value: UnicodeString);
+    procedure SetCantidad(Value: String);
+    procedure SetUnidad(Value: String);
+    procedure SetNoIdentificacion(Value: String);
+    procedure SetDescripcion(Value: String);
+    procedure SetValorUnitario(Value: String);
+    procedure SetImporte(Value: String);
   public
     procedure AfterConstruction; override;
   end;
@@ -222,12 +225,12 @@ type
   TFEXmlT_InformacionAduanera = class(TXMLNode, IFEXmlT_InformacionAduanera)
   protected
     { IFEXmlT_InformacionAduanera }
-    function GetNumero: UnicodeString;
-    function GetFecha: UnicodeString;
-    function GetAduana: UnicodeString;
-    procedure SetNumero(Value: UnicodeString);
-    procedure SetFecha(Value: UnicodeString);
-    procedure SetAduana(Value: UnicodeString);
+    function GetNumero: String;
+    function GetFecha: String;
+    function GetAduana: String;
+    procedure SetNumero(Value: String);
+    procedure SetFecha(Value: String);
+    procedure SetAduana(Value: String);
   end;
 
 { TFEXmlT_InformacionAduaneraList }
@@ -245,8 +248,8 @@ type
   TFEXmlCuentaPredial = class(TXMLNode, IFEXmlCuentaPredial)
   protected
     { IFEXmlCuentaPredial }
-    function GetNumero: UnicodeString;
-    procedure SetNumero(Value: UnicodeString);
+    function GetNumero: String;
+    procedure SetNumero(Value: String);
   end;
 
 { TFEXmlComplementoConcepto }
@@ -261,19 +264,19 @@ type
   TFEXmlParte = class(TXMLNodeCollection, IFEXmlParte)
   protected
     { IFEXmlParte }
-    function GetCantidad: UnicodeString;
-    function GetUnidad: UnicodeString;
-    function GetNoIdentificacion: UnicodeString;
-    function GetDescripcion: UnicodeString;
-    function GetValorUnitario: UnicodeString;
-    function GetImporte: UnicodeString;
+    function GetCantidad: String;
+    function GetUnidad: String;
+    function GetNoIdentificacion: String;
+    function GetDescripcion: String;
+    function GetValorUnitario: String;
+    function GetImporte: String;
     function GetInformacionAduanera(Index: Integer): IFEXmlT_InformacionAduanera;
-    procedure SetCantidad(Value: UnicodeString);
-    procedure SetUnidad(Value: UnicodeString);
-    procedure SetNoIdentificacion(Value: UnicodeString);
-    procedure SetDescripcion(Value: UnicodeString);
-    procedure SetValorUnitario(Value: UnicodeString);
-    procedure SetImporte(Value: UnicodeString);
+    procedure SetCantidad(Value: String);
+    procedure SetUnidad(Value: String);
+    procedure SetNoIdentificacion(Value: String);
+    procedure SetDescripcion(Value: String);
+    procedure SetValorUnitario(Value: String);
+    procedure SetImporte(Value: String);
     function Add: IFEXmlT_InformacionAduanera;
     function Insert(const Index: Integer): IFEXmlT_InformacionAduanera;
   public
@@ -295,12 +298,12 @@ type
   TFEXmlImpuestos = class(TXMLNode, IFEXmlImpuestos)
   protected
     { IFEXmlImpuestos }
-    function GetTotalImpuestosRetenidos: UnicodeString;
-    function GetTotalImpuestosTrasladados: UnicodeString;
+    function GetTotalImpuestosRetenidos: String;
+    function GetTotalImpuestosTrasladados: String;
     function GetRetenciones: IFEXmlRetenciones;
     function GetTraslados: IFEXmlTraslados;
-    procedure SetTotalImpuestosRetenidos(Value: UnicodeString);
-    procedure SetTotalImpuestosTrasladados(Value: UnicodeString);
+    procedure SetTotalImpuestosRetenidos(Value: String);
+    procedure SetTotalImpuestosTrasladados(Value: String);
   public
     procedure AfterConstruction; override;
   end;
@@ -322,10 +325,10 @@ type
   TFEXmlRetencion = class(TXMLNode, IFEXmlRetencion)
   protected
     { IFEXmlRetencion }
-    function GetImpuesto: UnicodeString;
-    function GetImporte: UnicodeString;
-    procedure SetImpuesto(Value: UnicodeString);
-    procedure SetImporte(Value: UnicodeString);
+    function GetImpuesto: String;
+    function GetImporte: String;
+    procedure SetImpuesto(Value: String);
+    procedure SetImporte(Value: String);
   end;
 
 { TFEXmlTraslados }
@@ -345,12 +348,12 @@ type
   TFEXmlTraslado = class(TXMLNode, IFEXmlTraslado)
   protected
     { IFEXmlTraslado }
-    function GetImpuesto: UnicodeString;
-    function GetTasa: UnicodeString;
-    function GetImporte: UnicodeString;
-    procedure SetImpuesto(Value: UnicodeString);
-    procedure SetTasa(Value: UnicodeString);
-    procedure SetImporte(Value: UnicodeString);
+    function GetImpuesto: String;
+    function GetTasa: String;
+    function GetImporte: String;
+    procedure SetImpuesto(Value: String);
+    procedure SetTasa(Value: String);
+    procedure SetImporte(Value: String);
   end;
 
 { TFEXmlComplemento }
@@ -370,7 +373,7 @@ type
 { Global Functions }
 
 function GetComprobante(Doc: IXMLDocument): IFEXmlComprobanteV2;
-function LoadComprobante(const FileName: UnicodeString): IFEXmlComprobanteV2;
+function LoadComprobante(const FileName: String): IFEXmlComprobanteV2;
 function NewComprobante: IFEXmlComprobanteV2;
 
 const
@@ -385,7 +388,7 @@ begin
   Result := Doc.GetDocBinding('Comprobante', TFEXmlComprobanteV2, TargetNamespace) as IFEXmlComprobanteV2;
 end;
 
-function LoadComprobante(const FileName: UnicodeString): IFEXmlComprobanteV2;
+function LoadComprobante(const FileName: String): IFEXmlComprobanteV2;
 begin
   Result := LoadXMLDocument(FileName).GetDocBinding('Comprobante', TFEXmlComprobanteV2, TargetNamespace) as IFEXmlComprobanteV2;
 end;
@@ -408,56 +411,56 @@ begin
   inherited;
 end;
 
-function TFEXmlComprobanteV2.GetVersion: UnicodeString;
+function TFEXmlComprobanteV2.GetVersion: String;
 begin
   Result := AttributeNodes['version'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetVersion(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetVersion(Value: String);
 begin
   SetAttribute('version', Value);
 end;
 
-function TFEXmlComprobanteV2.GetSerie: UnicodeString;
+function TFEXmlComprobanteV2.GetSerie: String;
 begin
   Result := AttributeNodes['serie'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetSerie(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetSerie(Value: String);
 begin
   SetAttribute('serie', Value);
 end;
 
-function TFEXmlComprobanteV2.GetFolio: UnicodeString;
+function TFEXmlComprobanteV2.GetFolio: String;
 begin
   Result := AttributeNodes['folio'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetFolio(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetFolio(Value: String);
 begin
   SetAttribute('folio', Value);
 end;
 
-function TFEXmlComprobanteV2.GetFecha: UnicodeString;
+function TFEXmlComprobanteV2.GetFecha: String;
 begin
   Result := AttributeNodes['fecha'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetFecha(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetFecha(Value: String);
 begin
   SetAttribute('fecha', Value);
 end;
 
-function TFEXmlComprobanteV2.GetSello: UnicodeString;
+function TFEXmlComprobanteV2.GetSello: String;
 begin
   Result := AttributeNodes['sello'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetSello(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetSello(Value: String);
 begin
   SetAttribute('sello', Value);
 end;
-
+{$ifdef V22}
 function TFEXmlComprobanteV2.GetNoAprobacion: Integer;
 begin
   Result := AttributeNodes['noAprobacion'].NodeValue;
@@ -477,103 +480,104 @@ procedure TFEXmlComprobanteV2.SetAnoAprobacion(Value: Integer);
 begin
   SetAttribute('anoAprobacion', Value);
 end;
+{$endif}
 
-function TFEXmlComprobanteV2.GetFormaDePago: UnicodeString;
+function TFEXmlComprobanteV2.GetFormaDePago: String;
 begin
   Result := AttributeNodes['formaDePago'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetFormaDePago(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetFormaDePago(Value: String);
 begin
   SetAttribute('formaDePago', Value);
 end;
 
-function TFEXmlComprobanteV2.GetNoCertificado: UnicodeString;
+function TFEXmlComprobanteV2.GetNoCertificado: String;
 begin
   Result := AttributeNodes['noCertificado'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetNoCertificado(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetNoCertificado(Value: String);
 begin
   SetAttribute('noCertificado', Value);
 end;
 
-function TFEXmlComprobanteV2.GetCertificado: UnicodeString;
+function TFEXmlComprobanteV2.GetCertificado: String;
 begin
   Result := AttributeNodes['certificado'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetCertificado(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetCertificado(Value: String);
 begin
   SetAttribute('certificado', Value);
 end;
 
-function TFEXmlComprobanteV2.GetCondicionesDePago: UnicodeString;
+function TFEXmlComprobanteV2.GetCondicionesDePago: String;
 begin
   Result := AttributeNodes['condicionesDePago'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetCondicionesDePago(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetCondicionesDePago(Value: String);
 begin
   SetAttribute('condicionesDePago', Value);
 end;
 
-function TFEXmlComprobanteV2.GetSubTotal: UnicodeString;
+function TFEXmlComprobanteV2.GetSubTotal: String;
 begin
   Result := AttributeNodes['subTotal'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetSubTotal(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetSubTotal(Value: String);
 begin
   SetAttribute('subTotal', Value);
 end;
 
-function TFEXmlComprobanteV2.GetDescuento: UnicodeString;
+function TFEXmlComprobanteV2.GetDescuento: String;
 begin
   Result := AttributeNodes['descuento'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetDescuento(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetDescuento(Value: String);
 begin
   SetAttribute('descuento', Value);
 end;
 
-function TFEXmlComprobanteV2.GetMotivoDescuento: UnicodeString;
+function TFEXmlComprobanteV2.GetMotivoDescuento: String;
 begin
   Result := AttributeNodes['motivoDescuento'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetMotivoDescuento(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetMotivoDescuento(Value: String);
 begin
   SetAttribute('motivoDescuento', Value);
 end;
 
-function TFEXmlComprobanteV2.GetTotal: UnicodeString;
+function TFEXmlComprobanteV2.GetTotal: String;
 begin
   Result := AttributeNodes['total'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetTotal(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetTotal(Value: String);
 begin
   SetAttribute('total', Value);
 end;
 
-function TFEXmlComprobanteV2.GetMetodoDePago: UnicodeString;
+function TFEXmlComprobanteV2.GetMetodoDePago: String;
 begin
   Result := AttributeNodes['metodoDePago'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetMetodoDePago(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetMetodoDePago(Value: String);
 begin
   SetAttribute('metodoDePago', Value);
 end;
 
-function TFEXmlComprobanteV2.GetTipoDeComprobante: UnicodeString;
+function TFEXmlComprobanteV2.GetTipoDeComprobante: String;
 begin
   Result := AttributeNodes['tipoDeComprobante'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetTipoDeComprobante(Value: UnicodeString);
+procedure TFEXmlComprobanteV2.SetTipoDeComprobante(Value: String);
 begin
   SetAttribute('tipoDeComprobante', Value);
 end;
@@ -617,22 +621,22 @@ begin
   inherited;
 end;
 
-function TFEXmlEmisorV2.GetRfc: UnicodeString;
+function TFEXmlEmisorV2.GetRfc: String;
 begin
   Result := AttributeNodes['rfc'].Text;
 end;
 
-procedure TFEXmlEmisorV2.SetRfc(Value: UnicodeString);
+procedure TFEXmlEmisorV2.SetRfc(Value: String);
 begin
   SetAttribute('rfc', Value);
 end;
 
-function TFEXmlEmisorV2.GetNombre: UnicodeString;
+function TFEXmlEmisorV2.GetNombre: String;
 begin
   Result := AttributeNodes['nombre'].Text;
 end;
 
-procedure TFEXmlEmisorV2.SetNombre(Value: UnicodeString);
+procedure TFEXmlEmisorV2.SetNombre(Value: String);
 begin
   SetAttribute('nombre', Value);
 end;
@@ -649,204 +653,204 @@ end;
 
 { TFEXmlT_UbicacionFiscal }
 
-function TFEXmlT_UbicacionFiscal.GetCalle: UnicodeString;
+function TFEXmlT_UbicacionFiscal.GetCalle: String;
 begin
   Result := AttributeNodes['calle'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetCalle(Value: UnicodeString);
+procedure TFEXmlT_UbicacionFiscal.SetCalle(Value: String);
 begin
   SetAttribute('calle', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetNoExterior: UnicodeString;
+function TFEXmlT_UbicacionFiscal.GetNoExterior: String;
 begin
   Result := AttributeNodes['noExterior'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetNoExterior(Value: UnicodeString);
+procedure TFEXmlT_UbicacionFiscal.SetNoExterior(Value: String);
 begin
   SetAttribute('noExterior', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetNoInterior: UnicodeString;
+function TFEXmlT_UbicacionFiscal.GetNoInterior: String;
 begin
   Result := AttributeNodes['noInterior'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetNoInterior(Value: UnicodeString);
+procedure TFEXmlT_UbicacionFiscal.SetNoInterior(Value: String);
 begin
   SetAttribute('noInterior', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetColonia: UnicodeString;
+function TFEXmlT_UbicacionFiscal.GetColonia: String;
 begin
   Result := AttributeNodes['colonia'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetColonia(Value: UnicodeString);
+procedure TFEXmlT_UbicacionFiscal.SetColonia(Value: String);
 begin
   SetAttribute('colonia', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetLocalidad: UnicodeString;
+function TFEXmlT_UbicacionFiscal.GetLocalidad: String;
 begin
   Result := AttributeNodes['localidad'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetLocalidad(Value: UnicodeString);
+procedure TFEXmlT_UbicacionFiscal.SetLocalidad(Value: String);
 begin
   SetAttribute('localidad', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetReferencia: UnicodeString;
+function TFEXmlT_UbicacionFiscal.GetReferencia: String;
 begin
   Result := AttributeNodes['referencia'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetReferencia(Value: UnicodeString);
+procedure TFEXmlT_UbicacionFiscal.SetReferencia(Value: String);
 begin
   SetAttribute('referencia', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetMunicipio: UnicodeString;
+function TFEXmlT_UbicacionFiscal.GetMunicipio: String;
 begin
   Result := AttributeNodes['municipio'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetMunicipio(Value: UnicodeString);
+procedure TFEXmlT_UbicacionFiscal.SetMunicipio(Value: String);
 begin
   SetAttribute('municipio', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetEstado: UnicodeString;
+function TFEXmlT_UbicacionFiscal.GetEstado: String;
 begin
   Result := AttributeNodes['estado'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetEstado(Value: UnicodeString);
+procedure TFEXmlT_UbicacionFiscal.SetEstado(Value: String);
 begin
   SetAttribute('estado', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetPais: UnicodeString;
+function TFEXmlT_UbicacionFiscal.GetPais: String;
 begin
   Result := AttributeNodes['pais'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetPais(Value: UnicodeString);
+procedure TFEXmlT_UbicacionFiscal.SetPais(Value: String);
 begin
   SetAttribute('pais', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetCodigoPostal: UnicodeString;
+function TFEXmlT_UbicacionFiscal.GetCodigoPostal: String;
 begin
   Result := AttributeNodes['codigoPostal'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetCodigoPostal(Value: UnicodeString);
+procedure TFEXmlT_UbicacionFiscal.SetCodigoPostal(Value: String);
 begin
   SetAttribute('codigoPostal', Value);
 end;
 
 { TFEXmlT_Ubicacion }
 
-function TFEXmlT_Ubicacion.GetCalle: UnicodeString;
+function TFEXmlT_Ubicacion.GetCalle: String;
 begin
   Result := AttributeNodes['calle'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetCalle(Value: UnicodeString);
+procedure TFEXmlT_Ubicacion.SetCalle(Value: String);
 begin
   SetAttribute('calle', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetNoExterior: UnicodeString;
+function TFEXmlT_Ubicacion.GetNoExterior: String;
 begin
   Result := AttributeNodes['noExterior'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetNoExterior(Value: UnicodeString);
+procedure TFEXmlT_Ubicacion.SetNoExterior(Value: String);
 begin
   SetAttribute('noExterior', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetNoInterior: UnicodeString;
+function TFEXmlT_Ubicacion.GetNoInterior: String;
 begin
   Result := AttributeNodes['noInterior'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetNoInterior(Value: UnicodeString);
+procedure TFEXmlT_Ubicacion.SetNoInterior(Value: String);
 begin
   SetAttribute('noInterior', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetColonia: UnicodeString;
+function TFEXmlT_Ubicacion.GetColonia: String;
 begin
   Result := AttributeNodes['colonia'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetColonia(Value: UnicodeString);
+procedure TFEXmlT_Ubicacion.SetColonia(Value: String);
 begin
   SetAttribute('colonia', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetLocalidad: UnicodeString;
+function TFEXmlT_Ubicacion.GetLocalidad: String;
 begin
   Result := AttributeNodes['localidad'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetLocalidad(Value: UnicodeString);
+procedure TFEXmlT_Ubicacion.SetLocalidad(Value: String);
 begin
   SetAttribute('localidad', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetReferencia: UnicodeString;
+function TFEXmlT_Ubicacion.GetReferencia: String;
 begin
   Result := AttributeNodes['referencia'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetReferencia(Value: UnicodeString);
+procedure TFEXmlT_Ubicacion.SetReferencia(Value: String);
 begin
   SetAttribute('referencia', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetMunicipio: UnicodeString;
+function TFEXmlT_Ubicacion.GetMunicipio: String;
 begin
   Result := AttributeNodes['municipio'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetMunicipio(Value: UnicodeString);
+procedure TFEXmlT_Ubicacion.SetMunicipio(Value: String);
 begin
   SetAttribute('municipio', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetEstado: UnicodeString;
+function TFEXmlT_Ubicacion.GetEstado: String;
 begin
   Result := AttributeNodes['estado'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetEstado(Value: UnicodeString);
+procedure TFEXmlT_Ubicacion.SetEstado(Value: String);
 begin
   SetAttribute('estado', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetPais: UnicodeString;
+function TFEXmlT_Ubicacion.GetPais: String;
 begin
   Result := AttributeNodes['pais'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetPais(Value: UnicodeString);
+procedure TFEXmlT_Ubicacion.SetPais(Value: String);
 begin
   SetAttribute('pais', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetCodigoPostal: UnicodeString;
+function TFEXmlT_Ubicacion.GetCodigoPostal: String;
 begin
   Result := AttributeNodes['codigoPostal'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetCodigoPostal(Value: UnicodeString);
+procedure TFEXmlT_Ubicacion.SetCodigoPostal(Value: String);
 begin
   SetAttribute('codigoPostal', Value);
 end;
@@ -859,22 +863,22 @@ begin
   inherited;
 end;
 
-function TFEXmlReceptor.GetRfc: UnicodeString;
+function TFEXmlReceptor.GetRfc: String;
 begin
   Result := AttributeNodes['rfc'].Text;
 end;
 
-procedure TFEXmlReceptor.SetRfc(Value: UnicodeString);
+procedure TFEXmlReceptor.SetRfc(Value: String);
 begin
   SetAttribute('rfc', Value);
 end;
 
-function TFEXmlReceptor.GetNombre: UnicodeString;
+function TFEXmlReceptor.GetNombre: String;
 begin
   Result := AttributeNodes['nombre'].Text;
 end;
 
-procedure TFEXmlReceptor.SetNombre(Value: UnicodeString);
+procedure TFEXmlReceptor.SetNombre(Value: String);
 begin
   SetAttribute('nombre', Value);
 end;
@@ -922,62 +926,62 @@ begin
   inherited;
 end;
 
-function TFEXmlConcepto.GetCantidad: UnicodeString;
+function TFEXmlConcepto.GetCantidad: String;
 begin
   Result := AttributeNodes['cantidad'].Text;
 end;
 
-procedure TFEXmlConcepto.SetCantidad(Value: UnicodeString);
+procedure TFEXmlConcepto.SetCantidad(Value: String);
 begin
   SetAttribute('cantidad', Value);
 end;
 
-function TFEXmlConcepto.GetUnidad: UnicodeString;
+function TFEXmlConcepto.GetUnidad: String;
 begin
   Result := AttributeNodes['unidad'].Text;
 end;
 
-procedure TFEXmlConcepto.SetUnidad(Value: UnicodeString);
+procedure TFEXmlConcepto.SetUnidad(Value: String);
 begin
   SetAttribute('unidad', Value);
 end;
 
-function TFEXmlConcepto.GetNoIdentificacion: UnicodeString;
+function TFEXmlConcepto.GetNoIdentificacion: String;
 begin
   Result := AttributeNodes['noIdentificacion'].Text;
 end;
 
-procedure TFEXmlConcepto.SetNoIdentificacion(Value: UnicodeString);
+procedure TFEXmlConcepto.SetNoIdentificacion(Value: String);
 begin
   SetAttribute('noIdentificacion', Value);
 end;
 
-function TFEXmlConcepto.GetDescripcion: UnicodeString;
+function TFEXmlConcepto.GetDescripcion: String;
 begin
   Result := AttributeNodes['descripcion'].Text;
 end;
 
-procedure TFEXmlConcepto.SetDescripcion(Value: UnicodeString);
+procedure TFEXmlConcepto.SetDescripcion(Value: String);
 begin
   SetAttribute('descripcion', Value);
 end;
 
-function TFEXmlConcepto.GetValorUnitario: UnicodeString;
+function TFEXmlConcepto.GetValorUnitario: String;
 begin
   Result := AttributeNodes['valorUnitario'].Text;
 end;
 
-procedure TFEXmlConcepto.SetValorUnitario(Value: UnicodeString);
+procedure TFEXmlConcepto.SetValorUnitario(Value: String);
 begin
   SetAttribute('valorUnitario', Value);
 end;
 
-function TFEXmlConcepto.GetImporte: UnicodeString;
+function TFEXmlConcepto.GetImporte: String;
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TFEXmlConcepto.SetImporte(Value: UnicodeString);
+procedure TFEXmlConcepto.SetImporte(Value: String);
 begin
   SetAttribute('importe', Value);
 end;
@@ -1004,32 +1008,32 @@ end;
 
 { TFEXmlT_InformacionAduanera }
 
-function TFEXmlT_InformacionAduanera.GetNumero: UnicodeString;
+function TFEXmlT_InformacionAduanera.GetNumero: String;
 begin
   Result := AttributeNodes['numero'].Text;
 end;
 
-procedure TFEXmlT_InformacionAduanera.SetNumero(Value: UnicodeString);
+procedure TFEXmlT_InformacionAduanera.SetNumero(Value: String);
 begin
   SetAttribute('numero', Value);
 end;
 
-function TFEXmlT_InformacionAduanera.GetFecha: UnicodeString;
+function TFEXmlT_InformacionAduanera.GetFecha: String;
 begin
   Result := AttributeNodes['fecha'].Text;
 end;
 
-procedure TFEXmlT_InformacionAduanera.SetFecha(Value: UnicodeString);
+procedure TFEXmlT_InformacionAduanera.SetFecha(Value: String);
 begin
   SetAttribute('fecha', Value);
 end;
 
-function TFEXmlT_InformacionAduanera.GetAduana: UnicodeString;
+function TFEXmlT_InformacionAduanera.GetAduana: String;
 begin
   Result := AttributeNodes['aduana'].Text;
 end;
 
-procedure TFEXmlT_InformacionAduanera.SetAduana(Value: UnicodeString);
+procedure TFEXmlT_InformacionAduanera.SetAduana(Value: String);
 begin
   SetAttribute('aduana', Value);
 end;
@@ -1052,12 +1056,12 @@ end;
 
 { TFEXmlCuentaPredial }
 
-function TFEXmlCuentaPredial.GetNumero: UnicodeString;
+function TFEXmlCuentaPredial.GetNumero: String;
 begin
   Result := AttributeNodes['numero'].Text;
 end;
 
-procedure TFEXmlCuentaPredial.SetNumero(Value: UnicodeString);
+procedure TFEXmlCuentaPredial.SetNumero(Value: String);
 begin
   SetAttribute('numero', Value);
 end;
@@ -1074,62 +1078,62 @@ begin
   inherited;
 end;
 
-function TFEXmlParte.GetCantidad: UnicodeString;
+function TFEXmlParte.GetCantidad: String;
 begin
   Result := AttributeNodes['cantidad'].Text;
 end;
 
-procedure TFEXmlParte.SetCantidad(Value: UnicodeString);
+procedure TFEXmlParte.SetCantidad(Value: String);
 begin
   SetAttribute('cantidad', Value);
 end;
 
-function TFEXmlParte.GetUnidad: UnicodeString;
+function TFEXmlParte.GetUnidad: String;
 begin
   Result := AttributeNodes['unidad'].Text;
 end;
 
-procedure TFEXmlParte.SetUnidad(Value: UnicodeString);
+procedure TFEXmlParte.SetUnidad(Value: String);
 begin
   SetAttribute('unidad', Value);
 end;
 
-function TFEXmlParte.GetNoIdentificacion: UnicodeString;
+function TFEXmlParte.GetNoIdentificacion: String;
 begin
   Result := AttributeNodes['noIdentificacion'].Text;
 end;
 
-procedure TFEXmlParte.SetNoIdentificacion(Value: UnicodeString);
+procedure TFEXmlParte.SetNoIdentificacion(Value: String);
 begin
   SetAttribute('noIdentificacion', Value);
 end;
 
-function TFEXmlParte.GetDescripcion: UnicodeString;
+function TFEXmlParte.GetDescripcion: String;
 begin
   Result := AttributeNodes['descripcion'].Text;
 end;
 
-procedure TFEXmlParte.SetDescripcion(Value: UnicodeString);
+procedure TFEXmlParte.SetDescripcion(Value: String);
 begin
   SetAttribute('descripcion', Value);
 end;
 
-function TFEXmlParte.GetValorUnitario: UnicodeString;
+function TFEXmlParte.GetValorUnitario: String;
 begin
   Result := AttributeNodes['valorUnitario'].Text;
 end;
 
-procedure TFEXmlParte.SetValorUnitario(Value: UnicodeString);
+procedure TFEXmlParte.SetValorUnitario(Value: String);
 begin
   SetAttribute('valorUnitario', Value);
 end;
 
-function TFEXmlParte.GetImporte: UnicodeString;
+function TFEXmlParte.GetImporte: String;
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TFEXmlParte.SetImporte(Value: UnicodeString);
+procedure TFEXmlParte.SetImporte(Value: String);
 begin
   SetAttribute('importe', Value);
 end;
@@ -1174,22 +1178,22 @@ begin
   inherited;
 end;
 
-function TFEXmlImpuestos.GetTotalImpuestosRetenidos: UnicodeString;
+function TFEXmlImpuestos.GetTotalImpuestosRetenidos: String;
 begin
   Result := AttributeNodes['totalImpuestosRetenidos'].Text;
 end;
 
-procedure TFEXmlImpuestos.SetTotalImpuestosRetenidos(Value: UnicodeString);
+procedure TFEXmlImpuestos.SetTotalImpuestosRetenidos(Value: String);
 begin
   SetAttribute('totalImpuestosRetenidos', Value);
 end;
 
-function TFEXmlImpuestos.GetTotalImpuestosTrasladados: UnicodeString;
+function TFEXmlImpuestos.GetTotalImpuestosTrasladados: String;
 begin
   Result := AttributeNodes['totalImpuestosTrasladados'].Text;
 end;
 
-procedure TFEXmlImpuestos.SetTotalImpuestosTrasladados(Value: UnicodeString);
+procedure TFEXmlImpuestos.SetTotalImpuestosTrasladados(Value: String);
 begin
   SetAttribute('totalImpuestosTrasladados', Value);
 end;
@@ -1231,22 +1235,22 @@ end;
 
 { TFEXmlRetencion }
 
-function TFEXmlRetencion.GetImpuesto: UnicodeString;
+function TFEXmlRetencion.GetImpuesto: String;
 begin
   Result := AttributeNodes['impuesto'].Text;
 end;
 
-procedure TFEXmlRetencion.SetImpuesto(Value: UnicodeString);
+procedure TFEXmlRetencion.SetImpuesto(Value: String);
 begin
   SetAttribute('impuesto', Value);
 end;
 
-function TFEXmlRetencion.GetImporte: UnicodeString;
+function TFEXmlRetencion.GetImporte: String;
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TFEXmlRetencion.SetImporte(Value: UnicodeString);
+procedure TFEXmlRetencion.SetImporte(Value: String);
 begin
   SetAttribute('importe', Value);
 end;
@@ -1278,32 +1282,32 @@ end;
 
 { TFEXmlTraslado }
 
-function TFEXmlTraslado.GetImpuesto: UnicodeString;
+function TFEXmlTraslado.GetImpuesto: String;
 begin
   Result := AttributeNodes['impuesto'].Text;
 end;
 
-procedure TFEXmlTraslado.SetImpuesto(Value: UnicodeString);
+procedure TFEXmlTraslado.SetImpuesto(Value: String);
 begin
   SetAttribute('impuesto', Value);
 end;
 
-function TFEXmlTraslado.GetTasa: UnicodeString;
+function TFEXmlTraslado.GetTasa: String;
 begin
   Result := AttributeNodes['tasa'].Text;
 end;
 
-procedure TFEXmlTraslado.SetTasa(Value: UnicodeString);
+procedure TFEXmlTraslado.SetTasa(Value: String);
 begin
   SetAttribute('tasa', Value);
 end;
 
-function TFEXmlTraslado.GetImporte: UnicodeString;
+function TFEXmlTraslado.GetImporte: String;
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TFEXmlTraslado.SetImporte(Value: UnicodeString);
+procedure TFEXmlTraslado.SetImporte(Value: String);
 begin
   SetAttribute('importe', Value);
 end;

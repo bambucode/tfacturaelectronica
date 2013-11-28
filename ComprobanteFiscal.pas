@@ -10,6 +10,9 @@
 
   La licencia de este codigo fuente se encuentra en:
   http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
+
+  Cambios para CFDI v3.2 Por Ing. Pablo Torres TecSisNet.net Cd. Juarez Chihuahua
+  el 11-24-2013
   ***************************************************************************** *}
 unit ComprobanteFiscal;
 
@@ -18,7 +21,7 @@ interface
 uses FacturaTipos, SysUtils, dialogs,
   // Unidades especificas de manejo de XML:
   XmlDom, XMLIntf, MsXmlDom, XMLDoc, DocComprobanteFiscal,
-  FeCFDv22, FeCFDv2, feCFD;
+  FeCFDv22,FeCFDv32, FeCFDv2, feCFD;
 
 type
 
@@ -43,7 +46,7 @@ type
     // Variables internas
     fDocumentoXML: TXMLDocument;
 
-    // Referencia a un comprobante "comun" que puede ser v2.0 o v2.2
+    // Referencia a un comprobante "comun" que puede ser v2.0 o v2.2  o v3.2
     fXmlComprobante: IFEXMLComprobante;
 
     // Propiedades exclusivas del comprobante digital:
@@ -90,6 +93,7 @@ type
     procedure AsignarNumeroDeCuenta;
     procedure EstablecerVersionDelComprobante;
   protected
+    procedure GenerarComprobante;
     function getXML: WideString; virtual;
     procedure setXML(const Valor: WideString); virtual;
 {$IFDEF VERSION_DE_PRUEBA}
@@ -99,7 +103,7 @@ type
   protected
 {$ENDIF}
   public
-    const VERSION_ACTUAL = '2.2'; // Version del CFD que implementa este código
+    const VERSION_ACTUAL = '3.2'; // Version del CFD que implementa este código
 
     constructor Create();
     destructor Destroy(); override;
@@ -129,7 +133,7 @@ implementation
 
 uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
   OpenSSLUtils, Classes, CadenaOriginal,
-  DateUtils, CodeSiteLogging;
+  DateUtils;
 
 // Al crear el objeto, comenzamos a "llenar" el XML interno
 constructor TFEComprobanteFiscal.Create();
@@ -150,9 +154,11 @@ begin
   fDesglosarTotalesImpuestos := True;
   fCadenaOriginalCalculada:='';
   fSelloDigitalCalculado:='';
-   // La version actual para nuevos CFD es la 2.2
-  fVersion:=fev22;
-
+   // La version actual para nuevos CFD es la 3.2
+//  if (Now < EncodeDate(2014,1,1)) then
+//   fVersion:=fev22
+//  else
+  fVersion:=fev32;
   // Creamos el objeto XML
   fDocumentoXML := TXMLDocument.Create(nil);
   fDocumentoXML.Active := True;
@@ -161,6 +167,7 @@ begin
   case fVersion of
     fev20: fXmlComprobante := GetComprobante(fDocumentoXML);
     fev22: fXmlComprobante := GetComprobanteV22(fDocumentoXML);
+    fev32: fXmlComprobante := GetComprobanteV32(fDocumentoXML);    
   end;
 
   // De acuerdo a los articulos 29 y 29-A del CFF
@@ -184,9 +191,12 @@ end;
 
 procedure TFEComprobanteFiscal.AsignarDescuentos;
 begin
-  fXmlComprobante.Descuento := TFEReglamentacion.ComoMoneda(inherited DescuentoMonto);
-  if Trim(inherited DescuentoMotivo) <> '' then
-    fXmlComprobante.MotivoDescuento := TFEReglamentacion.ComoCadena(inherited DescuentoMotivo);
+  if (inherited DescuentoMonto) > 0 then
+  begin
+    fXmlComprobante.Descuento := TFEReglamentacion.ComoMoneda(inherited DescuentoMonto);
+    if Trim(inherited DescuentoMotivo) <> '' then
+      fXmlComprobante.MotivoDescuento := TFEReglamentacion.ComoCadena(inherited DescuentoMotivo);
+  end;
 end;
 
 function TFEComprobanteFiscal.getCadenaOriginal(): TStringCadenaOriginal;
@@ -221,9 +231,19 @@ procedure TFEComprobanteFiscal.AsignarEmisor;
      // Agregamos cada regimen fiscal del emisor al comprobante
      for I := 0 to Length(inherited Emisor.Regimenes) - 1 do
      begin
-          NombreRegimenFiscal:=(inherited Emisor.Regimenes)[I];
+      NombreRegimenFiscal:=(inherited Emisor.Regimenes)[I];
+      case fVersion of
+       fev22:
+        Begin
           with IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal.Add do
               Regimen:=NombreRegimenFiscal;
+        End;
+       fev32:
+        Begin
+          with IFEXMLComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal.Add do
+              Regimen:=NombreRegimenFiscal;
+        End;
+     end;
      end;
   end;
 
@@ -294,11 +314,46 @@ begin
             Pais := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Pais);
             CodigoPostal := (inherited Emisor).Direccion.CodigoPostal;
           end;
-
           // Agregamos el nuevo campo requerido Regimen Fiscal (implementado en 2.2)
           Assert(Length(inherited Emisor.Regimenes) > 0,
              'Se debe especificar al menos un régimen del cliente');
           AsignarRegimenesFiscales;
+        end;
+    end;
+    fev32:
+    begin
+       with IFEXmlComprobanteV32(fXmlComprobante).Emisor do
+        begin
+          RFC :=(inherited Emisor).RFC;
+          Nombre := TFEReglamentacion.ComoCadena((inherited Emisor).Nombre);
+          with DomicilioFiscal do // Alias de UbicacionFiscal
+          begin
+            Calle := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Calle);
+
+            if Trim((inherited Emisor).Direccion.NoExterior) <> '' then
+              NoExterior := (inherited Emisor).Direccion.NoExterior; // Opcional
+
+            if Trim((inherited Emisor).Direccion.NoInterior) <> '' then
+              NoInterior := (inherited Emisor).Direccion.NoInterior; // Opcional
+
+            if Trim((inherited Emisor).Direccion.Colonia) <> '' then
+              Colonia := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Colonia); // Opcional
+
+            if Trim((inherited Emisor).Direccion.Localidad) <> '' then
+              Localidad := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Localidad); // Opcional
+
+            if Trim((inherited Emisor).Direccion.Referencia) <> '' then
+              Referencia := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Referencia); // Opcional
+
+            Municipio := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Municipio);
+            Estado := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Estado);
+            Pais := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Pais);
+            CodigoPostal := (inherited Emisor).Direccion.CodigoPostal;
+            // Agregamos el nuevo campo requerido Regimen Fiscal (implementado en 2.2)
+             Assert(Length(inherited Emisor.Regimenes) > 0,
+               'Se debe especificar al menos un régimen del cliente');
+             AsignarRegimenesFiscales;
+          end;
         end;
     end;
   end;
@@ -357,9 +412,65 @@ begin
                     CodigoPostal := (inherited ExpedidoEn).CodigoPostal;
                 end;
           end;
+          fev32:
+          begin
+                with IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn do
+                begin
+                    Calle := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Calle);
+                    if Trim((inherited ExpedidoEn).NoExterior) <> '' then
+                      NoExterior := (inherited ExpedidoEn).NoExterior; // Opcional
+
+                    if Trim((inherited ExpedidoEn).NoInterior) <> '' then
+                      NoInterior := (inherited ExpedidoEn).NoInterior; // Opcional
+
+                    if Trim((inherited ExpedidoEn).Colonia) <> '' then
+                      Colonia := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Colonia); // Opcional
+                    if Trim((inherited ExpedidoEn).Localidad) <> '' then
+                      Localidad := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Localidad); // Opcional
+                    if Trim((inherited ExpedidoEn).Referencia) <> '' then
+                      Referencia := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Referencia); // Opcional
+                    Municipio := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Municipio);
+                    Estado := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Estado);
+                    Pais := TFEReglamentacion.ComoCadena((inherited ExpedidoEn).Pais);
+                    CodigoPostal := (inherited ExpedidoEn).CodigoPostal;
+                end;
+          end;
         end;
     end;
 end;
+
+{procedure TFEComprobanteFiscal.AsignarTimbreFiscal;
+var
+  NuevoTimbre: TFETimbre;
+  I: Integer;
+begin
+
+
+  case fVersion of
+   fev32:
+    begin
+    for I := 0 to Length(inherited TimbreFiscal) - 1 do
+    begin
+        NuevoTimbre:=(inherited TimbreFiscal)[I];
+        with IFEXmlComprobanteV32(fXmlComprobante).TimbreFiscal.Add do
+        begin
+         if Trim(NuevoTimbre.Version) <> '' then
+          Version:=TFEReglamentacion.ComoCadena(NuevoTimbre.Version);
+         UUID:=TFEReglamentacion.ComoCadena(NuevoTimbre.UUID);
+        if Trim(NuevoTimbre.FechaTimbrado) <> '' then
+         FechaTimbrado:=TFEReglamentacion.ComoCadena(NuevoTimbre.FechaTimbrado);
+        if Trim(NuevoTimbre.SelloCFD) <> '' then
+         SelloCFD:=TFEReglamentacion.ComoCadena(NuevoTimbre.SelloCFD);
+        if Trim(NuevoTimbre.NoCertificadoSAT) <> '' then
+         NoCertificadoSAT:=TFEReglamentacion.ComoCadena(NuevoTimbre.NoCertificadoSAT);
+        if Trim(NuevoTimbre.SelloSAT) <> '' then
+         SelloSAT:=TFEReglamentacion.ComoCadena(NuevoTimbre.SelloSAT);
+      end;
+    end;
+    end;
+  end;
+end;
+}
 
 // 3. Clave del RFC de la persona a favor de quien se expida la factura (29-A, Fraccion IV)
 procedure TFEComprobanteFiscal.AsignarReceptor;
@@ -367,7 +478,7 @@ begin
   with fXmlComprobante.Receptor do
   begin
     RFC := Trim((inherited Receptor).RFC);
-    
+
     // Si es un CFD de venta al publico en general o extranjeros no incluimos nombre ni direccion
     if ((Rfc <> _RFC_VENTA_PUBLICO_EN_GENERAL) And (Rfc <> _RFC_VENTA_EXTRANJEROS)) then
     begin
@@ -389,7 +500,10 @@ begin
             Localidad := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Localidad); // Opcional
           if Trim((inherited Receptor).Direccion.Referencia) <> '' then
             Referencia := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Referencia); // Opcional
-          Municipio := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Municipio);
+
+          if Trim((inherited Receptor).Direccion.Municipio) <> '' then
+            Municipio := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Municipio);
+
           Estado := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Estado);
           Pais := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Pais);
           CodigoPostal := (inherited Receptor).Direccion.CodigoPostal;
@@ -561,9 +675,10 @@ procedure TFEComprobanteFiscal.AsignarDatosFolios;
 begin
    if Trim(fBloqueFolios.Serie) <> '' then
     fXmlComprobante.Serie := fBloqueFolios.Serie;
-
-  fXmlComprobante.NoAprobacion := fBloqueFolios.NumeroAprobacion;
-  fXmlComprobante.AnoAprobacion := fBloqueFolios.AnoAprobacion;
+ {$ifdef V22}
+   fXmlComprobante.NoAprobacion := fBloqueFolios.NumeroAprobacion;
+   fXmlComprobante.AnoAprobacion := fBloqueFolios.AnoAprobacion;
+ {$endif}
 end;
 
 // 8. Numero de folio, el cual debe de ser asignado de manera automatica por el sistema
@@ -664,7 +779,12 @@ end;
 
 procedure TFEComprobanteFiscal.AsignarLugarExpedicion;
 begin
-   IFEXMLComprobanteV22(fXmlComprobante).LugarExpedicion := (inherited LugarDeExpedicion);
+  case fVersion of
+    fev22:
+     IFEXMLComprobanteV22(fXmlComprobante).LugarExpedicion := (inherited LugarDeExpedicion);
+    fev32:
+     IFEXMLComprobanteV32(fXmlComprobante).LugarExpedicion := (inherited LugarDeExpedicion);
+  end;
 end;
 
 procedure TFEComprobanteFiscal.AsignarNumeroDeCuenta;
@@ -676,6 +796,11 @@ begin
     begin
          if Trim(inherited NumeroDeCuenta) <> '' then
             IFEXMLComprobanteV22(fXmlComprobante).NumCtaPago:=inherited NumeroDeCuenta;
+    end;
+    fev32:
+    begin
+         if Trim(inherited NumeroDeCuenta) <> '' then
+            IFEXMLComprobanteV32(fXmlComprobante).NumCtaPago:=inherited NumeroDeCuenta;
     end;
   end;
 end;
@@ -699,8 +824,8 @@ begin
         AsignarContenidoCertificado;
         AsignarCondicionesDePago;
         AsignarMetodoDePago;
-        // Nuevas propiedades de CFD 2.2:
-        if (fVersion = fev22) then
+        // Nuevas propiedades de CFD 2.2: y 3.2
+        if (fVersion = fev22) or (fVersion = fev32) then
         begin
           AsignarLugarExpedicion;
           AsignarNumeroDeCuenta;
@@ -750,12 +875,27 @@ procedure TFEComprobanteFiscal.EstablecerVersionDelComprobante;
 begin
   Assert(fXmlComprobante <> nil, 'El comprobante No debio haber sido NULO');
   fXmlComprobante.SetAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-  fXmlComprobante.SetAttribute('xsi:schemaLocation',
-    'http://www.sat.gob.mx/cfd/2 http://www.sat.gob.mx/sitio_internet/cfd/2/cfdv22.xsd');
+  case fVersion of
+   fev22:
+    begin
+     fXmlComprobante.SetAttribute('xsi:schemaLocation',
+      'http://www.sat.gob.mx/cfd/2 http://www.sat.gob.mx/sitio_internet/cfd/2/cfdv22.xsd');
+    end;
+   fev32:
+    begin
+     fXmlComprobante.SetAttribute('xsi:schemaLocation',
+      'http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv32.xsd');
+    end;
+  end;
   fXmlComprobante.Version := VERSION_ACTUAL;
 
   fDocumentoXML.Version := '1.0';
   fDocumentoXML.Encoding := 'UTF-8';
+end;
+
+procedure TFEComprobanteFiscal.GenerarComprobante;
+begin
+  fXmlComprobante.Sello:=Self.SelloDigital;
 end;
 
 procedure TFEComprobanteFiscal.ValidarQueFolioEsteEnRango;
@@ -784,7 +924,10 @@ end;
 // El metodo que genera el CFD al final...
 procedure TFEComprobanteFiscal.GuardarEnArchivo(sArchivoDestino: String);
 begin
+  (*TODO: extracted code
   fXmlComprobante.Sello:=Self.SelloDigital;
+  *)
+  GenerarComprobante;
   fDocumentoXML.SaveToFile(sArchivoDestino);
   // TODO: Implementar las diversas fallas que pueden ocurrir
 end;
@@ -898,8 +1041,11 @@ begin
         if AnsiPos('version="2.2"', Valor) > 0 then
           fXmlComprobante := GetComprobanteV22(fDocumentoXML);
 
+        if AnsiPos('version="3.2"', Valor) > 0 then
+          fXmlComprobante := GetComprobanteV32(fDocumentoXML);
+
         fDocumentoXML.Encoding := 'UTF-8';
-        Assert(fXmlComprobante <> nil, 'El CFD debio haber sido ver 2.0 o v2.2');
+        Assert(fXmlComprobante <> nil, 'El CFD/I debio haber sido ver 2.0 o v2.2 o v3.2');
         Assert(fXmlComprobante.Version <> '', 'El comprobante no fue leido correctamente.');
 
         // Checamos que versión es
@@ -909,6 +1055,9 @@ begin
         if fXmlComprobante.Version = '2.2' then
           fVersion:=fev22;
 
+        if fXmlComprobante.Version = '3.2' then
+          fVersion:=fev32;
+
         // Ahora, actualizamos todas las variables internas (de la clase) con los valores del XML
         with fXmlComprobante do
         begin
@@ -916,20 +1065,34 @@ begin
             // Datos del certificado
             fCertificado.NumeroSerie:=NoCertificado;
             fCertificadoTexto := Certificado;
-            fBloqueFolios.NumeroAprobacion:=NoAprobacion;
-            fBloqueFolios.AnoAprobacion:=AnoAprobacion;
-            fBloqueFolios.Serie:=Serie;
-            inherited Serie:=Serie;
+            {$ifdef V22}
+             fBloqueFolios.NumeroAprobacion:=NoAprobacion;
+             fBloqueFolios.AnoAprobacion:=AnoAprobacion;
+            {$endif}
+
+             if TieneAtributo(fXmlComprobante, 'serie') then
+            begin
+              fBloqueFolios.Serie:=Serie;
+              inherited Serie:=Serie;
+            end;
+
             fBloqueFolios.FolioInicial:=inherited Folio;
             fBloqueFolios.FolioFinal:=inherited Folio;
 
-            // CFD 2.2
+            // CFD 2.2 /CFD 3.2
             if (fVersion = fev22) then
             begin
                 inherited LugarDeExpedicion:=IFEXMLComprobanteV22(fXmlComprobante).LugarExpedicion;
 
                 if TieneAtributo(fXmlComprobante, 'NumCtaPago') then
                   inherited NumeroDeCuenta:=IFEXMLComprobanteV22(fXmlComprobante).NumCtaPago;
+            end
+           Else if (fVersion = fev32) then
+            begin
+                inherited LugarDeExpedicion:=IFEXMLComprobanteV32(fXmlComprobante).LugarExpedicion;
+
+                if TieneAtributo(fXmlComprobante, 'NumCtaPago') then
+                  inherited NumeroDeCuenta:=IFEXMLComprobanteV32(fXmlComprobante).NumCtaPago;
             end;
 
             FechaGeneracion:=TFEReglamentacion.ComoDateTime(fXmlComprobante.Fecha);
@@ -1003,6 +1166,36 @@ begin
                         ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
                   end;
               end;
+              fev32:
+              begin
+                  if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'nombre') then
+                      ValorEmisor.Nombre:=IFEXmlComprobanteV32(fXmlComprobante).Emisor.Nombre;
+
+                  if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'rfc') then
+                     ValorEmisor.RFC:=IFEXmlComprobanteV32(fXmlComprobante).Emisor.RFC;
+
+                  with IFEXmlComprobanteV32(fXmlComprobante).Emisor do
+                  begin
+                      if TieneAtributo(DomicilioFiscal, 'calle') then
+                        ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
+                      if TieneAtributo(DomicilioFiscal, 'noExterior') then
+                        ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
+                      if TieneAtributo(DomicilioFiscal, 'noInterior') then
+                        ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
+                      if TieneAtributo(DomicilioFiscal, 'codigoPostal') then
+                        ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
+                      if TieneAtributo(DomicilioFiscal, 'colonia') then
+                        ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
+                      if TieneAtributo(DomicilioFiscal, 'localidad') then
+                        ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
+                      if TieneAtributo(DomicilioFiscal, 'municipio') then
+                        ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
+                      if TieneAtributo(DomicilioFiscal, 'estado') then
+                        ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
+                      if TieneAtributo(DomicilioFiscal, 'pais') then
+                        ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
+                  end;
+              end;
             end;
 
             // Copiamos los régimenes fiscales del emisor
@@ -1012,6 +1205,15 @@ begin
                 for I := 0 to IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal.Count - 1 do
                 begin
                      feRegimen := IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal[I].Regimen;
+                     ValorEmisor.Regimenes[I]:=feRegimen;
+                end;
+            end
+            else if (fVersion = fev32) then
+            begin
+                SetLength(ValorEmisor.Regimenes, IFEXMLComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal.Count);
+                for I := 0 to IFEXMLComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal.Count - 1 do
+                begin
+                     feRegimen := IFEXMLComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal[I].Regimen;
                      ValorEmisor.Regimenes[I]:=feRegimen;
                 end;
             end;
@@ -1099,6 +1301,31 @@ begin
                               if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'estado') then
                                 ValorExpedidoEn.Estado := Estado;
                               if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'pais') then
+                                ValorExpedidoEn.Pais := Pais;
+                          end;
+                    end;
+              end;
+              fev32:
+              begin
+                   if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'ExpedidoEn') then
+                    begin
+                          with IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn do
+                          begin
+                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'calle') then
+                                ValorExpedidoEn.Calle := Calle;
+                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'NoExterior') then
+                                ValorExpedidoEn.NoExterior := NoExterior;
+                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'codigoPostal') then
+                                ValorExpedidoEn.CodigoPostal := CodigoPostal;
+                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'localidad') then
+                                ValorExpedidoEn.Localidad := Localidad;
+                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'municipio') then
+                                ValorExpedidoEn.Municipio := Municipio;
+                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'colonia') then
+                                ValorExpedidoEn.Colonia := Colonia;
+                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'estado') then
+                                ValorExpedidoEn.Estado := Estado;
+                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'pais') then
                                 ValorExpedidoEn.Pais := Pais;
                           end;
                     end;
