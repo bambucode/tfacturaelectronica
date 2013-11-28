@@ -24,12 +24,8 @@ type
   TAlgoritmoHash = (haMD5, haSHA1);
 
   TFacturacionHashing = class
-     class function CalcularHash(const aCadena: string; aAlgoritmo : TAlgoritmoHash) : String;
+     class function CalcularHash(const aCadena: WideString; aAlgoritmo : TAlgoritmoHash) : String;
   end;
-
-
-{function CalcHash(Stream: TStream; Algorithm: THashAlgorithm): string; overload;
-function CalcHash(Archivo: string; Algorithm: THashAlgorithm): string; overload;        }
 
 implementation
 
@@ -83,7 +79,7 @@ function CryptDestroyHash(hHash: HCRYPTHASH): BOOL; stdcall;
 function CryptReleaseContext(hProv: HCRYPTPROV; dwFlags: DWORD): BOOL; stdcall;
   external ADVAPI32 name 'CryptReleaseContext';
 
-function CalcHash(Stream: TStream; Algorithm: TAlgoritmoHash): string; overload;
+function CalcHash(Stream: TStream; Algorithm: TAlgoritmoHash): WideString; overload;
 var
   hProv: HCRYPTPROV;
   hHash: HCRYPTHASH;
@@ -138,28 +134,12 @@ begin
   end;
 end;
 
-function CalcHash(Archivo: string; Algorithm: TAlgoritmoHash): string; overload;
-var
-  Stream: TFileStream;
-begin
-  Result:= EmptyStr;
-  if FileExists(Archivo) then
-  try
-    Stream:= TFileStream.Create(Archivo,fmOpenRead or fmShareDenyWrite);
-    try
-      Result:= CalcHash(Stream,Algorithm);
-    finally
-      Stream.Free;
-    end;
-  except end;
-end;
-
-class function TFacturacionHashing.CalcularHash(const aCadena: string; aAlgoritmo : TAlgoritmoHash) : String;
+class function TFacturacionHashing.CalcularHash(const aCadena: WideString; aAlgoritmo : TAlgoritmoHash) : String;
 var
   Stream: TStringStream;
 begin
   Result:= EmptyStr;
-  Stream:= TStringStream.Create(aCadena);
+  Stream:= TStringStream.Create(aCadena, TEncoding.UTF8);
   try
     Result:= CalcHash(Stream, aAlgoritmo);
   finally
