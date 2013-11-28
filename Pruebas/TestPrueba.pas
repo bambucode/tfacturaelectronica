@@ -101,6 +101,7 @@ function TTestPrueba.leerContenidoDeArchivo(sNombreArchivo: String): WideString;
 var
   slArchivo: TStrings;
 begin
+  Assert(FileExists(sNombreArchivo), 'No existe el archivo a leer');
   slArchivo := TStringList.Create;
   slArchivo.LoadFromFile(sNombreArchivo);
   {$IF Compilerversion >= 20}
