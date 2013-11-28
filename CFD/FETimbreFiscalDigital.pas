@@ -4,7 +4,6 @@
 {                                    XML Data Binding                                     }
 {                                                                                         }
 {         Generated on: 11/22/2013 10:36:32 AM                                            }
-{       Generated from: D:\Proyectos\Codigo\Papelerama\GPA\CFDI\TimbreFiscalDigital.xsd   }
 {                                                                                         }
 {*****************************************************************************************}
 

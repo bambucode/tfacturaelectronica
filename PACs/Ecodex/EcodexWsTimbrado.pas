@@ -13,7 +13,8 @@ unit EcodexWsTimbrado;
 
 interface
 
-uses InvokeRegistry, SOAPHTTPClient, Types, XSBuiltIns;
+uses InvokeRegistry, SOAPHTTPClient, Types, XSBuiltIns,
+     ProveedorAutorizadoCertificacion;
 
 const
   IS_OPTN = $0001;
@@ -88,12 +89,13 @@ type
   // ************************************************************************ //
   TEcodexComprobanteXML = class(TRemotable)
   private
-    FDatosXML: string;
+    FDatosXML: TTipoComprobanteXML;
     FDatosXML_Specified: boolean;
-    procedure SetDatosXML(Index: Integer; const Astring: string);
+    procedure SetDatosXML(Index: Integer; const Astring: TTipoComprobanteXML);
     function  DatosXML_Specified(Index: Integer): boolean;
   published
-    property DatosXML: string  Index (IS_OPTN or IS_NLBL) read FDatosXML write SetDatosXML stored DatosXML_Specified;
+    property DatosXML: TTipoComprobanteXML index (IS_OPTN or IS_NLBL) read
+        FDatosXML write SetDatosXML stored DatosXML_Specified;
   end;
 
 
@@ -763,6 +765,10 @@ begin
     RIO := THTTPRIO.Create(nil)
   else
     RIO := HTTPRIO;
+
+  // Configuramos uso de UTF8 (Probablemente solo para Delphi 2010 y menores)
+  //RIO.HTTPWebNode.UseUTF8InHeader := True;
+
   try
     Result := (RIO as IEcodexServicioTimbrado);
     if UseWSDL then
@@ -790,7 +796,8 @@ begin
   Result := FImagen_Specified;
 end;
 
-procedure TEcodexComprobanteXML.SetDatosXML(Index: Integer; const Astring: string);
+procedure TEcodexComprobanteXML.SetDatosXML(Index: Integer; const Astring:
+    TTipoComprobanteXML);
 begin
   FDatosXML := Astring;
   FDatosXML_Specified := True;

@@ -24,6 +24,9 @@ uses Classes,
 
 type
 
+// Definimos el tipo nativo en Delphi para enviar el XML al PAC
+TTipoComprobanteXML = String;
+
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Clase padre abstracta que representa a un proveedor autorizado de certificacion
@@ -32,10 +35,13 @@ type
 ///	</summary>
 {$ENDREGION}
  TProveedorAutorizadoCertificacion = class
+ protected
+  function getNombre() : String; virtual; abstract;
  public
+  property Nombre : String read getNombre;
   procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); virtual; abstract;
-  function CancelarDocumento(const aDocumento: string): Boolean; virtual; abstract;
-  function TimbrarDocumento(const aDocumento: string): TFETimbre; virtual; abstract;
+  function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; virtual; abstract;
+  function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; virtual; abstract;
  end;
 
 implementation

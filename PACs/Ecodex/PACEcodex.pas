@@ -36,7 +36,6 @@ type
  // Excepciones específicas de Ecodex
  EEcodexNoExisteAliasDeLlaveException = class(Exception); // Error código 1001
 
-
  {$REGION 'Documentation'}
  ///	<summary>
  ///	  Implementa el servicio de timbrado para CFDI del proveedor "Comercio
@@ -46,24 +45,33 @@ type
  TPACEcodex = class(TProveedorAutorizadoCertificacion)
  private
   fCredenciales : TFEPACCredenciales;
-  fDocumentoXMLTimbrado : TXMLDocument;
   wsTimbradoEcodex: IEcodexServicioTimbrado;
   fManejadorDeSesion : TEcodexManejadorDeSesion;
-  function ObtenerURLTimbrado: String;
+  function AsignarTimbreDeRespuestaDeEcodex(const aRespuestaTimbrado:
+      TEcodexRespuestaTimbrado): TFETimbre;
   procedure ProcesarCodigoDeError(aRespuestaDePAC: String);
-  function ValidarXML(const xmlFile : TFileName) : String; //unicamente valida la estructura del xml solo se usaria para desarrollo
+  function getNombre() : string; override;
 public
   destructor Destroy(); override;
   procedure AfterConstruction; override;
   procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); override;
-  function CancelarDocumento(const aDocumento: String): Boolean; override;
-  function TimbrarDocumento(const aDocumento: String): TFETimbre; override;
+  function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; override;
+  function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; override;
+  property Nombre : String read getNombre;
  end;
 
 implementation
 
 uses Soap.InvokeRegistry,
+     feCFDv32,
+     FacturaReglamentacion,
      CodeSiteLogging;
+
+
+function TPACEcodex.getNombre() : string;
+begin
+  Result := 'Ecodex';
+end;
 
 destructor TPACEcodex.Destroy();
 begin
@@ -75,9 +83,6 @@ end;
 
 procedure TPACEcodex.AfterConstruction;
 begin
-  fDocumentoXMLTimbrado := TXMLDocument.Create(nil);
-  fDocumentoXMLTimbrado.Active := True;
-
   // Obtenemos una instancia del WebService de Timbrado de Ecodex
   wsTimbradoEcodex := GetWsEcodexTimbrado;
   fManejadorDeSesion := TEcodexManejadorDeSesion.Create;
@@ -90,28 +95,56 @@ begin
   fManejadorDeSesion.AsignarCredenciales(aCredenciales);
 end;
 
-{
-Procedure TPACComercioDigital.AgregaTimbreFiscal(sXML:String);
-Procedure TPACEcodexç.AgregaTimbreFiscal(sXML:String);
-Procedure TPACEcodex.AgregaTimbreFiscal(sXML:String);
-  if FileExists(sXML) then
-   Begin
-    FileName:=TStringList.Create;
-    FileName.LoadFromFile(sXML);
-    FileName.Text:=UTF8Encode(StringReplace(FileName.Text,'</cfdi:Comprobante>',
-                              '<cfdi:Complemento>'+fDocumentoXML.XML.Text+'</cfdi:Complemento></cfdi:Comprobante>',[rfReplaceAll]));
-    FileName.SaveToFile(sXML);
-    FileName.Free;
-   End;
-End;
-           }
 
-
-function TPACEcodex.ObtenerURLTimbrado: String;
+function TPACEcodex.AsignarTimbreDeRespuestaDeEcodex(const aRespuestaTimbrado:
+    TEcodexRespuestaTimbrado): TFETimbre;
+var
+  comprobanteTimbrado: IFEXMLComprobanteV32;
+  nodoXMLTimbre: IFEXMLtimbreFiscalDigital;
+  documentoXMLTimbrado, documentoXMLTimbre: TXmlDocument;
 begin
- 
+  Assert(aRespuestaTimbrado <> nil, 'La respuesta del servicio de timbrado fue nula');
+
+  // Creamos el documento XML para almacenar el XML del comprobante completo que nos regresa Ecodex
+  documentoXMLTimbrado := TXMLDocument.Create(nil);
+  documentoXMLTimbrado.Active := True;
+  documentoXMLTimbrado.Version := '1.0';
+  documentoXMLTimbrado.Encoding := 'utf-8';
+  {$IF Compilerversion >= 20}
+  // Delphi 2010 y superiores
+  documentoXMLTimbrado.XML.Text:=aRespuestaTimbrado.ComprobanteXML.DatosXML;
+  {$ELSE}
+  documentoXMLTimbrado.XML.Text:=UTF8Encode(aRespuestaTimbrado.ComprobanteXML.DatosXML);
+  {$IFEND}
+
+  documentoXMLTimbrado.Active:=True;
+
+  // Convertimos el XML a la interfase del CFD v3.2
+  comprobanteTimbrado := GetComprobanteV32(documentoXMLTimbrado);
+
+  // Extraemos solamente el nodo del timbre
+  Assert(IFEXMLComprobanteV32(comprobanteTimbrado).Complemento.HasChildNodes,
+        'No se recibio correctamente el timbre');
+  Assert(IFEXMLComprobanteV32(comprobanteTimbrado).Complemento.ChildNodes.Count = 1,
+        'Se debio haber tenido solo el timbre como complemento');
+
+  // Creamos el documento XML solamente del timbre
+  documentoXMLTimbre := TXMLDocument.Create(nil);
+  documentoXMLTimbre.XML.Text := IFEXMLComprobanteV32(comprobanteTimbrado).Complemento.ChildNodes.First.XML;
+  documentoXMLTimbre.Active := True;
+
+  // Convertimos el XML del nodo a la interfase del Timbre v3.2
+  nodoXMLTimbre := GetTimbreFiscalDigital(documentoXMLTimbre);
+
+  // Extraemos las propiedades del timbre para regresarlas en el tipo TFETimbre
+  Result.Version:=nodoXMLTimbre.Version;
+  Result.UUID:=nodoXMLTimbre.UUID;
+  Result.FechaTimbrado:=TFEReglamentacion.DeFechaHoraISO8601(nodoXMLTimbre.FechaTimbrado);
+  Result.SelloCFD:=nodoXMLTimbre.SelloCFD;
+  Result.NoCertificadoSAT:=nodoXMLTimbre.NoCertificadoSAT;
+  Result.SelloSAT:=nodoXMLTimbre.SelloSAT;
+  Result.XML := nodoXMLTimbre.XML;
 end;
-//unicamente valida la estructura del xml solo se usaria para desarrollo
 
 procedure TPACEcodex.ProcesarCodigoDeError(aRespuestaDePAC: String);
 begin
@@ -151,29 +184,14 @@ begin
   raise ETimbradoErrorGenericoException.Create(aRespuestaDePAC);
 end;
 
-function TPACEcodex.ValidarXML(const xmlFile : TFileName) : String;
-begin
-   try
-     fDocumentoXMLTimbrado.LoadFromFile(xmlFile) ;
-     fDocumentoXMLTimbrado.Active := true; //esto valida
-     result := '';
-   except
-     on EX : EDOMParseError do
-     begin
-     Result:='XML Invalido: ' + Ex.Message ;
-     end;
-   end;
-end;
-
-
-function TPACEcodex.TimbrarDocumento(const aDocumento: String): TFETimbre;
+function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre;
 var
-  nodoXMLTimbre : IFEXMLtimbreFiscalDigital;
   solicitudTimbrado: TSolicitudTimbradoEcodex;
   respuestaTimbrado: TEcodexRespuestaTimbrado;
   tokenDeUsuario: string;
 const
   _ECODEX_FUERA_DE_SERVICIO = 22;
+  _CODEPAGE_UTF8 = 65001;
 begin
   try
     // 1. Iniciamos una nueva sesion solicitando un nuevo token
@@ -189,22 +207,12 @@ begin
     solicitudTimbrado.Token := tokenDeUsuario;
     solicitudTimbrado.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
 
-    // 3. Realizamos la solicitud de timbrado
     try
+      // 3. Realizamos la solicitud de timbrado
       respuestaTimbrado := wsTimbradoEcodex.TimbraXML(solicitudTimbrado);
 
-      // 4. Asignamos las propiedades del Timbre que vamos a regresar
-      fDocumentoXMLTimbrado.XML.Text:=UTF8Encode(respuestaTimbrado.ComprobanteXML.DatosXML);
-      fDocumentoXMLTimbrado.Active:=True;
-      nodoXMLTimbre := GetTimbreFiscalDigital(fDocumentoXMLTimbrado);
-
-      Result.Version:=nodoXMLTimbre.Version;
-      Result.UUID:=nodoXMLTimbre.UUID;
-      //Result.FechaTimbrado:=nodoXMLTimbre.FechaTimbrado;
-      Result.SelloCFD:=nodoXMLTimbre.SelloCFD;
-      Result.NoCertificadoSAT:=nodoXMLTimbre.NoCertificadoSAT;
-      Result.SelloSAT:=nodoXMLTimbre.SelloSAT;
-      Result.XML := nodoXMLTimbre.XML;
+      // 4. Extraemos las propiedades del timbre de la respuesta del WebService
+      Result := AsignarTimbreDeRespuestaDeEcodex(respuestaTimbrado)
     except
       On E:Exception do
       begin
@@ -224,25 +232,22 @@ begin
               CodeSite.Send('Sugerencia:', EFallaServicioException(E).FaultCode);
 
               if EFallaServicioException(E).Numero = _ECODEX_FUERA_DE_SERVICIO then
-
-
-              raise EPACServicioNoDisponibleException.Create(E.Message);
+                raise EPACServicioNoDisponibleException.Create(EFallaServicioException(E).Descripcion);
             end;
-            ProcesarCodigoDeError(E.Message);
+
         end else
-          raise;
+          ProcesarCodigoDeError(E.Message);
       end;
     end;
   finally
+    respuestaTimbrado.Free;
     solicitudTimbrado.Free;
   end;
 end;
 
-function TPACEcodex.CancelarDocumento(const aDocumento: string): Boolean;
+function TPACEcodex.CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean;
 begin
-  // TODO: TPACComercioDigital.CancelarDocumento
-  // TODO: TPACEcodexç.CancelarDocumento
-  // TODO: TPACEcodex.CancelarDocumento
+  // TODO: Implementar TPACEcodex.CancelarDocumento
 end;
 
 end.

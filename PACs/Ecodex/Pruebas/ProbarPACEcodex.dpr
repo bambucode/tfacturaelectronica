@@ -42,11 +42,11 @@ uses
   TestManejadorDeSesion in 'TestManejadorDeSesion.pas',
   PAC.Ecodex.ManejadorDeSesion in '..\PAC.Ecodex.ManejadorDeSesion.pas',
   EcodexWsSeguridad in '..\EcodexWsSeguridad.pas',
-  PAC.Ecodex.Timbrado in '..\PAC.Ecodex.Timbrado.pas',
   ProveedorAutorizadoCertificacion in '..\..\ProveedorAutorizadoCertificacion.pas',
   EcodexWsTimbrado in '..\EcodexWsTimbrado.pas',
   TestPACEcodex in 'TestPACEcodex.pas',
-  TestPrueba in '..\..\..\Pruebas\TestPrueba.pas';
+  TestPrueba in '..\..\..\Pruebas\TestPrueba.pas',
+  PACEcodex in '..\PACEcodex.pas';
 
 {$R *.RES}
 
