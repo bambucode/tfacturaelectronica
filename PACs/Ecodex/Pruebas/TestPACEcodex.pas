@@ -16,7 +16,7 @@ uses
   TestFramework,
   FacturaTipos,
   TestPrueba,
-  PAC.Ecodex.Timbrado;
+  PACEcodex;
 
 type
 
