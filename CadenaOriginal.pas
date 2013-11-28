@@ -46,6 +46,7 @@ implementation
 uses SysUtils,
      StrUtils,
      {$IFDEF CODESITE}
+     FacturacionHashes,
      CodeSiteLogging,
      {$ENDIF}
      FacturaReglamentacion;
@@ -184,12 +185,19 @@ begin
       // 1) Datos del comprobante
 
       // NOTA IMPORTANTE: El parametro nombre de atributo tiene que ser exactamente igual que el de la definicion
-      // del XSD (minusculas y mayusculas) ya que es sensible a ello.
+      // del XSD (minusculas y mayusculas) ya que es sensible a ello
       AgregarAtributo(fXmlComprobante, 'version');
-      AgregarAtributo(fXmlComprobante, 'serie');
-      AgregarAtributo(fXmlComprobante, 'folio');
+
+      // Los parametros serie y folio solo aplican en CFD <= 2.2
+      if fVersionCFD In [fev20, fev22] then
+      begin
+        AgregarAtributo(fXmlComprobante, 'serie');
+        AgregarAtributo(fXmlComprobante, 'folio');
+      end;
+
       AgregarAtributo(fXmlComprobante, 'fecha');
-      if fVersionCFD <> fev32 then
+
+      if fVersionCFD In [fev20, fev22] then
       begin
         AgregarAtributo(fXmlComprobante, 'noAprobacion');
         AgregarAtributo(fXmlComprobante, 'anoAprobacion');
@@ -200,6 +208,13 @@ begin
       AgregarAtributo(fXmlComprobante, 'condicionesDePago');
       AgregarAtributo(fXmlComprobante, 'subTotal');
       AgregarAtributo(fXmlComprobante, 'descuento');
+
+      if fVersionCFD In [fev32] then
+      begin
+        AgregarAtributo(fXmlComprobante, 'TipoCambio');
+        AgregarAtributo(fXmlComprobante, 'Moneda');
+      end;
+
       AgregarAtributo(fXmlComprobante, 'total');
 
       // Nuevos atributos requeridos de la v2.2:
@@ -247,11 +262,10 @@ begin
            AgregarAtributo(fXmlComprobante, 'LugarExpedicion'); // Requerido
            AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante), 'NumCtaPago');
 
-          { if Assigned(fXmlComprobante.ChildNodes.FindNode('TipoCambio')) then
-              AgregarAtributo(IFEXmlComprobanteV22(fXmlComprobante), 'TipoCambio');
-
-           if Assigned(fXmlComprobante.ChildNodes.FindNode('Moneda')) then
-              AgregarAtributo(IFEXmlComprobanteV22(fXmlComprobante), 'Moneda'); }
+           AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante), 'FolioFiscalOrig');
+           AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante), 'SerieFolioFiscalOrig');
+           AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante), 'FechaFolioFiscalOrig');
+           AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante), 'MontoFolioFiscalOrig');
 
            AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'rfc');
            AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'nombre');
@@ -261,9 +275,10 @@ begin
            if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor')) then
              if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor').ChildNodes.FindNode('ExpedidoEn')) then
                AgregarUbicacion(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn);
+
            // 5) Datos del Regimen Fiscal
-           if Assigned(IFEXmlComprobanteV32(fXmlComprobante).ChildNodes.FindNode('Emisor').ChildNodes.FindNode('RegimenFiscal')) then
-              AgregarRegimenesFiscales(IFEXmlComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal);
+           if Assigned(IFEXmlComprobanteV22(fXmlComprobante).ChildNodes.FindNode('Emisor').ChildNodes.FindNode('RegimenFiscal')) then
+              AgregarRegimenesFiscales(IFEXmlComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal);
         end;
       end;
 
@@ -352,6 +367,10 @@ begin
 
       {$IFDEF CODESITE}
       CodeSite.Send('Cadena Original Calculada', Result);
+      // El siguiente SHA1 lo podemos comprar con el de utilerias como "ValidaCFD" para corroborar
+      // que estemos calculando bien la cadena original
+      CodeSite.Send('SHA1 Cadena Original',
+                    UpperCase(TFacturacionHashing.CalcularHash(Result, haSHA1)));
       {$ENDIF}
 end;
 
