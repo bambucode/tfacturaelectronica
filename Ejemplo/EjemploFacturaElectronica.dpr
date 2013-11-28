@@ -48,22 +48,24 @@ uses
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
   FacturacionHashes in '..\FacturacionHashes.pas',
   PACEcodex in '..\PACs\Ecodex\PACEcodex.pas',
-  {$IFDEF CODESITE}
   CodeSiteLogging,
-  {$ENDIF}
   PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas',
-  PACEjemplo in '..\PACs\Ejemplo\PACEjemplo.pas';
+  PACEjemplo in '..\PACs\Ejemplo\PACEjemplo.pas',
+  GeneradorCBB in '..\GeneradorCBB\GeneradorCBB.pas',
+  QuricolAPI in '..\GeneradorCBB\QuricolAPI.pas',
+  QuricolCode in '..\GeneradorCBB\QuricolCode.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
    TimbreDeFactura : TFETimbre;
-   archivoFacturaXML: String;
+   archivoFacturaXML, rutaImagenCBB: String;
    Factura: TFacturaElectronica;
    Emisor, Receptor: TFEContribuyente;
    Certificado: TFECertificado;
    BloqueFolios: TFEBloqueFolios;
    Impuesto1, Impuesto2: TFEImpuestoTrasladado;
    Concepto1, Concepto2 : TFEConcepto;
+   generadorCBB: TGeneradorCBB;
    CredencialesPAC: TFEPACCredenciales;
 
    function GetDesktopFolder: string;
@@ -85,6 +87,26 @@ begin
       // para obtener la ruta al Escritorio de Windows.
       CoInitialize(nil);
   {$IFEND}
+
+  // Checamos la presencia de archivos necesarios para el ejemplo
+  if Not FileExists('./libeay32.dll') then
+  begin
+    WriteLn('Favor de copiar el archivo libeay32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
+    exit;
+  end;
+
+  if Not FileExists('./libssl32.dll') then
+  begin
+    WriteLn('Favor de copiar el archivo libeay32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
+    exit;
+  end;
+
+  // Checamos la presencia del DLL de la libreria para generacion de CBB
+  if Not FileExists('./quricol32.dll') then
+  begin
+    WriteLn('Favor de copiar el archivo quricol32.dll de la subcarpeta \GeneradorCBB a la carpeta donde esta el ejecutable');
+    exit;
+  end;
 
   try
       // 1. Definimos los datos del emisor y receptor
@@ -183,6 +205,7 @@ begin
         CreateDir(GetDesktopFolder() + '\Prueba-CFDI');
 
       archivoFacturaXML:=GetDesktopFolder() + '\Prueba-CFDI\MiFactura.xml';
+      rutaImagenCBB := GetDesktopFolder() + '\Prueba-CFDI\MiFactura-CBB.jpg';
 
       // Mandamos generar el CFD en memoria antes de timbrarlo
       Factura.Generar(12345, fpUnaSolaExhibicion);
@@ -207,6 +230,12 @@ begin
         // Asignamos el timbre a la factura para que sea válida
         WriteLn('Asignando timbre a factura para generar CFDI');
         Factura.AsignarTimbre(TimbreDeFactura);
+
+        // Ahora generamos el CBB del CFDI
+        generadorCBB := TGeneradorCBB.Create;
+
+        // Generamos el CBB que por default se genera de 1200x1200px para que tenga la resolucion necesaria
+        generadorCBB.GenerarImagen(Emisor, Receptor, Factura.Total, TimbreDeFactura.UUID, rutaImagenCBB);
       finally
         ProveedorTimbrado.Free;
       end;
