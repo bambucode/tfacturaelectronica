@@ -1,6 +1,6 @@
 {* *****************************************************************************
   PROYECTO FACTURACION ELECTRONICA
-  Copyright (C) 2010-2013 - Bambú Code SA de CV - Ing. Luis Carrasco
+  Copyright (C) 2010-2014 - Bambú Code SA de CV - Ing. Luis Carrasco
 
   Esta clase representa la implementación para timbrado de CFDI del proveedor
   Comercio Digital (http://www.comercio-digital.com.mx)
@@ -45,16 +45,18 @@ type
  private
   fCredenciales : TFEPACCredenciales;
   fDocumentoXMLTimbrado : TXMLDocument;
+  function getNombre() : string; override;
   function ObtenerURLTimbrado: String;
   procedure ProcesarCodigoDeError(aRespuestaDePAC: String);
-  function RealizarPeticionREST(const URL, aDocumentoXML: string): string;
+  function RealizarPeticionREST(const URL : string; const aDocumentoXML: TTipoComprobanteXML): TTipoComprobanteXML;
   function ValidarXML(const xmlFile : TFileName) : String; //unicamente valida la estructura del xml solo se usaria para desarrollo
 public
   destructor Destroy(); override;
   procedure AfterConstruction; override;
   procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); override;
-  function CancelarDocumento(const aDocumento: String): Boolean; override;
-  function TimbrarDocumento(const aDocumento: String): TFETimbre; override;
+  function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; override;
+  function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; override;
+  property Nombre: String read getNombre;
  end;
 
 const
@@ -62,7 +64,14 @@ const
 
 implementation
 
-destructor TPACComercioDigital.Destroy();
+uses FacturaReglamentacion;
+
+function TPACComercioDigital.getNombre() : string;
+begin
+  Result := 'Comercio Digital';
+end;
+
+destructor TPACComercioDigital.Destroy();
 begin
   // Al ser una interface el objeto TXMLDocument se libera automaticamente por Delphi al dejar de ser usado
   // aunque para asegurarnos hacemos lo siguiente:
@@ -82,22 +91,6 @@ procedure TPACComercioDigital.AsignarCredenciales(const aCredenciales:
 begin
   fCredenciales := aCredenciales;
 end;
-
-{
-Procedure TPACComercioDigital.AgregaTimbreFiscal(sXML:String);
- var FileName:TStringList;
-Begin
-  if FileExists(sXML) then
-   Begin
-    FileName:=TStringList.Create;
-    FileName.LoadFromFile(sXML);
-    FileName.Text:=UTF8Encode(StringReplace(FileName.Text,'</cfdi:Comprobante>',
-                              '<cfdi:Complemento>'+fDocumentoXML.XML.Text+'</cfdi:Complemento></cfdi:Comprobante>',[rfReplaceAll]));
-    FileName.SaveToFile(sXML);
-    FileName.Free;
-   End;
-End;
-           }
 
 function TPACComercioDigital.ObtenerURLTimbrado: String;
 begin
@@ -162,8 +155,8 @@ begin
    end;
 end;
  
-function TPACComercioDigital.RealizarPeticionREST(const URL, aDocumentoXML:
-    string): string;
+function TPACComercioDigital.RealizarPeticionREST(const URL: string; const aDocumentoXML:
+    TTipoComprobanteXML): TTipoComprobanteXML;
 var
   HTTP: THTTPSend;
   resultadoAPI : TStringStream;
@@ -193,49 +186,49 @@ begin
   end;
 end;
 
-function TPACComercioDigital.TimbrarDocumento(const aDocumento: String): TFETimbre;
+function TPACComercioDigital.TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre;
 var
-  respuestaCadena: string;
+  respuestaCadena: TTipoComprobanteXML;
   nodoXMLTimbre : IFEXMLtimbreFiscalDigital;
 begin
   try
-    try
-      // Paso 1. Mandamos solicitar el timbre por medio del API Rest de Comercio Digital
-      respuestaCadena := RealizarPeticionREST(ObtenerURLTimbrado(),
-                                              aDocumento);
+    // Paso 1. Mandamos solicitar el timbre por medio del API Rest de Comercio Digital
+    respuestaCadena := RealizarPeticionREST(ObtenerURLTimbrado(),
+                                            aDocumento);
 
-      // Checamos haber recibido el timbrado correctamente
-      if Copy(Trim(respuestaCadena),1,4)='<tfd' then
-      Begin
-        fDocumentoXMLTimbrado.XML.Text:=UTF8Encode(respuestaCadena);
-        fDocumentoXMLTimbrado.Active:=True;
-        //if Trim(sTimbre)<>'' then
-        //fDocumentoXML.SaveToFile(sTimbre);
-        nodoXMLTimbre := GetTimbreFiscalDigital(fDocumentoXMLTimbrado);
+    // Checamos haber recibido el timbrado correctamente
+    if Copy(Trim(respuestaCadena),1,4)='<tfd' then
+    Begin
+      {$IF Compilerversion >= 20}
+      fDocumentoXMLTimbrado.XML.Text:=respuestaCadena;
+      {$ELSE}
+      fDocumentoXMLTimbrado.XML.Text:=UTF8Encode(respuestaCadena);
+      {$IFEND}
 
-        // Asignamos las propiedades del Timbre que vamos a regresar
-        Result.Version:=nodoXMLTimbre.Version;
-        Result.UUID:=nodoXMLTimbre.UUID;
-        //Result.FechaTimbrado:=nodoXMLTimbre.FechaTimbrado;
-        Result.SelloCFD:=nodoXMLTimbre.SelloCFD;
-        Result.NoCertificadoSAT:=nodoXMLTimbre.NoCertificadoSAT;
-        Result.SelloSAT:=nodoXMLTimbre.SelloSAT;
-        Result.XML := nodoXMLTimbre.XML;
-      end else
-        ProcesarCodigoDeError(respuestaCadena);
-    except
-      On E:Exception do
-      begin
-          raise;
-      end;
+      fDocumentoXMLTimbrado.Active:=True;
+      nodoXMLTimbre := GetTimbreFiscalDigital(fDocumentoXMLTimbrado);
+
+      // Asignamos las propiedades del Timbre que vamos a regresar
+      Result.Version:=nodoXMLTimbre.Version;
+      Result.UUID:=nodoXMLTimbre.UUID;
+      Result.FechaTimbrado:=TFEReglamentacion.DeFechaHoraISO8601(nodoXMLTimbre.FechaTimbrado);
+      Result.SelloCFD:=nodoXMLTimbre.SelloCFD;
+      Result.NoCertificadoSAT:=nodoXMLTimbre.NoCertificadoSAT;
+      Result.SelloSAT:=nodoXMLTimbre.SelloSAT;
+      Result.XML := nodoXMLTimbre.XML;
+    end else
+      ProcesarCodigoDeError(respuestaCadena);
+  except
+    On E:Exception do
+    begin
+        // TODO: Procesar correctamente los diferentes tipos de errores
+        raise;
     end;
-  finally
-    //AgregaTimbreFiscal(sXML);
   end;
 end;
 
 function TPACComercioDigital.CancelarDocumento(const aDocumento:
-    String): Boolean;
+    TTipoComprobanteXML): Boolean;
 begin
   // TODO: TPACComercioDigital.CancelarDocumento
 end;

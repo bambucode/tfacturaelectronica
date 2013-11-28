@@ -1,6 +1,6 @@
 {* *****************************************************************************
   PROYECTO FACTURACION ELECTRONICA
-  Copyright (C) 2010-2013 - Bambú Code SA de CV - Ing. Luis Carrasco
+  Copyright (C) 2010-2014 - Bambú Code SA de CV - Ing. Luis Carrasco
 
   Esta clase representa la estructura de un PAC Ejemplo para basarse en ella
   y poder implementar a un nuevo PAC. Se deben de implementar los 3 métodos
@@ -19,58 +19,45 @@ unit PACEjemplo;
 interface
 
 uses Classes,
-     xmldom,
-     XMLIntf,
-     msxmldom,
-     XMLDoc,
      SysUtils,
      FacturaTipos,
+     ProveedorAutorizadoCertificacion,
      FeCFD;
 
 type
 
- {$REGION 'Documentation'}
- ///	<summary>
- ///	  Implementa el servicio de timbrado para CFDI del proveedor "Comercio
- ///	  Digital" (<see href="http://www.comercio-digital.com.mx" />)
- ///	</summary>
- {$ENDREGION}
- TPACEjemplo = class(TInterfacedObject, IProveedorAutorizadoDeCertificacion)
+ TPACEjemplo = class(TProveedorAutorizadoCertificacion)
 {$IFDEF VERSION_DE_PRUEBA}
   public
 {$ELSE}
   private
 {$ENDIF}
   fCredenciales : TFEPACCredenciales;
-  fDocumentoXML : TXMLDocument;
 public
   procedure AfterConstruction; override;
   procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
-  function CancelarDocumento(const aDocumento: string): Boolean;
-  function TimbrarDocumento(const aDocumento: string): TFETimbre;
+  function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean;
+  function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre;
  end;
 
 implementation
 
-
 procedure TPACEjemplo.AfterConstruction;
 begin
   inherited;
-  fDocumentoXML := TXMLDocument.Create(nil);
-  fDocumentoXML.Active := True;
 end;
 
 procedure TPACEjemplo.AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
 begin
-  //
+  fCredenciales := aCredenciales;
 end;
 
-function TPACEjemplo.CancelarDocumento(const aDocumento: string): Boolean;
+function TPACEjemplo.CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean;
 begin
   // TODO: Implementar la cancelacion del documento por medio del API del PAC
 end;
 
-function TPACEjemplo.TimbrarDocumento(const aDocumento: string): TFETimbre;
+function TPACEjemplo.TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre;
 begin
    // TODO: Aqui se debe de implementar el metodo que recibe el comprobante XML y lo manda
    // al PAC segun el API del mismo (SOAP, REST, etc)

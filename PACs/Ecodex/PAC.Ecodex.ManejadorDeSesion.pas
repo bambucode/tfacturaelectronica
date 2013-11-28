@@ -24,8 +24,10 @@ type
 implementation
 
 uses SysUtils,
-     FacturacionHashes,
-     CodeSiteLogging;
+     {$IFDEF CODESITE}
+     CodeSiteLogging,
+     {$ENDIF}
+     FacturacionHashes;
 
 procedure TEcodexManejadorDeSesion.AfterConstruction;
 begin
@@ -58,19 +60,18 @@ var
   respuestaSolicitudDeToken: TEcodexRespuestaObtenerToken;
 begin
   Assert(fCredenciales.RFC <> '', 'Las credenciales del PAC no fueron asignadas');
-
-  CodeSite.EnterMethod('ObtenerNuevoTokenDeServicio');
+  {$IFDEF CODESITE} CodeSite.EnterMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
   try
     nuevaSolicitudDeToken := TEcodexSolicitudDeToken.Create;
     nuevaSolicitudDeToken.RFC := fCredenciales.RFC;
     nuevaSolicitudDeToken.TransaccionID := fNumeroTransaccion;
 
     respuestaSolicitudDeToken := wsSeguridad.ObtenerToken(nuevaSolicitudDeToken);
-    CodeSite.Send('Token de servicio obtenido', respuestaSolicitudDeToken.Token);
+    {$IFDEF CODESITE} CodeSite.Send('Token de servicio obtenido', respuestaSolicitudDeToken.Token); {$ENDIF}
     Result := respuestaSolicitudDeToken.Token;
   finally
     nuevaSolicitudDeToken.Free;
-    CodeSite.ExitMethod('ObtenerNuevoTokenDeServicio');
+    {$IFDEF CODESITE} CodeSite.ExitMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
   end;
 end;
 

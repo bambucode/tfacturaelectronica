@@ -64,8 +64,10 @@ implementation
 
 uses Soap.InvokeRegistry,
      feCFDv32,
-     FacturaReglamentacion,
-     CodeSiteLogging;
+     {$IFDEF CODESITE}
+     CodeSiteLogging,
+     {$ENDIF}
+     FacturaReglamentacion;
 
 
 function TPACEcodex.getNombre() : string;
@@ -88,13 +90,11 @@ begin
   fManejadorDeSesion := TEcodexManejadorDeSesion.Create;
 end;
 
-
 procedure TPACEcodex.AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
 begin
   fCredenciales := aCredenciales;
   fManejadorDeSesion.AsignarCredenciales(aCredenciales);
 end;
-
 
 function TPACEcodex.AsignarTimbreDeRespuestaDeEcodex(const aRespuestaTimbrado:
     TEcodexRespuestaTimbrado): TFETimbre;
@@ -188,7 +188,7 @@ function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFE
 var
   solicitudTimbrado: TSolicitudTimbradoEcodex;
   respuestaTimbrado: TEcodexRespuestaTimbrado;
-  tokenDeUsuario: string;
+  tokenDeUsuario, mensajeFalla: string;
 const
   _ECODEX_FUERA_DE_SERVICIO = 22;
   _CODEPAGE_UTF8 = 65001;
@@ -216,27 +216,33 @@ begin
     except
       On E:Exception do
       begin
+        mensajeFalla := E.Message;
+
         if (E Is EFallaValidacionException) Or (E Is EFallaServicioException) then
         begin
             if (E Is EFallaValidacionException)  then
             begin
+              {$IFDEF CODESITE}
               CodeSite.Send('Falla Validacion Error No.', EFallaValidacionException(E).Numero);
               CodeSite.Send('Falla Validacion Desc:', EFallaValidacionException(E).Descripcion);
               CodeSite.Send('Sugerencia:', EFallaValidacionException(E).Sugerencia);
+              {$ENDIF}
             end;
 
             if (E Is EFallaServicioException)  then
             begin
+              {$IFDEF CODESITE}
               CodeSite.Send('Falla Servicio Error No.', EFallaServicioException(E).Numero);
               CodeSite.Send('Falla Servicio Desc:', EFallaServicioException(E).Descripcion);
               CodeSite.Send('Sugerencia:', EFallaServicioException(E).FaultCode);
+              {$ENDIF}
 
               if EFallaServicioException(E).Numero = _ECODEX_FUERA_DE_SERVICIO then
-                raise EPACServicioNoDisponibleException.Create(EFallaServicioException(E).Descripcion);
+                raise EPACServicioNoDisponibleException.Create(mensajeFalla);
             end;
 
         end else
-          ProcesarCodigoDeError(E.Message);
+          ProcesarCodigoDeError(mensajeFalla);
       end;
     end;
   finally
