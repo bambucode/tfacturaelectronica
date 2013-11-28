@@ -13,7 +13,7 @@
 
   ***************************************************************************** *}
 
-unit PAC.Ecodex.Timbrado;
+unit PACEcodex;
 
 interface
 
