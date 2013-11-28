@@ -1,4 +1,4 @@
-﻿TFACTURACIONELECTRONICA (Beta)     
+﻿TFACTURACIONELECTRONICA v3.2 (Beta)     
 =====================================
 Esta es una librería que sirve para generar una factura electrónica de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
@@ -28,18 +28,23 @@ las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/b
 - Manejo de Adendas.
 - Manejo y pruebas de conceptos con datos aduanales.
 - Manejo y pruebas de articulos con cuenta predial.
+- Método de Cancelar para  los PAC de Ecodex y Comercio Digital
 
+Proveedores Autorizados de Certificación (PAC) Soportados
+-------------
+* Ecodex - <http://www.ecodex.com.mx>
+* Comercio Digital - <http://www.comercio-digital.com.mx>
 
 Completado
 -------------
-- Implementar la version 3.2 de los CFD (o comprobantes digitales en linea). <Completado en Diciembre 2013> con colaboración de Ing. Pablo 
+- Implementar la version 3.2 de los CFD (o comprobantes digitales en linea) con colaboración de Ing. Pablo Torres - <Completado a finales de Noviembre 2013>
 - Implementar soporte para la versión 2.2 de CFD - Completado Junio 2012.
 - Implementar la lectura de un CFD y que al mismo tiempo verifique si es válido o no. <- Completado 12 Dic 2010>
 - Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT. < Completado 26 Ene 2011 >
 
 ¿Cómo puedo colaborar?
 -------------
-Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a mi correo: <luis@bambucode.com>
+Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a mi correo: <luis@bambucode.com> ya sea para envío de código realizado o bien si lo deseas puedes mandarme un "pull request" de tu "fork" de la librería.
 
 Notas adicionales
 ------------
@@ -49,7 +54,7 @@ final.
 
 Compatibilidad con versiones
 ------------
-La libreria ha sido probada solamente con Delphi XE2 aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 2007 si se encuentra algún error favor de reportarlo a la brevedad.
+La libreria ha sido probada solamente con Delphi XE2 aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 2007 si se encuentra algún error favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2.
 
 Colaboradores actuales.
 -------------

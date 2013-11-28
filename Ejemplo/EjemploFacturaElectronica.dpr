@@ -1,6 +1,6 @@
 (******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
- Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2010-2014 - Bambu Code SA de CV - Ing. Luis Carrasco
 
  Proyecto de consola que genera una Factura Electronica de ejemplo
 
@@ -16,6 +16,7 @@
 program EjemploFacturaElectronica;
 
 {$APPTYPE CONSOLE}
+{.$DEFINE CODESITE}
 
 uses
   SysUtils,
@@ -23,6 +24,7 @@ uses
   ShlObj,
   Forms,
   ExtCtrls,
+  Classes,
   ClaseOpenSSL in '..\ClaseOpenSSL.pas',
   ComprobanteFiscal in '..\ComprobanteFiscal.pas',
   FacturaElectronica in '..\FacturaElectronica.pas',
@@ -46,13 +48,16 @@ uses
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
   FacturacionHashes in '..\FacturacionHashes.pas',
   PACEcodex in '..\PACs\Ecodex\PACEcodex.pas',
-  PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas';
+  {$IFDEF CODESITE}
+  CodeSiteLogging,
+  {$ENDIF}
+  PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas',
+  PACEjemplo in '..\PACs\Ejemplo\PACEjemplo.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
    TimbreDeFactura : TFETimbre;
-   Timbre : UTF8String;
-   sCBB, archivoFacturaXML, STimbre: String;
+   archivoFacturaXML: String;
    Factura: TFacturaElectronica;
    Emisor, Receptor: TFEContribuyente;
    Certificado: TFECertificado;
@@ -96,7 +101,7 @@ begin
       Emisor.Direccion.Localidad:='Oaxaca';
       //Emisor.Direccion.Referencia:='ZZZ';
 
-       // 2. Agregamos los régimenes fiscales (requerido en el CFD 2.2)
+       // 2. Agregamos los régimenes fiscales (requerido en CFD >= 2.2)
       SetLength(Emisor.Regimenes, 1);
       Emisor.Regimenes[0] := 'Regimen General de Ley';
 
@@ -125,7 +130,7 @@ begin
       Receptor.Direccion.Localidad:='Boca del Rio';
       //Receptor.Direccion.Referencia:='IZQ';
 
-      // 3. Definimos los datos de los folios que nos autorizo el SAT (para CFD 2.2)
+      // 3. Definimos los datos de los folios que nos autorizo el SAT (solo para CFD 2.2)
       {BloqueFolios.NumeroAprobacion:=1;
       BloqueFolios.AnoAprobacion:=2010;
       BloqueFolios.Serie:='A';
@@ -144,9 +149,11 @@ begin
       //Factura.AutoAsignarFechaGeneracion := False;
       //Factura.FechaGeneracion := EncodeDateTime(2012, 05, 12, 19, 47, 22, 0);
       //Factura.OnComprobanteGenerado:=onComprobanteGenerado;
+
       Factura.MetodoDePago:='Tarjeta de credito';
       //Factura.NumeroDeCuenta:='1234';
-      // Asignamos el lugar de expedición (requerido en la CFD 2.2)
+
+      // Asignamos el lugar de expedición (requerido en  CFD >= 2.2)
       Factura.LugarDeExpedicion:='Queretaro, Qro';
 
       // Definimos todos los conceptos que incluyo la factura
@@ -168,12 +175,6 @@ begin
       Concepto2.ValorUnitario:=18.90;
       Factura.AgregarConcepto(Concepto2);
 
-      // Agregamos el impuesto del concepto 2 con Tasa Cero
-      {Impuesto2.Nombre:='IVA';
-      Impuesto2.Tasa:=16;
-      Impuesto2.Importe:=(Concepto2.ValorUnitario * Concepto2.Cantidad) * (Impuesto2.Tasa/100);
-      Factura.AgregarImpuestoTrasladado(Impuesto2);}
-
       // Le damos un descuento
       //Factura.AsignarDescuento(5, 'Por pronto pago');
 
@@ -183,24 +184,24 @@ begin
 
       archivoFacturaXML:=GetDesktopFolder() + '\Prueba-CFDI\MiFactura.xml';
 
-      // Mandamos generar el CFD antes de timbrarlo
+      // Mandamos generar el CFD en memoria antes de timbrarlo
       Factura.Generar(12345, fpUnaSolaExhibicion);
-      Factura.Guardar(archivoFacturaXML);
-
-      WriteLn('Mandando a PAC para timbrado...');
+      
       // Ya que tenemos el comprobante, lo mandamos timbrar con el PAC de nuestra elección,
-      // por cuestiones de ejemplo, usaremos al PAC "Comercio Digital"
-      ProveedorTimbrado := TPACComercioDigital.Create;
-      //ProveedorTimbrado := TPACEcodex.Create;
+      // por cuestiones de ejemplo, usaremos al PAC "Ecodex"
+
+      ProveedorTimbrado := TPACEcodex.Create;
+      //ProveedorTimbrado := TPACComercioDigital.Create; // Si queremos usar a Comercio Digital solo des-comentamos aqui
 
       try
-        // Asignamos nuestras credenciales de acceso con el PAC
         CredencialesPAC.RFC   := 'AAA010101AAA';
         CredencialesPAC.Clave := 'PWD';
+        // Este es el "ID de Integrador" de pruebas de Ecodex
         CredencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
+        // Asignamos nuestras credenciales de acceso con el PAC
         ProveedorTimbrado.AsignarCredenciales(CredencialesPAC);
 
-        // Mandamos realizar el timbrado
+        WriteLn('Mandando a PAC "' + ProveedorTimbrado.Nombre + '" para timbrado...');
         TimbreDeFactura := ProveedorTimbrado.TimbrarDocumento(Factura.XML);
 
         // Asignamos el timbre a la factura para que sea válida
@@ -216,9 +217,9 @@ begin
       // Para la representación gráfica debemos generar el Codigo de Barras Bidimensional (CBB)
       // TODO: Implementar generacion de CBB con libreria que no dependa de Google Charts.
 
+      FreeAndNil(Factura);
       WriteLn('CFDI generado con éxito en ' + archivoFacturaXML + '. Presiona cualquier tecla para salir');
       Readln;
-      FreeAndNil(Factura);
   except
     on E: Exception do
     begin

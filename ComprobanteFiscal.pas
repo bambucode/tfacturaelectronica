@@ -1,6 +1,6 @@
 ﻿{* *****************************************************************************
   PROYECTO FACTURACION ELECTRONICA
-  Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
+  Copyright (C) 2010-2014 - Bambu Code SA de CV - Ing. Luis Carrasco
 
   Esta clase representa un Comprobante Fiscal Digital en su Version 2.0 asi como
   los metodos para generarla.
@@ -133,6 +133,9 @@ implementation
 
 uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
   OpenSSLUtils, Classes, CadenaOriginal,
+  {$IFDEF CODESITE}
+  CodeSiteLogging,
+  {$ENDIF}
   DateUtils;
 
 // Al crear el objeto, comenzamos a "llenar" el XML interno
@@ -895,6 +898,7 @@ end;
 
 procedure TFEComprobanteFiscal.GenerarComprobante;
 begin
+  // Al mandar solicitar el sello se genera la cadena original y por lo tanto se llena el comprobante
   fXmlComprobante.Sello:=Self.SelloDigital;
 end;
 
@@ -1442,6 +1446,10 @@ begin
         Result:=fDocumentoXML.XML.Text
     else
         Raise Exception.Create('No se puede obtener el XML cuando aún no se ha generado el archivo CFD');
+
+    {$IFDEF CODESITE}
+    CodeSite.Send('Codificacion Cadena getXML', StringCodePage(Result));
+    {$ENDIF}
 end;
 
 end.

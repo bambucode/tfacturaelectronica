@@ -1,6 +1,6 @@
 ﻿(******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
- Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2010-2014 - Bambu Code SA de CV - Ing. Luis Carrasco
 
  Metodos para validar los diferentes tipos de datos y como deben de estar
  especificados en el archivo XML.
@@ -25,6 +25,7 @@ type
       class function ComoCadena(sCadena: String) : String;
       class function ComoCantidad(dCantidad: Double) : String;
       class function ComoFechaHora(dtFecha: TDateTime) : String;
+      class function DeFechaHoraISO8601(const aFechaISO8601: String) : TDateTime;
       class function ComoFechaAduanera(dtFecha: TDateTime) : String;
       class function ComoTasaImpuesto(dTasa: Double) : String;
       class function ComoDateTime(sFechaISO8601: String): TDateTime;
@@ -33,13 +34,25 @@ type
 
 implementation
 
-uses SysUtils, DateUtils;
+uses SysUtils, DateUtils, Soap.XSBuiltIns;
 
 // Segun las reglas del SAT:
 // "Se expresa en la forma aaaa-mm-ddThh:mm:ss, de acuerdo con la especificación ISO 8601"
 class function TFEReglamentacion.ComoFechaHora(dtFecha: TDateTime) : String;
 begin
   Result := FormatDateTime('yyyy-mm-dd', dtFecha) + 'T' + FormatDateTime('hh:nn:ss', dtFecha);
+end;
+
+class function TFEReglamentacion.DeFechaHoraISO8601(const aFechaISO8601: String) : TDateTime;
+begin
+  // Ref: http://stackoverflow.com/questions/6651829/how-do-i-convert-an-iso-8601-string-to-a-delphi-tdate
+  with TXSDateTime.Create() do
+  try
+    XSToNative(aFechaISO8601);
+    Result := AsUTCDateTime;
+  finally
+    Free;
+  end;
 end;
 
 // Regresa la fecha/hora en el formato del Informe Mensual

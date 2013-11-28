@@ -1,6 +1,6 @@
 ﻿{******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
- Copyright (C) 2010-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2010-2014 - Bambu Code SA de CV - Ing. Luis Carrasco
 
  Clase usada para generar el Sello Digital de una Cadena Original proveniente
  de una factura electrónica. Aqui se especifican todas las reglas especificadas
