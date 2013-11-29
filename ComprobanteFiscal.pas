@@ -987,8 +987,8 @@ begin
           {$IFDEF DEBUG}
             ShowMessage(E.Message);
           {$ENDIF}
-          raise E.Create(E.Message);
           FacturaGenerada := False;
+          raise;
         end;
       end;
   end;
