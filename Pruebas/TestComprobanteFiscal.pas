@@ -624,7 +624,7 @@ procedure TestTFEComprobanteFiscal.ConfigurarCertificadoDePrueba(var Certificado
 const
   _MICROE_ARCHIVO_CERTIFICADO = 'comprobante_fiscal\aaa010101aaa_csd_01.cer';
   _MICROE_ARCHIVO_LLAVE_PRIVADA = 'comprobante_fiscal\aaa010101aaa_csd_01.key';
-  _MICROE_CLAVE_LLAVE_PRIVADA = 'a0123456789';
+  _MICROE_CLAVE_LLAVE_PRIVADA = '12345678a';
 begin
   Certificado.Ruta := fRutaFixtures + _MICROE_ARCHIVO_CERTIFICADO;
   Certificado.LlavePrivada.Ruta := fRutaFixtures + _MICROE_ARCHIVO_LLAVE_PRIVADA;
