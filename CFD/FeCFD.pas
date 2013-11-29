@@ -38,10 +38,6 @@ type
     function GetFolio: String;
     function GetFecha: String;
     function GetSello: String;
-    {$ifdef V22}
-     function GetNoAprobacion: Integer;
-     function GetAnoAprobacion: Integer;
-    {$endif}
     function GetFormaDePago: String;
     function GetNoCertificado: String;
     function GetCertificado: String;
@@ -62,10 +58,6 @@ type
     procedure SetFolio(Value: String);
     procedure SetFecha(Value: String);
     procedure SetSello(Value: String);
-    {$ifdef V22}
-     procedure SetNoAprobacion(Value: Integer);
-     procedure SetAnoAprobacion(Value: Integer);
-    {$endif}
     procedure SetFormaDePago(Value: String);
     procedure SetNoCertificado(Value: String);
     procedure SetCertificado(Value: String);
@@ -82,10 +74,6 @@ type
     property Folio: String read GetFolio write SetFolio;
     property Fecha: String read GetFecha write SetFecha;
     property Sello: String read GetSello write SetSello;
-    {$ifdef V22}
-      property NoAprobacion: Integer read GetNoAprobacion write SetNoAprobacion;
-      property AnoAprobacion: Integer read GetAnoAprobacion write SetAnoAprobacion;
-    {$endif}
     property FormaDePago: String read GetFormaDePago write SetFormaDePago;
     property NoCertificado: String read GetNoCertificado write SetNoCertificado;
     property Certificado: String read GetCertificado write SetCertificado;

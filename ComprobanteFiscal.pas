@@ -105,7 +105,16 @@ type
   public
     const VERSION_ACTUAL = '3.2'; // Version del CFD que implementa este código
 
-    constructor Create();
+    {$REGION 'Documentation'}
+    ///	<summary>
+    ///	  Se encarga de crear un nuevo CFD, por default crea el CFD con la
+    ///	  versión mas reciente o que debe ser de acuerdo a la vigencia
+    ///	</summary>
+    ///	<param name="aVersionComprobante">
+    ///	  Version del comprobante a crear
+    ///	</param>
+    {$ENDREGION}
+    constructor Create(const aVersionComprobante: TFEVersionComprobante = fev32);
     destructor Destroy(); override;
     procedure Cancelar();
 
@@ -139,7 +148,8 @@ uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
   DateUtils;
 
 // Al crear el objeto, comenzamos a "llenar" el XML interno
-constructor TFEComprobanteFiscal.Create();
+constructor TFEComprobanteFiscal.Create(const aVersionComprobante:
+    TFEVersionComprobante = fev32);
 begin
   inherited Create;
   _CADENA_PAGO_UNA_EXHIBICION := 'Pago en una sola exhibición';
@@ -149,6 +159,9 @@ begin
     _USAR_HORA_REAL := False;
   {$ENDIF}
 
+   // Ahora La decisión de que tipo de comprobante y su versión deberá de ser del programa y no de la clase
+  fVersion:=aVersionComprobante;
+
   // Establecemos como default que SI queremos incluir el certificado en el XML
   // ya que presenta la ventaja de poder validar el comprobante con solo el archivo
   // XML.
@@ -157,11 +170,7 @@ begin
   fDesglosarTotalesImpuestos := True;
   fCadenaOriginalCalculada:='';
   fSelloDigitalCalculado:='';
-   // La version actual para nuevos CFD es la 3.2
-//  if (Now < EncodeDate(2014,1,1)) then
-//   fVersion:=fev22
-//  else
-  fVersion:=fev32;
+
   // Creamos el objeto XML
   fDocumentoXML := TXMLDocument.Create(nil);
   fDocumentoXML.Active := True;
@@ -194,7 +203,7 @@ end;
 
 procedure TFEComprobanteFiscal.AsignarDescuentos;
 begin
-  if (inherited DescuentoMonto) > 0 then
+  //if (inherited DescuentoMonto) > 0 then
   begin
     fXmlComprobante.Descuento := TFEReglamentacion.ComoMoneda(inherited DescuentoMonto);
     if Trim(inherited DescuentoMotivo) <> '' then
@@ -676,13 +685,21 @@ end;
 
 // Asignamos la serie, el no y año de aprobacion al XML...
 procedure TFEComprobanteFiscal.AsignarDatosFolios;
+var
+  soportaFolios : IFESoportaBloqueFolios;
 begin
    if Trim(fBloqueFolios.Serie) <> '' then
-    fXmlComprobante.Serie := fBloqueFolios.Serie;
- {$ifdef V22}
-   fXmlComprobante.NoAprobacion := fBloqueFolios.NumeroAprobacion;
-   fXmlComprobante.AnoAprobacion := fBloqueFolios.AnoAprobacion;
- {$endif}
+      fXmlComprobante.Serie := fBloqueFolios.Serie;
+
+   // Los folios asignados solo se soportan en CFD 2.0, 2.2
+   if fVersion In [fev20, fev22] then
+   begin
+      if Supports(fXmlComprobante, IFESoportaBloqueFolios, soportaFolios) then
+      begin
+        soportaFolios.NoAprobacion := fBloqueFolios.NumeroAprobacion;
+        soportaFolios.AnoAprobacion := fBloqueFolios.AnoAprobacion;
+      end;
+   end;
 end;
 
 // 8. Numero de folio, el cual debe de ser asignado de manera automatica por el sistema
@@ -882,16 +899,17 @@ begin
   case fVersion of
    fev22:
     begin
-     fXmlComprobante.SetAttribute('xsi:schemaLocation',
-      'http://www.sat.gob.mx/cfd/2 http://www.sat.gob.mx/sitio_internet/cfd/2/cfdv22.xsd');
+      fXmlComprobante.SetAttribute('xsi:schemaLocation',
+                                   'http://www.sat.gob.mx/cfd/2 http://www.sat.gob.mx/sitio_internet/cfd/2/cfdv22.xsd');
+      fXmlComprobante.Version := '2.2';
     end;
    fev32:
     begin
-     fXmlComprobante.SetAttribute('xsi:schemaLocation',
-      'http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv32.xsd');
+      fXmlComprobante.SetAttribute('xsi:schemaLocation',
+                                   'http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv32.xsd');
+      fXmlComprobante.Version := '3.2';
     end;
   end;
-  fXmlComprobante.Version := VERSION_ACTUAL;
 
   fDocumentoXML.Version := '1.0';
   fDocumentoXML.Encoding := 'UTF-8';
@@ -929,9 +947,6 @@ end;
 // El metodo que genera el CFD al final...
 procedure TFEComprobanteFiscal.GuardarEnArchivo(sArchivoDestino: String);
 begin
-  (*TODO: extracted code
-  fXmlComprobante.Sello:=Self.SelloDigital;
-  *)
   GenerarComprobante;
   fDocumentoXML.SaveToFile(sArchivoDestino);
   // TODO: Implementar las diversas fallas que pueden ocurrir
@@ -954,13 +969,13 @@ begin
   begin
       fSelloDigitalCalculado:='';
 
+      // Obtenemos la cadena Original del CFD primero
+      CadenaOriginal := Self.CadenaOriginal;
+
       {$IFDEF VERSION_DE_PRUEBA}
               Assert(FechaGeneracion > EncodeDate(2009, 1, 1),
                      'La fecha de generacion debe ser en el 2010 o superior!! fue' + DateTimeToStr(FechaGeneracion));
       {$ENDIF}
-
-      // Obtenemos la cadena Original del CFD primero
-      CadenaOriginal := Self.CadenaOriginal;
 
       // Segun la leglislacion vigente si la factura se hace
       // antes del 1 de Enero del 2011, usamos MD5
@@ -1007,6 +1022,7 @@ var
   ImpuestoTrasladado: TFEImpuestoTrasladado;
   ImpuestoRetenido: TFEImpuestoRetenido;
   sMotivoDescuento: String;
+  comprobanteConBloqueFolios:IFESoportaBloqueFolios;
 
   function TieneAtributo(NodoPadre: IXMLNode; NombreAtributo: String) : Boolean;
   begin
@@ -1070,10 +1086,15 @@ begin
             // Datos del certificado
             fCertificado.NumeroSerie:=NoCertificado;
             fCertificadoTexto := Certificado;
-            {$ifdef V22}
-             fBloqueFolios.NumeroAprobacion:=NoAprobacion;
-             fBloqueFolios.AnoAprobacion:=AnoAprobacion;
-            {$endif}
+
+            if fVersion In [fev20, fev22] then
+            begin
+              if Supports(fXmlComprobante, IFESoportaBloqueFolios, comprobanteConBloqueFolios) then
+              begin
+                fBloqueFolios.NumeroAprobacion:=comprobanteConBloqueFolios.NoAprobacion;
+                fBloqueFolios.AnoAprobacion:=comprobanteConBloqueFolios.AnoAprobacion;
+              end;
+            end;
 
              if TieneAtributo(fXmlComprobante, 'serie') then
             begin

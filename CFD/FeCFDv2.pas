@@ -54,10 +54,8 @@ type
     function GetFolio: String;
     function GetFecha: String;
     function GetSello: String;
-    {$ifdef V22}
-     function GetNoAprobacion: Integer;
-     function GetAnoAprobacion: Integer;
-    {$endif}
+    function GetNoAprobacion: Integer;
+    function GetAnoAprobacion: Integer;
     function GetFormaDePago: String;
     function GetNoCertificado: String;
     function GetCertificado: String;
@@ -79,10 +77,8 @@ type
     procedure SetFolio(Value: String);
     procedure SetFecha(Value: String);
     procedure SetSello(Value: String);
-    {$ifdef V22}
-     procedure SetNoAprobacion(Value: Integer);
-     procedure SetAnoAprobacion(Value: Integer);
-    {$endif}
+    procedure SetNoAprobacion(Value: Integer);
+    procedure SetAnoAprobacion(Value: Integer);
     procedure SetFormaDePago(Value: String);
     procedure SetNoCertificado(Value: String);
     procedure SetCertificado(Value: String);
@@ -460,7 +456,7 @@ procedure TFEXmlComprobanteV2.SetSello(Value: String);
 begin
   SetAttribute('sello', Value);
 end;
-{$ifdef V22}
+
 function TFEXmlComprobanteV2.GetNoAprobacion: Integer;
 begin
   Result := AttributeNodes['noAprobacion'].NodeValue;
@@ -480,7 +476,6 @@ procedure TFEXmlComprobanteV2.SetAnoAprobacion(Value: Integer);
 begin
   SetAttribute('anoAprobacion', Value);
 end;
-{$endif}
 
 function TFEXmlComprobanteV2.GetFormaDePago: String;
 begin

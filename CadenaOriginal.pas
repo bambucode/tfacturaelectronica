@@ -177,6 +177,7 @@ end;
 function TCadenaOriginal.Calcular(): TStringCadenaOriginal;
 var
   I, J: Integer;
+  comprobanteConFolios : IFESoportaBloqueFolios;
 begin
       fResultado := '';
   
@@ -199,8 +200,8 @@ begin
 
       if fVersionCFD In [fev20, fev22] then
       begin
-        AgregarAtributo(fXmlComprobante, 'noAprobacion');
-        AgregarAtributo(fXmlComprobante, 'anoAprobacion');
+        AgregarAtributo(fXMLComprobante, 'noAprobacion');
+        AgregarAtributo(fXMLComprobante, 'anoAprobacion');
       end;
 
       AgregarAtributo(fXmlComprobante, 'tipoDeComprobante');
