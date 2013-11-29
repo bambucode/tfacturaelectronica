@@ -203,12 +203,14 @@ end;
 
 procedure TFEComprobanteFiscal.AsignarDescuentos;
 begin
-  //if (inherited DescuentoMonto) > 0 then
-  begin
-    fXmlComprobante.Descuento := TFEReglamentacion.ComoMoneda(inherited DescuentoMonto);
-    if Trim(inherited DescuentoMotivo) <> '' then
-      fXmlComprobante.MotivoDescuento := TFEReglamentacion.ComoCadena(inherited DescuentoMotivo);
-  end;
+  // Si el descuento es cero NO lo asignamos en v3.2 ya que se agregaria incorrectamente a la cadena original
+  if fVersion = fev32 then
+    if (inherited DescuentoMonto) = 0 then
+      exit;
+
+  fXmlComprobante.Descuento := TFEReglamentacion.ComoMoneda(inherited DescuentoMonto);
+  if Trim(inherited DescuentoMotivo) <> '' then
+    fXmlComprobante.MotivoDescuento := TFEReglamentacion.ComoCadena(inherited DescuentoMotivo);
 end;
 
 function TFEComprobanteFiscal.getCadenaOriginal(): TStringCadenaOriginal;
@@ -1468,10 +1470,6 @@ begin
         Result:=fDocumentoXML.XML.Text
     else
         Raise Exception.Create('No se puede obtener el XML cuando aún no se ha generado el archivo CFD');
-
-    {$IFDEF CODESITE}
-    CodeSite.Send('Codificacion Cadena getXML', StringCodePage(Result));
-    {$ENDIF}
 end;
 
 end.
