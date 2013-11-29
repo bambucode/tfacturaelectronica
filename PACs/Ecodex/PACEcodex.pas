@@ -147,7 +147,14 @@ begin
 end;
 
 procedure TPACEcodex.ProcesarCodigoDeError(aRespuestaDePAC: String);
+const
+  _ECODEX_FUERA_DE_SERVICIO = '(22)';
 begin
+
+  if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, aRespuestaDePAC) > -1 then
+    raise EPACServicioNoDisponibleException.Create(aRespuestaDePAC);
+
+  if AnsiPos(_ERROR_SAT_XML_INVALIDO, aRespuestaDePAC) > -1 then
     raise ETimbradoXMLInvalidoException.Create(aRespuestaDePAC);
 
   if AnsiPos(_ERROR_SAT_SELLO_EMISOR_INVALIDO, aRespuestaDePAC) > -1 then
@@ -189,9 +196,6 @@ var
   solicitudTimbrado: TSolicitudTimbradoEcodex;
   respuestaTimbrado: TEcodexRespuestaTimbrado;
   tokenDeUsuario, mensajeFalla: string;
-const
-  _ECODEX_FUERA_DE_SERVICIO = 22;
-  _CODEPAGE_UTF8 = 65001;
 begin
   try
     // 1. Iniciamos una nueva sesion solicitando un nuevo token
@@ -208,6 +212,8 @@ begin
     solicitudTimbrado.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
 
     try
+      mensajeFalla := '';
+
       // 3. Realizamos la solicitud de timbrado
       respuestaTimbrado := wsTimbradoEcodex.TimbraXML(solicitudTimbrado);
 
@@ -222,29 +228,22 @@ begin
         begin
             if (E Is EFallaValidacionException)  then
             begin
-              {$IFDEF CODESITE}
-              CodeSite.Send('Falla Validacion Error No.', EFallaValidacionException(E).Numero);
-              CodeSite.Send('Falla Validacion Desc:', EFallaValidacionException(E).Descripcion);
-              CodeSite.Send('Sugerencia:', EFallaValidacionException(E).Sugerencia);
-              {$ENDIF}
+              mensajeFalla := 'EFallaValidacionException (' + IntToStr(EFallaValidacionException(E).Numero) + ') ' +
+                              EFallaValidacionException(E).Descripcion;
             end;
 
             if (E Is EFallaServicioException)  then
             begin
-              {$IFDEF CODESITE}
-              CodeSite.Send('Falla Servicio Error No.', EFallaServicioException(E).Numero);
-              CodeSite.Send('Falla Servicio Desc:', EFallaServicioException(E).Descripcion);
-              CodeSite.Send('Sugerencia:', EFallaServicioException(E).FaultCode);
-              {$ENDIF}
-
-              if EFallaServicioException(E).Numero = _ECODEX_FUERA_DE_SERVICIO then
-                raise EPACServicioNoDisponibleException.Create(mensajeFalla);
+              mensajeFalla := 'EFallaServicioException (' + IntToStr(EFallaServicioException(E).Numero) + ') ' +
+                              EFallaServicioException(E).Descripcion;
             end;
-
-        end else
-          ProcesarCodigoDeError(mensajeFalla);
+        end;
       end;
     end;
+
+    // Checamos si tuvimos algun mensaje de falla para lanzar nuestras propias excepciones
+    if (mensajeFalla <> '') then
+       ProcesarCodigoDeError(mensajeFalla);
   finally
     respuestaTimbrado.Free;
     solicitudTimbrado.Free;
