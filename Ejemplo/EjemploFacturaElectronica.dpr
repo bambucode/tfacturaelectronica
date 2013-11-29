@@ -235,9 +235,15 @@ begin
         generadorCBB := TGeneradorCBB.Create;
 
         // Generamos el CBB que por default se genera de 1200x1200px para que tenga la resolucion necesaria
-        generadorCBB.GenerarImagen(Emisor, Receptor, Factura.Total, TimbreDeFactura.UUID, rutaImagenCBB);
+        generadorCBB.GenerarImagen(Emisor,
+                                   Receptor,
+                                   Factura.Total,
+                                   TimbreDeFactura.UUID,
+                                   rutaImagenCBB);
+
       finally
         ProveedorTimbrado.Free;
+        generadorCBB.Free;
       end;
 
       // Finalmente ya que la factura fue timbrada mandamos guardar la factura
