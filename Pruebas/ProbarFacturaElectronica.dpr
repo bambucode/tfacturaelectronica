@@ -54,7 +54,8 @@ uses
   FeCFDv32 in '..\CFD\FeCFDv32.pas',
   TestInformeMensual in 'TestInformeMensual.pas',
   TestClaseOpenSSL in 'TestClaseOpenSSL.pas',
-  TestComprobanteFiscal in 'TestComprobanteFiscal.pas';
+  TestComprobanteFiscalv22 in 'TestComprobanteFiscalv22.pas',
+  ComprobanteFiscal in '..\ComprobanteFiscal.pas';
 
 {$R *.RES}
 

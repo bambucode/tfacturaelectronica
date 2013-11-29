@@ -7,7 +7,7 @@
   La licencia de este codigo fuente se encuentra en:
   http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
   ***************************************************************************** *)
-unit TestComprobanteFiscal;
+unit TestComprobanteFiscalv22;
 
 interface
 
@@ -16,7 +16,7 @@ uses
 
 type
 
-  TestTFEComprobanteFiscal = class(TTestPrueba)
+  TestTFEComprobanteFiscalV22 = class(TTestPrueba)
   strict private
     fComprobanteFiscal: TFEComprobanteFiscal;
   private
@@ -58,18 +58,18 @@ uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
   DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv32, FeCFDv2;
 
-procedure TestTFEComprobanteFiscal.SetUp;
+procedure TestTFEComprobanteFiscalV22.SetUp;
 begin
   inherited;
-  fComprobanteFiscal := TFEComprobanteFiscal.Create;
+  fComprobanteFiscal := TFEComprobanteFiscal.Create(fev22);
 end;
 
-procedure TestTFEComprobanteFiscal.TearDown;
+procedure TestTFEComprobanteFiscalV22.TearDown;
 begin
   FreeAndNil(fComprobanteFiscal);
 end;
 
-procedure TestTFEComprobanteFiscal.AgregarConcepto_Concepto_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscalV22.AgregarConcepto_Concepto_LoGuardeEnXML;
 var
   Concepto: TFEConcepto;
   sXMLConcepto: WideString;
@@ -90,7 +90,7 @@ begin
     'El concepto no fue almacenado correctamente en la estrucutr XML');
 end;
 
-procedure TestTFEComprobanteFiscal.setBloqueFolios_Bloque_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscalV22.setBloqueFolios_Bloque_LoGuardeEnXML;
 var
   sXMLFixture: WideString;
   Bloque: TFEBloqueFolios;
@@ -114,7 +114,7 @@ begin
     'No se guardo el numero de aprobacion, serie y año de aprobacion en la estructura del XML');
 end;
 
-procedure TestTFEComprobanteFiscal.setBloqueFolios_FolioFueraDeRango_CauseExcepcion;
+procedure TestTFEComprobanteFiscalV22.setBloqueFolios_FolioFueraDeRango_CauseExcepcion;
 var
   Bloque: TFEBloqueFolios;
   bHuboError: Boolean;
@@ -138,7 +138,7 @@ begin
     'No se lanzo la excepcion al asignar un folio fuera del rango especificado en la propiedad BloqueFolios');
 end;
 
-procedure TestTFEComprobanteFiscal.setFolio_Folio_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscalV22.setFolio_Folio_LoGuardeEnXML;
 var
   sXMLFixture: WideString;
   Folio: TFEFolio;
@@ -155,7 +155,7 @@ begin
 end;
 
 {
-procedure TestTFEComprobanteFiscal.setTotal_Monto_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscalV22.setTotal_Monto_LoGuardeEnXML;
 var
   sXMLFixture: WideString;
 const
@@ -172,7 +172,7 @@ begin
     'El Contenido XML no contiene el monto total o este es incorrecto.');
 end;   }
 
-procedure TestTFEComprobanteFiscal.setSubtotal_Monto_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscalV22.setSubtotal_Monto_LoGuardeEnXML;
 var
   sXMLFixture: WideString;
 const
@@ -190,7 +190,7 @@ begin
     'El Contenido XML no contiene el monto de subtotal o este es incorrecto.');
 end;
 
-procedure TestTFEComprobanteFiscal.AgregarImpuestoRetenido_Impuesto_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscalV22.AgregarImpuestoRetenido_Impuesto_LoGuardeEnXML;
 var
   ImpuestoRetenido: TFEImpuestoRetenido;
   TotalImpuestosAnterior: Currency;
@@ -216,7 +216,7 @@ begin
     'No se sumo correctamente el importe del impuesto al total de impuestos retenidos');
 end;
 
-procedure TestTFEComprobanteFiscal.AgregarImpuestoTrasladado_Impuesto_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscalV22.AgregarImpuestoTrasladado_Impuesto_LoGuardeEnXML;
 var
   ImpuestoTrasladado: TFEImpuestoTrasladado;
   TotalImpuestosAnterior: Currency;
@@ -243,7 +243,7 @@ begin
     'No se sumo correctamente el importe del impuesto al total de impuestos trasladados');
 end;
 
-procedure TestTFEComprobanteFiscal.AgregarImpuestoRetenido_Varios_SumeSuTotal;
+procedure TestTFEComprobanteFiscalV22.AgregarImpuestoRetenido_Varios_SumeSuTotal;
 var
   iCuantos, I: Integer;
   aImpuestos: Array of TFEImpuestoRetenido;
@@ -274,7 +274,7 @@ begin
 
 end;
 
-procedure TestTFEComprobanteFiscal.AgregarImpuestoTrasladado_Varios_SumeSuTotal;
+procedure TestTFEComprobanteFiscalV22.AgregarImpuestoTrasladado_Varios_SumeSuTotal;
 var
   iCuantos, I: Integer;
   aImpuestos: Array of TFEImpuestoTrasladado;
@@ -307,7 +307,7 @@ end;
 
 // Funcion comun para generar el comprobante fiscal con los mismos datos
 // que el XML especificado como parametro, regresa el Sello
-function TestTFEComprobanteFiscal.LeerXMLEnComprobante(DeArchivoXML: String;
+function TestTFEComprobanteFiscalV22.LeerXMLEnComprobante(DeArchivoXML: String;
     Certificado: TFECertificado; var ComprobanteDestino: TFEComprobanteFiscal):
     String;
 var
@@ -324,6 +324,7 @@ var
   fXMLPrueba: TXMLDocument;
   fXMLComprobantePrueba: IFEXMLComprobante;
   VersionCFD: TFEVersionComprobante;
+  comprobanteConBloqueFolios: IFESoportaBloqueFolios;
 
   procedure leerComprobanteXML();
   begin
@@ -346,7 +347,7 @@ var
     if AnsiPos('version="3.2"', fXMLPrueba.XML.Text) > 0 then
     begin
       fXMLComprobantePrueba := GetComprobanteV32(fXMLPrueba);
-      VersionCFD:=fev22;
+      VersionCFD:=fev32;
     end;
   end;
 
@@ -405,11 +406,14 @@ begin
   ComprobanteDestino.Folio := StrToInt(fXMLComprobantePrueba.Folio);
   // Si es la version de prueba, establecemos la fecha/hora para que coincida
   // con la fecha/hora en que se genero el comprobante usando MicroE
-  ComprobanteDestino.FechaGeneracion := ConvertirFechaComprobanteADateTime
-    (fXMLComprobantePrueba.Fecha);
+  ComprobanteDestino.FechaGeneracion := ConvertirFechaComprobanteADateTime(fXMLComprobantePrueba.Fecha);
 
-  //Bloque.NumeroAprobacion := ((IFEXMLComprobanteV32(fXMLComprobantePrueba).NoAprobacion);
-  //Bloque.AnoAprobacion := ((fXMLComprobantePrueba As IFEXMLComprobanteV22).AnoAprobacion);
+  if Supports(fXMLComprobantePrueba, IFESoportaBloqueFolios, comprobanteConBloqueFolios) then
+  begin
+    Bloque.NumeroAprobacion := comprobanteConBloqueFolios.NoAprobacion;
+    Bloque.AnoAprobacion := comprobanteConBloqueFolios.AnoAprobacion;
+  end;
+
   Bloque.Serie := fXMLComprobantePrueba.Serie;
   Bloque.FolioInicial := 1;
   // Indicamos que el folio final es el folio del comprobante + 1 para que siempre este "en reango"
@@ -620,7 +624,7 @@ begin
   Result:=sSello;
 end;
 
-procedure TestTFEComprobanteFiscal.ConfigurarCertificadoDePrueba(var Certificado: TFECertificado);
+procedure TestTFEComprobanteFiscalV22.ConfigurarCertificadoDePrueba(var Certificado: TFECertificado);
 const
   _MICROE_ARCHIVO_CERTIFICADO = 'comprobante_fiscal\aaa010101aaa_csd_01.cer';
   _MICROE_ARCHIVO_LLAVE_PRIVADA = 'comprobante_fiscal\aaa010101aaa_csd_01.key';
@@ -631,7 +635,7 @@ begin
   Certificado.LlavePrivada.Clave := _MICROE_CLAVE_LLAVE_PRIVADA;
 end;
 
-procedure TestTFEComprobanteFiscal.CadenaOriginal_DeComprobante_SeaCorrecta;
+procedure TestTFEComprobanteFiscalV22.CadenaOriginal_DeComprobante_SeaCorrecta;
 var
   sCadenaOriginalCorrecta: TStringCadenaOriginal;
   Certificado: TFECertificado;
@@ -672,7 +676,7 @@ begin
 end;
 
 
-procedure TestTFEComprobanteFiscal.SelloDigital_DeMilConceptos_SeaCorrecto;
+procedure TestTFEComprobanteFiscalV22.SelloDigital_DeMilConceptos_SeaCorrecto;
 var
      sSelloDigitalDelXML, sSelloCalculado: String;
      Certificado: TFECertificado;
@@ -699,7 +703,7 @@ begin
                  'El sello digital no fue calculado correctamente');
 end;
 
-procedure TestTFEComprobanteFiscal.SelloDigital_DeComprobante_SeaCorrecto;
+procedure TestTFEComprobanteFiscalV22.SelloDigital_DeComprobante_SeaCorrecto;
 var
   sSelloDigitalCorrecto: String;
   Certificado: TFECertificado;
@@ -710,12 +714,12 @@ begin
   sSelloDigitalCorrecto := LeerXMLEnComprobante
     (fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml',
     Certificado, fComprobanteFiscal);
-  
+
   CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
               'El sello digital no fue calculado correctamente');
 end;
 
-procedure TestTFEComprobanteFiscal.SelloDigital_DespuesDeVariosSegundos_SeaElMismo;
+procedure TestTFEComprobanteFiscalV22.SelloDigital_DespuesDeVariosSegundos_SeaElMismo;
 var
   sSelloDigitalCorrecto: String;
   Certificado: TFECertificado;
@@ -741,7 +745,7 @@ begin
               'El sello digital no fue calculado correctamente la segunda ocasion');
 end;
 
-procedure TestTFEComprobanteFiscal.GuardarEnArchivo_ComprobanteDeXML_LoGuarde;
+procedure TestTFEComprobanteFiscalV22.GuardarEnArchivo_ComprobanteDeXML_LoGuarde;
 var
   sContenidoXML: UnicodeString;
   sArchivo: String;
@@ -760,7 +764,7 @@ begin
     CheckTrue(FileExists(sArchivo), 'No se guardo el archivo XML del comprobante leido de una cadena XML');
 end;
 
-procedure TestTFEComprobanteFiscal.setXML_DeComprobanteExistente_EstablezcaLasPropiedadesCorrectamente;
+procedure TestTFEComprobanteFiscalV22.setXML_DeComprobanteExistente_EstablezcaLasPropiedadesCorrectamente;
 var
     sContenidoXML: WideString;
     Certificado: TFECertificado;
@@ -801,7 +805,7 @@ begin
     fComprobanteFiscal.XML:=UTF8ToString(sContenidoXML);
 
     // Leemos el comprobante de ejemplo con el metodo alternativo usado en las pruebas
-    fComprobanteComparacion:=TFEComprobanteFiscal.Create;
+    fComprobanteComparacion:=TFEComprobanteFiscal.Create(fev22);
     LeerXMLEnComprobante(fRutaFixtures + 'comprobante_fiscal/comprobante_correcto.xml',
                            Certificado, fComprobanteComparacion);
 
@@ -841,7 +845,7 @@ begin
 end;
 
 
-procedure TestTFEComprobanteFiscal.XML_DeComprobanteHecho_GenereXMLCorrectamente;
+procedure TestTFEComprobanteFiscalV22.XML_DeComprobanteHecho_GenereXMLCorrectamente;
 var
   sSelloDigitalCorrecto: String;
   Certificado: TFECertificado;
@@ -856,14 +860,14 @@ begin
   CheckEquals(True, True, '');
 end;
 
-procedure TestTFEComprobanteFiscal.Create_NuevoComprobante_GenereEstructuraXMLBasica;
+procedure TestTFEComprobanteFiscalV22.Create_NuevoComprobante_GenereEstructuraXMLBasica;
 var
   sXMLEncabezadoBasico: WideString;
   NuevoComprobante: TFEComprobanteFiscal;
 begin
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
   sXMLEncabezadoBasico := leerContenidoDeFixture('comprobante_fiscal/nuevo.xml');
-  NuevoComprobante := TFEComprobanteFiscal.Create;
+  NuevoComprobante := TFEComprobanteFiscal.Create(fev22);
 
   // Checamos que sea igual que nuestro Fixture...
   CheckEquals(sXMLEncabezadoBasico, fComprobanteFiscal.fXmlComprobante.XML,
@@ -871,7 +875,7 @@ begin
   FreeAndNil(NuevoComprobante);
 end;
 
-procedure TestTFEComprobanteFiscal.setCertificado_Certificado_GuardeNumeroDeSerieEnEstructuraXML;
+procedure TestTFEComprobanteFiscalV22.setCertificado_Certificado_GuardeNumeroDeSerieEnEstructuraXML;
 var
   Certificado: TFECertificado;
   sXMLConNumSerieCertificado: WideString;
@@ -892,7 +896,7 @@ begin
     'El Contenido XML no contiene el numero de serie del certificado o este es incorrecto.');
 end;
 
-procedure TestTFEComprobanteFiscal.setCertificado_IncluyendoEnXML_GuardeCertificadoBase64EnXML;
+procedure TestTFEComprobanteFiscalV22.setCertificado_IncluyendoEnXML_GuardeCertificadoBase64EnXML;
 var
   Certificado: TFECertificado;
   sXMLConCertificado: WideString;
@@ -915,7 +919,7 @@ end;
 
 
 
-procedure TestTFEComprobanteFiscal.setEmisor_Emisor_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscalV22.setEmisor_Emisor_LoGuardeEnXML;
 var
   Emisor: TFEContribuyente;
   sXMLConReceptor: WideString;
@@ -950,7 +954,7 @@ begin
     'El Contenido XML del Comprobante no almaceno correctamente los datos del receptor (es diferente al fixture receptor.xml)');
 end;
 
-procedure TestTFEComprobanteFiscal.setReceptor_Receptor_LoGuardeEnXML;
+procedure TestTFEComprobanteFiscalV22.setReceptor_Receptor_LoGuardeEnXML;
 var
   Receptor: TFEContribuyente;
   sXMLConReceptor: WideString;
@@ -983,7 +987,7 @@ begin
 end;
 
 procedure
-    TestTFEComprobanteFiscal.setXML_DeComprobanteV2_EstablezcaLasPropiedadesCorrectamente;
+    TestTFEComprobanteFiscalV22.setXML_DeComprobanteV2_EstablezcaLasPropiedadesCorrectamente;
 var
     sContenidoXML: WideString;
     Certificado: TFECertificado;
@@ -1024,7 +1028,7 @@ begin
     fComprobanteFiscal.XML:=UTF8ToString(sContenidoXML);
 
     // Leemos el comprobante de ejemplo con el metodo alternativo usado en las pruebas
-    fComprobanteComparacion:=TFEComprobanteFiscal.Create;
+    fComprobanteComparacion:=TFEComprobanteFiscal.Create(fev20);
     LeerXMLEnComprobante(fRutaFixtures + 'comprobante_fiscal/comprobante_ver2.0.xml',
                            Certificado, fComprobanteComparacion);
 
@@ -1063,6 +1067,6 @@ end;
 initialization
 
 // Registra la prueba de esta unidad en la suite de pruebas
-RegisterTest(TestTFEComprobanteFiscal.Suite);
+RegisterTest(TestTFEComprobanteFiscalV22.Suite);
 
 end.
