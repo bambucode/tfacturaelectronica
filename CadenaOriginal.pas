@@ -38,8 +38,6 @@ type
       constructor Create(Comprobante: IFEXMLComprobante; aVersionCFD:
           TFEVersionComprobante); overload;
       function Calcular() : TStringCadenaOriginal;
-  published
-      class function Transform(XMLContent : string; XSLContent : string): WideString;
   end;
 
 
@@ -376,67 +374,5 @@ begin
       {$ENDIF}
 end;
 
-class function TCadenaOriginal.Transform(XMLContent : string; XSLContent : string):
-    WideString;
-var
-  XML : IXMLDocument;
-  XSL : IXMLDocument;
-begin
-
-  XML := LoadXMLData(XMLContent);
-  XSL := LoadXMLData(XSLContent);
-
-  XML.DocumentElement.TransformNode(XSL.DocumentElement, Result)
-
-end;
-
-
-// TODO:
-// Incluimos los archivos XSLT como recursos (.RES) para no tener que distribuirlos
-// manualmente en el EXE
-// Mas Info en: http://delphi.about.com/od/objectpascalide/a/embed_resources.htm
-// Regresamos la Cadena Original de este comprobante fiscal segun las reglas
-// definidas previamente...
-{
-  function TFEComprobanteFiscal.getCadenaOriginalOld(): WideString;
-  var
-  XSLTransformador: TXSLPageProducer;
-  begin
-  // La cadena original tambien puede ser generada usando un componente de transformacion
-  // XSLT y usando los archivos para dicho proposito, sin embargo se decidio
-  // hacerlo manualmente para evitar multiples dependencias de librerias DLL para su funcionamiento
-
-  // Primero, extraemos los archivos XSLT para realizar la transformacion de los archivos .RES
-  // TODO: Extraer de los RES
-
-
-
-  XSLTransformador := TXSLPageProducer.Create(nil);
-  XSLTransformador.ParseOptions := [poResolveExternals, poValidateOnParse];
-  // XMLDocument1.Active := False; // just in case
-  XSLTransformador.FileName :='C:\Delphi\Otros\bc_facturacionelectronica\Resources\cadenaoriginal_2_0_l.xslt';
-  XSLTransformador.XMLData := fDocumentoXML;
-  // XMLDocument1.Active := True;
-  // Al ejecutar la siguiente lienea, el transformador usa la plantilla XSLT del SAT
-  // para convertir el XML en la CadenaOriginal usando precisamente, las reglas de validacion
-  // y presentacion definidas en los documentos XSLT.
-  try
-  sCadenaOriginal := XSLTransformador.Content;
-  // XMLDocument1.Active := False;
-  // TODO: Codificar en UTF8??? o ya viene asi del XSLT????
-  // NOTA: Al obtenerlo para desplegarlo hay que descodificarlo de UTF8, por ejemplo para un Memo edit.
-  Result := sCadenaOriginal;
-  except
-  // Manejar los diversos errores de validacion que se pueden generar...
-  On E: Exception do
-  begin
-  ShowMessage(E.Message);
-  Result := '';
-  end;
-  end;
-
-  FreeAndNil(XSLTransformador);
-  end;
-}
 
 end.
