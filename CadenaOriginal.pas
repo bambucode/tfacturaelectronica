@@ -38,6 +38,8 @@ type
       constructor Create(Comprobante: IFEXMLComprobante; aVersionCFD:
           TFEVersionComprobante); overload;
       function Calcular() : TStringCadenaOriginal;
+  published
+      class function Transform(XMLContent : string; XSLContent : string): WideString;
   end;
 
 
@@ -372,6 +374,20 @@ begin
       CodeSite.Send('SHA1 Cadena Original',
                     UpperCase(TFacturacionHashing.CalcularHash(Result, haSHA1)));
       {$ENDIF}
+end;
+
+class function TCadenaOriginal.Transform(XMLContent : string; XSLContent : string):
+    WideString;
+var
+  XML : IXMLDocument;
+  XSL : IXMLDocument;
+begin
+
+  XML := LoadXMLData(XMLContent);
+  XSL := LoadXMLData(XSLContent);
+
+  XML.DocumentElement.TransformNode(XSL.DocumentElement, Result)
+
 end;
 
 

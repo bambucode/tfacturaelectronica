@@ -69,6 +69,7 @@ type
     procedure setCertificado(Certificado: TFECertificado);
     function getCadenaOriginal(): TStringCadenaOriginal;
     function getSelloDigital(): String;
+    function LoadFileToStr(const FileName: TFileName): AnsiString;
     procedure setBloqueFolios(Bloque: TFEBloqueFolios);
     procedure ValidarQueFolioEsteEnRango;
     procedure AsignarCondicionesDePago;
@@ -204,23 +205,39 @@ end;
 
 function TFEComprobanteFiscal.getCadenaOriginal(): TStringCadenaOriginal;
 var
-  CadenaOriginal : TCadenaOriginal;
+  CadenaOriginal: TCadenaOriginal;
+  //xslt: string;
 begin
-    if FacturaGenerada = True then
-    begin
-        Result:=fCadenaOriginalCalculada;
-    end else
-    begin
-        // Si aun no ha sido generada la factura la "llenamos"
-        LlenarComprobante;
-        try
-            CadenaOriginal:=TCadenaOriginal.Create(fXmlComprobante, fVersion);
-            fCadenaOriginalCalculada:=CadenaOriginal.Calcular;
-            Result:=fCadenaOriginalCalculada;
-        finally
-            FreeAndNil(CadenaOriginal);
-        end;
+  if FacturaGenerada = True then
+  begin
+    Result:=fCadenaOriginalCalculada;
+  end else
+  begin
+    // Si aun no ha sido generada la factura la "llenamos"
+    LlenarComprobante;
+    try
+      CadenaOriginal:=TCadenaOriginal.Create(fXmlComprobante, fVersion);
+      fCadenaOriginalCalculada:=CadenaOriginal.Calcular;
+      //xslt :=  LoadFileToStr('C:\Delphi\eleventa\externos\TFacturaElectronica\cadenaoriginal_3_2.xslt');
+      //fCadenaOriginalCalculada := TCadenaOriginal.Transform(fXmlComprobante.XML, xslt);
+      Result:=fCadenaOriginalCalculada;
+    finally
+      FreeAndNil(CadenaOriginal);
     end;
+  end;
+end;
+
+function TFEComprobanteFiscal.LoadFileToStr(const FileName: TFileName): AnsiString;
+var
+  LStrings: TStringList;
+begin
+  LStrings := TStringList.Create;
+  try
+    LStrings.Loadfromfile(FileName);
+    Result := LStrings.text;
+  finally
+    FreeAndNil(LStrings);
+  end;
 end;
 
 // 1. Datos de quien la expide (Emisor) (Art. 29-A, Fraccion I)
