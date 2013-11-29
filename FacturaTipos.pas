@@ -138,9 +138,7 @@ TFETimbre = record
   SelloSAT : WideString;
   XML: WideString;
 end;
- {
-TTimbreFiscal = Array of TFETimbre;
-}
+
 TFEImpuestoTrasladado = record
     Nombre: String; // IVA, IEPS
     Tasa: Double;

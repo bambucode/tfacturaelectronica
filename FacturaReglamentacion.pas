@@ -88,13 +88,23 @@ begin
 end;
 
 class function TFEReglamentacion.ComoMoneda(dMonto: Currency) : String;
+const
+  _NUMERO_DECIMALES_MONEDA = 6;
 begin
-   Result:=FloatToStrF(dMonto,ffFixed,10,2);
+   // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
+   // http://www.sat.gob.mx/cfd/3/cfdv32.xsd
+   // http://www.sat.gob.mx/cfd/2/cfdv22.xsd
+   Result:=CurrToStrF(dMonto, ffFixed, _NUMERO_DECIMALES_MONEDA);
 end;
 
 class function TFEReglamentacion.ComoTasaImpuesto(dTasa: Double) : String;
+const
+  _NUMERO_DECIMALES_TASA = 6;
 begin
-   Result:=FloatToStrF(dTasa,ffFixed,10,2);
+   // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
+   // http://www.sat.gob.mx/cfd/3/cfdv32.xsd
+   // http://www.sat.gob.mx/cfd/2/cfdv22.xsd
+   Result:=FloatToStrF(dTasa,ffFixed, 10, _NUMERO_DECIMALES_TASA);
 end;
 
 // Las cadenas usadas en el XML deben de escapar caracteres incorrectos
