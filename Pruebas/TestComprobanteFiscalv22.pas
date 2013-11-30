@@ -72,7 +72,7 @@ var
   Concepto: TFEConcepto;
   sXMLConcepto: WideString;
 begin
-  sXMLConcepto := leerContenidoDeFixture('comprobante_fiscal/concepto.xml');
+  sXMLConcepto := leerContenidoDeFixture('comprobante_fiscal/v22/concepto.xml');
 
   Concepto.Cantidad := 12.55;
   Concepto.Unidad := 'pz';
@@ -94,7 +94,7 @@ var
   Bloque: TFEBloqueFolios;
 begin
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/bloque_folios.xml');
+  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/v22/bloque_folios.xml');
 
   Bloque.NumeroAprobacion := 12345;
   Bloque.AnoAprobacion := 2010;
@@ -142,7 +142,7 @@ var
   Folio: TFEFolio;
 begin
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/folio.xml');
+  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/v22/folio.xml');
 
   Folio := 12345678;
   fComprobanteFiscal.Folio := Folio;
@@ -177,7 +177,7 @@ const
   _SUBTOTAL_COMPROBANTE = 1000;
 begin
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/subtotal.xml');
+  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/v22/subtotal.xml');
 
   // Especificamos el certificado que usaremos a la clase comprobante
   fComprobanteFiscal.SubTotal := _SUBTOTAL_COMPROBANTE;
@@ -198,7 +198,7 @@ begin
   ImpuestoRetenido.Importe := 1000;
 
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/agregarimpuesto_retencion.xml');
+  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/v22/agregarimpuesto_retencion.xml');
   TotalImpuestosAnterior := fComprobanteFiscal.TotalImpuestosRetenidos;
 
   // Agregamos el impuesto en cuestion
@@ -225,7 +225,7 @@ begin
   ImpuestoTrasladado.Importe := 1000;
 
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/agregarimpuesto_trasladado.xml');
+  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/v22/agregarimpuesto_trasladado.xml');
   TotalImpuestosAnterior := fComprobanteFiscal.TotalImpuestosTrasladados;
 
   // Agregamos el impuesto en cuestion
@@ -336,11 +336,11 @@ var
 
 begin
   // Leemos la cadena original generada de ejemplo generada previamente con otra aplicacion
-  sCadenaOriginalCorrecta := leerArchivoEnUTF8('comprobante_fiscal/factura_cadena_original_utf8.txt');
+  sCadenaOriginalCorrecta := leerArchivoEnUTF8('comprobante_fiscal/v22/factura_cadena_original_utf8.txt');
   ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
-  LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/comprobante_cadena_original.xml',
+  LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/v22/comprobante_cadena_original.xml',
                        Certificado,
                        fComprobanteFiscal);
 
@@ -365,7 +365,7 @@ begin
 
       // Leemos el comprobante del XML (que no tiene conceptos)
       sSelloDigitalDelXML := LeerXMLDePruebaEnComprobante(fRutaFixtures +
-                              'comprobante_fiscal/comprobante_para_sello_digital_con_mil_conceptos.xml',
+                              'comprobante_fiscal/v22/comprobante_para_sello_digital_con_mil_conceptos.xml',
                               Certificado,
                               fComprobanteFiscal);
 
@@ -392,7 +392,7 @@ begin
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
   sSelloDigitalCorrecto := LeerXMLDePruebaEnComprobante
-    (fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml',
+    (fRutaFixtures + 'comprobante_fiscal/v22/comprobante_para_sello_digital.xml',
     Certificado, fComprobanteFiscal);
 
   CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscal.SelloDigital,
@@ -407,7 +407,7 @@ begin
   ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
-  LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml',
+  LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/v22/comprobante_para_sello_digital.xml',
                            Certificado, fComprobanteFiscal);
 
   // Establecemos la propiedad de DEBUG solamente para que use la fecha/hora actual
@@ -431,7 +431,7 @@ var
   sArchivo: String;
 begin
    // Leemos el XML de nuestro Fixture en memoria
-    sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/comprobante_correcto.xml');
+    sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/v22/comprobante_correcto.xml');
     Assert(AnsiPos('version="2.2"', sContenidoXML) > 0,
           'El XML de pruebas tiene que ser un CFD 2.2 para poder ejecutar la prueba');
     fComprobanteFiscal.XML:=sContenidoXML;
@@ -478,7 +478,7 @@ begin
     ConfigurarCertificadoDePrueba(Certificado);
 
     // Leemos el XML de nuestro Fixture en memoria
-    sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/comprobante_correcto.xml');
+    sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/v22/comprobante_correcto.xml');
     Assert(AnsiPos('version="2.2"', sContenidoXML) > 0,
           'El XML de pruebas tiene que ser un CFD 2.2 para poder ejecutar la prueba');
 
@@ -486,7 +486,7 @@ begin
 
     // Leemos el comprobante de ejemplo con el metodo alternativo usado en las pruebas
     fComprobanteComparacion:=TFEComprobanteFiscal.Create(fev22);
-    LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/comprobante_correcto.xml',
+    LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/v22/comprobante_correcto.xml',
                            Certificado, fComprobanteComparacion);
 
     // Comparamos algunas de sus propiedades las cuales deben de ser las mismas
@@ -534,7 +534,7 @@ begin
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
   sSelloDigitalCorrecto := LeerXMLDePruebaEnComprobante
-    (fRutaFixtures + 'comprobante_fiscal/comprobante_correcto.xml',
+    (fRutaFixtures + 'comprobante_fiscal/v22/comprobante_correcto.xml',
     Certificado, fComprobanteFiscal);
 
   CheckEquals(True, True, '');
@@ -546,7 +546,7 @@ var
   NuevoComprobante: TFEComprobanteFiscal;
 begin
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-  sXMLEncabezadoBasico := leerContenidoDeFixture('comprobante_fiscal/nuevo.xml');
+  sXMLEncabezadoBasico := leerContenidoDeFixture('comprobante_fiscal/v22/nuevo.xml');
   NuevoComprobante := TFEComprobanteFiscal.Create(fev22);
 
   // Checamos que sea igual que nuestro Fixture...
@@ -563,7 +563,7 @@ begin
   Certificado.Ruta := fRutaFixtures + _RUTA_CERTIFICADO;
 
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-  sXMLConNumSerieCertificado := leerContenidoDeFixture('comprobante_fiscal/numeroserie.xml');
+  sXMLConNumSerieCertificado := leerContenidoDeFixture('comprobante_fiscal/v22/numeroserie.xml');
 
   // Especificamos que NO incluya el certificado en el XML (esa es otra prueba independiente)
   fComprobanteFiscal.IncluirCertificadoEnXml:=False;
@@ -584,7 +584,7 @@ begin
   Certificado.Ruta := fRutaFixtures + _RUTA_CERTIFICADO;
 
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-  sXMLConCertificado := leerContenidoDeFixture('comprobante_fiscal/con_certificado.xml');
+  sXMLConCertificado := leerContenidoDeFixture('comprobante_fiscal/v22/con_certificado.xml');
 
   // Especificamos que Si incluya el certificado en el XML
   fComprobanteFiscal.IncluirCertificadoEnXml:=True;
@@ -629,7 +629,7 @@ begin
   fComprobanteFiscal.AsignarEmisor;
 
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-  sXMLConReceptor := leerContenidoDeFixture('comprobante_fiscal/emisor.xml');
+  sXMLConReceptor := leerContenidoDeFixture('comprobante_fiscal/v22/emisor.xml');
   CheckEquals(sXMLConReceptor, fComprobanteFiscal.fXmlComprobante.XML,
     'El Contenido XML del Comprobante no almaceno correctamente los datos del receptor (es diferente al fixture receptor.xml)');
 end;
@@ -661,7 +661,7 @@ begin
 
   // guardarContenido(fComprobanteFiscal.fXmlComprobante.XML, 'comprobante_fiscal/receptor.xml');
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-  sXMLConReceptor := leerContenidoDeFixture('comprobante_fiscal/receptor.xml');
+  sXMLConReceptor := leerContenidoDeFixture('comprobante_fiscal/v22/receptor.xml');
   CheckEquals(sXMLConReceptor, fComprobanteFiscal.fXmlComprobante.XML,
     'El Contenido XML del Comprobante no almaceno correctamente los datos del receptor (es diferente al fixture receptor.xml)');
 end;
@@ -701,7 +701,7 @@ begin
     ConfigurarCertificadoDePrueba(Certificado);
 
     // Leemos el XML de nuestro Fixture en memoria
-    sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/comprobante_ver2.0.xml');
+    sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/v22/comprobante_ver2.0.xml');
     Assert(AnsiPos('version="2.0"', sContenidoXML) > 0,
           'El XML de la prueba tiene que ser un CFD 2.0');
 
@@ -709,7 +709,7 @@ begin
 
     // Leemos el comprobante de ejemplo con el metodo alternativo usado en las pruebas
     fComprobanteComparacion:=TFEComprobanteFiscal.Create(fev20);
-    LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/comprobante_ver2.0.xml',
+    LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/v22/comprobante_ver2.0.xml',
                            Certificado, fComprobanteComparacion);
 
     // Comparamos algunas de sus propiedades las cuales deben de ser las mismas

@@ -130,6 +130,9 @@ function TInformeMensual.AgregarLinea(Comprobante: TComprobanteInformeMensual): 
 var
    d, m, y: word;
    nueva_linea: String;
+const
+  // En el Informe Mensual solo son 2 decimales
+  _NUMERO_DECIMALES_INFORME_MENSUAL = 2;
 begin
   if (Length(Comprobante.Receptor.RFC) < 12) then
     raise ERFCInvalido.create('El rfc de la factura añadida no es valido, el rfc debe ser de 12 o 13 caracteres');
@@ -173,8 +176,8 @@ begin
               IntToStr(Comprobante.Folio)  + '|' +
               IntToStr(fAno) + IntToStr(Comprobante.NumAprobacion) + '|' + //  4. Año y Num de Aprobacion
               TFEReglamentacion.ComoFechaHoraInforme(Comprobante.FechaExpedicion) + '|' +  // Fecha y hora de expedicion
-              TFEReglamentacion.ComoMoneda(Comprobante.Total)  + '|' +
-              TFEReglamentacion.ComoMoneda(Comprobante.Impuestos)  + '|' +
+              TFEReglamentacion.ComoMoneda(Comprobante.Total, _NUMERO_DECIMALES_INFORME_MENSUAL)  + '|' +
+              TFEReglamentacion.ComoMoneda(Comprobante.Impuestos, _NUMERO_DECIMALES_INFORME_MENSUAL)  + '|' +
               ConvertirComprobanteEstadoACadena(Comprobante.Estado)  + '|' +
               ConvertirComprobanteEfectoACadena(Comprobante.Efecto)  + '|' +
               '||' + // <--- TODO: Leer aqui el arreglo de los datos aduaneros e incluirlos en lugar de poner NULL
