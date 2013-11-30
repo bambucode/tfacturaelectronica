@@ -27,12 +27,10 @@ type
   published
     procedure Create_NuevoComprobantev32_GenereEstructuraXMLBasica;
     procedure SelloDigital_DeMilConceptos_SeaCorrecto;
-    procedure setBloqueFolios_Bloque_LoGuardeEnXML;
-    procedure setBloqueFolios_FolioFueraDeRango_CauseExcepcion;
     procedure CadenaOriginal_DeComprobanteV32_SeaCorrecta;
     procedure SelloDigital_DespuesDeVariosSegundos_SeaElMismo;
     procedure SelloDigital_DeComprobante_SeaCorrecto;
-    procedure getXML_DeComprobanteV32_GenereXMLCorrectamente;
+    procedure getXML_DeComprobanteTimbrado_GenereXMLCorrectamente;
     procedure setXML_DeComprobanteV32_EstablezcaLasPropiedadesCorrectamente;
   end;
 
@@ -41,6 +39,7 @@ implementation
 uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
   DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
+  FacturacionHashes,
   UtileriasPruebas;
 
 procedure TestTFEComprobanteFiscalV32.SetUp;
@@ -54,63 +53,11 @@ begin
   FreeAndNil(fComprobanteFiscalv32);
 end;
 
-procedure TestTFEComprobanteFiscalV32.setBloqueFolios_Bloque_LoGuardeEnXML;
-var
-  sXMLFixture: WideString;
-  Bloque: TFEBloqueFolios;
-begin
-  // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
-  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/bloque_folios.xml');
-
-  Bloque.NumeroAprobacion := 12345;
-  Bloque.AnoAprobacion := 2010;
-  Bloque.Serie := 'ABC';
-  Bloque.FolioInicial:=1;
-  Bloque.FolioFinal:=10000;
-
-  // Asignamos el bloque de folios
-  fComprobanteFiscalv32.Folio:=1;
-  fComprobanteFiscalv32.BloqueFolios := Bloque;
-  fComprobanteFiscalv32.AsignarDatosFolios;
-
-  // guardarContenido(fComprobanteFiscalv32.fXmlComprobante.XML, 'comprobante_fiscal/bloque_folios.xml');
-  CheckEquals(sXMLFixture, fComprobanteFiscalv32.fXmlComprobante.XML,
-    'No se guardo el numero de aprobacion, serie y año de aprobacion en la estructura del XML');
-end;
-
-procedure TestTFEComprobanteFiscalV32.setBloqueFolios_FolioFueraDeRango_CauseExcepcion;
-var
-  Bloque: TFEBloqueFolios;
-  bHuboError: Boolean;
-begin
-  Bloque.FolioInicial := 1000;
-  Bloque.FolioFinal := 2000;
-  bHuboError := False;
-
-  // Asignamos primero un Numero de Folio fuera del rango
-  fComprobanteFiscalv32.Folio := Bloque.FolioInicial - 5;
-
-  // Ahora, Asignamos el bloque de folios
-  try
-    fComprobanteFiscalv32.BloqueFolios := Bloque;
-  except
-    On EFEFolioFueraDeRango do
-      bHuboError := True;
-  end;
-
-  CheckEquals(True, bHuboError,
-    'No se lanzo la excepcion al asignar un folio fuera del rango especificado en la propiedad BloqueFolios');
-end;
-
 procedure TestTFEComprobanteFiscalV32.ConfigurarCertificadoDePrueba(var Certificado: TFECertificado);
-const
-  _MICROE_ARCHIVO_CERTIFICADO = 'comprobante_fiscal\aaa010101aaa_csd_01.cer';
-  _MICROE_ARCHIVO_LLAVE_PRIVADA = 'comprobante_fiscal\aaa010101aaa_csd_01.key';
-  _MICROE_CLAVE_LLAVE_PRIVADA = '12345678a';
 begin
-  Certificado.Ruta := fRutaFixtures + _MICROE_ARCHIVO_CERTIFICADO;
-  Certificado.LlavePrivada.Ruta := fRutaFixtures + _MICROE_ARCHIVO_LLAVE_PRIVADA;
-  Certificado.LlavePrivada.Clave := _MICROE_CLAVE_LLAVE_PRIVADA;
+  Certificado.Ruta := fRutaFixtures + _CERTIFICADO_PRUEBAS_SAT;
+  Certificado.LlavePrivada.Ruta := fRutaFixtures + _LLAVE_PRIVADA_PRUEBAS_SAT;
+  Certificado.LlavePrivada.Clave := _CLAVE_LLAVE_PRIVADA_PRUEBAS_SAT;
 end;
 
 procedure
@@ -167,7 +114,7 @@ begin
 
       // Leemos el comprobante del XML (que no tiene conceptos)
       sSelloDigitalDelXML := LeerXMLDePruebaEnComprobante(fRutaFixtures +
-                              'comprobante_fiscal/comprobante_para_sello_digital_con_mil_conceptos.xml',
+                              'comprobante_fiscal/v32/comprobante_para_sello_digital_con_mil_conceptos.xml',
                               Certificado,
                               fComprobanteFiscalv32);
 
@@ -194,7 +141,7 @@ begin
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
   sSelloDigitalCorrecto := LeerXMLDePruebaEnComprobante
-    (fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml',
+    (fRutaFixtures + 'comprobante_fiscal/v32/comprobante_para_sello_digital.xml',
     Certificado, fComprobanteFiscalv32);
 
   CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscalv32.SelloDigital,
@@ -209,7 +156,7 @@ begin
   ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
-  LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/comprobante_para_sello_digital.xml',
+  LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/v32/comprobante_para_sello_digital.xml',
                            Certificado, fComprobanteFiscalv32);
 
   // Establecemos la propiedad de DEBUG solamente para que use la fecha/hora actual
@@ -304,12 +251,32 @@ end;
 
 
 procedure
-    TestTFEComprobanteFiscalV32.getXML_DeComprobanteV32_GenereXMLCorrectamente;
+    TestTFEComprobanteFiscalV32.getXML_DeComprobanteTimbrado_GenereXMLCorrectamente;
 var
-  sSelloDigitalCorrecto: String;
+  sSelloDigitalCorrecto, archivoComprobanteGuardado, hashComprobanteOriginal, hashComprobanteGuardado: String;
+  archivoComprobantePrueba : string;
   Certificado: TFECertificado;
 begin
-  Check(False, 'Prueba vacia');
+  ConfigurarCertificadoDePrueba(Certificado);
+  archivoComprobantePrueba := fRutaFixtures + 'comprobante_fiscal/v32/comprobante_timbrado.xml';
+
+  // Llenamos el comprobante fiscal con datos usados para generar la factura
+  sSelloDigitalCorrecto := LeerXMLDePruebaEnComprobante(archivoComprobantePrueba,
+                                                        Certificado, fComprobanteFiscalV32);
+
+  // Calculamos el MD5 del comprobante original
+  hashComprobanteOriginal := TFacturacionHashing.CalcularHash(archivoComprobantePrueba, haMD5);
+
+  // Guardamos de nuevo el XML
+  Randomize;
+  archivoComprobanteGuardado := fDirTemporal + 'comprobante_prueba_v32_' + IntToStr(Random(9999999999)) + '.xml';
+  fComprobanteFiscalV32.GuardarEnArchivo(archivoComprobanteGuardado);
+  hashComprobanteGuardado := TFacturacionHashing.CalcularHash(archivoComprobanteGuardado, haMD5);
+
+  // Comprobamos el MD5 de ambos archivos para corroborar que tengan exactamente el mismo contenido
+  CheckEquals(hashComprobanteOriginal,
+              hashComprobanteGuardado,
+              'El contenido del comprobante v3.2 guardado fue difernete al original. Sus hashes MD5 fueron diferentes!');
 end;
 
 procedure
