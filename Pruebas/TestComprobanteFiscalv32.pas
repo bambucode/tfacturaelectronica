@@ -30,7 +30,7 @@ type
     procedure CadenaOriginal_DeComprobanteV32_SeaCorrecta;
     procedure SelloDigital_DespuesDeVariosSegundos_SeaElMismo;
     procedure SelloDigital_DeComprobante_SeaCorrecto;
-    procedure getXML_DeComprobanteTimbrado_GenereXMLCorrectamente;
+    procedure GuardarEnArchivo_DeComprobanteTimbrado_GenereXMLIgualAlLeido;
     procedure setXML_DeComprobanteTimbrado_AsignePropiedadesDelTimbre;
     procedure setXML_DeComprobanteV32_EstablezcaLasPropiedadesCorrectamente;
   end;
@@ -259,7 +259,7 @@ begin
     ConfigurarCertificadoDePrueba(Certificado);
 
     // Leemos el XML de nuestro Fixture en memoria
-    sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/v32/comprobante_correcto.xml');
+    sContenidoXML := leerContenidoDeFixture('comprobante_fiscal/v32/comprobante_timbrado.xml');
     Assert(AnsiPos('version="3.2"', sContenidoXML) > 0,
           'El XML de pruebas tiene que ser un CFD 3.2 para poder ejecutar la prueba');
 
@@ -267,7 +267,7 @@ begin
 
     // Leemos el comprobante de ejemplo con el metodo alternativo usado en las pruebas
     fComprobanteComparacion:=TFEComprobanteFiscal.Create(fev32);
-    LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/v32/comprobante_correcto.xml',
+    LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/v32/comprobante_timbrado.xml',
                            Certificado, fComprobanteComparacion);
 
     // Comparamos algunas de sus propiedades las cuales deben de ser las mismas
@@ -301,27 +301,28 @@ end;
 
 
 procedure
-    TestTFEComprobanteFiscalV32.getXML_DeComprobanteTimbrado_GenereXMLCorrectamente;
+    TestTFEComprobanteFiscalV32.GuardarEnArchivo_DeComprobanteTimbrado_GenereXMLIgualAlLeido;
 var
   sSelloDigitalCorrecto, archivoComprobanteGuardado, hashComprobanteOriginal, hashComprobanteGuardado: String;
   archivoComprobantePrueba : string;
   Certificado: TFECertificado;
+  xmlPrueba : TXMLDocument;
 begin
   ConfigurarCertificadoDePrueba(Certificado);
   archivoComprobantePrueba := fRutaFixtures + 'comprobante_fiscal/v32/comprobante_timbrado.xml';
 
-  // Llenamos el comprobante fiscal con datos usados para generar la factura
+  // Leemos el CFDI de pruebas ya timbrado
   sSelloDigitalCorrecto := LeerXMLDePruebaEnComprobante(archivoComprobantePrueba,
                                                         Certificado, fComprobanteFiscalV32);
 
   // Calculamos el MD5 del comprobante original
-  hashComprobanteOriginal := TFacturacionHashing.CalcularHash(archivoComprobantePrueba, haMD5);
+  hashComprobanteOriginal := TFacturacionHashing.CalcularHashArchivo(archivoComprobantePrueba, haMD5);
 
-  // Guardamos de nuevo el XML
+  // ****** Guardamos de nuevo el XML *********
   Randomize;
   archivoComprobanteGuardado := fDirTemporal + 'comprobante_prueba_v32_' + IntToStr(Random(9999999999)) + '.xml';
   fComprobanteFiscalV32.GuardarEnArchivo(archivoComprobanteGuardado);
-  hashComprobanteGuardado := TFacturacionHashing.CalcularHash(archivoComprobanteGuardado, haMD5);
+  hashComprobanteGuardado := TFacturacionHashing.CalcularHashArchivo(archivoComprobanteGuardado, haMD5);
 
   // Comprobamos el MD5 de ambos archivos para corroborar que tengan exactamente el mismo contenido
   CheckEquals(hashComprobanteOriginal,

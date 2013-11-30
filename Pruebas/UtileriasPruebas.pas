@@ -14,19 +14,22 @@ unit UtileriasPruebas;
 interface
 
 uses FacturaTipos,
-     SysUtils,
-     Xml.XMLDoc,
-     System.DateUtils,
      ComprobanteFiscal,
-     FeCFD,
-     FeCFDv2,
-     FeCFDv22,
-     FeCFDv32;
+     SysUtils;
 
 function LeerXMLDePruebaEnComprobante(DeArchivoXML: String; Certificado: TFECertificado;
                                       var ComprobanteDestino: TFEComprobanteFiscal): String;
 
 implementation
+
+uses FeTimbreFiscalDigital,
+     FacturaReglamentacion,
+     Xml.XMLDoc,
+     System.DateUtils,
+     FeCFD,
+     FeCFDv2,
+     FeCFDv22,
+     FeCFDv32;
 
 // Funcion comun para generar el comprobante fiscal con los mismos datos
 // que el XML especificado como parametro, regresa el Sello
@@ -43,10 +46,12 @@ var
   subTotal: Currency;
   sSello: String;
 
-  fXMLPrueba: TXMLDocument;
+  fXMLPrueba, documentoXMLTimbre: TXMLDocument;
   fXMLComprobantePrueba: IFEXMLComprobante;
   VersionCFD: TFEVersionComprobante;
   comprobanteConBloqueFolios: IFESoportaBloqueFolios;
+  complementoTimbre: IFEXMLtimbreFiscalDigital;
+  timbreComprobante: TFETimbre;
 
   procedure leerComprobanteXML();
   begin
@@ -379,6 +384,41 @@ begin
 
   // Asignamos el subtotal de la factura
   ComprobanteDestino.SubTotal := subTotal;
+
+  // Timbre Fiscal
+  if VersionCFD In [fev32] then
+  begin
+    if IFEXMLComprobanteV32(fXMLComprobantePrueba).Complemento.HasChildNodes then
+    begin
+      // Creamos el documento XML solamente del timbre
+      documentoXMLTimbre := TXMLDocument.Create(nil);
+      documentoXMLTimbre.XML.Text := IFEXMLComprobanteV32(fXMLComprobantePrueba).Complemento.ChildNodes.First.XML;
+      documentoXMLTimbre.Active := True;
+
+      try
+        // Convertimos el XML del nodo a la interfase del Timbre v3.2
+        complementoTimbre := GetTimbreFiscalDigital(documentoXMLTimbre);
+
+        // Asignamos las propiedades del XMl del timbre a las internas
+        with timbreComprobante do
+        begin
+          Version := complementoTimbre.Version;
+          UUID := complementoTimbre.UUID;
+          FechaTimbrado := TFEReglamentacion.DeFechaHoraISO8601(complementoTimbre.FechaTimbrado);
+          SelloCFD := complementoTimbre.SelloCFD;
+          NoCertificadoSAT := complementoTimbre.NoCertificadoSAT;
+          SelloSAT := complementoTimbre.SelloSAT;
+          XML := documentoXMLTimbre.XML.Text;
+        end;
+
+        // Agregamos el timbre al CFD
+        ComprobanteDestino.AsignarTimbreFiscal(timbreComprobante);
+      except
+        On E:Exception do
+          raise;
+      end;
+    end;
+  end;
 
   Result:=sSello;
 end;

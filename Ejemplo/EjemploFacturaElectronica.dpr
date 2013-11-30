@@ -229,7 +229,7 @@ begin
 
         // Asignamos el timbre a la factura para que sea válida
         WriteLn('Asignando timbre a factura para generar CFDI');
-        Factura.AsignarTimbre(TimbreDeFactura);
+        Factura.AsignarTimbreFiscal(TimbreDeFactura);
 
         // Ahora generamos el CBB del CFDI
         generadorCBB := TGeneradorCBB.Create;

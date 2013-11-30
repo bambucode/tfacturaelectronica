@@ -25,7 +25,7 @@ type
 
   TFacturacionHashing = class
      class function CalcularHash(const aCadena: WideString; aAlgoritmo : TAlgoritmoHash) : String; overload;
-     class function CalcularHash(const aRutaArchivo: string; aAlgoritmo: TAlgoritmoHash): string; overload;
+     class function CalcularHashArchivo(const aRutaArchivo: string; aAlgoritmo: TAlgoritmoHash): string; overload;
   end;
 
 implementation
@@ -148,7 +148,7 @@ begin
   end;
 end;
 
-class function TFacturacionHashing.CalcularHash(const aRutaArchivo: string; aAlgoritmo : TAlgoritmoHash): string;
+class function TFacturacionHashing.CalcularHashArchivo(const aRutaArchivo: string; aAlgoritmo : TAlgoritmoHash): string;
 var
   Stream: TFileStream;
 begin

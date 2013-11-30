@@ -537,13 +537,13 @@ begin
                                                         Certificado, fComprobanteFiscal);
 
   // Calculamos el MD5 del comprobante original
-  hashComprobanteOriginal := TFacturacionHashing.CalcularHash(archivoComprobantePrueba, haMD5);
+  hashComprobanteOriginal := TFacturacionHashing.CalcularHashArchivo(archivoComprobantePrueba, haMD5);
 
   // Guardamos de nuevo el XML
   Randomize;
   archivoComprobanteGuardado := fDirTemporal + 'comprobante_prueba_' + IntToStr(Random(9999999999)) + '.xml';
   fComprobanteFiscal.GuardarEnArchivo(archivoComprobanteGuardado);
-  hashComprobanteGuardado := TFacturacionHashing.CalcularHash(archivoComprobanteGuardado, haMD5);
+  hashComprobanteGuardado := TFacturacionHashing.CalcularHashArchivo(archivoComprobanteGuardado, haMD5);
 
   // Comprobamos el MD5 de ambos archivos para corroborar que tengan exactamente el mismo contenido
   CheckEquals(hashComprobanteOriginal,

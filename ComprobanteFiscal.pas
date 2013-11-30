@@ -67,6 +67,15 @@ type
     bIncluirCertificadoEnXML: Boolean;
     fAutoAsignarFechaGeneracion: Boolean;
     
+
+    {$REGION 'Documentation'}
+    ///	<summary>
+    ///	  Este metodo es llamado cuando estamos generando el XML del
+    ///	  comprobante y se encarga de asignar el XML del timbre del nodo
+    ///	  "Complemento".
+    ///	</summary>
+    {$ENDREGION}
+    procedure AgregarTimbreFiscalAlXML;
     procedure LlenarComprobante;
     procedure setCertificado(Certificado: TFECertificado);
     function getCadenaOriginal(): TStringCadenaOriginal;
@@ -93,7 +102,14 @@ type
     procedure AsignarFechaGeneracion;
     procedure AsignarLugarExpedicion;
     procedure AsignarNumeroDeCuenta;
-    procedure AsignarPropiedadesDeTimbre;
+
+    {$REGION 'Documentation'}
+    ///	<summary>
+    ///	  Este metodo es llamado cuando leemos un XML (a través del metodo
+    ///	  setXML) para leer las propiedades del TimbreFiscalDigital 
+    ///	</summary>
+    {$ENDREGION}
+    procedure LeerPropiedadesDeTimbre;
     procedure EstablecerVersionDelComprobante;
     function GetTimbre: TFETimbre;
   protected
@@ -134,6 +150,14 @@ type
     property AutoAsignarFechaGeneracion : Boolean read fAutoAsignarFechaGeneracion write fAutoAsignarFechaGeneracion default true;
     property Timbre: TFETimbre read GetTimbre;
     property Version : TFEVersionComprobante read fVersion;
+
+    {$REGION 'Documentation'}
+    ///	<summary>
+    ///	  Evento llamado cuando hemos recibido el timbre de parte del PAC para
+    ///	  asignarle el mismo al CFD de forma interna así como al XML.
+    ///	</summary>
+    {$ENDREGION}
+    procedure AsignarTimbreFiscal(const aTimbre: TFETimbre);
     /// <summary>Guarda una copia del XML en el archivo indicado</summary>
     /// <param name="ArchivoFacturaXML">Ruta completa con nombre de archivo en el que se
     /// almacenara el XML del comprobante</param>
@@ -201,6 +225,27 @@ begin
   inherited;
 end;
 
+procedure TFEComprobanteFiscal.AgregarTimbreFiscalAlXML;
+var
+  xmlTimbrado: WideString;
+const
+  _CARACTER_RETORNO_DE_CARRO = #13#10;
+begin
+  Assert(fTimbre.XML <> '', 'El timbre interno fue nulo');
+
+  // Debido a que el nodo XML trae retornos de carro al final, los removemos para no tener diferencias
+  // en el XML (por si fue leido)
+  xmlTimbrado := StringReplace(fTimbre.XML,
+                               _CARACTER_RETORNO_DE_CARRO,
+                               '',
+                               [rfReplaceAll, rfIgnoreCase]);
+
+  // Creamos un nuevo nodo complemento y le asignamos el XML del Timbre
+  // Ref: http://stackoverflow.com/questions/16743380/string-to-xmlnode-delphi-or-how-to-add-an-xml-fragment-to-txmldocument
+  IFEXmlComprobanteV32(fXmlComprobante).Complemento.ChildNodes.Add(LoadXMLData(xmlTimbrado).DocumentElement);
+
+  fFueTimbrado := True;
+end;
 
 procedure TFEComprobanteFiscal.AsignarCondicionesDePago;
 begin
@@ -461,38 +506,8 @@ begin
     end;
 end;
 
-{procedure TFEComprobanteFiscal.AsignarTimbreFiscal;
-var
-  NuevoTimbre: TFETimbre;
-  I: Integer;
-begin
 
 
-  case fVersion of
-   fev32:
-    begin
-    for I := 0 to Length(inherited TimbreFiscal) - 1 do
-    begin
-        NuevoTimbre:=(inherited TimbreFiscal)[I];
-        with IFEXmlComprobanteV32(fXmlComprobante).TimbreFiscal.Add do
-        begin
-         if Trim(NuevoTimbre.Version) <> '' then
-          Version:=TFEReglamentacion.ComoCadena(NuevoTimbre.Version);
-         UUID:=TFEReglamentacion.ComoCadena(NuevoTimbre.UUID);
-        if Trim(NuevoTimbre.FechaTimbrado) <> '' then
-         FechaTimbrado:=TFEReglamentacion.ComoCadena(NuevoTimbre.FechaTimbrado);
-        if Trim(NuevoTimbre.SelloCFD) <> '' then
-         SelloCFD:=TFEReglamentacion.ComoCadena(NuevoTimbre.SelloCFD);
-        if Trim(NuevoTimbre.NoCertificadoSAT) <> '' then
-         NoCertificadoSAT:=TFEReglamentacion.ComoCadena(NuevoTimbre.NoCertificadoSAT);
-        if Trim(NuevoTimbre.SelloSAT) <> '' then
-         SelloSAT:=TFEReglamentacion.ComoCadena(NuevoTimbre.SelloSAT);
-      end;
-    end;
-    end;
-  end;
-end;
-}
 
 // 3. Clave del RFC de la persona a favor de quien se expida la factura (29-A, Fraccion IV)
 procedure TFEComprobanteFiscal.AsignarReceptor;
@@ -620,6 +635,21 @@ begin
           Importe := TFEReglamentacion.ComoMoneda(NuevoImpuesto.Importe);
         end;
     end;
+end;
+
+procedure TFEComprobanteFiscal.AsignarTimbreFiscal(const aTimbre: TFETimbre);
+begin
+  Assert(fVersion In [fev32], 'No es posible asignar un timbre a un CFD que no es v3.2');
+  //Assert(FacturaGenerada, 'Se debio haber tenido generada la factura antes de asignarle el timbre');
+  Assert(Not fFueTimbrado, 'No es posible asignar un timbre a una factura timbrada previamente');
+  Assert(aTimbre.XML <> '', 'El contenido del timbre fue nulo');
+
+  // Asignamos el timbre a la estructura interna del mismo
+  fTimbre := aTimbre;
+
+  // Mandamos llamar el evento de que se asigno el timbrado
+  {if Assigned(fOnTimbradoAsignado) then
+    fOnTimbradoAsignado(Self);  }
 end;
 
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
@@ -835,7 +865,7 @@ begin
   end;
 end;
 
-procedure TFEComprobanteFiscal.AsignarPropiedadesDeTimbre;
+procedure TFEComprobanteFiscal.LeerPropiedadesDeTimbre;
 var
   complementoTimbre: IFEXMLtimbreFiscalDigital;
   documentoXMLTimbre: TXmlDocument;
@@ -852,8 +882,7 @@ begin
     try
       // Convertimos el XML del nodo a la interfase del Timbre v3.2
       complementoTimbre := GetTimbreFiscalDigital(documentoXMLTimbre);
-      fFueTimbrado := True;
-
+      
       // Asignamos las propiedades del XMl del timbre a las internas
       fTimbre.Version := complementoTimbre.Version;
       fTimbre.UUID := complementoTimbre.UUID;
@@ -903,8 +932,8 @@ begin
         AsignarExpedidoEn;
         // Atributo Receptor
         AsignarReceptor;
+
         // Atributo conceptos
-        //if Trim(fCadenaOriginalCalculada) = '' then
         AsignarConceptos;
 
         // Atributo Impuestos
@@ -964,6 +993,14 @@ procedure TFEComprobanteFiscal.GenerarComprobante;
 begin
   // Al mandar solicitar el sello se genera la cadena original y por lo tanto se llena el comprobante
   fXmlComprobante.Sello:=Self.SelloDigital;
+
+  // Complementos - Timbre Fiscal
+  if fVersion In [fev32] then
+  begin
+     // Si tenemos timbre y no lo hemos agregado al XML lo agregamos
+     if ((fFueTimbrado = False) And (fTimbre.XML <> '')) then
+      AgregarTimbreFiscalAlXML;
+  end;
 end;
 
 procedure TFEComprobanteFiscal.ValidarQueFolioEsteEnRango;
@@ -1492,7 +1529,7 @@ begin
             // Leemos el timbre del CFDI
             if fVersion In [fev32] then
             begin
-              AsignarPropiedadesDeTimbre;
+              LeerPropiedadesDeTimbre;
             end;
 
             // Indicamos que el comprobante XML ya fue "llenado"

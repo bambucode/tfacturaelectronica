@@ -17,7 +17,6 @@ TFacturaElectronica = class(TFEComprobanteFiscal)
 {$ELSE}
   private
 {$ENDIF}
-  fFueTimbrada: Boolean;
   fComprobanteGenerado : Boolean;
   fOnComprobanteGenerado: TOnComprobanteGenerado;
   function obtenerCertificado() : TFECertificado;
@@ -53,8 +52,6 @@ public
   // function Cancelar;
   procedure Generar(const aFolio: Integer; aFormaDePago: TFEFormaDePago);
   procedure Guardar(const aArchivoDestino: String);
-  procedure AsignarTimbre(const aTimbre: TFETimbre);
-
 published
   constructor Create; overload;
 end;
@@ -116,29 +113,6 @@ begin
     inherited XML:=Valor;
 end;
  }
-
-procedure TFacturaElectronica.AsignarTimbre(const aTimbre: TFETimbre);
-var
-  facturaPrevioTimbrado, facturaPostTimbrado: WideString;
-begin
-  Assert(FacturaGenerada, 'Se debio haber tenido generada la factura antes de asignarle el timbre');
-  Assert(Not fFueTimbrada, 'No es posible asignar un timbre a una factura timbrada previamente');
-  Assert(aTimbre.XML <> '', 'El contenido del timbre fue nulo');
-
-  facturaPrevioTimbrado := getXML;
-  facturaPostTimbrado := UTF8Encode(StringReplace(facturaPrevioTimbrado,
-                                                  '</cfdi:Comprobante>',
-                                                  '<cfdi:Complemento>' + aTimbre.XML +
-                                                  '</cfdi:Complemento></cfdi:Comprobante>',
-                                                  [rfReplaceAll]));
-
-  // Asignamos el nuevo XML ya con el timbre incluido
-  setXML(facturaPostTimbrado);
-
-   // Mandamos llamar el evento de que se asigno el timbrado
-   {if Assigned(fOnTimbradoAsignado) then
-      fOnTimbradoAsignado(Self);  }
-end;
 
 procedure TFacturaElectronica.Generar(const aFolio: Integer; aFormaDePago: TFEFormaDePago);
 begin
