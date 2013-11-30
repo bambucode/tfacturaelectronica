@@ -55,7 +55,9 @@ uses
   TestInformeMensual in 'TestInformeMensual.pas',
   TestClaseOpenSSL in 'TestClaseOpenSSL.pas',
   TestComprobanteFiscalv22 in 'TestComprobanteFiscalv22.pas',
-  ComprobanteFiscal in '..\ComprobanteFiscal.pas';
+  ComprobanteFiscal in '..\ComprobanteFiscal.pas',
+  TestComprobanteFiscalv32 in 'TestComprobanteFiscalv32.pas',
+  UtileriasPruebas in 'UtileriasPruebas.pas';
 
 {$R *.RES}
 
