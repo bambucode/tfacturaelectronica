@@ -122,6 +122,8 @@ var
   end;}
 
 begin
+  Assert(FileExists(DeArchivoXML), 'El XML ' + DeArchivoXML + ' no existe!');
+
   // Leemos el fixture de comprobante XML para obtener sus propiedades y asignarlas al comprobante
   leerComprobanteXML();
   // 1. Definimos los datos de los folios

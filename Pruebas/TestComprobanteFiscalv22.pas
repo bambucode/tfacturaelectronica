@@ -43,7 +43,7 @@ type
     procedure CadenaOriginal_DeComprobante_SeaCorrecta;
     procedure SelloDigital_DespuesDeVariosSegundos_SeaElMismo;
     procedure SelloDigital_DeComprobante_SeaCorrecto;
-    procedure XML_DeComprobanteHecho_GenereXMLCorrectamente;
+    procedure getXML_DeComprobanteHecho_GenereXMLCorrectamente;
     procedure setXML_DeComprobanteExistente_EstablezcaLasPropiedadesCorrectamente;
     procedure GuardarEnArchivo_ComprobanteDeXML_LoGuarde;
     procedure setXML_DeComprobanteV2_EstablezcaLasPropiedadesCorrectamente;
@@ -54,6 +54,7 @@ implementation
 uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
   DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
+  FacturacionHashes,
   UtileriasPruebas;
 
 procedure TestTFEComprobanteFiscalV22.SetUp;
@@ -305,14 +306,10 @@ end;
 
 
 procedure TestTFEComprobanteFiscalV22.ConfigurarCertificadoDePrueba(var Certificado: TFECertificado);
-const
-  _MICROE_ARCHIVO_CERTIFICADO = 'comprobante_fiscal\aaa010101aaa_csd_01.cer';
-  _MICROE_ARCHIVO_LLAVE_PRIVADA = 'comprobante_fiscal\aaa010101aaa_csd_01.key';
-  _MICROE_CLAVE_LLAVE_PRIVADA = '12345678a';
 begin
-  Certificado.Ruta := fRutaFixtures + _MICROE_ARCHIVO_CERTIFICADO;
-  Certificado.LlavePrivada.Ruta := fRutaFixtures + _MICROE_ARCHIVO_LLAVE_PRIVADA;
-  Certificado.LlavePrivada.Clave := _MICROE_CLAVE_LLAVE_PRIVADA;
+  Certificado.Ruta := fRutaFixtures + _CERTIFICADO_PRUEBAS_SAT;
+  Certificado.LlavePrivada.Ruta := fRutaFixtures + _LLAVE_PRIVADA_PRUEBAS_SAT;
+  Certificado.LlavePrivada.Clave := _CLAVE_LLAVE_PRIVADA_PRUEBAS_SAT;
 end;
 
 procedure TestTFEComprobanteFiscalV22.CadenaOriginal_DeComprobante_SeaCorrecta;
@@ -525,19 +522,33 @@ begin
 end;
 
 
-procedure TestTFEComprobanteFiscalV22.XML_DeComprobanteHecho_GenereXMLCorrectamente;
+procedure
+    TestTFEComprobanteFiscalV22.getXML_DeComprobanteHecho_GenereXMLCorrectamente;
 var
-  sSelloDigitalCorrecto: String;
+  sSelloDigitalCorrecto, archivoComprobanteGuardado, hashComprobanteOriginal, hashComprobanteGuardado: String;
+  archivoComprobantePrueba : string;
   Certificado: TFECertificado;
 begin
   ConfigurarCertificadoDePrueba(Certificado);
+  archivoComprobantePrueba := fRutaFixtures + 'comprobante_fiscal/v22/comprobante_correcto.xml';
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura
-  sSelloDigitalCorrecto := LeerXMLDePruebaEnComprobante
-    (fRutaFixtures + 'comprobante_fiscal/v22/comprobante_correcto.xml',
-    Certificado, fComprobanteFiscal);
+  sSelloDigitalCorrecto := LeerXMLDePruebaEnComprobante(archivoComprobantePrueba,
+                                                        Certificado, fComprobanteFiscal);
 
-  CheckEquals(True, True, '');
+  // Calculamos el MD5 del comprobante original
+  hashComprobanteOriginal := TFacturacionHashing.CalcularHash(archivoComprobantePrueba, haMD5);
+
+  // Guardamos de nuevo el XML
+  Randomize;
+  archivoComprobanteGuardado := fDirTemporal + 'comprobante_prueba_' + IntToStr(Random(9999999999)) + '.xml';
+  fComprobanteFiscal.GuardarEnArchivo(archivoComprobanteGuardado);
+  hashComprobanteGuardado := TFacturacionHashing.CalcularHash(archivoComprobanteGuardado, haMD5);
+
+  // Comprobamos el MD5 de ambos archivos para corroborar que tengan exactamente el mismo contenido
+  CheckEquals(hashComprobanteOriginal,
+              hashComprobanteGuardado,
+              'El contenido del comprobante guardado fue difernete al original. Sus hashes MD5 fueron diferentes!');
 end;
 
 procedure TestTFEComprobanteFiscalV22.Create_NuevoComprobante_GenereEstructuraXMLBasica;

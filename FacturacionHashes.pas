@@ -24,7 +24,8 @@ type
   TAlgoritmoHash = (haMD5, haSHA1);
 
   TFacturacionHashing = class
-     class function CalcularHash(const aCadena: WideString; aAlgoritmo : TAlgoritmoHash) : String;
+     class function CalcularHash(const aCadena: WideString; aAlgoritmo : TAlgoritmoHash) : String; overload;
+     class function CalcularHash(const aRutaArchivo: string; aAlgoritmo: TAlgoritmoHash): string; overload;
   end;
 
 implementation
@@ -144,6 +145,22 @@ begin
     Result:= CalcHash(Stream, aAlgoritmo);
   finally
     Stream.Free;
+  end;
+end;
+
+class function TFacturacionHashing.CalcularHash(const aRutaArchivo: string; aAlgoritmo : TAlgoritmoHash): string;
+var
+  Stream: TFileStream;
+begin
+  Result:= EmptyStr;
+  if FileExists(aRutaArchivo) then
+  begin
+    Stream:= TFileStream.Create(aRutaArchivo,fmOpenRead or fmShareDenyWrite);
+    try
+      Result:= CalcHash(Stream, aAlgoritmo);
+    finally
+      Stream.Free;
+    end;
   end;
 end;
 
