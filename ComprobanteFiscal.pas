@@ -55,6 +55,8 @@ type
     fCertificado: TFECertificado;
     fCertificadoTexto: WideString;
     fBloqueFolios: TFEBloqueFolios;
+    fFueTimbrado: Boolean;
+    fTimbre : TFETimbre;
     fVersion : TFEVersionComprobante;
     fComprobanteLleno: Boolean;
 
@@ -91,7 +93,9 @@ type
     procedure AsignarFechaGeneracion;
     procedure AsignarLugarExpedicion;
     procedure AsignarNumeroDeCuenta;
+    procedure AsignarPropiedadesDeTimbre;
     procedure EstablecerVersionDelComprobante;
+    function GetTimbre: TFETimbre;
   protected
     procedure GenerarComprobante;
     function getXML: WideString; virtual;
@@ -128,6 +132,7 @@ type
     property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
     property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML default true;
     property AutoAsignarFechaGeneracion : Boolean read fAutoAsignarFechaGeneracion write fAutoAsignarFechaGeneracion default true;
+    property Timbre: TFETimbre read GetTimbre;
     property Version : TFEVersionComprobante read fVersion;
     /// <summary>Guarda una copia del XML en el archivo indicado</summary>
     /// <param name="ArchivoFacturaXML">Ruta completa con nombre de archivo en el que se
@@ -142,6 +147,7 @@ implementation
 
 uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
   OpenSSLUtils, Classes, CadenaOriginal,
+  FeTimbreFiscalDigital,
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
@@ -170,6 +176,7 @@ begin
   fDesglosarTotalesImpuestos := True;
   fCadenaOriginalCalculada:='';
   fSelloDigitalCalculado:='';
+  fFueTimbrado := False;
 
   // Creamos el objeto XML
   fDocumentoXML := TXMLDocument.Create(nil);
@@ -828,6 +835,42 @@ begin
   end;
 end;
 
+procedure TFEComprobanteFiscal.AsignarPropiedadesDeTimbre;
+var
+  complementoTimbre: IFEXMLtimbreFiscalDigital;
+  documentoXMLTimbre: TXmlDocument;
+begin
+  Assert(fVersion = fev32, 'Solo es posible asignar el timbre de un CFD v3.2');
+
+  if IFEXMLComprobanteV32(fXmlComprobante).Complemento.HasChildNodes then
+  begin
+    // Creamos el documento XML solamente del timbre
+    documentoXMLTimbre := TXMLDocument.Create(nil);
+    documentoXMLTimbre.XML.Text := IFEXMLComprobanteV32(fXmlComprobante).Complemento.ChildNodes.First.XML;
+    documentoXMLTimbre.Active := True;
+
+    try
+      // Convertimos el XML del nodo a la interfase del Timbre v3.2
+      complementoTimbre := GetTimbreFiscalDigital(documentoXMLTimbre);
+      fFueTimbrado := True;
+
+      // Asignamos las propiedades del XMl del timbre a las internas
+      fTimbre.Version := complementoTimbre.Version;
+      fTimbre.UUID := complementoTimbre.UUID;
+      fTimbre.FechaTimbrado := TFEReglamentacion.DeFechaHoraISO8601(complementoTimbre.FechaTimbrado);
+      fTimbre.SelloCFD := complementoTimbre.SelloCFD;
+      fTimbre.NoCertificadoSAT := complementoTimbre.NoCertificadoSAT;
+      fTimbre.SelloSAT := complementoTimbre.SelloSAT;
+      fTimbre.XML := documentoXMLTimbre.XML.Text;
+    except
+      On E:Exception do
+        raise;
+    end;
+  end else
+    fFueTimbrado := False;
+end;
+
+
 // Funcion encargada de llenar el comprobante fiscal EN EL ORDEN que se especifica en el XSD
 // ya que si no es asi, el XML se va llenando en el orden en que se establecen las propiedades de la clase
 // haciendo que el comprobante no pase las validaciones del SAT.
@@ -1011,6 +1054,14 @@ begin
   end;
 end;
 
+function TFEComprobanteFiscal.GetTimbre: TFETimbre;
+begin
+  if fVersion In [fev32] then
+    Result := fTimbre
+  else
+    raise EComprobanteNoSoportaPropiedadException.Create('La version de este CFD no soporta timbrado');
+end;
+
 // Permite establecer el XML del comprobante (por si se esta leyendo de la BD, etc)
 // y almacena todo en la estructura interna de datos y XML
 procedure TFEComprobanteFiscal.setXML(const Valor: WideString);
@@ -1025,6 +1076,7 @@ var
   ImpuestoRetenido: TFEImpuestoRetenido;
   sMotivoDescuento: String;
   comprobanteConBloqueFolios:IFESoportaBloqueFolios;
+  complementoTimbre: IFEXMLtimbreFiscalDigital;
 
   function TieneAtributo(NodoPadre: IXMLNode; NombreAtributo: String) : Boolean;
   begin
@@ -1068,7 +1120,7 @@ begin
           fXmlComprobante := GetComprobanteV32(fDocumentoXML);
 
         fDocumentoXML.Encoding := 'UTF-8';
-        Assert(fXmlComprobante <> nil, 'El CFD/I debio haber sido ver 2.0 o v2.2 o v3.2');
+        Assert(fXmlComprobante <> nil, 'No se obtuvo una instancia del comprobante ya que fue nula');
         Assert(fXmlComprobante.Version <> '', 'El comprobante no fue leido correctamente.');
 
         // Checamos que versión es
@@ -1436,6 +1488,12 @@ begin
 
             // Asignamos el subtotal de la factura
             inherited SubTotal := StrToFloat(Subtotal);
+
+            // Leemos el timbre del CFDI
+            if fVersion In [fev32] then
+            begin
+              AsignarPropiedadesDeTimbre;
+            end;
 
             // Indicamos que el comprobante XML ya fue "llenado"
             fComprobanteLleno:=True;

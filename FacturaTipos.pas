@@ -158,8 +158,27 @@ TFEPACCredenciales = record
   DistribuidorID: string; // Usado por algunos PAC para la comunicacion (Ej: Ecodex)
 end;
 
-// Excepciones que se lanzan durante el proceso de timbrado de un CFDI
+{$REGION 'Otras excepciones que se presentan al usar el comprobante fiscal'}
 
+{$REGION 'Documentation'}
+///	<summary>
+///	  Este error se presenta cuando se intenta acceder a una propiedad que la
+///	  version especifica del CFD no soporta, por ejemplo cuando se quiere
+///	  obtener el timbre de un CFD 2.2, etc.
+///	</summary>
+{$ENDREGION}
+EComprobanteNoSoportaPropiedadException = class(Exception);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Esta excepcion se lanza cuando el XML del CFD no tuvo una estrucutra
+///	  correcta o estaba mal formado, etc.
+///	</summary>
+{$ENDREGION}
+EComprobanteEstructuraIncorrectaException = class(Exception);
+{$ENDREGION}
+
+// Excepciones que se lanzan durante el proceso de timbrado de un CFDI
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Error estándard del SAT (301) el cual se lanza cuando el XML enviado al

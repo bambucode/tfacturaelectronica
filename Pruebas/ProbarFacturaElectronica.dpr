@@ -57,7 +57,9 @@ uses
   TestComprobanteFiscalv22 in 'TestComprobanteFiscalv22.pas',
   ComprobanteFiscal in '..\ComprobanteFiscal.pas',
   TestComprobanteFiscalv32 in 'TestComprobanteFiscalv32.pas',
-  UtileriasPruebas in 'UtileriasPruebas.pas';
+  UtileriasPruebas in 'UtileriasPruebas.pas',
+  FacturacionHashes in '..\FacturacionHashes.pas',
+  FeTimbreFiscalDigital in '..\CFD\FeTimbreFiscalDigital.pas';
 
 {$R *.RES}
 

@@ -31,6 +31,7 @@ type
     procedure SelloDigital_DespuesDeVariosSegundos_SeaElMismo;
     procedure SelloDigital_DeComprobante_SeaCorrecto;
     procedure getXML_DeComprobanteTimbrado_GenereXMLCorrectamente;
+    procedure setXML_DeComprobanteTimbrado_AsignePropiedadesDelTimbre;
     procedure setXML_DeComprobanteV32_EstablezcaLasPropiedadesCorrectamente;
   end;
 
@@ -40,6 +41,7 @@ uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
   DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
   FacturacionHashes,
+  FacturaReglamentacion,
   UtileriasPruebas;
 
 procedure TestTFEComprobanteFiscalV32.SetUp;
@@ -175,6 +177,54 @@ begin
 end;
 
 procedure
+    TestTFEComprobanteFiscalV32.setXML_DeComprobanteTimbrado_AsignePropiedadesDelTimbre;
+var
+  contenidoXML: WideString;
+  Certificado: TFECertificado;
+const
+  // ToDo: Leer estas propiedades de forma alternativa desde el XML de prueba para no tenerlas fijas
+  // y pode cambiar el XML de prueba facilmente
+  _TIMBRE_VERSION = '1.0';
+  _TIMBRE_SELLO_SAT = 'XWJRk4IX97i2WEBJj1KJ4e3IYyGHOazTVtNusuGMLUT7YSt/nNWNK9dll3/p+mXOccLbfxRJcwIXzkIw0D+FetYPtpe8+Bw+utCF4/ZmDMy1xX5GzOWqXk2eu5KCz+HZQdkPFntD2/lyFtFP2+6xl+cR1aLB4BSQZ862JS2gj7M=';
+  _TIMBRE_NOCERTIFICADO_SAT = '20001000000100005761';
+  _TIMBRE_UUID = '2BDCA386-B562-45B0-8904-6099A33CA6B8';
+  _TIMBRE_FECHA = '2013-11-29T17:35:51';
+begin
+    ConfigurarCertificadoDePrueba(Certificado);
+
+    // Leemos un CFDI ya timbrado
+    contenidoXML := leerContenidoDeFixture('comprobante_fiscal/v32/comprobante_timbrado.xml');
+
+    //*** Asignamos el XML al comprobante **
+    fComprobanteFiscalv32.XML:=UTF8ToString(contenidoXML);
+
+    // Verificamos que se haya asignado la propiedad del XML correctamente
+    CheckEquals(_TIMBRE_VERSION,
+                 fComprobanteFiscalv32.Timbre.Version,
+                'La version del timbrado del CFDI fue diferente!');
+
+     CheckEquals(_TIMBRE_SELLO_SAT,
+                 fComprobanteFiscalv32.Timbre.SelloSAT,
+                'El sello del SAT del timbre no fue el correcto');
+
+     CheckEquals(_TIMBRE_NOCERTIFICADO_SAT,
+                 fComprobanteFiscalv32.Timbre.NoCertificadoSAT,
+                'El No Certificado del SAT no fue el correcto');
+
+     CheckEquals(_TIMBRE_UUID,
+                 fComprobanteFiscalv32.Timbre.UUID,
+                'El UUID del timbre no fue el correcto');
+
+     CheckEquals(_TIMBRE_FECHA,
+                 TFeReglamentacion.ComoFechaHora(fComprobanteFiscalv32.Timbre.FechaTimbrado),
+                'La fecha del timbrado no fue correcta');
+
+     CheckNotEquals('',
+                  fComprobanteFiscalv32.Timbre.XML,
+                  'El XML del timbre fue vacio!');
+end;
+
+procedure
     TestTFEComprobanteFiscalV32.setXML_DeComprobanteV32_EstablezcaLasPropiedadesCorrectamente;
 var
     sContenidoXML: WideString;
@@ -216,7 +266,7 @@ begin
     fComprobanteFiscalv32.XML:=UTF8ToString(sContenidoXML);
 
     // Leemos el comprobante de ejemplo con el metodo alternativo usado en las pruebas
-    fComprobanteComparacion:=TFEComprobanteFiscal.Create(fev22);
+    fComprobanteComparacion:=TFEComprobanteFiscal.Create(fev32);
     LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/v32/comprobante_correcto.xml',
                            Certificado, fComprobanteComparacion);
 
@@ -295,6 +345,8 @@ begin
 
   FreeAndNil(NuevoComprobante);
 end;
+
+
 
 initialization
 
