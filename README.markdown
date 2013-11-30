@@ -42,9 +42,15 @@ Completado
 - Implementar la lectura de un CFD y que al mismo tiempo verifique si es válido o no. <- Completado 12 Dic 2010>
 - Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT. < Completado 26 Ene 2011 >
 
-¿Cómo puedo colaborar?
+¿Cómo puedo ayudar?
 -------------
+Actualmente la librería se encuentra en estado "beta" en la implementación de CFDI. La manera en que puedes ayudar es en realizar más pruebas de unidad para probar los diferentes casos y corroborar que la librería funcione como debe. También puedes implementar más PACs basándote en los actuales y el ejemplo incluído.
+
 Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a mi correo: <luis@bambucode.com> ya sea para envío de código realizado o bien si lo deseas puedes mandarme un "pull request" de tu "fork" de la librería.
+
+Soporte Técnico
+------------
+El soporte es limitado y por la misma razón la librería es de código abierto, para que puedas estudiarla, mejorarla y corregirla en donde encuentres alguna falla. Si encuentras alguna falla favor de reportarla en esta página en la sección de "Issues" para que otros usuarios puedan colaborar y encontrar una solución como comunidad.
 
 Notas adicionales
 ------------
@@ -58,5 +64,5 @@ La libreria ha sido probada solamente con Delphi XE2 aunque se ha tratado de man
 
 Colaboradores actuales.
 -------------
-* Ing. Luis Carrasco - Bambu Code SA de CV - <http://github.com/lcarrasco>
+* Ing. Luis Carrasco - Bambú Code SA de CV - <http://github.com/lcarrasco>
 *  Ing. Pablo Torres - <http://www.tecsisnet.net>
