@@ -262,8 +262,53 @@ begin
 end;
 
 function TPACEcodex.CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean;
+var
+  timbreUUID, mensajeFalla, tokenDeUsuario: String;
+  solicitudCancelacion : TEcodexSolicitudCancelacion;
+  respuestaCancelacion : TEcodexRespuestaCancelacion;
+
+  function ExtraerUUID(const aDocumentoTimbrado: TTipoComprobanteXML) : String;
+  const
+    _LONGITUD_UUID = 36;
+  begin
+      Result:=Copy(aDocumentoTimbrado,
+                   AnsiPos('UUID="', aDocumentoTimbrado) + 6,
+                   _LONGITUD_UUID);
+  end;
+
 begin
-  // TODO: Implementar TPACEcodex.CancelarDocumento
+  Result := False;
+
+  // 1. Iniciamos una nueva sesion solicitando un nuevo token
+  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+
+  try
+    // 2. Creamos la solicitud de cancelacion
+    solicitudCancelacion := TEcodexSolicitudCancelacion.Create;
+    solicitudCancelacion.RFC := fCredenciales.RFC;
+    solicitudCancelacion.Token := tokenDeUsuario;
+    solicitudCancelacion.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+    // Ecodex solo requiere que le enviemos el UUID del timbre anterior, lo extraemos para enviarlo
+    solicitudCancelacion.UUID := ExtraerUUID(aDocumento);
+
+    try
+      mensajeFalla := '';
+      respuestaCancelacion := wsTimbradoEcodex.CancelaTimbrado(solicitudCancelacion);
+
+      Result := respuestaCancelacion.Cancelada;
+    except
+      On E: Exception do
+      begin
+         mensajeFalla := E.Message;
+      end;
+    end;
+
+     if (mensajeFalla <> '') then
+         ProcesarCodigoDeError(mensajeFalla);
+  finally
+    solicitudCancelacion.Free;
+    respuestaCancelacion.Free;
+  end;
 end;
 
 end.

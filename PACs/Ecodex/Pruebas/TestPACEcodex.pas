@@ -34,6 +34,7 @@ type
     procedure SetUp; override;
     procedure TearDown; override;
   published
+    procedure CancelarDocumento_Documento_CanceleCorrectamente;
     procedure TimbrarDocumento_ConRFCIncorrecto_CauseExcepcionDeRFC;
     procedure TimbrarDocumento_ConXMLMalformado_CauseExcepcion;
     procedure TimbrarDocumento_DePrueba_RegreseDatosDeTimbre;
@@ -133,6 +134,19 @@ begin
   Factura.Generar(Random(999999), fpUnaSolaExhibicion);
 
   Result := Factura.XML;
+end;
+
+procedure TestTPACEcodex.CancelarDocumento_Documento_CanceleCorrectamente;
+var
+  resultadoCancelacion: Boolean;
+begin
+   fDocumentoDePrueba := Self.leerContenidoDeArchivo(fDirectorioFixtures + '\comprobante_previamente_timbrado.xml');
+
+   resultadoCancelacion := cutPACEcodex.CancelarDocumento(fDocumentoDePrueba);
+
+   CheckEquals(True,
+               resultadoCancelacion,
+               'Se debio haber regresado verdadero tras el proceso de cancelación del CFDI');
 end;
 
 procedure TestTPACEcodex.TimbrarDocumento_ConRFCIncorrecto_CauseExcepcionDeRFC;
