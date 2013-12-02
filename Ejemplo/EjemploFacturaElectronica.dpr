@@ -62,7 +62,6 @@ var
    Factura: TFacturaElectronica;
    Emisor, Receptor: TFEContribuyente;
    Certificado: TFECertificado;
-   BloqueFolios: TFEBloqueFolios;
    Impuesto1, Impuesto2: TFEImpuestoTrasladado;
    Concepto1, Concepto2 : TFEConcepto;
    generadorCBB: TGeneradorCBB;
@@ -152,13 +151,6 @@ begin
       Receptor.Direccion.Localidad:='Boca del Rio';
       //Receptor.Direccion.Referencia:='IZQ';
 
-      // 3. Definimos los datos de los folios que nos autorizo el SAT (solo para CFD 2.2)
-      {BloqueFolios.NumeroAprobacion:=1;
-      BloqueFolios.AnoAprobacion:=2010;
-      BloqueFolios.Serie:='A';
-      BloqueFolios.FolioInicial:=1;
-      BloqueFolios.FolioFinal:=1000; }
-
       // 4. Definimos el certificado junto con su llave privada
       Certificado.Ruta:=ExtractFilePath(Application.ExeName) + '\aaa010101aaa_CSD_01.cer';
       Certificado.LlavePrivada.Ruta:=ExtractFilePath(Application.ExeName) + '\aaa010101aaa_CSD_01.key';
@@ -166,7 +158,7 @@ begin
 
       // 5. Creamos la clase Factura con los parametros minimos.
       WriteLn('Generando factura CFD ...');
-      Factura:=TFacturaElectronica.Create(Emisor, Receptor, BloqueFolios, Certificado, tcIngreso);
+      Factura:=TFacturaElectronica.Create(Emisor, Receptor, Certificado, tcIngreso);
 
       //Factura.AutoAsignarFechaGeneracion := False;
       //Factura.FechaGeneracion := EncodeDateTime(2012, 05, 12, 19, 47, 22, 0);
