@@ -296,7 +296,7 @@ begin
               AgregarAtributo(fXmlComprobante.Receptor, 'nombre');
       
       // 7) Datos del domicilio fiscal del Receptor
-      if Assigned(fXmlComprobante.ChildNodes.FindNode('Receptor').ChildNodes.FindNode('DomicilioFiscal')) then
+      if Assigned(fXmlComprobante.ChildNodes.FindNode('Receptor').ChildNodes.FindNode('Domicilio')) then
         AgregarUbicacion(fXmlComprobante.Receptor.Domicilio);
 
       // 8) Datos de Cada Concepto Relacionado en el Comprobante
