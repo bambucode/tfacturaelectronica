@@ -22,34 +22,45 @@ type
 
   TestTPACEcodex = class(TTestPrueba)
   strict private
+    fDirectorioFixtures: string;
     fDocumentoDePrueba: WideString;
     fCredencialesDePrueba : TFEPACCredenciales;
     cutPACEcodex: TPACEcodex;
   private
+    function ObtenerNuevaFacturaATimbrar: WideString;
 
   public
     procedure SetUp; override;
     procedure TearDown; override;
   published
-    procedure TimbrarDocumento_DePrueba_AsigneXMLDeTimbre;
+    procedure TimbrarDocumento_ConRFCIncorrecto_CauseExcepcionDeRFC;
+    procedure TimbrarDocumento_ConXMLMalformado_CauseExcepcion;
     procedure TimbrarDocumento_DePrueba_RegreseDatosDeTimbre;
+    procedure TimbrarDocumento_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
   end;
 
 implementation
 
 uses
-  Windows, SysUtils, Classes, Forms;
+  Windows, SysUtils, Classes, Forms,
+  FacturaElectronica;
 
 procedure TestTPACEcodex.SetUp;
 begin
   inherited;
   cutPACEcodex := TPACEcodex.Create;
 
+  // Definimos el directorio donde estan los archivos de prueba
+  fDirectorioFixtures := ExtractFilePath(Application.ExeName) + '..\..\Fixtures\';
+
   // Asignamos las credenciales de prueba
   // tomadas del documento "Guia de integracion ECODEX_v2.0.1.pdf" Página 28
-  fCredencialesDePrueba.RFC            := 'SUL010720JN8';
+  fCredencialesDePrueba.RFC            := 'AAA010101AAA';
   fCredencialesDePrueba.Clave          := 'prueba';
   fCredencialesDePrueba.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
+
+  // Asignamos las credenciales a Ecodex
+  cutPACEcodex.AsignarCredenciales(fCredencialesDePrueba);
 end;
 
 procedure TestTPACEcodex.TearDown;
@@ -57,25 +68,177 @@ begin
   FreeAndNil(cutPACEcodex);
 end;
 
-procedure TestTPACEcodex.TimbrarDocumento_DePrueba_AsigneXMLDeTimbre;
+
+function TestTPACEcodex.ObtenerNuevaFacturaATimbrar: WideString;
+var
+  Emisor, Receptor: TFEContribuyente;
+  Certificado: TFECertificado;
+  Factura: TFacturaElectronica;
+  Concepto: TFEConcepto;
+  impuestoIVA: TFEImpuestoTrasladado;
 begin
-  Check(False);
+
+  // 1. Definimos los datos del emisor y receptor
+  Emisor.RFC:='AAA010101AAA';
+  Emisor.Nombre:='Mi Empresa SA de CV';
+  Emisor.Direccion.Pais:='México';
+  Emisor.Direccion.Calle:='Calle de la Amargura';
+  Emisor.Direccion.NoExterior:='123';
+  Emisor.Direccion.NoInterior:='456';
+  Emisor.Direccion.CodigoPostal:='87345';
+  Emisor.Direccion.Colonia:='Col. Bondojito';
+  Emisor.Direccion.Municipio:='Oaxaca';
+  Emisor.Direccion.Estado:='Oaxaca';
+
+   // 2. Agregamos los régimenes fiscales (requerido en CFD >= 2.2)
+  SetLength(Emisor.Regimenes, 1);
+  Emisor.Regimenes[0] := 'Regimen General de Ley';
+
+  Receptor.RFC:='PWD090210DR5';
+  Receptor.Nombre:='Mi Cliente SA de CV';
+  Receptor.Direccion.Pais:='México';
+  Receptor.Direccion.Calle:='Patriotismo';
+  Receptor.Direccion.NoExterior:='4579';
+  Receptor.Direccion.NoInterior:='94';
+  Receptor.Direccion.CodigoPostal:='75489';
+  Receptor.Direccion.Colonia:='La Añoranza';
+  Receptor.Direccion.Municipio:='Coyoacán';
+  Receptor.Direccion.Estado:='Veracruz';
+  Receptor.Direccion.Localidad:='Boca del Rio';
+
+  // 4. Definimos el certificado junto con su llave privada
+  Certificado.Ruta:=fDirectorioFixtures + '\aaa010101aaa_CSD_01.cer';
+  Certificado.LlavePrivada.Ruta:=fDirectorioFixtures + '\aaa010101aaa_CSD_01.key';
+  Certificado.LlavePrivada.Clave:='12345678a';
+
+  // 5. Creamos la clase Factura con los parametros minimos.
+  Factura:=TFacturaElectronica.Create(Emisor, Receptor, Certificado, tcIngreso);
+  Factura.MetodoDePago:='Tarjeta de credito';
+
+  // Asignamos el lugar de expedición (requerido en  CFD >= 2.2)
+  Factura.LugarDeExpedicion:='Queretaro, Qro';
+
+  // Definimos todos los conceptos que incluyo la factura
+  Concepto.Cantidad:=10.25;
+  Concepto.Unidad:='Kilo';
+  Concepto.Descripcion:='Arroz blanco precocido';
+  Concepto.ValorUnitario:=12.23;
+  Factura.AgregarConcepto(Concepto);
+
+  // Agregamos el impuesto del concepto 1
+  impuestoIVA.Nombre:='IVA';
+  impuestoIVA.Tasa:=16;
+  impuestoIVA.Importe:=(concepto.ValorUnitario * concepto.Cantidad) * (impuestoIVA.Tasa/100);
+  Factura.AgregarImpuestoTrasladado(impuestoIVA);
+
+  // Mandamos generar el CFD en memoria antes de timbrarlo
+  Randomize;
+  Factura.Generar(Random(999999), fpUnaSolaExhibicion);
+
+  Result := Factura.XML;
+end;
+
+procedure TestTPACEcodex.TimbrarDocumento_ConRFCIncorrecto_CauseExcepcionDeRFC;
+var
+  excepcionLanzada: Boolean;
+  credencialesDiferentes: TFEPACCredenciales;
+begin
+  excepcionLanzada := False;
+
+  // Leemos el XML de un documento previamente timbrado
+  fDocumentoDePrueba := Self.leerContenidoDeArchivo(fDirectorioFixtures + '\comprobante_previamente_timbrado.xml');
+
+  credencialesDiferentes.RFC            := 'SUL010720JN8';
+  credencialesDiferentes.Clave          := 'prueba';
+  credencialesDiferentes.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
+
+  // Asignamos las nuevas credenciales a Ecodex con un RFC diferente al del documento a timbrar
+  cutPACEcodex.AsignarCredenciales(credencialesDiferentes);
+
+  try
+    // Mandamos timbrar
+    cutPACEcodex.TimbrarDocumento(fDocumentoDePrueba);
+  except
+    On E:ETimbradoRFCNoCorrespondeException do
+    begin
+       excepcionLanzada := True;
+    end;
+  end;
+
+  CheckTrue(excepcionLanzada, 'Se debio haber lanzado la excepcion de ETimbradoRFCNoCorrespondeException al ' +
+                              'enviar un XML a timbrar donde el RFC del emisor es diferente al de las credenciales del PAC');
+end;
+
+procedure TestTPACEcodex.TimbrarDocumento_ConXMLMalformado_CauseExcepcion;
+var
+  excepcionLanzada : Boolean;
+  documentoXMLInvalido : WideString;
+begin
+   documentoXMLInvalido := leerContenidoDeArchivo(fDirectorioFixtures + '\comprobante_malformado.xml');
+
+   try
+    // Mandamos timbrar
+    cutPACEcodex.TimbrarDocumento(documentoXMLInvalido);
+  except
+    On E:ETimbradoXMLInvalidoException do
+    begin
+       excepcionLanzada := True;
+    end;
+  end;
+
+
+  CheckTrue(excepcionLanzada, 'Se debio haber lanzado la excepcion de ETimbradoPreviamenteException al ' +
+                              'enviar un documento previamente timbrado');
 end;
 
 procedure TestTPACEcodex.TimbrarDocumento_DePrueba_RegreseDatosDeTimbre;
 var
-  timbreResultado : TFETimbre;
+  nuevoDocumentoATimbrar : WideString;
+  resultadoTimbre: TFETimbre;
 begin
-  cutPACEcodex.AsignarCredenciales(fCredencialesDePrueba);
+  // Creamos un comprobante nuevo para mandarlo timbrar
+  nuevoDocumentoATimbrar := ObtenerNuevaFacturaATimbrar();
 
-  // Leemos el XML de prueba para timbrarlo
-  fDocumentoDePrueba := Self.leerContenidoDeArchivo(ExtractFilePath(Application.ExeName) +
-                                                   '..\..\Fixtures\comprobante_a_timbrar.xml');
+  // ** Mandamos realizar el timbre **
+  resultadoTimbre := cutPACEcodex.TimbrarDocumento(nuevoDocumentoATimbrar);
 
-  timbreResultado := cutPACEcodex.TimbrarDocumento(fDocumentoDePrueba);
+  CheckEquals('1.0',
+              resultadoTimbre.Version,
+              'La version del timbre fue diferente a la esperada');
+  CheckTrue(resultadoTimbre.UUID <> '',
+            'El UUID del timbre no se asignó correctamente');
+  CheckTrue(resultadoTimbre.SelloCFD <> '',
+            'El Sello CFD del timbre no se asignó correctamente');
+  CheckTrue(resultadoTimbre.NoCertificadoSAT <> '',
+            'El NoCertificadoSAT del timbre no se asignó correctamente');
+  CheckTrue(resultadoTimbre.SelloSAT <> '',
+            'El SelloSAT del timbre no se asignó correctamente');
+  CheckTrue(resultadoTimbre.XML <> '',
+          'El XML del timbre no se asignó correctamente');
+end;
 
-  CheckTrue(timbreResultado.UUID <> '',
-            'El UUID del timbre no fue correcto');
+procedure
+    TestTPACEcodex.TimbrarDocumento_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
+var
+  excepcionLanzada: Boolean;
+begin
+  excepcionLanzada := False;
+  // Leemos el XML de un documento previamente timbrado
+  fDocumentoDePrueba := Self.leerContenidoDeArchivo(fDirectorioFixtures + '\comprobante_previamente_timbrado.xml');
+
+  try
+    // Mandamos timbrar
+    cutPACEcodex.TimbrarDocumento(fDocumentoDePrueba);
+  except
+    On E:ETimbradoPreviamenteException do
+    begin
+       excepcionLanzada := True;
+    end;
+  end;
+
+
+  CheckTrue(excepcionLanzada, 'Se debio haber lanzado la excepcion de ETimbradoPreviamenteException al ' +
+                              'enviar un documento previamente timbrado');
 end;
 
 initialization

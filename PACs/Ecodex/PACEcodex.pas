@@ -149,43 +149,54 @@ end;
 procedure TPACEcodex.ProcesarCodigoDeError(aRespuestaDePAC: String);
 const
   _ECODEX_FUERA_DE_SERVICIO = '(22)';
+  _ECODEX_VERSION_NO_SOPORTADA = 'El driver no soporta esta version de cfdi';
+  // Algunos errores no regresan código de error, los buscamos por cadena completa
+  _ECODEX_RFC_NO_CORRESPONDE = 'El rfc del Documento no corresponde al del encabezado';
+const
+  _NO_ECONTRADO = 0;
 begin
-
-  if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, aRespuestaDePAC) > _NO_ECONTRADO then
     raise EPACServicioNoDisponibleException.Create(aRespuestaDePAC);
 
-  if AnsiPos(_ERROR_SAT_XML_INVALIDO, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ERROR_SAT_XML_INVALIDO, aRespuestaDePAC) > _NO_ECONTRADO then
     raise ETimbradoXMLInvalidoException.Create(aRespuestaDePAC);
 
-  if AnsiPos(_ERROR_SAT_SELLO_EMISOR_INVALIDO, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ERROR_SAT_SELLO_EMISOR_INVALIDO, aRespuestaDePAC) > _NO_ECONTRADO then
     raise ETimbradoSelloEmisorInvalidoException.Create(aRespuestaDePAC);
 
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, aRespuestaDePAC) > _NO_ECONTRADO then
     raise ETimbradoCertificadoNoCorrespondeException.Create(aRespuestaDePAC);
 
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_REVOCADO, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ERROR_SAT_CERTIFICADO_REVOCADO, aRespuestaDePAC) > _NO_ECONTRADO then
     raise ETimbradoCertificadoRevocadoException.Create(aRespuestaDePAC);
 
-  if AnsiPos(_ERROR_SAT_FECHA_EMISION_SIN_VIGENCIA, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ERROR_SAT_FECHA_EMISION_SIN_VIGENCIA, aRespuestaDePAC) > _NO_ECONTRADO then
     raise ETimbradoFechaEmisionSinVigenciaException.Create(aRespuestaDePAC);
 
-  if AnsiPos(_ERROR_SAT_LLAVE_NO_CORRESPONDE, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ERROR_SAT_LLAVE_NO_CORRESPONDE, aRespuestaDePAC) > _NO_ECONTRADO then
     raise ETimbradoLlaveInvalidaException.Create(aRespuestaDePAC);
 
-  if AnsiPos(_ERROR_SAT_PREVIAMENTE_TIMBRADO, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ERROR_SAT_PREVIAMENTE_TIMBRADO, aRespuestaDePAC) > _NO_ECONTRADO then
     raise ETimbradoPreviamenteException.Create(aRespuestaDePAC);
 
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_FIRMADO_POR_SAT, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_FIRMADO_POR_SAT, aRespuestaDePAC) > _NO_ECONTRADO then
     raise ETimbradoCertificadoApocrifoException.Create(aRespuestaDePAC);
 
-  if AnsiPos(_ERROR_SAT_FECHA_FUERA_DE_RANGO, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ERROR_SAT_FECHA_FUERA_DE_RANGO, aRespuestaDePAC) > _NO_ECONTRADO then
     raise ETimbradoFechaGeneracionMasDe72HorasException.Create(aRespuestaDePAC);
 
-  if AnsiPos(_ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO, aRespuestaDePAC) > _NO_ECONTRADO then
     raise ETimbradoRegimenEmisorNoValidoException.Create(aRespuestaDePAC);
 
-  if AnsiPos(_ERROR_SAT_FECHA_EMISION_EN_EL_PASADO, aRespuestaDePAC) > -1 then
+  if AnsiPos(_ERROR_SAT_FECHA_EMISION_EN_EL_PASADO, aRespuestaDePAC) > _NO_ECONTRADO then
     raise ETimbradoFechaEnElPasadoException.Create(aRespuestaDePAC);
+
+  if AnsiPos(_ECODEX_RFC_NO_CORRESPONDE, aRespuestaDePAC) > _NO_ECONTRADO then
+    raise ETimbradoRFCNoCorrespondeException.Create('El RFC del documento y el del emisor no corresponden');
+
+  if AnsiPos(_ECODEX_VERSION_NO_SOPORTADA, aRespuestaDePAC) > _NO_ECONTRADO then
+    raise ETimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
+                                                             aRespuestaDePAC);
 
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
   raise ETimbradoErrorGenericoException.Create(aRespuestaDePAC);

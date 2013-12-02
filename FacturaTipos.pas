@@ -158,6 +158,11 @@ TFEPACCredenciales = record
   DistribuidorID: string; // Usado por algunos PAC para la comunicacion (Ej: Ecodex)
 end;
 
+{$REGION 'Errores durante generacion de CFD/I'}
+  EFEAtributoRequeridoNoPresenteException = class(Exception);
+{$ENDREGION}
+
+
 {$REGION 'Otras excepciones que se presentan al usar el comprobante fiscal'}
 
 {$REGION 'Documentation'}
@@ -186,6 +191,8 @@ EComprobanteEstructuraIncorrectaException = class(Exception);
 ///	</summary>
 {$ENDREGION}
 ETimbradoXMLInvalidoException = class(Exception);
+ETimbradoRFCNoCorrespondeException = class(Exception);
+ETimbradoVersionNoSoportadaPorPACException = class(Exception);
 
 {$REGION 'Documentation'}
 ///	<summary>
