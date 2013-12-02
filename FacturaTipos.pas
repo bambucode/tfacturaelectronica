@@ -162,7 +162,6 @@ end;
   EFEAtributoRequeridoNoPresenteException = class(Exception);
 {$ENDREGION}
 
-
 {$REGION 'Otras excepciones que se presentan al usar el comprobante fiscal'}
 
 {$REGION 'Documentation'}

@@ -444,8 +444,9 @@ begin
           RFC :=(inherited Emisor).RFC;
           Nombre := TFEReglamentacion.ComoCadena((inherited Emisor).Nombre);
 
-          // Agregamos el domicilio fiscal del Emisor
-          AgregarDireccionFiscalv32(DomicilioFiscal, (inherited Emisor).Direccion);
+          // Agregamos el domicilio fiscal del Emisor solo si tiene Calle
+          if (inherited Emisor).Direccion.Calle <> '' then
+            AgregarDireccionFiscalv32(DomicilioFiscal, (inherited Emisor).Direccion);
 
           // Agregamos el nuevo campo requerido Regimen Fiscal (implementado en 2.2)
           AsignarRegimenesFiscales;
@@ -551,8 +552,9 @@ begin
     begin
         Nombre := TFEReglamentacion.ComoCadena((inherited Receptor).Nombre);
 
-        // Agregamos el domicilio fiscal del Emisor
-        AgregarDireccionFiscalv32(Domicilio, (inherited Receptor).Direccion);
+        // Agregamos el domicilio fiscal del Receptor
+        if (inherited Receptor).Direccion.Calle <> '' then
+          AgregarDireccionFiscalv32(Domicilio, (inherited Receptor).Direccion);
     end else
         // Si es Publico en General solo agregamos el pais al nodo Direccion
         // cualquier otra cosa generara un CFD invalido.
@@ -1586,9 +1588,6 @@ begin
        if Length(inherited Emisor.Regimenes) = 0 then
         raise EFEAtributoRequeridoNoPresenteException.Create('Se debe especificar al menos 1 régimen fiscal');
 
-       if Trim((inherited Emisor).Direccion.Calle) = '' then
-        raise EFEAtributoRequeridoNoPresenteException.Create('Se debe especificar la Calle del emisor');
-
        if Trim((inherited Emisor).Direccion.Pais) = '' then
         raise EFEAtributoRequeridoNoPresenteException.Create('Se debe especificar el pais del emisor');
     end;
@@ -1602,9 +1601,6 @@ begin
     begin
        if Trim((inherited Receptor).RFC) = '' then
         raise EFEAtributoRequeridoNoPresenteException.Create('El Atributo RFC de Receptor está vacio');
-
-       if Trim((inherited Receptor).Direccion.Calle) = '' then
-        raise EFEAtributoRequeridoNoPresenteException.Create('Se debe especificar la Calle del Receptor');
 
        if Trim((inherited Receptor).Direccion.Pais) = '' then
         raise EFEAtributoRequeridoNoPresenteException.Create('Se debe especificar el pais del Receptor');
