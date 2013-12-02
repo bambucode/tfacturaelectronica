@@ -27,7 +27,8 @@ type
     fCredencialesDePrueba : TFEPACCredenciales;
     cutPACEcodex: TPACEcodex;
   private
-    function ObtenerNuevaFacturaATimbrar: WideString;
+    function ObtenerNuevaFacturaATimbrar(const aFechaGeneracion: TDateTime = 0):
+        WideString;
 
   public
     procedure SetUp; override;
@@ -36,6 +37,7 @@ type
     procedure TimbrarDocumento_ConRFCIncorrecto_CauseExcepcionDeRFC;
     procedure TimbrarDocumento_ConXMLMalformado_CauseExcepcion;
     procedure TimbrarDocumento_DePrueba_RegreseDatosDeTimbre;
+    procedure TimbrarDocumento_GeneradoHaceMasDe72Horas_CauseExcepcion;
     procedure TimbrarDocumento_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
   end;
 
@@ -43,6 +45,7 @@ implementation
 
 uses
   Windows, SysUtils, Classes, Forms,
+  System.DateUtils,
   FacturaElectronica;
 
 procedure TestTPACEcodex.SetUp;
@@ -69,7 +72,8 @@ begin
 end;
 
 
-function TestTPACEcodex.ObtenerNuevaFacturaATimbrar: WideString;
+function TestTPACEcodex.ObtenerNuevaFacturaATimbrar(const aFechaGeneracion:
+    TDateTime = 0): WideString;
 var
   Emisor, Receptor: TFEContribuyente;
   Certificado: TFECertificado;
@@ -77,18 +81,10 @@ var
   Concepto: TFEConcepto;
   impuestoIVA: TFEImpuestoTrasladado;
 begin
-
   // 1. Definimos los datos del emisor y receptor
   Emisor.RFC:='AAA010101AAA';
   Emisor.Nombre:='Mi Empresa SA de CV';
   Emisor.Direccion.Pais:='México';
-  Emisor.Direccion.Calle:='Calle de la Amargura';
-  Emisor.Direccion.NoExterior:='123';
-  Emisor.Direccion.NoInterior:='456';
-  Emisor.Direccion.CodigoPostal:='87345';
-  Emisor.Direccion.Colonia:='Col. Bondojito';
-  Emisor.Direccion.Municipio:='Oaxaca';
-  Emisor.Direccion.Estado:='Oaxaca';
 
    // 2. Agregamos los régimenes fiscales (requerido en CFD >= 2.2)
   SetLength(Emisor.Regimenes, 1);
@@ -97,14 +93,6 @@ begin
   Receptor.RFC:='PWD090210DR5';
   Receptor.Nombre:='Mi Cliente SA de CV';
   Receptor.Direccion.Pais:='México';
-  Receptor.Direccion.Calle:='Patriotismo';
-  Receptor.Direccion.NoExterior:='4579';
-  Receptor.Direccion.NoInterior:='94';
-  Receptor.Direccion.CodigoPostal:='75489';
-  Receptor.Direccion.Colonia:='La Añoranza';
-  Receptor.Direccion.Municipio:='Coyoacán';
-  Receptor.Direccion.Estado:='Veracruz';
-  Receptor.Direccion.Localidad:='Boca del Rio';
 
   // 4. Definimos el certificado junto con su llave privada
   Certificado.Ruta:=fDirectorioFixtures + '\aaa010101aaa_CSD_01.cer';
@@ -133,6 +121,15 @@ begin
 
   // Mandamos generar el CFD en memoria antes de timbrarlo
   Randomize;
+
+  // Checamos si queremos emular una fecha especifica en la que fue "generado" el CFD
+  if aFechaGeneracion <> 0 then
+  begin
+    Factura.AutoAsignarFechaGeneracion := False;
+    Factura.FechaGeneracion := aFechaGeneracion;
+  end;
+
+  // Generamos la factura
   Factura.Generar(Random(999999), fpUnaSolaExhibicion);
 
   Result := Factura.XML;
@@ -218,6 +215,30 @@ begin
 end;
 
 procedure
+    TestTPACEcodex.TimbrarDocumento_GeneradoHaceMasDe72Horas_CauseExcepcion;
+var
+  documentoATimbrarGeneradoHace73Horas : WideString;
+  excepcionLanzada: Boolean;
+  fechaGeneracion: TDateTime;
+begin
+  // Calculamos una fecha en el pasado en donde el CFD se genero hace 72 horas.
+  fechaGeneracion := IncHour(Now, -72);
+  // Creamos un comprobante nuevo para mandarlo timbrar con fecha de generacion en el pasado
+  documentoATimbrarGeneradoHace73Horas := ObtenerNuevaFacturaATimbrar(fechaGeneracion);
+
+  // ** Mandamos realizar el timbre **
+  try
+    cutPACEcodex.TimbrarDocumento(documentoATimbrarGeneradoHace73Horas);
+  except
+    On E:ETimbradoFechaGeneracionMasDe72HorasException do
+       excepcionLanzada := True;
+  end;
+
+  CheckTrue(excepcionLanzada, 'Se debio haber lanzado la excepcion de ETimbradoFechaGeneracionMasDe72HorasException al ' +
+                              'intentar timbrar un documento generado hace 72 horas o más');
+end;
+
+procedure
     TestTPACEcodex.TimbrarDocumento_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
 var
   excepcionLanzada: Boolean;
@@ -235,7 +256,6 @@ begin
        excepcionLanzada := True;
     end;
   end;
-
 
   CheckTrue(excepcionLanzada, 'Se debio haber lanzado la excepcion de ETimbradoPreviamenteException al ' +
                               'enviar un documento previamente timbrado');
