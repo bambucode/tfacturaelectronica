@@ -14,6 +14,7 @@ type
     fNumeroTransaccion: Integer;
     function GetNumeroDeTransaccion: Integer;
     function ObtenerNuevoTokenDeServicio: String;
+    procedure ProcesarFallaEcodex(const aMensajeFalla: String);
   public
     procedure AfterConstruction; override;
     procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
@@ -58,6 +59,7 @@ function TEcodexManejadorDeSesion.ObtenerNuevoTokenDeServicio: String;
 var
   nuevaSolicitudDeToken: TEcodexSolicitudDeToken;
   respuestaSolicitudDeToken: TEcodexRespuestaObtenerToken;
+  mensajeFalla: string;
 begin
   Assert(fCredenciales.RFC <> '', 'Las credenciales del PAC no fueron asignadas');
   {$IFDEF CODESITE} CodeSite.EnterMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
@@ -66,9 +68,17 @@ begin
     nuevaSolicitudDeToken.RFC := fCredenciales.RFC;
     nuevaSolicitudDeToken.TransaccionID := fNumeroTransaccion;
 
-    respuestaSolicitudDeToken := wsSeguridad.ObtenerToken(nuevaSolicitudDeToken);
-    {$IFDEF CODESITE} CodeSite.Send('Token de servicio obtenido', respuestaSolicitudDeToken.Token); {$ENDIF}
-    Result := respuestaSolicitudDeToken.Token;
+    try
+      respuestaSolicitudDeToken := wsSeguridad.ObtenerToken(nuevaSolicitudDeToken);
+      {$IFDEF CODESITE} CodeSite.Send('Token de servicio obtenido', respuestaSolicitudDeToken.Token); {$ENDIF}
+      Result := respuestaSolicitudDeToken.Token;
+    except
+      on E:Exception do
+        mensajeFalla := E.Message;
+    end;
+
+    if (mensajeFalla <> '') then
+      ProcesarFallaEcodex(mensajeFalla);
   finally
     nuevaSolicitudDeToken.Free;
     {$IFDEF CODESITE} CodeSite.ExitMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
@@ -95,6 +105,19 @@ begin
     On E:Exception do
       raise;
   end;
+end;
+
+procedure TEcodexManejadorDeSesion.ProcesarFallaEcodex(const aMensajeFalla:
+    String);
+const
+  _NO_ECONTRADO = 0;
+  _ERROR_ECODEX_EMISOR_NO_INSCRITO = 'Emisor no encontrado';
+begin
+   if AnsiPos(_ERROR_ECODEX_EMISOR_NO_INSCRITO, aMensajeFalla) > _NO_ECONTRADO then
+    raise EPACEmisorNoInscritoException.Create(aMensajeFalla);
+
+   // Si llegamos aqui y no se proceso ningun otro error generamos un error genérico de credenciales
+   raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + aMensajeFalla);
 end;
 
 

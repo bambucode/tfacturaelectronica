@@ -31,6 +31,7 @@ type
     procedure TearDown; override;
   published
     procedure ObtenerNuevoTokenDeUsuario_DePrueba_RegreseTokenValido;
+    procedure ObtenerNuevoTokenDeUsuario_ConEmisorNoInscrito_CauseExcepcion;
   end;
 
 implementation
@@ -59,20 +60,38 @@ procedure TestTEcodexManejadorDeSesion.ObtenerNuevoTokenDeUsuario_DePrueba_Regre
 var
   tokenDeUsuario, tokenCorrecto : String;
 begin
-  // Calculamos el token correcto con otra utileria de Ecodex para corroborar que se calcule correctamente
-  // TODO: Obtener!
-  tokenCorrecto := '';
-
   // Asignamos las credenciales de prueba
   cutManejador.AsignarCredenciales(fCredencialesDePrueba);
 
   tokenDeUsuario := cutManejador.ObtenerNuevoTokenDeUsuario;
 
-  {CheckEquals(tokenCorrecto,
-              tokenDeUsuario,
-              'El token de usuario obtenido no fue el esperado');}
+  CheckNotEquals('',
+                tokenDeUsuario,
+                'El token de usuario no se regreso correctamente');
+end;
 
-  // TODO: Probar con otra transaccion??
+procedure
+    TestTEcodexManejadorDeSesion.ObtenerNuevoTokenDeUsuario_ConEmisorNoInscrito_CauseExcepcion;
+var
+  credencialesIncorrectas: TFEPACCredenciales;
+  seLanzoExcepcion: Boolean;
+begin
+  credencialesIncorrectas.RFC            := 'SUL111111JN8'; ;
+  credencialesIncorrectas.Clave          := 'prueba';
+  credencialesIncorrectas.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
+
+  cutManejador.AsignarCredenciales(credencialesIncorrectas);
+
+  try
+     cutManejador.ObtenerNuevoTokenDeUsuario;
+  except
+    On E:EPACEmisorNoInscritoException do
+      seLanzoExcepcion := True;
+  end;
+
+  CheckTrue(seLanzoExcepcion,
+            'Se debio haber lanzado excepcion EPACEmisorNoInscritoException al mandar solicitar un token' +
+            ' de un RFC no inscrito con Ecodex.' );
 end;
 
 initialization

@@ -221,6 +221,8 @@ ETimbradoFechaEnElPasadoException = class(Exception); // Error 403
 ///	</summary>
 {$ENDREGION}
 EPACServicioNoDisponibleException = class(Exception);
+EPACEmisorNoInscritoException = class(Exception);
+EPACErrorGenericoDeAccesoException = class(Exception);
 
 {$REGION 'Documentation'}
 ///	<summary>
