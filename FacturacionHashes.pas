@@ -140,7 +140,11 @@ var
   Stream: TStringStream;
 begin
   Result:= EmptyStr;
-  Stream:= TStringStream.Create(aCadena, TEncoding.UTF8);
+  {$IF Compilerversion >= 20}
+   Stream:= TStringStream.Create(aCadena,TEncoding.UTF8 );
+  {$ELSE}
+   Stream:= TStringStream.Create(aCadena);
+  {$IFEND}
   try
     Result:= CalcHash(Stream, aAlgoritmo);
   finally

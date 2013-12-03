@@ -28,15 +28,15 @@ type
   IFEXmlEmisorV2 = interface(IXMLNode)
   ['{C084D8B6-04E3-4DC8-94F3-584CD358CBC2}']
     { Property Accessors }
-    function GetRfc: String;
-    function GetNombre: String;
+    function GetRfc: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetNombre: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
     function GetDomicilioFiscal: IFEXmlT_UbicacionFiscal;
     function GetExpedidoEn: IFEXmlT_Ubicacion;
-    procedure SetRfc(Value: String);
-    procedure SetNombre(Value: String);
+    procedure SetRfc(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetNombre(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
     { Methods & Properties }
-    property Rfc: String read GetRfc write SetRfc;
-    property Nombre: String read GetNombre write SetNombre;
+    property Rfc: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND} read GetRfc write SetRfc;
+    property Nombre: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND} read GetNombre write SetNombre;
     property DomicilioFiscal: IFEXmlT_UbicacionFiscal read GetDomicilioFiscal;
     property ExpedidoEn: IFEXmlT_Ubicacion read GetExpedidoEn;
   end;
@@ -49,46 +49,46 @@ type
   TFEXmlComprobanteV2 = class(TXMLNode, IFEXmlComprobanteV2)
   protected
     { IFEXmlComprobanteV2 }
-    function GetVersion: String;
-    function GetSerie: String;
-    function GetFolio: String;
-    function GetFecha: String;
-    function GetSello: String;
+    function GetVersion: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetSerie: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetFolio: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetFecha: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetSello: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
     function GetNoAprobacion: Integer;
     function GetAnoAprobacion: Integer;
-    function GetFormaDePago: String;
-    function GetNoCertificado: String;
-    function GetCertificado: String;
-    function GetCondicionesDePago: String;
-    function GetSubTotal: String;
-    function GetDescuento: String;
-    function GetMotivoDescuento: String;
-    function GetTotal: String;
-    function GetMetodoDePago: String;
-    function GetTipoDeComprobante: String;
+    function GetFormaDePago: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetNoCertificado: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetCertificado: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetCondicionesDePago: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetSubTotal: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetDescuento: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetMotivoDescuento: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetTotal: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetMetodoDePago: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetTipoDeComprobante: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
     function GetEmisor: IFEXmlEmisorV2;
     function GetReceptor: IFEXmlReceptor;
     function GetConceptos: IFEXmlConceptos;
     function GetImpuestos: IFEXmlImpuestos;
     function GetComplemento: IFEXmlComplemento;
     function GetAddenda: IFEXmlAddenda;
-    procedure SetVersion(Value: String);
-    procedure SetSerie(Value: String);
-    procedure SetFolio(Value: String);
-    procedure SetFecha(Value: String);
-    procedure SetSello(Value: String);
+    procedure SetVersion(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetSerie(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetFolio(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetFecha(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetSello(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
     procedure SetNoAprobacion(Value: Integer);
     procedure SetAnoAprobacion(Value: Integer);
-    procedure SetFormaDePago(Value: String);
-    procedure SetNoCertificado(Value: String);
-    procedure SetCertificado(Value: String);
-    procedure SetCondicionesDePago(Value: String);
-    procedure SetSubTotal(Value: String);
-    procedure SetDescuento(Value: String);
-    procedure SetMotivoDescuento(Value: String);
-    procedure SetTotal(Value: String);
-    procedure SetMetodoDePago(Value: String);
-    procedure SetTipoDeComprobante(Value: String);
+    procedure SetFormaDePago(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetNoCertificado(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetCertificado(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetCondicionesDePago(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetSubTotal(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetDescuento(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetMotivoDescuento(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetTotal(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetMetodoDePago(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetTipoDeComprobante(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
   public
     procedure AfterConstruction; override;
   end;
@@ -98,12 +98,12 @@ type
   TFEXmlEmisorV2 = class(TXMLNode, IFEXmlEmisorV2)
   protected
     { IFEXmlEmisorV2 }
-    function GetRfc: String;
-    function GetNombre: String;
+    function GetRfc: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetNombre: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
     function GetDomicilioFiscal: IFEXmlT_UbicacionFiscal;
     function GetExpedidoEn: IFEXmlT_Ubicacion;
-    procedure SetRfc(Value: String);
-    procedure SetNombre(Value: String);
+    procedure SetRfc(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetNombre(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
   public
     procedure AfterConstruction; override;
   end;
@@ -113,26 +113,26 @@ type
   TFEXmlT_UbicacionFiscal = class(TXMLNode, IFEXmlT_UbicacionFiscal)
   protected
     { IFEXmlT_UbicacionFiscal }
-    function GetCalle: String;
-    function GetNoExterior: String;
-    function GetNoInterior: String;
-    function GetColonia: String;
-    function GetLocalidad: String;
-    function GetReferencia: String;
-    function GetMunicipio: String;
-    function GetEstado: String;
-    function GetPais: String;
-    function GetCodigoPostal: String;
-    procedure SetCalle(Value: String);
-    procedure SetNoExterior(Value: String);
-    procedure SetNoInterior(Value: String);
-    procedure SetColonia(Value: String);
-    procedure SetLocalidad(Value: String);
-    procedure SetReferencia(Value: String);
-    procedure SetMunicipio(Value: String);
-    procedure SetEstado(Value: String);
-    procedure SetPais(Value: String);
-    procedure SetCodigoPostal(Value: String);
+    function GetCalle: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetNoExterior: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetNoInterior: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetColonia: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetLocalidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetReferencia: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetMunicipio: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetEstado: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetPais: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetCodigoPostal: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    procedure SetCalle(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetNoExterior(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetNoInterior(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetColonia(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetLocalidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetReferencia(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetMunicipio(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetEstado(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetPais(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetCodigoPostal(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
   end;
 
 { TFEXmlT_Ubicacion }
@@ -140,26 +140,26 @@ type
   TFEXmlT_Ubicacion = class(TXMLNode, IFEXmlT_Ubicacion)
   protected
     { IFEXmlT_Ubicacion }
-    function GetCalle: String;
-    function GetNoExterior: String;
-    function GetNoInterior: String;
-    function GetColonia: String;
-    function GetLocalidad: String;
-    function GetReferencia: String;
-    function GetMunicipio: String;
-    function GetEstado: String;
-    function GetPais: String;
-    function GetCodigoPostal: String;
-    procedure SetCalle(Value: String);
-    procedure SetNoExterior(Value: String);
-    procedure SetNoInterior(Value: String);
-    procedure SetColonia(Value: String);
-    procedure SetLocalidad(Value: String);
-    procedure SetReferencia(Value: String);
-    procedure SetMunicipio(Value: String);
-    procedure SetEstado(Value: String);
-    procedure SetPais(Value: String);
-    procedure SetCodigoPostal(Value: String);
+    function GetCalle: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetNoExterior: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetNoInterior: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetColonia: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetLocalidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetReferencia: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetMunicipio: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetEstado: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetPais: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetCodigoPostal: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    procedure SetCalle(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetNoExterior(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetNoInterior(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetColonia(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetLocalidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetReferencia(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetMunicipio(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetEstado(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetPais(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetCodigoPostal(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
   end;
 
 { TFEXmlReceptor }
@@ -167,11 +167,11 @@ type
   TFEXmlReceptor = class(TXMLNode, IFEXmlReceptor)
   protected
     { IFEXmlReceptor }
-    function GetRfc: String;
-    function GetNombre: String;
+    function GetRfc: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetNombre: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
     function GetDomicilio: IFEXmlT_Ubicacion;
-    procedure SetRfc(Value: String);
-    procedure SetNombre(Value: String);
+    procedure SetRfc(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetNombre(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
   public
     procedure AfterConstruction; override;
   end;
@@ -196,22 +196,22 @@ type
     FParte: IFEXmlParteList;
   protected
     { IFEXmlConcepto }
-    function GetCantidad: String;
-    function GetUnidad: String;
-    function GetNoIdentificacion: String;
-    function GetDescripcion: String;
-    function GetValorUnitario: String;
-    function GetImporte: String;
+    function GetCantidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetUnidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetNoIdentificacion: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetDescripcion: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetValorUnitario: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetImporte: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
     function GetInformacionAduanera: IFEXmlT_InformacionAduaneraList;
     function GetCuentaPredial: IFEXmlCuentaPredial;
     function GetComplementoConcepto: IFEXmlComplementoConcepto;
     function GetParte: IFEXmlParteList;
-    procedure SetCantidad(Value: String);
-    procedure SetUnidad(Value: String);
-    procedure SetNoIdentificacion(Value: String);
-    procedure SetDescripcion(Value: String);
-    procedure SetValorUnitario(Value: String);
-    procedure SetImporte(Value: String);
+    procedure SetCantidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetUnidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetNoIdentificacion(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetDescripcion(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetValorUnitario(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetImporte(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
   public
     procedure AfterConstruction; override;
   end;
@@ -221,12 +221,12 @@ type
   TFEXmlT_InformacionAduanera = class(TXMLNode, IFEXmlT_InformacionAduanera)
   protected
     { IFEXmlT_InformacionAduanera }
-    function GetNumero: String;
-    function GetFecha: String;
-    function GetAduana: String;
-    procedure SetNumero(Value: String);
-    procedure SetFecha(Value: String);
-    procedure SetAduana(Value: String);
+    function GetNumero: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetFecha: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetAduana: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    procedure SetNumero(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetFecha(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetAduana(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
   end;
 
 { TFEXmlT_InformacionAduaneraList }
@@ -244,8 +244,8 @@ type
   TFEXmlCuentaPredial = class(TXMLNode, IFEXmlCuentaPredial)
   protected
     { IFEXmlCuentaPredial }
-    function GetNumero: String;
-    procedure SetNumero(Value: String);
+    function GetNumero: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    procedure SetNumero(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
   end;
 
 { TFEXmlComplementoConcepto }
@@ -260,19 +260,19 @@ type
   TFEXmlParte = class(TXMLNodeCollection, IFEXmlParte)
   protected
     { IFEXmlParte }
-    function GetCantidad: String;
-    function GetUnidad: String;
-    function GetNoIdentificacion: String;
-    function GetDescripcion: String;
-    function GetValorUnitario: String;
-    function GetImporte: String;
+    function GetCantidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetUnidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetNoIdentificacion: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetDescripcion: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetValorUnitario: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetImporte: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
     function GetInformacionAduanera(Index: Integer): IFEXmlT_InformacionAduanera;
-    procedure SetCantidad(Value: String);
-    procedure SetUnidad(Value: String);
-    procedure SetNoIdentificacion(Value: String);
-    procedure SetDescripcion(Value: String);
-    procedure SetValorUnitario(Value: String);
-    procedure SetImporte(Value: String);
+    procedure SetCantidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetUnidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetNoIdentificacion(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetDescripcion(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetValorUnitario(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetImporte(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
     function Add: IFEXmlT_InformacionAduanera;
     function Insert(const Index: Integer): IFEXmlT_InformacionAduanera;
   public
@@ -294,12 +294,12 @@ type
   TFEXmlImpuestos = class(TXMLNode, IFEXmlImpuestos)
   protected
     { IFEXmlImpuestos }
-    function GetTotalImpuestosRetenidos: String;
-    function GetTotalImpuestosTrasladados: String;
+    function GetTotalImpuestosRetenidos: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetTotalImpuestosTrasladados: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
     function GetRetenciones: IFEXmlRetenciones;
     function GetTraslados: IFEXmlTraslados;
-    procedure SetTotalImpuestosRetenidos(Value: String);
-    procedure SetTotalImpuestosTrasladados(Value: String);
+    procedure SetTotalImpuestosRetenidos(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetTotalImpuestosTrasladados(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
   public
     procedure AfterConstruction; override;
   end;
@@ -321,10 +321,10 @@ type
   TFEXmlRetencion = class(TXMLNode, IFEXmlRetencion)
   protected
     { IFEXmlRetencion }
-    function GetImpuesto: String;
-    function GetImporte: String;
-    procedure SetImpuesto(Value: String);
-    procedure SetImporte(Value: String);
+    function GetImpuesto: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetImporte: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    procedure SetImpuesto(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetImporte(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
   end;
 
 { TFEXmlTraslados }
@@ -344,12 +344,12 @@ type
   TFEXmlTraslado = class(TXMLNode, IFEXmlTraslado)
   protected
     { IFEXmlTraslado }
-    function GetImpuesto: String;
-    function GetTasa: String;
-    function GetImporte: String;
-    procedure SetImpuesto(Value: String);
-    procedure SetTasa(Value: String);
-    procedure SetImporte(Value: String);
+    function GetImpuesto: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetTasa: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    function GetImporte: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
+    procedure SetImpuesto(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetTasa(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
+    procedure SetImporte(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
   end;
 
 { TFEXmlComplemento }
@@ -369,7 +369,7 @@ type
 { Global Functions }
 
 function GetComprobante(Doc: IXMLDocument): IFEXmlComprobanteV2;
-function LoadComprobante(const FileName: String): IFEXmlComprobanteV2;
+function LoadComprobante(const FileName: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND}): IFEXmlComprobanteV2;
 function NewComprobante: IFEXmlComprobanteV2;
 
 const
@@ -384,7 +384,7 @@ begin
   Result := Doc.GetDocBinding('Comprobante', TFEXmlComprobanteV2, TargetNamespace) as IFEXmlComprobanteV2;
 end;
 
-function LoadComprobante(const FileName: String): IFEXmlComprobanteV2;
+function LoadComprobante(const FileName: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND}): IFEXmlComprobanteV2;
 begin
   Result := LoadXMLDocument(FileName).GetDocBinding('Comprobante', TFEXmlComprobanteV2, TargetNamespace) as IFEXmlComprobanteV2;
 end;
@@ -407,52 +407,52 @@ begin
   inherited;
 end;
 
-function TFEXmlComprobanteV2.GetVersion: String;
+function TFEXmlComprobanteV2.GetVersion: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['version'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetVersion(Value: String);
+procedure TFEXmlComprobanteV2.SetVersion(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('version', Value);
 end;
 
-function TFEXmlComprobanteV2.GetSerie: String;
+function TFEXmlComprobanteV2.GetSerie: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['serie'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetSerie(Value: String);
+procedure TFEXmlComprobanteV2.SetSerie(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('serie', Value);
 end;
 
-function TFEXmlComprobanteV2.GetFolio: String;
+function TFEXmlComprobanteV2.GetFolio: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['folio'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetFolio(Value: String);
+procedure TFEXmlComprobanteV2.SetFolio(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('folio', Value);
 end;
 
-function TFEXmlComprobanteV2.GetFecha: String;
+function TFEXmlComprobanteV2.GetFecha: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['fecha'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetFecha(Value: String);
+procedure TFEXmlComprobanteV2.SetFecha(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('fecha', Value);
 end;
 
-function TFEXmlComprobanteV2.GetSello: String;
+function TFEXmlComprobanteV2.GetSello: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['sello'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetSello(Value: String);
+procedure TFEXmlComprobanteV2.SetSello(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('sello', Value);
 end;
@@ -477,102 +477,102 @@ begin
   SetAttribute('anoAprobacion', Value);
 end;
 
-function TFEXmlComprobanteV2.GetFormaDePago: String;
+function TFEXmlComprobanteV2.GetFormaDePago: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['formaDePago'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetFormaDePago(Value: String);
+procedure TFEXmlComprobanteV2.SetFormaDePago(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('formaDePago', Value);
 end;
 
-function TFEXmlComprobanteV2.GetNoCertificado: String;
+function TFEXmlComprobanteV2.GetNoCertificado: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['noCertificado'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetNoCertificado(Value: String);
+procedure TFEXmlComprobanteV2.SetNoCertificado(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('noCertificado', Value);
 end;
 
-function TFEXmlComprobanteV2.GetCertificado: String;
+function TFEXmlComprobanteV2.GetCertificado: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['certificado'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetCertificado(Value: String);
+procedure TFEXmlComprobanteV2.SetCertificado(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('certificado', Value);
 end;
 
-function TFEXmlComprobanteV2.GetCondicionesDePago: String;
+function TFEXmlComprobanteV2.GetCondicionesDePago: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['condicionesDePago'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetCondicionesDePago(Value: String);
+procedure TFEXmlComprobanteV2.SetCondicionesDePago(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('condicionesDePago', Value);
 end;
 
-function TFEXmlComprobanteV2.GetSubTotal: String;
+function TFEXmlComprobanteV2.GetSubTotal: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['subTotal'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetSubTotal(Value: String);
+procedure TFEXmlComprobanteV2.SetSubTotal(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('subTotal', Value);
 end;
 
-function TFEXmlComprobanteV2.GetDescuento: String;
+function TFEXmlComprobanteV2.GetDescuento: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['descuento'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetDescuento(Value: String);
+procedure TFEXmlComprobanteV2.SetDescuento(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('descuento', Value);
 end;
 
-function TFEXmlComprobanteV2.GetMotivoDescuento: String;
+function TFEXmlComprobanteV2.GetMotivoDescuento: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['motivoDescuento'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetMotivoDescuento(Value: String);
+procedure TFEXmlComprobanteV2.SetMotivoDescuento(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('motivoDescuento', Value);
 end;
 
-function TFEXmlComprobanteV2.GetTotal: String;
+function TFEXmlComprobanteV2.GetTotal: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['total'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetTotal(Value: String);
+procedure TFEXmlComprobanteV2.SetTotal(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('total', Value);
 end;
 
-function TFEXmlComprobanteV2.GetMetodoDePago: String;
+function TFEXmlComprobanteV2.GetMetodoDePago: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['metodoDePago'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetMetodoDePago(Value: String);
+procedure TFEXmlComprobanteV2.SetMetodoDePago(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('metodoDePago', Value);
 end;
 
-function TFEXmlComprobanteV2.GetTipoDeComprobante: String;
+function TFEXmlComprobanteV2.GetTipoDeComprobante: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['tipoDeComprobante'].Text;
 end;
 
-procedure TFEXmlComprobanteV2.SetTipoDeComprobante(Value: String);
+procedure TFEXmlComprobanteV2.SetTipoDeComprobante(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('tipoDeComprobante', Value);
 end;
@@ -616,22 +616,22 @@ begin
   inherited;
 end;
 
-function TFEXmlEmisorV2.GetRfc: String;
+function TFEXmlEmisorV2.GetRfc: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['rfc'].Text;
 end;
 
-procedure TFEXmlEmisorV2.SetRfc(Value: String);
+procedure TFEXmlEmisorV2.SetRfc(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('rfc', Value);
 end;
 
-function TFEXmlEmisorV2.GetNombre: String;
+function TFEXmlEmisorV2.GetNombre: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['nombre'].Text;
 end;
 
-procedure TFEXmlEmisorV2.SetNombre(Value: String);
+procedure TFEXmlEmisorV2.SetNombre(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('nombre', Value);
 end;
@@ -648,204 +648,204 @@ end;
 
 { TFEXmlT_UbicacionFiscal }
 
-function TFEXmlT_UbicacionFiscal.GetCalle: String;
+function TFEXmlT_UbicacionFiscal.GetCalle: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['calle'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetCalle(Value: String);
+procedure TFEXmlT_UbicacionFiscal.SetCalle(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('calle', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetNoExterior: String;
+function TFEXmlT_UbicacionFiscal.GetNoExterior: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['noExterior'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetNoExterior(Value: String);
+procedure TFEXmlT_UbicacionFiscal.SetNoExterior(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('noExterior', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetNoInterior: String;
+function TFEXmlT_UbicacionFiscal.GetNoInterior: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['noInterior'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetNoInterior(Value: String);
+procedure TFEXmlT_UbicacionFiscal.SetNoInterior(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('noInterior', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetColonia: String;
+function TFEXmlT_UbicacionFiscal.GetColonia: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['colonia'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetColonia(Value: String);
+procedure TFEXmlT_UbicacionFiscal.SetColonia(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('colonia', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetLocalidad: String;
+function TFEXmlT_UbicacionFiscal.GetLocalidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['localidad'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetLocalidad(Value: String);
+procedure TFEXmlT_UbicacionFiscal.SetLocalidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('localidad', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetReferencia: String;
+function TFEXmlT_UbicacionFiscal.GetReferencia: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['referencia'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetReferencia(Value: String);
+procedure TFEXmlT_UbicacionFiscal.SetReferencia(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('referencia', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetMunicipio: String;
+function TFEXmlT_UbicacionFiscal.GetMunicipio: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['municipio'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetMunicipio(Value: String);
+procedure TFEXmlT_UbicacionFiscal.SetMunicipio(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('municipio', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetEstado: String;
+function TFEXmlT_UbicacionFiscal.GetEstado: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['estado'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetEstado(Value: String);
+procedure TFEXmlT_UbicacionFiscal.SetEstado(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('estado', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetPais: String;
+function TFEXmlT_UbicacionFiscal.GetPais: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['pais'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetPais(Value: String);
+procedure TFEXmlT_UbicacionFiscal.SetPais(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('pais', Value);
 end;
 
-function TFEXmlT_UbicacionFiscal.GetCodigoPostal: String;
+function TFEXmlT_UbicacionFiscal.GetCodigoPostal: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['codigoPostal'].Text;
 end;
 
-procedure TFEXmlT_UbicacionFiscal.SetCodigoPostal(Value: String);
+procedure TFEXmlT_UbicacionFiscal.SetCodigoPostal(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('codigoPostal', Value);
 end;
 
 { TFEXmlT_Ubicacion }
 
-function TFEXmlT_Ubicacion.GetCalle: String;
+function TFEXmlT_Ubicacion.GetCalle: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['calle'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetCalle(Value: String);
+procedure TFEXmlT_Ubicacion.SetCalle(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('calle', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetNoExterior: String;
+function TFEXmlT_Ubicacion.GetNoExterior: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['noExterior'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetNoExterior(Value: String);
+procedure TFEXmlT_Ubicacion.SetNoExterior(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('noExterior', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetNoInterior: String;
+function TFEXmlT_Ubicacion.GetNoInterior: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['noInterior'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetNoInterior(Value: String);
+procedure TFEXmlT_Ubicacion.SetNoInterior(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('noInterior', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetColonia: String;
+function TFEXmlT_Ubicacion.GetColonia: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['colonia'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetColonia(Value: String);
+procedure TFEXmlT_Ubicacion.SetColonia(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('colonia', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetLocalidad: String;
+function TFEXmlT_Ubicacion.GetLocalidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['localidad'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetLocalidad(Value: String);
+procedure TFEXmlT_Ubicacion.SetLocalidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('localidad', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetReferencia: String;
+function TFEXmlT_Ubicacion.GetReferencia: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['referencia'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetReferencia(Value: String);
+procedure TFEXmlT_Ubicacion.SetReferencia(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('referencia', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetMunicipio: String;
+function TFEXmlT_Ubicacion.GetMunicipio: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['municipio'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetMunicipio(Value: String);
+procedure TFEXmlT_Ubicacion.SetMunicipio(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('municipio', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetEstado: String;
+function TFEXmlT_Ubicacion.GetEstado: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['estado'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetEstado(Value: String);
+procedure TFEXmlT_Ubicacion.SetEstado(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('estado', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetPais: String;
+function TFEXmlT_Ubicacion.GetPais: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['pais'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetPais(Value: String);
+procedure TFEXmlT_Ubicacion.SetPais(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('pais', Value);
 end;
 
-function TFEXmlT_Ubicacion.GetCodigoPostal: String;
+function TFEXmlT_Ubicacion.GetCodigoPostal: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['codigoPostal'].Text;
 end;
 
-procedure TFEXmlT_Ubicacion.SetCodigoPostal(Value: String);
+procedure TFEXmlT_Ubicacion.SetCodigoPostal(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('codigoPostal', Value);
 end;
@@ -858,22 +858,22 @@ begin
   inherited;
 end;
 
-function TFEXmlReceptor.GetRfc: String;
+function TFEXmlReceptor.GetRfc: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['rfc'].Text;
 end;
 
-procedure TFEXmlReceptor.SetRfc(Value: String);
+procedure TFEXmlReceptor.SetRfc(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('rfc', Value);
 end;
 
-function TFEXmlReceptor.GetNombre: String;
+function TFEXmlReceptor.GetNombre: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['nombre'].Text;
 end;
 
-procedure TFEXmlReceptor.SetNombre(Value: String);
+procedure TFEXmlReceptor.SetNombre(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('nombre', Value);
 end;
@@ -921,62 +921,62 @@ begin
   inherited;
 end;
 
-function TFEXmlConcepto.GetCantidad: String;
+function TFEXmlConcepto.GetCantidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['cantidad'].Text;
 end;
 
-procedure TFEXmlConcepto.SetCantidad(Value: String);
+procedure TFEXmlConcepto.SetCantidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('cantidad', Value);
 end;
 
-function TFEXmlConcepto.GetUnidad: String;
+function TFEXmlConcepto.GetUnidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['unidad'].Text;
 end;
 
-procedure TFEXmlConcepto.SetUnidad(Value: String);
+procedure TFEXmlConcepto.SetUnidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('unidad', Value);
 end;
 
-function TFEXmlConcepto.GetNoIdentificacion: String;
+function TFEXmlConcepto.GetNoIdentificacion: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['noIdentificacion'].Text;
 end;
 
-procedure TFEXmlConcepto.SetNoIdentificacion(Value: String);
+procedure TFEXmlConcepto.SetNoIdentificacion(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('noIdentificacion', Value);
 end;
 
-function TFEXmlConcepto.GetDescripcion: String;
+function TFEXmlConcepto.GetDescripcion: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['descripcion'].Text;
 end;
 
-procedure TFEXmlConcepto.SetDescripcion(Value: String);
+procedure TFEXmlConcepto.SetDescripcion(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('descripcion', Value);
 end;
 
-function TFEXmlConcepto.GetValorUnitario: String;
+function TFEXmlConcepto.GetValorUnitario: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['valorUnitario'].Text;
 end;
 
-procedure TFEXmlConcepto.SetValorUnitario(Value: String);
+procedure TFEXmlConcepto.SetValorUnitario(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('valorUnitario', Value);
 end;
 
-function TFEXmlConcepto.GetImporte: String;
+function TFEXmlConcepto.GetImporte: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TFEXmlConcepto.SetImporte(Value: String);
+procedure TFEXmlConcepto.SetImporte(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('importe', Value);
 end;
@@ -1003,32 +1003,32 @@ end;
 
 { TFEXmlT_InformacionAduanera }
 
-function TFEXmlT_InformacionAduanera.GetNumero: String;
+function TFEXmlT_InformacionAduanera.GetNumero: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['numero'].Text;
 end;
 
-procedure TFEXmlT_InformacionAduanera.SetNumero(Value: String);
+procedure TFEXmlT_InformacionAduanera.SetNumero(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('numero', Value);
 end;
 
-function TFEXmlT_InformacionAduanera.GetFecha: String;
+function TFEXmlT_InformacionAduanera.GetFecha: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['fecha'].Text;
 end;
 
-procedure TFEXmlT_InformacionAduanera.SetFecha(Value: String);
+procedure TFEXmlT_InformacionAduanera.SetFecha(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('fecha', Value);
 end;
 
-function TFEXmlT_InformacionAduanera.GetAduana: String;
+function TFEXmlT_InformacionAduanera.GetAduana: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['aduana'].Text;
 end;
 
-procedure TFEXmlT_InformacionAduanera.SetAduana(Value: String);
+procedure TFEXmlT_InformacionAduanera.SetAduana(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('aduana', Value);
 end;
@@ -1051,12 +1051,12 @@ end;
 
 { TFEXmlCuentaPredial }
 
-function TFEXmlCuentaPredial.GetNumero: String;
+function TFEXmlCuentaPredial.GetNumero: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['numero'].Text;
 end;
 
-procedure TFEXmlCuentaPredial.SetNumero(Value: String);
+procedure TFEXmlCuentaPredial.SetNumero(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('numero', Value);
 end;
@@ -1073,62 +1073,62 @@ begin
   inherited;
 end;
 
-function TFEXmlParte.GetCantidad: String;
+function TFEXmlParte.GetCantidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['cantidad'].Text;
 end;
 
-procedure TFEXmlParte.SetCantidad(Value: String);
+procedure TFEXmlParte.SetCantidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('cantidad', Value);
 end;
 
-function TFEXmlParte.GetUnidad: String;
+function TFEXmlParte.GetUnidad: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['unidad'].Text;
 end;
 
-procedure TFEXmlParte.SetUnidad(Value: String);
+procedure TFEXmlParte.SetUnidad(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('unidad', Value);
 end;
 
-function TFEXmlParte.GetNoIdentificacion: String;
+function TFEXmlParte.GetNoIdentificacion: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['noIdentificacion'].Text;
 end;
 
-procedure TFEXmlParte.SetNoIdentificacion(Value: String);
+procedure TFEXmlParte.SetNoIdentificacion(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('noIdentificacion', Value);
 end;
 
-function TFEXmlParte.GetDescripcion: String;
+function TFEXmlParte.GetDescripcion: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['descripcion'].Text;
 end;
 
-procedure TFEXmlParte.SetDescripcion(Value: String);
+procedure TFEXmlParte.SetDescripcion(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('descripcion', Value);
 end;
 
-function TFEXmlParte.GetValorUnitario: String;
+function TFEXmlParte.GetValorUnitario: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['valorUnitario'].Text;
 end;
 
-procedure TFEXmlParte.SetValorUnitario(Value: String);
+procedure TFEXmlParte.SetValorUnitario(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('valorUnitario', Value);
 end;
 
-function TFEXmlParte.GetImporte: String;
+function TFEXmlParte.GetImporte: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TFEXmlParte.SetImporte(Value: String);
+procedure TFEXmlParte.SetImporte(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('importe', Value);
 end;
@@ -1173,22 +1173,22 @@ begin
   inherited;
 end;
 
-function TFEXmlImpuestos.GetTotalImpuestosRetenidos: String;
+function TFEXmlImpuestos.GetTotalImpuestosRetenidos: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['totalImpuestosRetenidos'].Text;
 end;
 
-procedure TFEXmlImpuestos.SetTotalImpuestosRetenidos(Value: String);
+procedure TFEXmlImpuestos.SetTotalImpuestosRetenidos(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('totalImpuestosRetenidos', Value);
 end;
 
-function TFEXmlImpuestos.GetTotalImpuestosTrasladados: String;
+function TFEXmlImpuestos.GetTotalImpuestosTrasladados: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['totalImpuestosTrasladados'].Text;
 end;
 
-procedure TFEXmlImpuestos.SetTotalImpuestosTrasladados(Value: String);
+procedure TFEXmlImpuestos.SetTotalImpuestosTrasladados(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('totalImpuestosTrasladados', Value);
 end;
@@ -1230,22 +1230,22 @@ end;
 
 { TFEXmlRetencion }
 
-function TFEXmlRetencion.GetImpuesto: String;
+function TFEXmlRetencion.GetImpuesto: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['impuesto'].Text;
 end;
 
-procedure TFEXmlRetencion.SetImpuesto(Value: String);
+procedure TFEXmlRetencion.SetImpuesto(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('impuesto', Value);
 end;
 
-function TFEXmlRetencion.GetImporte: String;
+function TFEXmlRetencion.GetImporte: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TFEXmlRetencion.SetImporte(Value: String);
+procedure TFEXmlRetencion.SetImporte(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('importe', Value);
 end;
@@ -1277,32 +1277,32 @@ end;
 
 { TFEXmlTraslado }
 
-function TFEXmlTraslado.GetImpuesto: String;
+function TFEXmlTraslado.GetImpuesto: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['impuesto'].Text;
 end;
 
-procedure TFEXmlTraslado.SetImpuesto(Value: String);
+procedure TFEXmlTraslado.SetImpuesto(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('impuesto', Value);
 end;
 
-function TFEXmlTraslado.GetTasa: String;
+function TFEXmlTraslado.GetTasa: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['tasa'].Text;
 end;
 
-procedure TFEXmlTraslado.SetTasa(Value: String);
+procedure TFEXmlTraslado.SetTasa(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('tasa', Value);
 end;
 
-function TFEXmlTraslado.GetImporte: String;
+function TFEXmlTraslado.GetImporte: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND};
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TFEXmlTraslado.SetImporte(Value: String);
+procedure TFEXmlTraslado.SetImporte(Value: {$IF Compilerversion >= 20}  UnicodeString {$ELSE} UTF8String {$IFEND});
 begin
   SetAttribute('importe', Value);
 end;

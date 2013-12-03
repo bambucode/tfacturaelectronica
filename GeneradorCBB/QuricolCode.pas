@@ -14,7 +14,14 @@ unit QuricolCode;
 interface
 
 uses
-  Windows, SysUtils, Classes, QuricolAPI, Vcl.Graphics;
+  Windows, SysUtils, Classes, QuricolAPI,
+  {$IF Compilerversion >= 20}
+   Vcl.Graphics;
+  {$ELSE}
+   Graphics;
+  {$IFEND}
+
+
 
 type
 
