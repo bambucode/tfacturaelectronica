@@ -62,8 +62,8 @@ public
 
 implementation
 
-uses
-{$IF Compilerversion >= 20} Soap.InvokeRegistry,{$IFEND}
+// Compatibilidad con Delphi 2007 por http://github.com/ptorres
+uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
      feCFDv32,
      {$IFDEF CODESITE}
      CodeSiteLogging,
@@ -84,7 +84,7 @@ begin
   inherited;
 end;
 
-procedure TPACEcodex.AfterConstruction;
+procedure TPACEcodex.AfterConstruction;
 begin
   // Obtenemos una instancia del WebService de Timbrado de Ecodex
   wsTimbradoEcodex := GetWsEcodexTimbrado;
