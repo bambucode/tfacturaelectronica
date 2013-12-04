@@ -55,7 +55,6 @@ type
     fCertificado: TFECertificado;
     fCertificadoTexto: WideString;
     fBloqueFolios: TFEBloqueFolios;
-    fFueTimbrado: Boolean;
     fTimbre : TFETimbre;
     fVersion : TFEVersionComprobante;
     fComprobanteLleno: Boolean;
@@ -125,6 +124,7 @@ type
     procedure ValidarCamposEmisor;
     procedure ValidarCamposReceptor;
   protected
+    fFueTimbrado: Boolean;
     procedure GenerarComprobante;
     function getXML: WideString; virtual;
     procedure setXML(const Valor: WideString); virtual;
@@ -134,7 +134,7 @@ type
 {$ELSE}
   protected
 {$ENDIF}
-  public
+public
     const VERSION_ACTUAL = '3.2'; // Version del CFD que implementa este código
 
     {$REGION 'Documentation'}
