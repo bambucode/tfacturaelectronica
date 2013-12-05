@@ -102,17 +102,7 @@ type
     procedure AsignarFechaGeneracion;
     procedure AsignarLugarExpedicion;
     procedure AsignarNumeroDeCuenta;
-    procedure AgregarAtributoOpcionalSiNoEstaVacio(const nodoXML: IXMLNode; const aPropiedad: string;
-                                                  const aValorAsignar : String);
 
-    {$REGION 'Documentation'}
-    ///	<summary>
-    ///	  Agrega un Domicilio Fiscal de acuerdo a las leyes de validacion de
-    ///	  CFDI 3.2
-    ///	</summary>
-    {$ENDREGION}
-    procedure AgregarDireccionFiscalv32(const aNodoContribuyente: IXMLNode; const
-        aDireccionContribuyente: TFEDireccion);
     {$REGION 'Documentation'}
     ///	<summary>
     ///	  Este metodo es llamado cuando leemos un XML (a través del metodo
@@ -122,8 +112,6 @@ type
     procedure LeerPropiedadesDeTimbre;
     procedure EstablecerVersionDelComprobante;
     function GetTimbre: TFETimbre;
-    procedure ValidarCamposEmisor;
-    procedure ValidarCamposReceptor;
   protected
     procedure GenerarComprobante;
     function getXML: WideString; virtual;
@@ -237,42 +225,6 @@ begin
   inherited;
 end;
 
-procedure TFEComprobanteFiscal.AgregarAtributoOpcionalSiNoEstaVacio(const nodoXML: IXMLNode; const aPropiedad: string;
-                                               const aValorAsignar : String);
-begin
-  // Checamos si el atributo opcional NO esta vacio
-  if Trim(aValorAsignar) <> '' then
-  begin
-    nodoXML.Attributes[aPropiedad] := aValorAsignar;
-  end;
-end;
-
-procedure TFEComprobanteFiscal.AgregarDireccionFiscalv32(const
-    aNodoContribuyente: IXMLNode; const aDireccionContribuyente: TFEDireccion);
-begin
-  aNodoContribuyente.Attributes['calle'] := TFEReglamentacion.ComoCadena(aDireccionContribuyente.Calle);
-
-  //AgregarAtributoOpcionalSiNoEstaVacio(aNodoContribuyente, 'Calle', aDireccionContribuyente.Calle);
-  AgregarAtributoOpcionalSiNoEstaVacio(aNodoContribuyente, 'noExterior', aDireccionContribuyente.NoExterior);
-  AgregarAtributoOpcionalSiNoEstaVacio(aNodoContribuyente, 'noInterior', aDireccionContribuyente.NoInterior);
-  AgregarAtributoOpcionalSiNoEstaVacio(aNodoContribuyente, 'colonia',
-                                       TFEReglamentacion.ComoCadena(aDireccionContribuyente.Colonia));
-  AgregarAtributoOpcionalSiNoEstaVacio(aNodoContribuyente, 'localidad',
-                                       TFEReglamentacion.ComoCadena(aDireccionContribuyente.Localidad));
-  AgregarAtributoOpcionalSiNoEstaVacio(aNodoContribuyente, 'referencia',
-                                       TFEReglamentacion.ComoCadena(aDireccionContribuyente.Referencia));
-  AgregarAtributoOpcionalSiNoEstaVacio(aNodoContribuyente, 'municipio',
-                                       TFEReglamentacion.ComoCadena(aDireccionContribuyente.Municipio));
-  AgregarAtributoOpcionalSiNoEstaVacio(aNodoContribuyente, 'estado',
-                                       TFEReglamentacion.ComoCadena(aDireccionContribuyente.Estado));
-
-  // Requerido
-  aNodoContribuyente.Attributes['pais'] := TFEReglamentacion.ComoCadena(aDireccionContribuyente.Pais);
-
-  AgregarAtributoOpcionalSiNoEstaVacio(aNodoContribuyente, 'codigoPostal',
-                                       TFEReglamentacion.ComoCadena(aDireccionContribuyente.CodigoPostal));
-end;
-
 procedure TFEComprobanteFiscal.AgregarTimbreFiscalAlXML;
 var
   xmlTimbrado: WideString;
@@ -363,8 +315,6 @@ procedure TFEComprobanteFiscal.AsignarEmisor;
   end;
 
 begin
-  // Realizamos las validaciones correspondientes
-  ValidarCamposEmisor;
 
   // Segun la version del CFD asignamos el "Emisor" correspondiente
   case fVersion of
@@ -443,13 +393,34 @@ begin
         begin
           RFC :=(inherited Emisor).RFC;
           Nombre := TFEReglamentacion.ComoCadena((inherited Emisor).Nombre);
+          with DomicilioFiscal do // Alias de UbicacionFiscal
+          begin
+            Calle := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Calle);
 
-          // Agregamos el domicilio fiscal del Emisor solo si tiene Calle
-          if (inherited Emisor).Direccion.Calle <> '' then
-            AgregarDireccionFiscalv32(DomicilioFiscal, (inherited Emisor).Direccion);
+            if Trim((inherited Emisor).Direccion.NoExterior) <> '' then
+              NoExterior := (inherited Emisor).Direccion.NoExterior; // Opcional
 
-          // Agregamos el nuevo campo requerido Regimen Fiscal (implementado en 2.2)
-          AsignarRegimenesFiscales;
+            if Trim((inherited Emisor).Direccion.NoInterior) <> '' then
+              NoInterior := (inherited Emisor).Direccion.NoInterior; // Opcional
+
+            if Trim((inherited Emisor).Direccion.Colonia) <> '' then
+              Colonia := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Colonia); // Opcional
+
+            if Trim((inherited Emisor).Direccion.Localidad) <> '' then
+              Localidad := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Localidad); // Opcional
+
+            if Trim((inherited Emisor).Direccion.Referencia) <> '' then
+              Referencia := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Referencia); // Opcional
+
+            Municipio := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Municipio);
+            Estado := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Estado);
+            Pais := TFEReglamentacion.ComoCadena((inherited Emisor).Direccion.Pais);
+            CodigoPostal := (inherited Emisor).Direccion.CodigoPostal;
+            // Agregamos el nuevo campo requerido Regimen Fiscal (implementado en 2.2)
+             Assert(Length(inherited Emisor.Regimenes) > 0,
+               'Se debe especificar al menos un régimen del cliente');
+             AsignarRegimenesFiscales;
+          end;
         end;
     end;
   end;
@@ -541,8 +512,6 @@ end;
 // 3. Clave del RFC de la persona a favor de quien se expida la factura (29-A, Fraccion IV)
 procedure TFEComprobanteFiscal.AsignarReceptor;
 begin
-  ValidarCamposReceptor;
-
   with fXmlComprobante.Receptor do
   begin
     RFC := Trim((inherited Receptor).RFC);
@@ -552,9 +521,30 @@ begin
     begin
         Nombre := TFEReglamentacion.ComoCadena((inherited Receptor).Nombre);
 
-        // Agregamos el domicilio fiscal del Receptor
-        if (inherited Receptor).Direccion.Calle <> '' then
-          AgregarDireccionFiscalv32(Domicilio, (inherited Receptor).Direccion);
+        with Domicilio do
+        begin
+          Calle := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Calle);
+
+          if Trim((inherited Receptor).Direccion.NoExterior) <> '' then
+            NoExterior := (inherited Receptor).Direccion.NoExterior; // Opcional
+
+          if Trim((inherited Receptor).Direccion.NoInterior) <> '' then
+            NoInterior := (inherited Receptor).Direccion.NoInterior; // Opcional
+
+          if Trim((inherited Receptor).Direccion.Colonia) <> '' then
+            Colonia := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Colonia); // Opcional
+          if Trim((inherited Receptor).Direccion.Localidad) <> '' then
+            Localidad := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Localidad); // Opcional
+          if Trim((inherited Receptor).Direccion.Referencia) <> '' then
+            Referencia := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Referencia); // Opcional
+
+          if Trim((inherited Receptor).Direccion.Municipio) <> '' then
+            Municipio := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Municipio);
+
+          Estado := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Estado);
+          Pais := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Pais);
+          CodigoPostal := (inherited Receptor).Direccion.CodigoPostal;
+        end; { with CFD.Receptor.Domicilio }
     end else
         // Si es Publico en General solo agregamos el pais al nodo Direccion
         // cualquier otra cosa generara un CFD invalido.
@@ -563,7 +553,7 @@ begin
         else // Si es el RFC de extranjero ahi si obtenemos el pais del que se nos haya asignado...
           fXmlComprobante.Receptor.Domicilio.Pais := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Pais);
         
-  end;
+  end; { with CFD.Receptor }
 end;
 
 procedure TFEComprobanteFiscal.AsignarContenidoCertificado;
@@ -1575,37 +1565,6 @@ begin
         Result:=fDocumentoXML.XML.Text
     else
         Raise Exception.Create('No se puede obtener el XML cuando aún no se ha generado el archivo CFD');
-end;
-
-procedure TFEComprobanteFiscal.ValidarCamposEmisor;
-begin
-  case fVersion of
-    fev22, fev32:
-    begin
-       if Trim((inherited Emisor).RFC) = '' then
-        raise EFEAtributoRequeridoNoPresenteException.Create('El Atributo RFC de Emisor está vacio');
-
-       if Length(inherited Emisor.Regimenes) = 0 then
-        raise EFEAtributoRequeridoNoPresenteException.Create('Se debe especificar al menos 1 régimen fiscal');
-
-       if Trim((inherited Emisor).Direccion.Pais) = '' then
-        raise EFEAtributoRequeridoNoPresenteException.Create('Se debe especificar el pais del emisor');
-    end;
-  end;
-end;
-
-procedure TFEComprobanteFiscal.ValidarCamposReceptor;
-begin
-    case fVersion of
-    fev22, fev32:
-    begin
-       if Trim((inherited Receptor).RFC) = '' then
-        raise EFEAtributoRequeridoNoPresenteException.Create('El Atributo RFC de Receptor está vacio');
-
-       if Trim((inherited Receptor).Direccion.Pais) = '' then
-        raise EFEAtributoRequeridoNoPresenteException.Create('Se debe especificar el pais del Receptor');
-    end;
-  end;
 end;
 
 end.
