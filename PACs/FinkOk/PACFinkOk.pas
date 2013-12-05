@@ -85,7 +85,7 @@ begin
   inherited;
 end;
 
-procedure TPACFinkOk.AfterConstruction;
+procedure TPACFinkOk.AfterConstruction;
 begin
   fDocumentoXMLTimbrado := TXMLDocument.Create(nil);
   fDocumentoXMLTimbrado.Active := True;

@@ -48,12 +48,17 @@ uses
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
   FacturacionHashes in '..\FacturacionHashes.pas',
   PACEcodex in '..\PACs\Ecodex\PACEcodex.pas',
+  {$IFDEF CODESITE}
   CodeSiteLogging,
+  {$ENDIF}
   PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas',
   PACEjemplo in '..\PACs\Ejemplo\PACEjemplo.pas',
   GeneradorCBB in '..\GeneradorCBB\GeneradorCBB.pas',
   QuricolAPI in '..\GeneradorCBB\QuricolAPI.pas',
-  QuricolCode in '..\GeneradorCBB\QuricolCode.pas';
+  QuricolCode in '..\GeneradorCBB\QuricolCode.pas',
+  FinkOkWsTimbrado in '..\PACs\FinkOk\FinkOkWsTimbrado.pas',
+  PACFinkOk in '..\PACs\FinkOk\PACFinkOk.pas',
+  FECancelaComercioDigital in '..\PACs\ComercioDigital\FECancelaComercioDigital.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
@@ -62,11 +67,11 @@ var
    Factura: TFacturaElectronica;
    Emisor, Receptor: TFEContribuyente;
    Certificado: TFECertificado;
+   BloqueFolios: TFEBloqueFolios;
    Impuesto1, Impuesto2: TFEImpuestoTrasladado;
    Concepto1, Concepto2 : TFEConcepto;
    generadorCBB: TGeneradorCBB;
    CredencialesPAC: TFEPACCredenciales;
-
    function GetDesktopFolder: string;
    var
      buf: array[0..255] of char;
@@ -80,23 +85,20 @@ var
    end;
 
 begin
-  {$IF CompilerVersion < 20}
-      // Bajo Delphi < 2009 tenemos que mandar llamar la siguiente rutina
-      // para poder usar rutinas de la clase ActiveX, en este caso la rutina
-      // para obtener la ruta al Escritorio de Windows.
-      CoInitialize(nil);
-  {$IFEND}
+
 
   // Checamos la presencia de archivos necesarios para el ejemplo
   if Not FileExists('./libeay32.dll') then
   begin
     WriteLn('Favor de copiar el archivo libeay32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
+    Readln;
     exit;
   end;
 
   if Not FileExists('./libssl32.dll') then
   begin
-    WriteLn('Favor de copiar el archivo libeay32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
+    WriteLn('Favor de copiar el archivo libssl32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
+    Readln;
     exit;
   end;
 
@@ -104,12 +106,20 @@ begin
   if Not FileExists('./quricol32.dll') then
   begin
     WriteLn('Favor de copiar el archivo quricol32.dll de la subcarpeta \GeneradorCBB a la carpeta donde esta el ejecutable');
+    Readln;
     exit;
   end;
 
+  {$IF CompilerVersion < 20}  // se movio porque no alcanza a mostrar el mensaje de error de librerias
+      // Bajo Delphi < 2009 tenemos que mandar llamar la siguiente rutina
+      // para poder usar rutinas de la clase ActiveX, en este caso la rutina
+      // para obtener la ruta al Escritorio de Windows.
+      CoInitialize(nil);
+  {$IFEND}
+
   try
       // 1. Definimos los datos del emisor y receptor
-      Emisor.RFC:='AAA010101AAA';
+      Emisor.RFC:='AAD990814BP7';
       Emisor.Nombre:='Mi Empresa SA de CV';
       Emisor.Direccion.Calle:='Calle de la Amargura';
       Emisor.Direccion.NoExterior:='123';
@@ -151,14 +161,21 @@ begin
       Receptor.Direccion.Localidad:='Boca del Rio';
       //Receptor.Direccion.Referencia:='IZQ';
 
+      // 3. Definimos los datos de los folios que nos autorizo el SAT (solo para CFD 2.2)
+      {BloqueFolios.NumeroAprobacion:=1;
+      BloqueFolios.AnoAprobacion:=2010;
+      BloqueFolios.Serie:='A';
+      BloqueFolios.FolioInicial:=1;
+      BloqueFolios.FolioFinal:=1000; }
+
       // 4. Definimos el certificado junto con su llave privada
-      Certificado.Ruta:=ExtractFilePath(Application.ExeName) + '\aaa010101aaa_CSD_01.cer';
-      Certificado.LlavePrivada.Ruta:=ExtractFilePath(Application.ExeName) + '\aaa010101aaa_CSD_01.key';
+      Certificado.Ruta:=ExtractFilePath(Application.ExeName) + '\aad990814bp7_1210261233s.cer';
+      Certificado.LlavePrivada.Ruta:=ExtractFilePath(Application.ExeName) + '\aad990814bp7_1210261233s.key';
       Certificado.LlavePrivada.Clave:='12345678a';
 
       // 5. Creamos la clase Factura con los parametros minimos.
       WriteLn('Generando factura CFD ...');
-      Factura:=TFacturaElectronica.Create(Emisor, Receptor, Certificado, tcIngreso);
+      Factura:=TFacturaElectronica.Create(Emisor, Receptor, BloqueFolios, Certificado, tcIngreso);
 
       //Factura.AutoAsignarFechaGeneracion := False;
       //Factura.FechaGeneracion := EncodeDateTime(2012, 05, 12, 19, 47, 22, 0);
@@ -205,23 +222,31 @@ begin
       // Ya que tenemos el comprobante, lo mandamos timbrar con el PAC de nuestra elección,
       // por cuestiones de ejemplo, usaremos al PAC "Ecodex"
 
-      ProveedorTimbrado := TPACEcodex.Create;
-      //ProveedorTimbrado := TPACComercioDigital.Create; // Si queremos usar a Comercio Digital solo des-comentamos aqui
+//      ProveedorTimbrado := TPACFinkOk.Create;
+      ProveedorTimbrado := TPACComercioDigital.Create; // Si queremos usar a Comercio Digital solo des-comentamos aqui
 
       try
         CredencialesPAC.RFC   := 'AAA010101AAA';
         CredencialesPAC.Clave := 'PWD';
+//        CredencialesPAC.RFCEmisor   := 'AAD990814BP7';
+        CredencialesPAC.Certificado.Ruta:=Certificado.Ruta;
+        CredencialesPAC.Certificado.LlavePrivada.Ruta:=Certificado.LlavePrivada.Ruta;
+        CredencialesPAC.Certificado.LlavePrivada.Clave:=Certificado.LlavePrivada.Clave;
         // Este es el "ID de Integrador" de pruebas de Ecodex
         CredencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
         // Asignamos nuestras credenciales de acceso con el PAC
         ProveedorTimbrado.AsignarCredenciales(CredencialesPAC);
-
-        WriteLn('Mandando a PAC "' + ProveedorTimbrado.Nombre + '" para timbrado...');
+//        if ProveedorTimbrado.CancelarDocumento(Archivo.XML.Text) then
+//         writeln('Cancelado');
         TimbreDeFactura := ProveedorTimbrado.TimbrarDocumento(Factura.XML);
-
         // Asignamos el timbre a la factura para que sea válida
         WriteLn('Asignando timbre a factura para generar CFDI');
         Factura.AsignarTimbreFiscal(TimbreDeFactura);
+
+///////  Ejemplo para agregar,editar y eliminar clientes en FinkOK
+//        WriteLn(ProveedorTimbrado.BorraCliente('GPA980211KC0'));
+//        WriteLn(ProveedorTimbrado.AgregaCliente('GPA980211KC0'));
+//        WriteLn(ProveedorTimbrado.EditaCliente('GPA980211KC0',True));
 
         // Ahora generamos el CBB del CFDI
         generadorCBB := TGeneradorCBB.Create;
@@ -239,7 +264,7 @@ begin
       end;
 
       // Finalmente ya que la factura fue timbrada mandamos guardar la factura
-      Factura.Guardar(archivoFacturaXML);
+//      Factura.Guardar(archivoFacturaXML);
 
       // Para la representación gráfica debemos generar el Codigo de Barras Bidimensional (CBB)
       // TODO: Implementar generacion de CBB con libreria que no dependa de Google Charts.

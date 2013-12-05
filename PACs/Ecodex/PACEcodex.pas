@@ -83,7 +83,7 @@ begin
   inherited;
 end;
 
-procedure TPACEcodex.AfterConstruction;
+procedure TPACEcodex.AfterConstruction;
 begin
   // Obtenemos una instancia del WebService de Timbrado de Ecodex
   wsTimbradoEcodex := GetWsEcodexTimbrado;
