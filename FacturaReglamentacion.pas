@@ -34,7 +34,7 @@ type
 
 implementation
 
-uses SysUtils, DateUtils, Soap.XSBuiltIns;
+uses SysUtils, DateUtils {$IF Compilerversion >= 20} ,Soap.XSBuiltIns {$ELSE} , XSBuiltIns {$IFEND};
 
 // Segun las reglas del SAT:
 // "Se expresa en la forma aaaa-mm-ddThh:mm:ss, de acuerdo con la especificación ISO 8601"

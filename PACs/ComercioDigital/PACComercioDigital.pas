@@ -164,7 +164,11 @@ var
   llamadoExitoso: Boolean;
 begin
   // TODO: Cambiar este codigo para no depender de Synapse
-  resultadoAPI := TStringStream.Create;
+  {$IF Compilerversion >= 20}
+   resultadoAPI := TStringStream.Create(aDocumentoXML,TEncoding.UTF8 );
+  {$ELSE}
+   resultadoAPI := TStringStream.Create(aDocumentoXML);
+  {$IFEND}
   HTTP := THTTPSend.Create;
   respuestaDeServidor := TStringList.Create;
   try
