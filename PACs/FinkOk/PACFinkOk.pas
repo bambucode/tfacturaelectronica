@@ -67,8 +67,9 @@ end;
 
 implementation
 
-{$IF Compilerversion >= 20}uses  Soap.InvokeRegistry {$IFEND}
-  {$IFDEF CODESITE},CodeSiteLogging {$ENDIF} 
+uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
+     CodeSiteLogging;
+
 function TPACFinkOk.UTF8Bytes(const s: UTF8String): TBytedynArray; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
 begin
 {$IF Compilerversion >= 20}Assert(StringElementSize(s)=1){$IFEND};
@@ -108,11 +109,7 @@ begin
   if respuestaTimbrado.success then
     Result:=respuestaTimbrado.message
   Else
-  {$IFDEF CODESITE}
-    CodeSite.Send('El Cliente no se pudo agregar '+respuestaTimbrado.message);
-  {$ELSE}
-   raise exception.Create('El Cliente no se pudo agregar '+respuestaTimbrado.message);
-  {$ENDIF}
+   CodeSite.Send('El Cliente no se pudo agregar '+respuestaTimbrado.message);
 End;
 
 Function TPACFinkOk.EditaCliente(const Activar: Boolean;const aRFC:String):String;
@@ -127,12 +124,7 @@ begin
   if respuestaTimbrado.success then
     Result:=respuestaTimbrado.message
   Else
-  {$IFDEF CODESITE}
    CodeSite.Send('El Cliente no se pudo modificar '+respuestaTimbrado.message);
-  {$ELSE}
-   raise exception.Create('El Cliente no se pudo modificar '+respuestaTimbrado.message);
-  {$ENDIF}
-
 End;
 
 Function TPACFinkOk.BorraCliente(const aRFC: String):String;
@@ -143,11 +135,7 @@ begin
   if respuestaTimbrado.success then
     Result:=respuestaTimbrado.message
   Else
-  {$IFDEF CODESITE}
    CodeSite.Send('El Cliente no se pudo eliminar '+respuestaTimbrado.message);
-  {$ELSE}
-   raise exception.Create('El Cliente no se pudo eliminar '+respuestaTimbrado.message);
-  {$ENDIF}
 End;
 
 function TPACFinkOk.ObtenerURLTimbrado: String;
@@ -236,14 +224,8 @@ begin
       begin
        if Trim(respuestaTimbrado.CodEstatus) = '' then
         begin
-        {$IFDEF CODESITE}
          CodeSite.Send('Falla Validacion Error No.', respuestaTimbrado.Incidencias[0].CodigoError);
          CodeSite.Send('Falla Validacion Desc:', respuestaTimbrado.Incidencias[0].MensajeIncidencia);
-        {$ELSE}
-         raise exception.Create('Falla Validacion Error No.'+ respuestaTimbrado.Incidencias[0].CodigoError);
-         raise exception.Create('Falla Validacion Desc:'+ respuestaTimbrado.Incidencias[0].MensajeIncidencia);
-       {$ENDIF}
-
         end;
         end else
           raise;

@@ -48,9 +48,7 @@ uses
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
   FacturacionHashes in '..\FacturacionHashes.pas',
   PACEcodex in '..\PACs\Ecodex\PACEcodex.pas',
-  {$IFDEF CODESITE}
   CodeSiteLogging,
-  {$ENDIF}
   PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas',
   PACEjemplo in '..\PACs\Ejemplo\PACEjemplo.pas',
   GeneradorCBB in '..\GeneradorCBB\GeneradorCBB.pas',
@@ -85,20 +83,23 @@ var
    end;
 
 begin
-
+  {$IF CompilerVersion < 20}
+      // Bajo Delphi < 2009 tenemos que mandar llamar la siguiente rutina
+      // para poder usar rutinas de la clase ActiveX, en este caso la rutina
+      // para obtener la ruta al Escritorio de Windows.
+      CoInitialize(nil);
+  {$IFEND}
 
   // Checamos la presencia de archivos necesarios para el ejemplo
   if Not FileExists('./libeay32.dll') then
   begin
     WriteLn('Favor de copiar el archivo libeay32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
-    Readln;
     exit;
   end;
 
   if Not FileExists('./libssl32.dll') then
   begin
-    WriteLn('Favor de copiar el archivo libssl32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
-    Readln;
+    WriteLn('Favor de copiar el archivo libeay32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
     exit;
   end;
 
@@ -106,16 +107,8 @@ begin
   if Not FileExists('./quricol32.dll') then
   begin
     WriteLn('Favor de copiar el archivo quricol32.dll de la subcarpeta \GeneradorCBB a la carpeta donde esta el ejecutable');
-    Readln;
     exit;
   end;
-
-  {$IF CompilerVersion < 20}  // se movio porque no alcanza a mostrar el mensaje de error de librerias
-      // Bajo Delphi < 2009 tenemos que mandar llamar la siguiente rutina
-      // para poder usar rutinas de la clase ActiveX, en este caso la rutina
-      // para obtener la ruta al Escritorio de Windows.
-      CoInitialize(nil);
-  {$IFEND}
 
   try
       // 1. Definimos los datos del emisor y receptor
