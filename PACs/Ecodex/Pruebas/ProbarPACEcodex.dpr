@@ -46,7 +46,22 @@ uses
   EcodexWsTimbrado in '..\EcodexWsTimbrado.pas',
   TestPACEcodex in 'TestPACEcodex.pas',
   TestPrueba in '..\..\..\Pruebas\TestPrueba.pas',
-  PACEcodex in '..\PACEcodex.pas';
+  PACEcodex in '..\PACEcodex.pas',
+  FacturacionHashes in '..\..\..\FacturacionHashes.pas',
+  FETimbreFiscalDigital in '..\..\..\CFD\FETimbreFiscalDigital.pas',
+  FeCFDv32 in '..\..\..\CFD\FeCFDv32.pas',
+  FeCFD in '..\..\..\CFD\FeCFD.pas',
+  FeCFDv2 in '..\..\..\CFD\FeCFDv2.pas',
+  FeCFDv22 in '..\..\..\CFD\FeCFDv22.pas',
+  FacturaElectronica in '..\..\..\FacturaElectronica.pas',
+  ComprobanteFiscal in '..\..\..\..\ComprobanteFiscal.pas',
+  DocComprobanteFiscal in '..\..\..\DocComprobanteFiscal.pas',
+  ClaseOpenSSL in '..\..\..\ClaseOpenSSL.pas',
+  libeay32 in '..\..\..\libeay32.pas',
+  LibEay32Plus in '..\..\..\LibEay32Plus.pas',
+  OpenSSLUtils in '..\..\..\OpenSSLUtils.pas',
+  SelloDigital in '..\..\..\SelloDigital.pas',
+  CadenaOriginal in '..\..\..\CadenaOriginal.pas';
 
 {$R *.RES}
 

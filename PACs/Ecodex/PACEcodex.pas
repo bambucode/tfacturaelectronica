@@ -62,7 +62,8 @@ public
 
 implementation
 
-uses Soap.InvokeRegistry,
+uses
+{$IF Compilerversion >= 20} Soap.InvokeRegistry,{$IFEND}
      feCFDv32,
      {$IFDEF CODESITE}
      CodeSiteLogging,

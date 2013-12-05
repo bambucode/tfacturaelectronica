@@ -28,7 +28,6 @@ uses SysUtils,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
-     Winapi.ActiveX,
      FacturacionHashes;
 
 procedure TEcodexManejadorDeSesion.AfterConstruction;
@@ -62,7 +61,6 @@ var
   respuestaSolicitudDeToken: TEcodexRespuestaObtenerToken;
   mensajeFalla: string;
 begin
-  CoInitialize(nil);
   Assert(fCredenciales.RFC <> '', 'Las credenciales del PAC no fueron asignadas');
   {$IFDEF CODESITE} CodeSite.EnterMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
   try

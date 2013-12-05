@@ -38,9 +38,7 @@ public
   // el cual es un requisito del SAT (Art 29, Fraccion VI)</summary>
   property OnComprobanteGenerado : TOnComprobanteGenerado read fOnComprobanteGenerado write fOnComprobanteGenerado;
   constructor Create(cEmisor, cCliente: TFEContribuyente; bfBloqueFolios: TFEBloqueFolios;
-                     cerCertificado: TFECertificado; tcTipo: TFETipoComprobante);  overload; deprecated;
-  constructor Create(cEmisor, cCliente: TFEContribuyente; cerCertificado: TFECertificado;
-                      tcTipo: TFETipoComprobante);  overload;
+                     cerCertificado: TFECertificado; tcTipo: TFETipoComprobante);  overload;
   destructor Destroy; override;
   //procedure Leer(sRuta: String);
   /// <summary>Genera el archivo XML de la factura electrónica con el sello, certificado, etc</summary>
@@ -67,25 +65,10 @@ begin
   inherited Create;
 end;
 
-constructor TFacturaElectronica.Create(cEmisor, cCliente: TFEContribuyente; cerCertificado: TFECertificado;
-                      tcTipo: TFETipoComprobante);
-begin
-  // Si usamos este constructor que no usa bloque de folios creamos un CFDI 3.2 por default
-  inherited Create(fev32);
-  // Llenamos las variables internas con las de los parametros
-  inherited Emisor:=cEmisor;
-  inherited Receptor:=cCliente;
-
-  // REWRITE: Validamos aqui que el certificado sea valido
-  inherited Certificado:=cerCertificado;
-  inherited Tipo:=tcTipo;
-end;
-
 constructor TFacturaElectronica.Create(cEmisor, cCliente: TFEContribuyente;
             bfBloqueFolios: TFEBloqueFolios; cerCertificado: TFECertificado; tcTipo: TFETipoComprobante);
 begin
-    // Si usamos este metodo que usa bloque de folios creamos por default un CFD 2.2
-    inherited Create(fev22);
+    inherited Create;
     // Llenamos las variables internas con las de los parametros
     inherited Emisor:=cEmisor;
     inherited Receptor:=cCliente;
@@ -95,6 +78,13 @@ begin
     // REWRITE: Validamos aqui que el certificado sea valido
     inherited Certificado:=cerCertificado;
     inherited Tipo:=tcTipo;
+
+    // TODO: Implementar CFD 3.02 y usar la version segun sea necesario...
+    // Que version de CFD sera usada?
+    {if (Now < EncodeDate(2011,1,1)) then
+      fComprobante := TFEComprobanteFiscal.Create;
+    else
+      fVersion:=TFEComprobanteFiscalV3.Create; }
 end;
 
 destructor TFacturaElectronica.Destroy();

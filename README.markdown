@@ -1,13 +1,13 @@
 ﻿TFACTURACIONELECTRONICA v3.2 (Beta)     
 =====================================
-Esta es una biblioteca que sirve para generar una factura electrónica de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
+Esta es una librería que sirve para generar una factura electrónica de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
-El propósito es servir como una biblioteca gratuita, de código abierto, de fácil uso en la cual con el esfuerzo de la comunidad siempre esté actualizada y funcional.
+El propósito es servir como una libreria gratuita, de código abierto, de fácil uso en la cual con el esfuerzo de la comunidad siempre esté actualizada y funcional.
 
-Algunos aspectos que busca tener esta biblioteca:
+Algunos aspectos que busca tener esta libreria:
 
 - Estar vigente (actualizada)
-- No depender de bibliotecas comerciales.
+- No depender de librerias comerciales.
 - Ser de fácil uso.
 - Que pueda ser integrada fácilmente a cualquier proyecto existente.
 - Contar con pruebas de unidad automatizadas para corroborar el funcionamiento adecuado de cada función y clase.
@@ -20,7 +20,7 @@ Más información sobre este proyecto en:
 Requerimientos técnicos
 ------------
 - Contar con alguna edición de Delphi.
-- Contar con bibliotecas libeay32.dll, ssleay32.dll y el ejecutable openssl.exe (solo para las pruebas automatizadas)
+- Contar con librerias libeay32.dll, ssleay32.dll y el ejecutable openssl.exe (solo para las pruebas automatizadas)
 las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/binaries.html>
 
 ¿Qué falta por implementar?
@@ -28,7 +28,7 @@ las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/b
 - Manejo de Adendas.
 - Manejo y pruebas de conceptos con datos aduanales.
 - Manejo y pruebas de articulos con cuenta predial.
-- Método de Cancelar para el  PAC Comercio Digital.
+- Método de Cancelar para  los PAC de Ecodex y Comercio Digital
 
 Proveedores Autorizados de Certificación (PAC) Soportados
 -------------
@@ -42,27 +42,25 @@ Completado
 - Implementar la lectura de un CFD y que al mismo tiempo verifique si es válido o no. <- Completado 12 Dic 2010>
 - Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT. < Completado 26 Ene 2011 >
 
-Soporte Técnico
-------------
-El soporte es limitado y por la misma razón la biblioteca es de código abierto, para que puedas estudiarla, mejorarla y corregirla en donde encuentres alguna falla. Si encuentras alguna falla favor de reportarla en esta página <https://github.com/bambucode/tfacturaelectronica/issues/new> para que otros usuarios puedan colaborar y encontrar una solución como comunidad.
-
-NOTA: Cualquier petición de soporte, falla, etc. enviada por correo será ignorada, solo se aceptarán contribuciones de código fuente.
-
 ¿Cómo puedo ayudar?
 -------------
-Actualmente la biblioteca se encuentra en estado "beta" en la implementación de CFDI. La manera en que puedes ayudar es en realizar más pruebas de unidad para probar los diferentes casos y corroborar que la biblioteca funcione como debe. También puedes implementar más PACs basándote en los actuales y el ejemplo incluído.
+Actualmente la librería se encuentra en estado "beta" en la implementación de CFDI. La manera en que puedes ayudar es en realizar más pruebas de unidad para probar los diferentes casos y corroborar que la librería funcione como debe. También puedes implementar más PACs basándote en los actuales y el ejemplo incluído.
 
-Si te interesa contribuir en mejorar, extender o corregir esta biblioteca para el beneficio de la comunidad y crédito para tí ponte en contacto a mi correo: <luis@bambucode.com> (solo para envío de código fuente) o bien si lo deseas puedes mandarme un "pull request" de tu "fork" de la biblioteca.
+Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a mi correo: <luis@bambucode.com> ya sea para envío de código realizado o bien si lo deseas puedes mandarme un "pull request" de tu "fork" de la librería.
+
+Soporte Técnico
+------------
+El soporte es limitado y por la misma razón la librería es de código abierto, para que puedas estudiarla, mejorarla y corregirla en donde encuentres alguna falla. Si encuentras alguna falla favor de reportarla en esta página en la sección de "Issues" para que otros usuarios puedan colaborar y encontrar una solución como comunidad.
 
 Notas adicionales
 ------------
-El ejecutable que use esta biblioteca deberá contar con los archivos DLL de openssl en el mismo directorio de la
+El ejecutable que use esta libreria deberá contar con los archivos DLL de openssl en el mismo directorio de la
 aplicación para que pueda funcionar. Considere esto cuando genere un instalador o vaya a distribuir su aplicación
 final.
 
 Compatibilidad con versiones
 ------------
-La biblioteca ha sido probada solamente con Delphi XE2 aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 2007 si se encuentra algún error favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2.
+La libreria ha sido probada solamente con Delphi XE2 aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 2007 si se encuentra algún error favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2.
 
 Colaboradores actuales.
 -------------

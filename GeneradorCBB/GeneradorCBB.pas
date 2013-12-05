@@ -72,7 +72,12 @@ type
 
 implementation
 
-uses QuricolCode, QuricolAPI, pngimage, Jpeg, Vcl.Graphics;
+uses QuricolCode, QuricolAPI, pngimage, Jpeg,
+  {$IF Compilerversion >= 20}
+   Vcl.Graphics;
+  {$ELSE}
+   Graphics;
+  {$IFEND}
 
 function TGeneradorCBB.GenerarImagen(const aEmisor, aReceptor:
     TFEContribuyente; const aTotal: Currency; const aUUID, aRutaAGuardar:
