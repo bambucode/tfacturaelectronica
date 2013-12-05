@@ -371,9 +371,9 @@ begin
    res.Add('UUID='+ExtraerUUID(aDocumentoXML));
    res.Add('USER='+EncodeURL(fCredenciales.RFC));
    res.Add('PWDW='+EncodeURL(fCredenciales.Clave));
-   res.Add('CERT='+EncodeF(fCredenciales.Certificado.Ruta));
-   res.Add('KEYF='+EncodeF(fCredenciales.Certificado.LlavePrivada.Ruta));
-   res.Add('PWDK='+EncodeURL(fCredenciales.Certificado.LlavePrivada.Clave));
+//   res.Add('CERT='+EncodeF(fCredenciales.Certificado.Ruta));
+//   res.Add('KEYF='+EncodeF(fCredenciales.Certificado.LlavePrivada.Ruta));
+//   res.Add('PWDK='+EncodeURL(fCredenciales.Certificado.LlavePrivada.Clave));
    res.Add('ACUS=SI');
   {$IF Compilerversion >= 20}
    resultadoAPI := TStringStream.Create;

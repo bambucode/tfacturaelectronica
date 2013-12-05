@@ -154,10 +154,8 @@ TOnTimbradoRecibidoEvent = procedure(Sender: TObject; const aTimbre: TFETimbre) 
 
 TFEPACCredenciales = record
   RFC: string;
-//  RFCEmisor: string;
   Clave: String;
   DistribuidorID: string; // Usado por algunos PAC para la comunicacion (Ej: Ecodex)
-  Certificado: TFECertificado;
 end;
 
 {$REGION 'Errores durante generacion de CFD/I'}
