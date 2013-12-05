@@ -180,7 +180,7 @@ var
   comprobanteConFolios : IFESoportaBloqueFolios;
 begin
       fResultado := '';
-  
+
       // 2. El inicio de la cadena original se encuentra marcado mediante una secuencia de caracteres || (doble “pipe”).
       fResultado := _PIPE + _PIPE;
       // 1) Datos del comprobante
@@ -270,8 +270,11 @@ begin
 
            AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'rfc');
            AgregarAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'nombre');
+
            // 3) Datos del domicilio fiscal del emisor
-           AgregarUbicacionFiscal(IFEXmlComprobanteV32(fXmlComprobante).Emisor.DomicilioFiscal);
+           if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor').ChildNodes.FindNode('DomicilioFiscal')) then
+             AgregarUbicacionFiscal(IFEXmlComprobanteV32(fXmlComprobante).Emisor.DomicilioFiscal);
+
            // 4) Datos del Domicilio de Expedición del Comprobante
            if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor')) then
              if Assigned(fXmlComprobante.ChildNodes.FindNode('Emisor').ChildNodes.FindNode('ExpedidoEn')) then
@@ -291,9 +294,10 @@ begin
       if ((fXmlComprobante.Receptor.Rfc <> _RFC_VENTA_PUBLICO_EN_GENERAL)
           And (fXmlComprobante.Receptor.Rfc <> _RFC_VENTA_EXTRANJEROS)) then
               AgregarAtributo(fXmlComprobante.Receptor, 'nombre');
-      
+
       // 7) Datos del domicilio fiscal del Receptor
-      AgregarUbicacion(fXmlComprobante.Receptor.Domicilio);
+      if Assigned(fXmlComprobante.ChildNodes.FindNode('Receptor').ChildNodes.FindNode('Domicilio')) then
+        AgregarUbicacion(fXmlComprobante.Receptor.Domicilio);
 
       // 8) Datos de Cada Concepto Relacionado en el Comprobante
       for I := 0 to fXmlComprobante.Conceptos.Count - 1 do

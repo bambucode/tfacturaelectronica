@@ -54,14 +54,14 @@ uses
   FeCFDv2 in '..\..\..\CFD\FeCFDv2.pas',
   FeCFDv22 in '..\..\..\CFD\FeCFDv22.pas',
   FacturaElectronica in '..\..\..\FacturaElectronica.pas',
-  ComprobanteFiscal in '..\..\..\..\ComprobanteFiscal.pas',
   DocComprobanteFiscal in '..\..\..\DocComprobanteFiscal.pas',
   ClaseOpenSSL in '..\..\..\ClaseOpenSSL.pas',
   libeay32 in '..\..\..\libeay32.pas',
   LibEay32Plus in '..\..\..\LibEay32Plus.pas',
   OpenSSLUtils in '..\..\..\OpenSSLUtils.pas',
   SelloDigital in '..\..\..\SelloDigital.pas',
-  CadenaOriginal in '..\..\..\CadenaOriginal.pas';
+  CadenaOriginal in '..\..\..\CadenaOriginal.pas',
+  ComprobanteFiscal in '..\..\..\ComprobanteFiscal.pas';
 
 {$R *.RES}
 

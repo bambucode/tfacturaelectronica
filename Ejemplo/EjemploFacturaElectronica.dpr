@@ -120,9 +120,9 @@ begin
       // 1. Definimos los datos del emisor y receptor
 
       // Si se desea probar al PAC FinkOk usar el siguiente Emisor:
-      Emisor.RFC:='AAD990814BP7';
+      //Emisor.RFC:='AAD990814BP7';
       // Si se desea usar al PAC Ecodex usar al siguiente Emisor
-      //Emisor.RFC:='AAA010101AAA';
+      Emisor.RFC:='AAA010101AAA';
 
       Emisor.Nombre:='Mi Empresa SA de CV';
       Emisor.Direccion.Calle:='Calle de la Amargura';
@@ -218,8 +218,8 @@ begin
       // Ya que tenemos el comprobante, lo mandamos timbrar con el PAC de nuestra elección,
       // por cuestiones de ejemplo, usaremos al PAC "Ecodex"
 
-      ProveedorTimbrado := TPACFinkOk.Create;
-      //ProveedorTimbrado := TPACEcodex.Create;
+      //ProveedorTimbrado := TPACFinkOk.Create;
+      ProveedorTimbrado := TPACEcodex.Create;
       //ProveedorTimbrado := TPACComercioDigital.Create; // Si queremos usar a Comercio Digital solo des-comentamos aqui
 
       try
