@@ -66,6 +66,7 @@ type
     ///	  requerimientos del SAT
     ///	</summary>
     {$ENDREGION}
+    procedure AfterConstruction; override;
     function GenerarImagen(const aEmisor, aReceptor: TFEContribuyente; const
         aTotal: Currency; const aUUID, aRutaAGuardar: string): Boolean;
   end;
@@ -78,6 +79,11 @@ uses QuricolCode, QuricolAPI, pngimage, Jpeg,
   {$ELSE}
    Graphics;
   {$IFEND}
+
+procedure TGeneradorCBB.AfterConstruction;
+begin
+  inherited;
+end;
 
 function TGeneradorCBB.GenerarImagen(const aEmisor, aReceptor:
     TFEContribuyente; const aTotal: Currency; const aUUID, aRutaAGuardar:
@@ -93,6 +99,16 @@ const
   _ANCHO_ESTANDARD = 1200;
   _ALTO_ESTANDARD = 1200;
 begin
+  {$IFDEF WIN32}
+  Assert(FileExists('./quricol32.dll'),
+        'Debe existir el archivo quricol32.dll para la generación de CBB de los CFDI');
+  {$ENDIF}
+
+  {$IFDEF WIN64}
+  Assert(FileExists('./quricol64.dll'),
+        'Debe existir el archivo quricol64.dll para la generación de CBB de los CFDI');
+  {$ENDIF}
+
   Result := False;
   // Checamos que los parámetros esten correctos
   Assert(Length(aUUID) = _TAMANO_DE_UUID,
