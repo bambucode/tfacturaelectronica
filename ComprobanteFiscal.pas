@@ -901,6 +901,8 @@ begin
       fTimbre.NoCertificadoSAT := complementoTimbre.NoCertificadoSAT;
       fTimbre.SelloSAT := complementoTimbre.SelloSAT;
       fTimbre.XML := documentoXMLTimbre.XML.Text;
+
+      fFueTimbrado := True;
     except
       On E:Exception do
         raise;
