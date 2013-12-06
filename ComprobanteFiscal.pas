@@ -169,7 +169,7 @@ type
     ///	  asignarle el mismo al CFD de forma interna así como al XML.
     ///	</summary>
     {$ENDREGION}
-    procedure AsignarTimbreFiscal(const aTimbre: TFETimbre);
+    procedure AsignarTimbreFiscal(const aTimbre: TFETimbre); virtual;
     /// <summary>Guarda una copia del XML en el archivo indicado</summary>
     /// <param name="ArchivoFacturaXML">Ruta completa con nombre de archivo en el que se
     /// almacenara el XML del comprobante</param>
@@ -658,9 +658,8 @@ begin
   // Asignamos el timbre a la estructura interna del mismo
   fTimbre := aTimbre;
 
-  // Mandamos llamar el evento de que se asigno el timbrado
-  {if Assigned(fOnTimbradoAsignado) then
-    fOnTimbradoAsignado(Self);  }
+  // Lo agregamos al XML interno
+  AgregarTimbreFiscalAlXML;
 end;
 
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
