@@ -9,6 +9,5 @@
 *.identcache
 Pruebas/Debug/*
 Deploy/*
-Resources/*
 __history/
 Pruebas/ModelSupport_ProbarFacturaElectronica/*
