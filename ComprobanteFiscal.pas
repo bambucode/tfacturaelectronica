@@ -18,7 +18,7 @@ unit ComprobanteFiscal;
 
 interface
 
-uses FacturaTipos, SysUtils, dialogs,
+uses FacturaTipos, SysUtils,
   // Unidades especificas de manejo de XML:
   XmlDom, XMLIntf, MsXmlDom, XMLDoc, DocComprobanteFiscal,
   FeCFDv22,FeCFDv32, FeCFDv2, feCFD;
@@ -55,7 +55,6 @@ type
     fCertificado: TFECertificado;
     fCertificadoTexto: WideString;
     fBloqueFolios: TFEBloqueFolios;
-    fFueTimbrado: Boolean;
     fTimbre : TFETimbre;
     fVersion : TFEVersionComprobante;
     fComprobanteLleno: Boolean;
@@ -125,6 +124,7 @@ type
     procedure ValidarCamposEmisor;
     procedure ValidarCamposReceptor;
   protected
+    fFueTimbrado: Boolean;
     procedure GenerarComprobante;
     function getXML: WideString; virtual;
     procedure setXML(const Valor: WideString); virtual;
@@ -183,6 +183,7 @@ implementation
 
 uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
   OpenSSLUtils, Classes, CadenaOriginal,
+  {$IFDEF DEBUG} Dialogs, {$ENDIF}
   FeTimbreFiscalDigital,
   {$IFDEF CODESITE}
   CodeSiteLogging,
