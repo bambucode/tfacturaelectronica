@@ -6,6 +6,7 @@ uses FacturaTipos,
      Classes,
      XMLDoc,
      XMLIntf,
+     XSLProd,
      System.SysUtils, JvBaseThumbnail;
 
 type
@@ -18,9 +19,10 @@ type
   {$ENDREGION}
   TCadenaOriginalDeTimbre = class
   private
-    fRecursoXSLT: TResourceStream;
+    fFileXSLT: string;
+    //fRecursoXSLT: TResourceStream;
     fXMLTimbre: TStringCadenaOriginal;
-    fXSLT: TStringCadenaOriginal;
+    fXSLT: string;
     function LeerContenidoDeArchivo(sNombreArchivo: String): WideString;
   public
     constructor Create(const aXMLTimbre: WideString; const aRutaXSLT: WideString);
@@ -35,8 +37,8 @@ implementation
 
 constructor TCadenaOriginalDeTimbre.Create(const aXMLTimbre: WideString; const
     aRutaXSLT: WideString);
-const
-  _NOMBRE_DEL_RECURSO_XSLT = 'cadenaoriginal_TFD_1_0';
+//const
+//  _NOMBRE_DEL_RECURSO_XSLT = 'cadenaoriginal_TFD_1_0';
 begin
   // TODO: Inicializar variables internas
 
@@ -46,22 +48,27 @@ begin
   //fRecursoXSLT := TResourceStream.Create(hInstance, _NOMBRE_DEL_RECURSO_XSLT, 'BIN');
 
   fXMLTimbre := aXMLTimbre;
-  fXSLT := LeerContenidoDeArchivo(aRutaXSLT);
+  fFileXSLT := aRutaXSLT;
+  fXSLT := LeerContenidoDeArchivo(fFileXSLT);
 
   Assert(fXMLTimbre <> '', 'El XML del timbre no debe ser vacio');
-  Assert(fXSLT <> '', 'El XSLT de transformacion del timbre no debe ser vacio');    
+  Assert(fFileXSLT <> '', 'El XSLT de transformacion del timbre no debe ser vacio');
 end;
 
 function TCadenaOriginalDeTimbre.Generar: TStringCadenaOriginal;
 var
   XML : IXMLDocument;
   XSL : IXMLDocument;
-  res : WideString;
-begin       
+  res: WideString;
+begin
   XML := LoadXMLData(fXMLTimbre);
   XSL := LoadXMLData(fXSLT);
 
   XML.DocumentElement.TransformNode(XSL.DocumentElement, res);
+
+  // TODO: FACTURACION Refactorizar transformacion XSLT
+  // Fix temporal debido a que delphi no aplica correctamente las cadenas de inicio y terminacion
+  res := '|' + res + '||';
 
   Result := res;
 end;

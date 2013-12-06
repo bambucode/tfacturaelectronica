@@ -48,9 +48,6 @@ uses
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
   FacturacionHashes in '..\FacturacionHashes.pas',
   PACEcodex in '..\PACs\Ecodex\PACEcodex.pas',
-  {$IFDEF CODESITE}
-  CodeSiteLogging,
-  {$ENDIF}
   PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas',
   PACEjemplo in '..\PACs\Ejemplo\PACEjemplo.pas',
   GeneradorCBB in '..\GeneradorCBB\GeneradorCBB.pas',
@@ -58,7 +55,8 @@ uses
   QuricolCode in '..\GeneradorCBB\QuricolCode.pas',
   FinkOkWsTimbrado in '..\PACs\FinkOk\FinkOkWsTimbrado.pas',
   PACFinkOk in '..\PACs\FinkOk\PACFinkOk.pas',
-  FECancelaComercioDigital in '..\PACs\ComercioDigital\FECancelaComercioDigital.pas';
+  FECancelaComercioDigital in '..\PACs\ComercioDigital\FECancelaComercioDigital.pas',
+  CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
@@ -71,6 +69,8 @@ var
    Concepto1, Concepto2 : TFEConcepto;
    generadorCBB: TGeneradorCBB;
    CredencialesPAC: TFEPACCredenciales;
+   lCadenaOriginalTimbre: TStringCadenaOriginal;
+   generadorCadenaOriginalTimbre: TCadenaOriginalDeTimbre;
    function GetDesktopFolder: string;
    var
      buf: array[0..255] of char;
@@ -82,10 +82,10 @@ var
       if (SHGetPathFromIDList(pidList, buf)) then
         Result := buf;
    end;
+const
+  _RUTA_XSLT = '../XSLT/cadenaoriginal_TFD_1_0.xslt';
 
 begin
-
-
   // Checamos la presencia de archivos necesarios para el ejemplo
   if Not FileExists('./libeay32.dll') then
   begin
@@ -102,7 +102,7 @@ begin
   end;
 
   // Checamos la presencia del DLL de la libreria para generacion de CBB
-  if Not FileExists('./quricol32.dll') then
+  if Not FileExists('../GeneradorCBB/quricol32.dll') then
   begin
     WriteLn('Favor de copiar el archivo quricol32.dll de la subcarpeta \GeneradorCBB a la carpeta donde esta el ejecutable');
     Readln;
@@ -248,6 +248,9 @@ begin
                                    Factura.Total,
                                    TimbreDeFactura.UUID,
                                    rutaImagenCBB);
+
+        generadorCadenaOriginalTimbre := TCadenaOriginalDeTimbre.Create(Factura.Timbre.XML, _RUTA_XSLT);
+        lCadenaOriginalTimbre := generadorCadenaOriginalTimbre.Generar;
 
       finally
         ProveedorTimbrado.Free;
