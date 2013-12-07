@@ -228,10 +228,8 @@ begin
 
         // Este es el "ID de Integrador" de pruebas de Ecodex
         CredencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
-
         // Asignamos nuestras credenciales de acceso con el PAC
         ProveedorTimbrado.AsignarCredenciales(CredencialesPAC);
-
         // Mandamos timbrar el documento al PAC
         TimbreDeFactura := ProveedorTimbrado.TimbrarDocumento(Factura.XML);
 
@@ -249,9 +247,10 @@ begin
                                    TimbreDeFactura.UUID,
                                    rutaImagenCBB);
 
-        generadorCadenaOriginalTimbre := TCadenaOriginalDeTimbre.Create(Factura.Timbre.XML, _RUTA_XSLT);
-        lCadenaOriginalTimbre := generadorCadenaOriginalTimbre.Generar;
-
+        // Para la representación gráfica necesitamos la Cadena Original del Timbre, la obtenemos de la siguiente
+        // manera:
+        Writeln('Cadena Original del Timbre Fiscal:');
+        Writeln(Factura.CadenaOriginalTimbre);
       finally
         ProveedorTimbrado.Free;
         generadorCBB.Free;
