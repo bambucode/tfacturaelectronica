@@ -18,6 +18,9 @@ program EjemploFacturaElectronica;
 {$APPTYPE CONSOLE}
 {.$DEFINE CODESITE}
 
+{$R 'CadenaOriginalTimbre.res' '..\CadenaOriginalTimbre.rc'}
+{$R *.dres}
+
 uses
   SysUtils,
   ActiveX,
