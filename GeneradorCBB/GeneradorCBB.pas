@@ -99,14 +99,16 @@ const
   _ANCHO_ESTANDARD = 1200;
   _ALTO_ESTANDARD = 1200;
 begin
-  {$IFDEF WIN32}
-  Assert(FileExists('./quricol32.dll'),
-        'Debe existir el archivo quricol32.dll para la generación de CBB de los CFDI');
-  {$ENDIF}
+  {$IFNDEF RELEASE}
+    {$IFDEF WIN32}
+    Assert(FileExists('../GeneradorCBB/quricol32.dll'),
+          'Debe existir el archivo quricol32.dll para la generación de CBB de los CFDI');
+    {$ENDIF}
 
-  {$IFDEF WIN64}
-  Assert(FileExists('./quricol64.dll'),
-        'Debe existir el archivo quricol64.dll para la generación de CBB de los CFDI');
+    {$IFDEF WIN64}
+    Assert(FileExists('../GeneradorCBB/quricol64.dll'),
+          'Debe existir el archivo quricol64.dll para la generación de CBB de los CFDI');
+    {$ENDIF}
   {$ENDIF}
 
   Result := False;

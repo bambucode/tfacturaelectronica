@@ -38,6 +38,7 @@ uses
   GUITestRunner,
   TextTestRunner,
   TestSelloDigital in 'TestSelloDigital.pas',
+  TestCadenaOriginalDeTimbre in 'TestCadenaOriginalDeTimbre.pas',
   FacturaTipos in '..\FacturaTipos.pas',
   FacturaReglamentacion in '..\FacturaReglamentacion.pas',
   SelloDigital in '..\SelloDigital.pas',
@@ -59,7 +60,8 @@ uses
   TestComprobanteFiscalv32 in 'TestComprobanteFiscalv32.pas',
   UtileriasPruebas in 'UtileriasPruebas.pas',
   FacturacionHashes in '..\FacturacionHashes.pas',
-  FeTimbreFiscalDigital in '..\CFD\FeTimbreFiscalDigital.pas';
+  FeTimbreFiscalDigital in '..\CFD\FeTimbreFiscalDigital.pas',
+  CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas';
 
 {$R *.RES}
 
