@@ -1,6 +1,24 @@
+{******************************************************************************
+ PROYECTO FACTURACION ELECTRONICA
+ Copyright (C) 2010-2014 - Bambu Code SA de CV - Ing. Luis Carrasco
+
+ Clase usada para generar la Cadena Original del XML del Timbre Fiscal
+ recibido cuando se manda el comprobante a un PAC para su timbrado.
+
+ Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
+ http://bambucode.com/codigoabierto
+
+ La licencia de este codigo fuente se encuentra en:
+ http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
+ ******************************************************************************}
 unit CadenaOriginalTimbre;
 
 interface
+
+// Incluimos el recurso que guarda el archivo XSLT para cuando se compile
+// esta unidad en cualquier proyecto que la use, se incluya en el ejecutable
+// Ref: http://delphi.about.com/od/objectpascalide/a/embed_resources.htm
+{$R 'CadenaOriginalTimbre.res' 'CadenaOriginalTimbre.rc'}
 
 uses FacturaTipos,
      Classes,
@@ -19,12 +37,9 @@ type
   {$ENDREGION}
   TCadenaOriginalDeTimbre = class
   private
-    fFileXSLT: string;
-    fRecursoXSLT: TResourceStream;
     fXMLTimbre: TStringCadenaOriginal;
     fXSLT: string;
-    function LeerContenidoDeArchivo(sNombreArchivo: String): WideString;
-    procedure LoadStringListFromResource(const ResName: string;SL : TStringList);
+    function LeerXSLTDeRecurso(const aNombreRecurso: string): string;
   public
     constructor Create(const aXMLTimbre: WideString; const aRutaXSLT: WideString);
         overload;
@@ -35,34 +50,20 @@ implementation
 
 constructor TCadenaOriginalDeTimbre.Create(const aXMLTimbre: WideString; const
     aRutaXSLT: WideString);
-var
-  SL: TStringList;
 const
-   //http://delphi.about.com/od/objectpascalide/a/embed_resources.htm
   _NOMBRE_DEL_RECURSO_XSLT = 'CADENA_ORIGINAL_TFD_1_0';
 begin
-  try
-    // Obtenemos el archivo XSLT para transformar el XML del timbre a cadena original usando
-    // el XSLT proveido por el SAT de la direccion:
-    // ftp://ftp2.sat.gob.mx/asistencia_servicio_ftp/publicaciones/solcedi/cadenaoriginal_TFD_1_0.xslt
-    fRecursoXSLT := TResourceStream.Create(hInstance, _NOMBRE_DEL_RECURSO_XSLT, 'TEXT');
+  fXMLTimbre := aXMLTimbre;
 
-    fXMLTimbre := aXMLTimbre;
-    //fFileXSLT := aRutaXSLT;
-    //fXSLT := LeerContenidoDeArchivo(fFileXSLT);
+  // Obtenemos el archivo XSLT para transformar el XML del timbre a cadena original usando
+  // el XSLT proveido por el SAT de la direccion:
+  // ftp://ftp2.sat.gob.mx/asistencia_servicio_ftp/publicaciones/solcedi/cadenaoriginal_TFD_1_0.xslt
+  fXSLT := LeerXSLTDeRecurso(_NOMBRE_DEL_RECURSO_XSLT);
 
-    SL := TStringList.Create;
-    SL.LoadFromStream(fRecursoXSLT);
-
-    fXSLT := SL.Text;
-
-    Assert(fXMLTimbre <> '', 'El XML del timbre no debe ser vacio');
-    Assert(fXSLT <> '', 'El XSLT de transformacion del timbre no debe ser vacio');
-  finally
-    fRecursoXSLT.Free;
-    SL.Free;
-  end;
+  Assert(fXMLTimbre <> '', 'El XML del timbre no debe ser vacio');
+  Assert(fXSLT <> '', 'El XSLT de transformacion del timbre no debe ser vacio');
 end;
+
 
 function TCadenaOriginalDeTimbre.Generar: TStringCadenaOriginal;
 var
@@ -73,39 +74,28 @@ begin
   XML := LoadXMLData(fXMLTimbre);
   XSL := LoadXMLData(fXSLT);
 
+  // Transformamos el XML del timbre usando el XSLT proveido por el SAT
   XML.DocumentElement.TransformNode(XSL.DocumentElement, res);
 
-  // TODO: FACTURACION Refactorizar transformacion XSLT
-  // Fix temporal debido a que delphi no aplica correctamente las cadenas de inicio y terminacion
-  res := '|' + res + '||';
-
-  Result := res;
+  // Fix temporal debido a que por alguna razon el XSLT no aplica correctamente las cadenas de inicio y terminacion
+  Result := '|' + res + '||';
 end;
 
-function TCadenaOriginalDeTimbre.LeerContenidoDeArchivo(sNombreArchivo: String): WideString;
-var
-  slArchivo: TStrings;
-begin
-  slArchivo := TStringList.Create;
-  slArchivo.LoadFromFile(sNombreArchivo);
-  {$IF Compilerversion >= 20}
-  Result:=Trim(slArchivo.Text);
-  {$ELSE}
-  Result:=Trim(UTF8Encode(slArchivo.Text));
-  {$IFEND}
-  FreeAndNil(slArchivo);
-end;
 
-procedure TCadenaOriginalDeTimbre.LoadStringListFromResource(const ResName: string; SL : TStringList);
+function TCadenaOriginalDeTimbre.LeerXSLTDeRecurso(const aNombreRecurso:
+    string): string;
 var
   RS: TResourceStream;
+  sl: TStringList;
 begin
-  RS := TResourceStream.Create(HInstance, ResName, 'TEXT');
+  RS := TResourceStream.Create(HInstance, aNombreRecurso, 'TEXT');
   try
     SL := TStringList.Create;
     SL.LoadFromStream(RS);
+    Result := sl.Text;
   finally
     RS.Free;
+    sl.Free;
   end;
 end;
 
