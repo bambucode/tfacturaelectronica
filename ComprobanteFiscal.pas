@@ -352,10 +352,9 @@ begin
   begin
     Assert(fTimbre.XML <> '', 'El contenido del timbre fue vacio');
     try
-       {generadorCadenaOriginalTimbre := TCadenaOriginalDeTimbre.Create(fTimbre.XML, '');
+       generadorCadenaOriginalTimbre := TCadenaOriginalDeTimbre.Create(fTimbre.XML, '');
        // Calculamos la cadena y la regresamos
-       Result := generadorCadenaOriginalTimbre.Generar;  }
-       Result := '||Cadena||'
+       Result := generadorCadenaOriginalTimbre.Generar;
     finally
        generadorCadenaOriginalTimbre.Free;
     end;
