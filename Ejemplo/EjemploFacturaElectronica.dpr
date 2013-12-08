@@ -17,10 +17,7 @@ program EjemploFacturaElectronica;
 
 {$APPTYPE CONSOLE}
 {.$DEFINE CODESITE}
-
-{$R 'CadenaOriginalTimbre.res' '..\CadenaOriginalTimbre.rc'}
-{$R *.dres}
-
+
 uses
   SysUtils,
   ActiveX,
@@ -72,8 +69,7 @@ var
    Concepto1, Concepto2 : TFEConcepto;
    generadorCBB: TGeneradorCBB;
    CredencialesPAC: TFEPACCredenciales;
-   lCadenaOriginalTimbre: TStringCadenaOriginal;
-   generadorCadenaOriginalTimbre: TCadenaOriginalDeTimbre;
+
    function GetDesktopFolder: string;
    var
      buf: array[0..255] of char;
@@ -250,13 +246,13 @@ begin
                                    TimbreDeFactura.UUID,
                                    rutaImagenCBB);
 
+        generadorCBB.Free;
         // Para la representación gráfica necesitamos la Cadena Original del Timbre, la obtenemos de la siguiente
         // manera:
         Writeln('Cadena Original del Timbre Fiscal:');
         Writeln(Factura.CadenaOriginalTimbre);
       finally
         ProveedorTimbrado.Free;
-        generadorCBB.Free;
       end;
 
       // Finalmente ya que la factura fue timbrada mandamos guardar la factura
