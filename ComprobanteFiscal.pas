@@ -683,9 +683,6 @@ begin
 
   // Asignamos el timbre a la estructura interna del mismo
   fTimbre := aTimbre;
-
-  // Lo agregamos al XML interno
-  //AgregarTimbreFiscalAlXML;
 end;
 
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);

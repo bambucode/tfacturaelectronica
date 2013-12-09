@@ -15,10 +15,12 @@ interface
 
 uses FacturaTipos,
      ComprobanteFiscal,
+     Classes,
      SysUtils;
 
 function LeerXMLDePruebaEnComprobante(DeArchivoXML: String; Certificado: TFECertificado;
                                       var ComprobanteDestino: TFEComprobanteFiscal): String;
+function leerArchivoEnUTF8(const aArchivo: String): WideString;
 
 implementation
 
@@ -30,6 +32,23 @@ uses FeTimbreFiscalDigital,
      FeCFDv2,
      FeCFDv22,
      FeCFDv32;
+
+// Creamos una rutina especial para leer el archivo de cadena original de ejemplo
+  // ya que viene en UTF8 y tiene que ser leida como tal para poder compararla
+function leerArchivoEnUTF8(const aArchivo: String): WideString;
+var
+  slArchivo: TStrings;
+begin
+  Assert(FileExists(aArchivo), 'No existe el archivo a leer');
+  slArchivo := TStringList.Create;
+  slArchivo.LoadFromFile(aArchivo);
+  {$IF Compilerversion >= 20}
+  Result:=Trim((slArchivo.Text));
+  {$ELSE}
+  Result:=Trim(UTF8Encode(slArchivo.Text));
+  {$IFEND}
+  FreeAndNil(slArchivo);
+end;
 
 // Funcion comun para generar el comprobante fiscal con los mismos datos
 // que el XML especificado como parametro, regresa el Sello
@@ -413,6 +432,8 @@ begin
 
         // Agregamos el timbre al CFD
         ComprobanteDestino.AsignarTimbreFiscal(timbreComprobante);
+        // Obtenemos el XML para forzar que se asigne el XML del timbre
+        ComprobanteDestino.XML;
       except
         On E:Exception do
           raise;
