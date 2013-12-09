@@ -17,7 +17,7 @@ program EjemploFacturaElectronica;
 
 {$APPTYPE CONSOLE}
 {.$DEFINE CODESITE}
-
+
 uses
   SysUtils,
   ActiveX,
@@ -48,9 +48,6 @@ uses
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
   FacturacionHashes in '..\FacturacionHashes.pas',
   PACEcodex in '..\PACs\Ecodex\PACEcodex.pas',
-  {$IFDEF CODESITE}
-  CodeSiteLogging,
-  {$ENDIF}
   PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas',
   PACEjemplo in '..\PACs\Ejemplo\PACEjemplo.pas',
   GeneradorCBB in '..\GeneradorCBB\GeneradorCBB.pas',
@@ -58,7 +55,8 @@ uses
   QuricolCode in '..\GeneradorCBB\QuricolCode.pas',
   FinkOkWsTimbrado in '..\PACs\FinkOk\FinkOkWsTimbrado.pas',
   PACFinkOk in '..\PACs\FinkOk\PACFinkOk.pas',
-  FECancelaComercioDigital in '..\PACs\ComercioDigital\FECancelaComercioDigital.pas';
+  FECancelaComercioDigital in '..\PACs\ComercioDigital\FECancelaComercioDigital.pas',
+  CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
@@ -71,6 +69,7 @@ var
    Concepto1, Concepto2 : TFEConcepto;
    generadorCBB: TGeneradorCBB;
    CredencialesPAC: TFEPACCredenciales;
+
    function GetDesktopFolder: string;
    var
      buf: array[0..255] of char;
@@ -84,8 +83,6 @@ var
    end;
 
 begin
-
-
   // Checamos la presencia de archivos necesarios para el ejemplo
   if Not FileExists('./libeay32.dll') then
   begin
@@ -102,7 +99,7 @@ begin
   end;
 
   // Checamos la presencia del DLL de la libreria para generacion de CBB
-  if Not FileExists('./quricol32.dll') then
+  if Not FileExists('../GeneradorCBB/quricol32.dll') then
   begin
     WriteLn('Favor de copiar el archivo quricol32.dll de la subcarpeta \GeneradorCBB a la carpeta donde esta el ejecutable');
     Readln;
@@ -228,10 +225,8 @@ begin
 
         // Este es el "ID de Integrador" de pruebas de Ecodex
         CredencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
-
         // Asignamos nuestras credenciales de acceso con el PAC
         ProveedorTimbrado.AsignarCredenciales(CredencialesPAC);
-
         // Mandamos timbrar el documento al PAC
         TimbreDeFactura := ProveedorTimbrado.TimbrarDocumento(Factura.XML);
 
@@ -239,7 +234,12 @@ begin
         WriteLn('Asignando timbre a factura para generar CFDI');
         Factura.AsignarTimbreFiscal(TimbreDeFactura);
 
-        // Ahora generamos el CBB del CFDI
+        // Guardamos la factura una vez timbrada
+        Factura.Guardar(archivoFacturaXML);
+
+        // *********** PARA LA REPRESENTACION GRAFICA ***********
+
+        // Generamos el CBB del CFDI
         generadorCBB := TGeneradorCBB.Create;
 
         // Generamos el CBB que por default se genera de 1200x1200px para que tenga la resolucion necesaria
@@ -249,13 +249,14 @@ begin
                                    TimbreDeFactura.UUID,
                                    rutaImagenCBB);
 
+        generadorCBB.Free;
+
+        // Generamos la Cadena Original del Timbre:
+        Writeln('Cadena Original del Timbre Fiscal:');
+        Writeln(Factura.CadenaOriginalTimbre);
       finally
         ProveedorTimbrado.Free;
-        generadorCBB.Free;
       end;
-
-      // Finalmente ya que la factura fue timbrada mandamos guardar la factura
-      Factura.Guardar(archivoFacturaXML);
 
       FreeAndNil(Factura);
       WriteLn('CFDI generado con éxito en ' + archivoFacturaXML + '. Presiona cualquier tecla para salir');

@@ -1,3 +1,16 @@
+{******************************************************************************
+ PROYECTO FACTURACION ELECTRONICA
+ Copyright (C) 2010-2014 - Bambu Code SA de CV - Ing. Luis Carrasco
+
+ Clase usada para generar la Cadena Original del XML del comprobante y que nos
+ servirá para calcular el sello digital
+
+ Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
+ http://bambucode.com/codigoabierto
+
+ La licencia de este codigo fuente se encuentra en:
+ http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
+ ******************************************************************************}
 unit CadenaOriginal;
 
 interface

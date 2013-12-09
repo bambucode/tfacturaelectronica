@@ -25,6 +25,7 @@ type
     procedure SetUp; override;
     procedure TearDown; override;
   published
+    procedure CadenaOriginalDeTimbre_DeComprobanteV32_SeaCorrecta;
     procedure Create_NuevoComprobantev32_GenereEstructuraXMLBasica;
     procedure SelloDigital_DeMilConceptos_SeaCorrecto;
     procedure CadenaOriginal_DeComprobanteV32_SeaCorrecta;
@@ -43,6 +44,31 @@ uses
   FacturacionHashes,
   FacturaReglamentacion,
   UtileriasPruebas;
+
+procedure
+    TestTFEComprobanteFiscalV32.CadenaOriginalDeTimbre_DeComprobanteV32_SeaCorrecta;
+var
+  Certificado: TFECertificado;
+  cadenaOriginalDeTimbreEsperada: TStringCadenaOriginal;
+begin
+  ConfigurarCertificadoDePrueba(Certificado);
+  cadenaOriginalDeTimbreEsperada := leerArchivoEnUTF8(fRutaFixtures + 'comprobante_fiscal/v32/factura_cadena_original_de_timbre.txt');
+
+  // Llenamos el comprobante fiscal con datos usados para generar la factura
+  LeerXMLDePruebaEnComprobante(fRutaFixtures + 'comprobante_fiscal/v32/comprobante_timbrado.xml',
+                               Certificado,
+                               fComprobanteFiscalv32);
+
+  // Quitamos la cadena original y sellos del XML para re-calcularlos
+  fComprobanteFiscalv32.FacturaGenerada:=False;
+  fComprobanteFiscalv32.fCadenaOriginalCalculada:='';
+  fComprobanteFiscalv32.fSelloDigitalCalculado:='';
+
+  // Comparamos el resultado del metodo de la clase con el del archivo codificado con la funcion
+  CheckEquals(cadenaOriginalDeTimbreEsperada,
+             fComprobanteFiscalv32.CadenaOriginalTimbre,
+             'La cadena original del timbre no fue generada correctamente');
+end;
 
 procedure TestTFEComprobanteFiscalV32.SetUp;
 begin
@@ -68,26 +94,9 @@ var
   sCadenaOriginalCorrecta: TStringCadenaOriginal;
   Certificado: TFECertificado;
 
-  // Creamos una rutina especial para leer el archivo de cadena original de ejemplo
-  // ya que viene en UTF8 y tiene que ser leida como tal para poder compararla
-  function leerArchivoEnUTF8(sNombreFixture: String): WideString;
-  var
-    slArchivo: TStrings;
-  begin
-    Assert(FileExists(fRutaFixtures + sNombreFixture), 'No existe el archivo a leer');
-    slArchivo := TStringList.Create;
-    slArchivo.LoadFromFile(fRutaFixtures + sNombreFixture);
-    {$IF Compilerversion >= 20}
-    Result:=Trim((slArchivo.Text));
-    {$ELSE}
-    Result:=Trim(UTF8Encode(slArchivo.Text));
-    {$IFEND}
-    FreeAndNil(slArchivo);
-  end;
-
 begin
   // Leemos la cadena original generada de ejemplo generada previamente con otra aplicacion
-  sCadenaOriginalCorrecta := leerArchivoEnUTF8('comprobante_fiscal/v32/factura_cadena_original_utf8.txt');
+  sCadenaOriginalCorrecta := leerArchivoEnUTF8(fRutaFixtures + 'comprobante_fiscal/v32/factura_cadena_original_utf8.txt');
   ConfigurarCertificadoDePrueba(Certificado);
 
   // Llenamos el comprobante fiscal con datos usados para generar la factura

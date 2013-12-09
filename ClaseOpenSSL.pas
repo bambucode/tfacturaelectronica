@@ -93,6 +93,27 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
         /// <param name="sArchivo">Ruta completa del archivo de certificado (extension .cer)</param>
         function ObtenerCertificado(sArchivo: String) : TX509Certificate;
         destructor Destroy; override;
+
+        {$REGION 'Documentation'}
+        ///	<summary>
+        ///	  <para>
+        ///	    Se encarga de guardar la llave privada (previamente
+        ///	    desencriptada usando el metodo AbrirLlavePrivada) a formato
+        ///	    Base64 (PEM).
+        ///	  </para>
+        ///	  <para>
+        ///	    Funcion necesaria para el timbrado/cancelacion de algunos PACs.
+        ///	  </para>
+        ///	</summary>
+        ///	<param name="aLlaveAbierta">
+        ///	  Llave previamente abierta
+        ///	</param>
+        ///	<param name="aArchivoDestino">
+        ///	  Ruta del archivo .PEM a guardar
+        ///	</param>
+        {$ENDREGION}
+        procedure GuardarLlavePrivadaEnPEM(const aLlaveAbierta: pPKCS8_Priv_Key_Info;
+            const aArchivoDestino: String);
     end;
 
 implementation
@@ -171,6 +192,21 @@ begin
   {$WARNINGS ON}
 end;
 
+procedure TOpenSSL.GuardarLlavePrivadaEnPEM(const aLlaveAbierta:
+    pPKCS8_Priv_Key_Info; const aArchivoDestino: String);
+var
+  archivoPEM: pEVP_PKEY;
+  bioArchivoPEM: pBIO;
+begin
+  bioArchivoPEM := BIO_new(BIO_s_file());
+  if BIO_write_filename(bioArchivoPEM, ToChar(aArchivoDestino)) = 0 then
+    raise Exception.Create('Error al intentar guardar llave privada en formato PEM:' + ObtenerUltimoMensajeDeError())
+  else
+  begin
+    PEM_write_bio_PKCS8_PRIV_KEY_INFO(bioArchivoPEM, aLlaveAbierta);
+    BIO_free(bioArchivoPEM);
+  end;
+end;
 
 function TOpenSSL.AbrirLlavePrivada(Ruta, ClaveLlavePrivada : String) : pPKCS8_Priv_Key_Info;
 var
@@ -251,8 +287,7 @@ begin
               raise TCertificadoLlaveEsFiel.Create('El certificado (archivo de llave) pertenece a la FIEL. + '
               'Use el certificado de Llave Privada')
            else}
-        end else
-
+        end;
     finally
         // Liberamos las variables usadas en memoria
         X509_SIG_free(p8);
@@ -262,6 +297,7 @@ begin
 
     Result:=p8inf;
 end;
+
 
 // Metodo creado por Luis Carrasco (luis@bambucode.com) con ayuda de
 // Marco Ferrante <marco@csita.unige.it>

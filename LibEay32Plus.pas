@@ -55,6 +55,8 @@ function d2i_PKCS8_bio(bp: pBIO; p8: pX509_SIG) : pX509_SIG; cdecl;
 procedure X509_SIG_free(a : pX509_SIG); cdecl;
 function EVP_PKCS82PKEY(p8 : pPKCS8_Priv_Key_Info) : pEVP_PKEY; cdecl;
 function PKCS8_decrypt(p8: pX509_SIG; Pass: PCharacter; PassLen: integer): pPKCS8_Priv_Key_Info; cdecl;
+// Funcion usada para guardar la llave privada en formato base64 (PEM)
+function PEM_write_bio_PKCS8_PRIV_KEY_INFO(p8 : pPKCS8_Priv_Key_Info; bp: pBIO): Integer; cdecl;
 function d2i_PKCS8_PRIV_KEY_INFO(var a: pPKCS8_Priv_Key_Info; pp: PCharacter; Length: LongInt): pPKCS8_Priv_Key_Info; cdecl;
 procedure PKCS8_PRIV_KEY_INFO_free(var a: pPKCS8_Priv_Key_Info); cdecl;
 // Funciones para obtener datos del certificado
@@ -76,6 +78,7 @@ function EVP_PKCS82PKEY; external LIBEAY_DLL_NAME;
 function d2i_PKCS8_PRIV_KEY_INFO; external LIBEAY_DLL_NAME;
 procedure PKCS8_PRIV_KEY_INFO_free; external LIBEAY_DLL_NAME;
 function PKCS8_decrypt; external LIBEAY_DLL_NAME;
+function PEM_write_bio_PKCS8_PRIV_KEY_INFO; external LIBEAY_DLL_NAME;
 
 {$IF CompilerVersion >= 20}
     function toPCharacter(Str: String) : PCharacter;

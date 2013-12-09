@@ -24,6 +24,7 @@ uses FacturaTipos, ComprobanteFiscal;
 type
 
 TOnComprobanteGenerado = procedure(Sender: TObject) of Object;
+TOnComprobanteTimbrado = procedure(Sender: TObject) of Object;
 
 ///<summary>Representa una factura electronica sus metodos para generarla, leerla y validarla
 /// cumpliendo la ley del Codigo Fiscal de la Federacion (CFF) Articulos 29 y 29-A.
@@ -35,8 +36,11 @@ TFacturaElectronica = class(TFEComprobanteFiscal)
   private
 {$ENDIF}
   fComprobanteGenerado : Boolean;
+  fOnComprobanteTimbrado : TOnComprobanteTimbrado;
   fOnComprobanteGenerado: TOnComprobanteGenerado;
+  function GetonComprobanteTimbrado: TOnComprobanteTimbrado;
   function obtenerCertificado() : TFECertificado;
+  procedure SetonComprobanteTimbrado(const Value: TOnComprobanteTimbrado);
 public
   property FechaGeneracion;
   property FacturaGenerada;
@@ -45,6 +49,8 @@ public
   property Conceptos;
   property ImpuestosRetenidos;
   property ImpuestosTrasladados;
+  property onComprobanteTimbrado: TOnComprobanteTimbrado read
+      GetonComprobanteTimbrado write SetonComprobanteTimbrado;
 public
   /// <summary>Evento que es llamado inemdiatamente después de que el CFD fue generado,
   /// el cual puede ser usado para registrar en su sistema contable el registro de la factura
@@ -65,6 +71,7 @@ public
   procedure GenerarYGuardar(iFolio: Integer; fpFormaDePago: TFEFormaDePago; sArchivo: String); deprecated;
   procedure Generar(const aFolio: Integer; aFormaDePago: TFEFormaDePago);
   procedure Guardar(const aArchivoDestino: String);
+  procedure AsignarTimbreFiscal(const aTimbre: TFETimbre); override;
 published
   constructor Create; overload;
 end;
@@ -152,6 +159,26 @@ procedure TFacturaElectronica.GenerarYGuardar(iFolio: Integer; fpFormaDePago: TF
 begin
      Generar(iFolio, fpFormaDePago);
      Guardar(sArchivo);
+end;
+
+procedure TFacturaElectronica.AsignarTimbreFiscal(const aTimbre: TFETimbre);
+begin
+  inherited AsignarTimbreFiscal(aTimbre);
+
+  // Mandamos llamar el evento de que se asigno el timbrado
+  if Assigned(fOnComprobanteTimbrado) then
+    fOnComprobanteTimbrado(Self);
+end;
+
+function TFacturaElectronica.GetonComprobanteTimbrado: TOnComprobanteTimbrado;
+begin
+  Result := fOnComprobanteTimbrado;
+end;
+
+procedure TFacturaElectronica.SetonComprobanteTimbrado(const Value:
+    TOnComprobanteTimbrado);
+begin
+  fOnComprobanteTimbrado := Value;
 end;
 
 
