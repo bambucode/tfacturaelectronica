@@ -81,8 +81,6 @@ var
       if (SHGetPathFromIDList(pidList, buf)) then
         Result := buf;
    end;
-const
-  _RUTA_XSLT = '../XSLT/cadenaoriginal_TFD_1_0.xslt';
 
 begin
   // Checamos la presencia de archivos necesarios para el ejemplo
@@ -236,7 +234,12 @@ begin
         WriteLn('Asignando timbre a factura para generar CFDI');
         Factura.AsignarTimbreFiscal(TimbreDeFactura);
 
-        // Ahora generamos el CBB del CFDI
+        // Guardamos la factura una vez timbrada
+        Factura.Guardar(archivoFacturaXML);
+
+        // *********** PARA LA REPRESENTACION GRAFICA ***********
+
+        // Generamos el CBB del CFDI
         generadorCBB := TGeneradorCBB.Create;
 
         // Generamos el CBB que por default se genera de 1200x1200px para que tenga la resolucion necesaria
@@ -247,16 +250,13 @@ begin
                                    rutaImagenCBB);
 
         generadorCBB.Free;
-        // Para la representación gráfica necesitamos la Cadena Original del Timbre, la obtenemos de la siguiente
-        // manera:
+
+        // Generamos la Cadena Original del Timbre:
         Writeln('Cadena Original del Timbre Fiscal:');
         Writeln(Factura.CadenaOriginalTimbre);
       finally
         ProveedorTimbrado.Free;
       end;
-
-      // Finalmente ya que la factura fue timbrada mandamos guardar la factura
-      Factura.Guardar(archivoFacturaXML);
 
       FreeAndNil(Factura);
       WriteLn('CFDI generado con éxito en ' + archivoFacturaXML + '. Presiona cualquier tecla para salir');
