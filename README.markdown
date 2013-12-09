@@ -1,4 +1,4 @@
-﻿TFACTURACIONELECTRONICA v3.2 (Beta)     
+﻿TFACTURACIONELECTRONICA v1.0 (Beta) - Con soporte para CFD 2.2 y CFDI 3.2     
 =====================================
 Esta es una librería que sirve para generar una factura electrónica de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
@@ -50,7 +50,7 @@ Si te interesa contribuir en mejorar, extender o corregir esta librería para el
 
 Soporte Técnico
 ------------
-El soporte es limitado y por la misma razón la librería es de código abierto, para que puedas estudiarla, mejorarla y corregirla en donde encuentres alguna falla. Si encuentras alguna falla favor de reportarla en esta página en la sección de "Issues" para que otros usuarios puedan colaborar y encontrar una solución como comunidad.
+El soporte es limitado y por la misma razón la librería es de código abierto, para que puedas estudiarla, mejorarla y corregirla en donde encuentres alguna falla. Si encuentras alguna falla favor de reportarla en esta página en la sección de "Issues" para que otros usuarios puedan colaborar y encontrar una solución como comunidad, te agradecemos intentes corregir cualquier problema primero antes de reportarlo para al menos saber que has intentado solucionarlo por tu cuenta.
 
 Notas adicionales
 ------------
