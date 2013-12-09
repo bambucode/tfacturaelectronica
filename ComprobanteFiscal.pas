@@ -685,7 +685,7 @@ begin
   fTimbre := aTimbre;
 
   // Lo agregamos al XML interno
-  AgregarTimbreFiscalAlXML;
+  //AgregarTimbreFiscalAlXML;
 end;
 
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
@@ -1598,11 +1598,13 @@ end;
 // Regresa el XML final del comprobante ya lleno
 function TFEComprobanteFiscal.getXML: WideString;
 begin
-    // Checamos si ya fue generada previamente la factura
-    if FacturaGenerada = True then
-        Result:=fDocumentoXML.XML.Text
-    else
-        Raise Exception.Create('No se puede obtener el XML cuando aún no se ha generado el archivo CFD');
+  GenerarComprobante;
+
+  // Checamos si ya fue generada previamente la factura
+  if FacturaGenerada = True then
+      Result:=fDocumentoXML.XML.Text
+  else
+      Raise Exception.Create('No se puede obtener el XML cuando aún no se ha generado el archivo CFD');
 end;
 
 procedure TFEComprobanteFiscal.ValidarCamposEmisor;
