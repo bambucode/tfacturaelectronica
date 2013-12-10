@@ -49,7 +49,7 @@ type
   fManejadorDeSesion : TEcodexManejadorDeSesion;
   function AsignarTimbreDeRespuestaDeEcodex(const aRespuestaTimbrado:
       TEcodexRespuestaTimbrado): TFETimbre;
-  procedure ProcesarCodigoDeError(aRespuestaDePAC: String);
+  procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
   function getNombre() : string; override;
 public
   destructor Destroy(); override;
@@ -147,60 +147,79 @@ begin
   Result.XML := nodoXMLTimbre.XML;
 end;
 
-procedure TPACEcodex.ProcesarCodigoDeError(aRespuestaDePAC: String);
+procedure TPACEcodex.ProcesarExcepcionDePAC(const aExcepcion: Exception);
+var
+  mensajeExcepcion: string;
 const
   _ECODEX_FUERA_DE_SERVICIO = '(22)';
   _ECODEX_VERSION_NO_SOPORTADA = 'El driver no soporta esta version de cfdi';
   // Algunos errores no regresan código de error, los buscamos por cadena completa
   _ECODEX_RFC_NO_CORRESPONDE = 'El rfc del Documento no corresponde al del encabezado';
-const
   _NO_ECONTRADO = 0;
 begin
-  if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise EPACServicioNoDisponibleException.Create(aRespuestaDePAC);
+  mensajeExcepcion := aExcepcion.Message;
 
-  if AnsiPos(_ERROR_SAT_XML_INVALIDO, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoXMLInvalidoException.Create(aRespuestaDePAC);
+  if (aExcepcion Is EEcodexFallaValidacionException) Or (aExcepcion Is EEcodexFallaServicioException) then
+  begin
+      if (aExcepcion Is EEcodexFallaValidacionException)  then
+      begin
+        mensajeExcepcion := 'EFallaValidacionException (' + IntToStr(EEcodexFallaValidacionException(aExcepcion).Numero) + ') ' +
+                        EEcodexFallaValidacionException(aExcepcion).Descripcion;
+      end;
 
-  if AnsiPos(_ERROR_SAT_SELLO_EMISOR_INVALIDO, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoSelloEmisorInvalidoException.Create(aRespuestaDePAC);
+      if (aExcepcion Is EEcodexFallaServicioException)  then
+      begin
+        mensajeExcepcion := 'EFallaServicioException (' + IntToStr(EEcodexFallaServicioException(aExcepcion).Numero) + ') ' +
+                        EEcodexFallaServicioException(aExcepcion).Descripcion;
+      end;
+  end;
 
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoCertificadoNoCorrespondeException.Create(aRespuestaDePAC);
+  if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise EPACServicioNoDisponibleException.Create(mensajeExcepcion, 0, True);
 
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_REVOCADO, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoCertificadoRevocadoException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_XML_INVALIDO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise  ETimbradoXMLInvalidoException.Create(mensajeExcepcion, 301, False);
 
-  if AnsiPos(_ERROR_SAT_FECHA_EMISION_SIN_VIGENCIA, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoFechaEmisionSinVigenciaException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_SELLO_EMISOR_INVALIDO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoSelloEmisorInvalidoException.Create(mensajeExcepcion, 302, False);
 
-  if AnsiPos(_ERROR_SAT_LLAVE_NO_CORRESPONDE, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoLlaveInvalidaException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoCertificadoNoCorrespondeException.Create(mensajeExcepcion, 303, False);
 
-  if AnsiPos(_ERROR_SAT_PREVIAMENTE_TIMBRADO, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoPreviamenteException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_CERTIFICADO_REVOCADO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoCertificadoRevocadoException.Create(mensajeExcepcion, 304, False);
 
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_FIRMADO_POR_SAT, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoCertificadoApocrifoException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_FECHA_EMISION_SIN_VIGENCIA, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoFechaEmisionSinVigenciaException.Create(mensajeExcepcion, 305, False);
 
-  if AnsiPos(_ERROR_SAT_FECHA_FUERA_DE_RANGO, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoFechaGeneracionMasDe72HorasException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_LLAVE_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoLlaveInvalidaException.Create(mensajeExcepcion, 306, False);
 
-  if AnsiPos(_ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoRegimenEmisorNoValidoException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_PREVIAMENTE_TIMBRADO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoPreviamenteException.Create(mensajeExcepcion, 307, False);
 
-  if AnsiPos(_ERROR_SAT_FECHA_EMISION_EN_EL_PASADO, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoFechaEnElPasadoException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_FIRMADO_POR_SAT, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoCertificadoApocrifoException.Create(mensajeExcepcion, 308, False);
 
-  if AnsiPos(_ECODEX_RFC_NO_CORRESPONDE, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoRFCNoCorrespondeException.Create('El RFC del documento y el del emisor no corresponden');
+  if AnsiPos(_ERROR_SAT_FECHA_FUERA_DE_RANGO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoFechaGeneracionMasDe72HorasException.Create(mensajeExcepcion, 401, False);
 
-  if AnsiPos(_ECODEX_VERSION_NO_SOPORTADA, aRespuestaDePAC) > _NO_ECONTRADO then
-    raise ETimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
-                                                             aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoRegimenEmisorNoValidoException.Create(mensajeExcepcion, 402, False);
+
+  if AnsiPos(_ERROR_SAT_FECHA_EMISION_EN_EL_PASADO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoFechaEnElPasadoException.Create(mensajeExcepcion, 403, False);
+
+  if AnsiPos(_ECODEX_RFC_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
+    raise EPACTimbradoRFCNoCorrespondeException.Create('El RFC del documento y el del emisor no corresponden', 0, False);
+
+  if AnsiPos(_ECODEX_VERSION_NO_SOPORTADA, mensajeExcepcion) > _NO_ECONTRADO then
+    raise EPACTimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
+                                                              mensajeExcepcion, 0, False);
 
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
-  raise ETimbradoErrorGenericoException.Create(aRespuestaDePAC);
+  // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
+  raise ETimbradoErrorGenericoException.Create(mensajeExcepcion, 0, True);
 end;
 
 function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre;
@@ -230,35 +249,15 @@ begin
       respuestaTimbrado := wsTimbradoEcodex.TimbraXML(solicitudTimbrado);
 
       // 4. Extraemos las propiedades del timbre de la respuesta del WebService
-      Result := AsignarTimbreDeRespuestaDeEcodex(respuestaTimbrado)
+      Result := AsignarTimbreDeRespuestaDeEcodex(respuestaTimbrado);
+      respuestaTimbrado.Free;
     except
       On E:Exception do
-      begin
-        mensajeFalla := E.Message;
-
-        if (E Is EEcodexFallaValidacionException) Or (E Is EEcodexFallaServicioException) then
-        begin
-            if (E Is EEcodexFallaValidacionException)  then
-            begin
-              mensajeFalla := 'EFallaValidacionException (' + IntToStr(EEcodexFallaValidacionException(E).Numero) + ') ' +
-                              EEcodexFallaValidacionException(E).Descripcion;
-            end;
-
-            if (E Is EEcodexFallaServicioException)  then
-            begin
-              mensajeFalla := 'EFallaServicioException (' + IntToStr(EEcodexFallaServicioException(E).Numero) + ') ' +
-                              EEcodexFallaServicioException(E).Descripcion;
-            end;
-        end;
-      end;
+        ProcesarExcepcionDePAC(E);
     end;
-
-    // Checamos si tuvimos algun mensaje de falla para lanzar nuestras propias excepciones
-    if (mensajeFalla <> '') then
-       ProcesarCodigoDeError(mensajeFalla);
   finally
-    respuestaTimbrado.Free;
-    solicitudTimbrado.Free;
+    if Assigned(solicitudTimbrado) then
+      solicitudTimbrado.Free;
   end;
 end;
 
@@ -297,18 +296,14 @@ begin
       respuestaCancelacion := wsTimbradoEcodex.CancelaTimbrado(solicitudCancelacion);
 
       Result := respuestaCancelacion.Cancelada;
+      respuestaCancelacion.Free;
     except
-      On E: Exception do
-      begin
-         mensajeFalla := E.Message;
-      end;
+      On E:Exception do
+        ProcesarExcepcionDePAC(E);
     end;
-
-     if (mensajeFalla <> '') then
-         ProcesarCodigoDeError(mensajeFalla);
   finally
-    solicitudCancelacion.Free;
-    respuestaCancelacion.Free;
+    if Assigned(solicitudCancelacion) then
+      solicitudCancelacion.Free;
   end;
 end;
 

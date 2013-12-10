@@ -170,7 +170,7 @@ begin
     // Mandamos timbrar
     cutPACEcodex.TimbrarDocumento(fDocumentoDePrueba);
   except
-    On E:ETimbradoRFCNoCorrespondeException do
+    On E:EPACTimbradoRFCNoCorrespondeException do
     begin
        excepcionLanzada := True;
     end;
