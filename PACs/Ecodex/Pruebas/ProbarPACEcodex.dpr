@@ -61,7 +61,9 @@ uses
   OpenSSLUtils in '..\..\..\OpenSSLUtils.pas',
   SelloDigital in '..\..\..\SelloDigital.pas',
   CadenaOriginal in '..\..\..\CadenaOriginal.pas',
-  ComprobanteFiscal in '..\..\..\ComprobanteFiscal.pas';
+  ComprobanteFiscal in '..\..\..\ComprobanteFiscal.pas',
+  EcodexWsClientes in '..\EcodexWsClientes.pas',
+  EcodexWsComun in '..\EcodexWsComun.pas';
 
 {$R *.RES}
 
