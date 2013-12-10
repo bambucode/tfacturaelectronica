@@ -34,6 +34,7 @@ type
     procedure SetUp; override;
     procedure TearDown; override;
   published
+    procedure AgregaCliente_NuevoEmisor_GuardeClienteCorrectamente;
     procedure CancelarDocumento_Documento_CanceleCorrectamente;
     procedure TimbrarDocumento_ConRFCIncorrecto_CauseExcepcionDeRFC;
     procedure TimbrarDocumento_ConXMLMalformado_CauseExcepcion;
@@ -49,10 +50,11 @@ uses
   System.DateUtils,
   FacturaElectronica;
 
+
 procedure TestTPACEcodex.SetUp;
 begin
   inherited;
-  cutPACEcodex := TPACEcodex.Create;
+  cutPACEcodex := TPACEcodex.Create('https://pruebas.ecodex.com.mx:2045');
 
   // Definimos el directorio donde estan los archivos de prueba
   fDirectorioFixtures := ExtractFilePath(Application.ExeName) + '..\..\Fixtures\';
@@ -71,7 +73,6 @@ procedure TestTPACEcodex.TearDown;
 begin
   FreeAndNil(cutPACEcodex);
 end;
-
 
 function TestTPACEcodex.ObtenerNuevaFacturaATimbrar(const aFechaGeneracion:
     TDateTime = 0): WideString;
@@ -134,6 +135,22 @@ begin
   Factura.Generar(Random(999999), fpUnaSolaExhibicion);
 
   Result := Factura.XML;
+end;
+
+procedure TestTPACEcodex.AgregaCliente_NuevoEmisor_GuardeClienteCorrectamente;
+var
+  nuevoEmisor: TFEContribuyente;
+  respuestaAltaEmisor: Boolean;
+begin
+  nuevoEmisor.Nombre := 'Mi empresa de prueba SA de CV';
+  nuevoEmisor.RFC := 'SUL010720JN8';
+  nuevoEmisor.CorreoElectronico := 'test@test.com';
+
+  respuestaAltaEmisor := cutPACEcodex.AgregaCliente(nuevoEmisor, fCredencialesDePrueba.RFC);
+
+  CheckEquals(True,
+              respuestaAltaEmisor,
+              'No se dio de alta al nuevo emisor correctamente');
 end;
 
 procedure TestTPACEcodex.CancelarDocumento_Documento_CanceleCorrectamente;

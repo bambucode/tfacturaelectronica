@@ -39,12 +39,13 @@ TTipoComprobanteXML = String;
   function getNombre() : String; virtual; abstract;
  public
   property Nombre : String read getNombre;
+  constructor Create(const aDominioWebService : String); virtual; abstract;
   procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); virtual; abstract;
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; virtual; abstract;
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; virtual; abstract;
-  Function AgregaCliente(const aRFC: String):String; virtual; abstract;
-  Function EditaCliente(const Activar: Boolean;const aRFC:String):String; virtual; abstract;
-  Function BorraCliente(const aRFC: String):String; virtual; abstract;
+  function AgregaCliente(const aNuevoEmisor: TFEContribuyente; const aRFCIntegrador: string): Boolean; virtual; abstract;
+  function EditaCliente(const Activar: Boolean;const aRFC:String):String; virtual; abstract;
+  function BorraCliente(const aRFC: String):String; virtual; abstract;
  end;
 
 implementation

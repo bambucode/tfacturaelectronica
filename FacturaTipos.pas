@@ -75,6 +75,8 @@ TFEContribuyente = record
   ExpedidoEn: TFEExpedidoEn;
   // Un contribuyente puede tener muchos regímenes fiscales
   Regimenes : TFERegimenes;
+  // Atributo opcional para almacenar el correo del contribuyente
+  CorreoElectronico : String;
 end;
 
 // Pre-definimos los tipos de contribuyentes de Publico en General y Extranjero
@@ -258,7 +260,7 @@ EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
 ///	  </note>
 ///	</remarks>
 {$ENDREGION}
-ETimbradoErrorGenericoException = class(EPACException);
+EPACErrorGenericoException = class(EPACException);
 
 const
 _RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';

@@ -29,6 +29,7 @@ uses HTTPSend,
      FETimbreFiscalDigital,
      PAC.Ecodex.ManejadorDeSesion,
      EcodexWsTimbrado,
+     EcodexWsClientes,
      FeCFD;
 
 type
@@ -44,7 +45,9 @@ type
  {$ENDREGION}
  TPACEcodex = class(TProveedorAutorizadoCertificacion)
  private
+  fDominioWebService : string;
   fCredenciales : TFEPACCredenciales;
+  wsClientesEcodex : IEcodexServicioClientes;
   wsTimbradoEcodex: IEcodexServicioTimbrado;
   fManejadorDeSesion : TEcodexManejadorDeSesion;
   function AsignarTimbreDeRespuestaDeEcodex(const aRespuestaTimbrado:
@@ -57,7 +60,10 @@ public
   procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); override;
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; override;
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; override;
+  function AgregaCliente(const aNuevoEmisor: TFEContribuyente; const
+      aRFCIntegrador: string): Boolean; override;
   property Nombre : String read getNombre;
+  constructor Create(const aDominioWebService : String); overload;
  end;
 
 implementation
@@ -70,6 +76,21 @@ uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
      {$ENDIF}
      FacturaReglamentacion;
 
+constructor TPACEcodex.Create(const aDominioWebService : String);
+begin
+  inherited;
+
+  // Obtenemos el dominio del WS que usaremos
+  fDominioWebService := aDominioWebService;
+end;
+
+procedure TPACEcodex.AfterConstruction;
+begin
+  // Obtenemos una instancia del WebService de Timbrado de Ecodex
+  wsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
+  wsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService + '/ServicioClientes.svc');
+  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService);
+end;
 
 function TPACEcodex.getNombre() : string;
 begin
@@ -82,13 +103,6 @@ begin
   // Al ser una interface el objeto TXMLDocument se libera automaticamente por Delphi al dejar de ser usado
   // aunque para asegurarnos hacemos lo siguiente:
   inherited;
-end;
-
-procedure TPACEcodex.AfterConstruction;
-begin
-  // Obtenemos una instancia del WebService de Timbrado de Ecodex
-  wsTimbradoEcodex := GetWsEcodexTimbrado;
-  fManejadorDeSesion := TEcodexManejadorDeSesion.Create;
 end;
 
 procedure TPACEcodex.AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
@@ -219,7 +233,7 @@ begin
 
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
   // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
-  raise ETimbradoErrorGenericoException.Create(mensajeExcepcion, 0, True);
+  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, True);
 end;
 
 function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre;
@@ -304,6 +318,61 @@ begin
   finally
     if Assigned(solicitudCancelacion) then
       solicitudCancelacion.Free;
+  end;
+end;
+
+function TPACEcodex.AgregaCliente(const aNuevoEmisor: TFEContribuyente; const
+    aRFCIntegrador: string): Boolean;
+var
+  nuevoEmisor : TEcodexNuevoEmisor;
+  solicitudRegistroCliente : TEcodexSolicitudRegistroCliente;
+  respuestaRegistroCliente: TEcodexRespuestaRegistro;
+const
+  // Segun documento "Guia de integracion con Ecodex_v2.0.1.pdf"
+  _CADENA_ALTA_EXITOSA = 'Activo';
+begin
+  Assert(fManejadorDeSesion <> nil, 'El manejador de sesion de Ecodex es nulo');
+  Assert(wsClientesEcodex <> nil, 'La referencia al servicio de Ecodex de clientes fue nula');
+  Assert(aRFCIntegrador <> '', 'El RFC del integrador estuvo vacio');
+  Assert(aNuevoEmisor.RFC <> '', 'El RFC del nuevo emisor estuvo vacio');
+  Assert(aNuevoEmisor.Nombre <> '', 'La razon social del nuevo emisor estuvo vacia');
+
+  try
+    try
+      // Creamos el objeto Emisor que enviaremos
+      nuevoEmisor := TEcodexNuevoEmisor.Create;
+      nuevoEmisor.RFC := aNuevoEmisor.RFC;
+      nuevoEmisor.RazonSocial := aNuevoEmisor.Nombre;
+      nuevoEmisor.CorreoElectronico := aNuevoEmisor.CorreoElectronico;
+
+      // Creamos la solicitud de registro de emisor
+      solicitudRegistroCliente := TEcodexSolicitudRegistroCliente.Create;
+      solicitudRegistroCliente.Token := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+      solicitudRegistroCliente.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+      solicitudRegistroCliente.Emisor := nuevoEmisor;
+      solicitudRegistroCliente.RfcIntegrador := aRFCIntegrador;
+
+      // Mandamos registrar al emisor
+      respuestaRegistroCliente := wsClientesEcodex.Registrar(solicitudRegistroCliente);
+
+      Assert(respuestaRegistroCliente.Respuesta <> nil, 'La respuesta de registro de emisor fue nula!');
+
+      {$IFDEF CODESITE}
+      CodeSite.Send('Respuesta registro emisor', respuestaRegistroCliente.Respuesta.Estatus);
+      CodeSite.Send('Clave certificado', respuestaRegistroCliente.Respuesta.ClaveCertificado);
+      {$ENDIF}
+
+      // Nos regreso la cadena de exito?
+      Result := respuestaRegistroCliente.Respuesta.Estatus = _CADENA_ALTA_EXITOSA;
+      respuestaRegistroCliente.Free;
+    except
+      // Si ocurrio cualquier error procesamos la excepcion
+      On E:Exception do
+        ProcesarExcepcionDePAC(E);
+    end;
+  finally
+    if Assigned(solicitudRegistroCliente) then
+      solicitudRegistroCliente.Free;
   end;
 end;
 

@@ -9,6 +9,7 @@ type
 
   TEcodexManejadorDeSesion = class
   private
+    fDominioWebService: String;
     fCredenciales: TFEPACCredenciales;
     wsSeguridad : IEcodexServicioSeguridad;
     fNumeroTransaccion: Integer;
@@ -16,6 +17,7 @@ type
     function ObtenerNuevoTokenDeServicio: String;
     procedure ProcesarFallaEcodex(const aMensajeFalla: String);
   public
+    constructor Create(const aDominioWebService : String);
     procedure AfterConstruction; override;
     procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
     function ObtenerNuevoTokenDeUsuario: String;
@@ -30,10 +32,16 @@ uses SysUtils,
      {$ENDIF}
      FacturacionHashes;
 
+constructor TEcodexManejadorDeSesion.Create(const aDominioWebService : String);
+begin
+  fDominioWebService := aDominioWebService;
+end;
+
 procedure TEcodexManejadorDeSesion.AfterConstruction;
 begin
   inherited;
-  wsSeguridad := GetWsEcodexSeguridad();
+  // Obtenemos la instancia del WebService de Sesion usando el dominio especificado por el usuario
+  wsSeguridad := GetWsEcodexSeguridad(False, fDominioWebService + '/ServicioSeguridad.svc');
 
   // El numero de transacción comenzará como un numero aleatorio
   // (excepto en las pruebas de unidad)

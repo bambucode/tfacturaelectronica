@@ -50,11 +50,8 @@ type
   // !:dateTime        - "http://www.w3.org/2001/XMLSchema"[Gbl]
   // !:long            - "http://www.w3.org/2001/XMLSchema"[Gbl]
 
-  ResultadoRegistroEmisor2 = class;             { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
-  AltaEmisor2          = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
-  FallaValidacion2     = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
-  FallaServicio2       = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
-  FallaSesion2         = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
+  TEcodexResultadoRegistroEmisor = class;             { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
+  TEcodexNuevoEmisor          = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
   Aviso2               = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
   CuentaEstatus2       = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
   TEcodexSolicitudAvisosNuevos = class;                { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
@@ -64,11 +61,8 @@ type
   ResultadoRegistroEmisor = class;              { "http://Ecodex.WS.Model/2011/CFDI"[GblElm] }
   TEcodexRespuestaAsignacionTimbres = class;           { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   TEcodexSolicitudAsignacionTimbres = class;           { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
-  FallaValidacion      = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[Flt][GblElm] }
-  FallaSesion          = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[Flt][GblElm] }
   Aviso                = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblElm] }
   TEcodexRespuestaAvisosNuevos = class;                { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
-  FallaServicio        = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[Flt][GblElm] }
   CuentaEstatus        = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblElm] }
   TEcodexRespuestaEstatusCuenta = class;               { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   TEcodexSolicitudEstatusCuenta = class;               { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
@@ -80,7 +74,7 @@ type
   // XML       : ResultadoRegistroEmisor, global, <complexType>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
   // ************************************************************************ //
-  ResultadoRegistroEmisor2 = class(TRemotable)
+  TEcodexResultadoRegistroEmisor = class(TRemotable)
   private
     FRFC: string;
     FRFC_Specified: boolean;
@@ -106,7 +100,7 @@ type
   // XML       : AltaEmisor, global, <complexType>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
   // ************************************************************************ //
-  AltaEmisor2 = class(TRemotable)
+  TEcodexNuevoEmisor = class(TRemotable)
   private
     FRFC: string;
     FRFC_Specified: boolean;
@@ -127,95 +121,6 @@ type
   end;
 
   ArrayOfstring = array of string;              { "http://schemas.microsoft.com/2003/10/Serialization/Arrays"[GblCplx] }
-
-
-  // ************************************************************************ //
-  // XML       : FallaValidacion, global, <complexType>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // ************************************************************************ //
-  FallaValidacion2 = class(TRemotable)
-  private
-    FRFC: string;
-    FNumero: Integer;
-    FDescripcion: string;
-    FDescripcion_Specified: boolean;
-    FNodo: string;
-    FNodo_Specified: boolean;
-    FAntecedente: string;
-    FAntecedente_Specified: boolean;
-    FSugerencia: string;
-    FSugerencia_Specified: boolean;
-    FEvento: string;
-    FEvento_Specified: boolean;
-    procedure SetDescripcion(Index: Integer; const Astring: string);
-    function  Descripcion_Specified(Index: Integer): boolean;
-    procedure SetNodo(Index: Integer; const Astring: string);
-    function  Nodo_Specified(Index: Integer): boolean;
-    procedure SetAntecedente(Index: Integer; const Astring: string);
-    function  Antecedente_Specified(Index: Integer): boolean;
-    procedure SetSugerencia(Index: Integer; const Astring: string);
-    function  Sugerencia_Specified(Index: Integer): boolean;
-    procedure SetEvento(Index: Integer; const Astring: string);
-    function  Evento_Specified(Index: Integer): boolean;
-  published
-    property RFC:         string   Index (IS_NLBL) read FRFC write FRFC;
-    property Numero:      Integer  read FNumero write FNumero;
-    property Descripcion: string   Index (IS_OPTN or IS_NLBL) read FDescripcion write SetDescripcion stored Descripcion_Specified;
-    property Nodo:        string   Index (IS_OPTN or IS_NLBL) read FNodo write SetNodo stored Nodo_Specified;
-    property Antecedente: string   Index (IS_OPTN or IS_NLBL) read FAntecedente write SetAntecedente stored Antecedente_Specified;
-    property Sugerencia:  string   Index (IS_OPTN or IS_NLBL) read FSugerencia write SetSugerencia stored Sugerencia_Specified;
-    property Evento:      string   Index (IS_OPTN or IS_NLBL) read FEvento write SetEvento stored Evento_Specified;
-  end;
-
-
-
-  // ************************************************************************ //
-  // XML       : FallaServicio, global, <complexType>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // ************************************************************************ //
-  FallaServicio2 = class(TRemotable)
-  private
-    FRFC: string;
-    FNumero: Integer;
-    FDescripcion: string;
-    FDescripcion_Specified: boolean;
-    FEvento: string;
-    FEvento_Specified: boolean;
-    procedure SetDescripcion(Index: Integer; const Astring: string);
-    function  Descripcion_Specified(Index: Integer): boolean;
-    procedure SetEvento(Index: Integer; const Astring: string);
-    function  Evento_Specified(Index: Integer): boolean;
-  published
-    property RFC:         string   Index (IS_NLBL) read FRFC write FRFC;
-    property Numero:      Integer  read FNumero write FNumero;
-    property Descripcion: string   Index (IS_OPTN or IS_NLBL) read FDescripcion write SetDescripcion stored Descripcion_Specified;
-    property Evento:      string   Index (IS_OPTN or IS_NLBL) read FEvento write SetEvento stored Evento_Specified;
-  end;
-
-
-
-  // ************************************************************************ //
-  // XML       : FallaSesion, global, <complexType>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // ************************************************************************ //
-  FallaSesion2 = class(TRemotable)
-  private
-    FRFC: string;
-    FEstatus: Integer;
-    FEstatus_Specified: boolean;
-    FDescripcion: string;
-    FDescripcion_Specified: boolean;
-    procedure SetEstatus(Index: Integer; const AInteger: Integer);
-    function  Estatus_Specified(Index: Integer): boolean;
-    procedure SetDescripcion(Index: Integer; const Astring: string);
-    function  Descripcion_Specified(Index: Integer): boolean;
-  published
-    property RFC:         string   Index (IS_NLBL) read FRFC write FRFC;
-    property Estatus:     Integer  Index (IS_OPTN) read FEstatus write SetEstatus stored Estatus_Specified;
-    property Descripcion: string   Index (IS_OPTN or IS_NLBL) read FDescripcion write SetDescripcion stored Descripcion_Specified;
-  end;
-
-
 
   // ************************************************************************ //
   // XML       : Aviso, global, <complexType>
@@ -328,11 +233,11 @@ type
   // ************************************************************************ //
   TEcodexRespuestaRegistro = class(TRemotable)
   private
-    FRespuesta: ResultadoRegistroEmisor2;
+    FRespuesta: TEcodexResultadoRegistroEmisor;
     FRespuesta_Specified: boolean;
     FTransaccionId: Int64;
     FTransaccionId_Specified: boolean;
-    procedure SetRespuesta(Index: Integer; const AResultadoRegistroEmisor2: ResultadoRegistroEmisor2);
+    procedure SetRespuesta(Index: Integer; const AResultadoRegistroEmisor2: TEcodexResultadoRegistroEmisor);
     function  Respuesta_Specified(Index: Integer): boolean;
     procedure SetTransaccionId(Index: Integer; const AInt64: Int64);
     function  TransaccionId_Specified(Index: Integer): boolean;
@@ -340,7 +245,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
   published
-    property Respuesta:     ResultadoRegistroEmisor2  Index (IS_OPTN or IS_NLBL) read FRespuesta write SetRespuesta stored Respuesta_Specified;
+    property Respuesta:     TEcodexResultadoRegistroEmisor  Index (IS_OPTN or IS_NLBL) read FRespuesta write SetRespuesta stored Respuesta_Specified;
     property TransaccionId: Int64                     Index (IS_OPTN) read FTransaccionId write SetTransaccionId stored TransaccionId_Specified;
   end;
 
@@ -350,12 +255,10 @@ type
   // XML       : AltaEmisor, global, <element>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
   // ************************************************************************ //
-  AltaEmisor = class(AltaEmisor2)
+  AltaEmisor = class(TEcodexNuevoEmisor)
   private
   published
   end;
-
-
 
   // ************************************************************************ //
   // XML       : TEcodexSolicitudRegistroCliente, global, <element>
@@ -365,7 +268,7 @@ type
   // ************************************************************************ //
   TEcodexSolicitudRegistroCliente = class(TRemotable)
   private
-    FEmisor: AltaEmisor2;
+    FEmisor: TEcodexNuevoEmisor;
     FEmisor_Specified: boolean;
     FRfcIntegrador: string;
     FRfcIntegrador_Specified: boolean;
@@ -373,7 +276,7 @@ type
     FToken_Specified: boolean;
     FTransaccionID: Int64;
     FTransaccionID_Specified: boolean;
-    procedure SetEmisor(Index: Integer; const AAltaEmisor2: AltaEmisor2);
+    procedure SetEmisor(Index: Integer; const AAltaEmisor2: TEcodexNuevoEmisor);
     function  Emisor_Specified(Index: Integer): boolean;
     procedure SetRfcIntegrador(Index: Integer; const Astring: string);
     function  RfcIntegrador_Specified(Index: Integer): boolean;
@@ -385,7 +288,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
   published
-    property Emisor:        AltaEmisor2  Index (IS_OPTN or IS_NLBL) read FEmisor write SetEmisor stored Emisor_Specified;
+    property Emisor:        TEcodexNuevoEmisor  Index (IS_OPTN or IS_NLBL) read FEmisor write SetEmisor stored Emisor_Specified;
     property RfcIntegrador: string       Index (IS_OPTN or IS_NLBL) read FRfcIntegrador write SetRfcIntegrador stored RfcIntegrador_Specified;
     property Token:         string       Index (IS_OPTN or IS_NLBL) read FToken write SetToken stored Token_Specified;
     property TransaccionID: Int64        Index (IS_OPTN) read FTransaccionID write SetTransaccionID stored TransaccionID_Specified;
@@ -397,7 +300,7 @@ type
   // XML       : ResultadoRegistroEmisor, global, <element>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
   // ************************************************************************ //
-  ResultadoRegistroEmisor = class(ResultadoRegistroEmisor2)
+  ResultadoRegistroEmisor = class(TEcodexResultadoRegistroEmisor)
   private
   published
   end;
@@ -472,75 +375,6 @@ type
     property TransaccionId:  Int64    Index (IS_OPTN) read FTransaccionId write SetTransaccionId stored TransaccionId_Specified;
   end;
 
-
-
-  // ************************************************************************ //
-  // XML       : FallaValidacion, global, <element>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // Info      : Fault
-  // Base Types: FallaValidacion
-  // ************************************************************************ //
-  FallaValidacion = class(ERemotableException)
-  private
-    FRFC: string;
-    FNumero: Integer;
-    FDescripcion: string;
-    FDescripcion_Specified: boolean;
-    FNodo: string;
-    FNodo_Specified: boolean;
-    FAntecedente: string;
-    FAntecedente_Specified: boolean;
-    FSugerencia: string;
-    FSugerencia_Specified: boolean;
-    FEvento: string;
-    FEvento_Specified: boolean;
-    procedure SetDescripcion(Index: Integer; const Astring: string);
-    function  Descripcion_Specified(Index: Integer): boolean;
-    procedure SetNodo(Index: Integer; const Astring: string);
-    function  Nodo_Specified(Index: Integer): boolean;
-    procedure SetAntecedente(Index: Integer; const Astring: string);
-    function  Antecedente_Specified(Index: Integer): boolean;
-    procedure SetSugerencia(Index: Integer; const Astring: string);
-    function  Sugerencia_Specified(Index: Integer): boolean;
-    procedure SetEvento(Index: Integer; const Astring: string);
-    function  Evento_Specified(Index: Integer): boolean;
-  published
-    property RFC:         string   Index (IS_NLBL) read FRFC write FRFC;
-    property Numero:      Integer  read FNumero write FNumero;
-    property Descripcion: string   Index (IS_OPTN or IS_NLBL) read FDescripcion write SetDescripcion stored Descripcion_Specified;
-    property Nodo:        string   Index (IS_OPTN or IS_NLBL) read FNodo write SetNodo stored Nodo_Specified;
-    property Antecedente: string   Index (IS_OPTN or IS_NLBL) read FAntecedente write SetAntecedente stored Antecedente_Specified;
-    property Sugerencia:  string   Index (IS_OPTN or IS_NLBL) read FSugerencia write SetSugerencia stored Sugerencia_Specified;
-    property Evento:      string   Index (IS_OPTN or IS_NLBL) read FEvento write SetEvento stored Evento_Specified;
-  end;
-
-
-
-  // ************************************************************************ //
-  // XML       : FallaSesion, global, <element>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // Info      : Fault
-  // Base Types: FallaSesion
-  // ************************************************************************ //
-  FallaSesion = class(ERemotableException)
-  private
-    FRFC: string;
-    FEstatus: Integer;
-    FEstatus_Specified: boolean;
-    FDescripcion: string;
-    FDescripcion_Specified: boolean;
-    procedure SetEstatus(Index: Integer; const AInteger: Integer);
-    function  Estatus_Specified(Index: Integer): boolean;
-    procedure SetDescripcion(Index: Integer; const Astring: string);
-    function  Descripcion_Specified(Index: Integer): boolean;
-  published
-    property RFC:         string   Index (IS_NLBL) read FRFC write FRFC;
-    property Estatus:     Integer  Index (IS_OPTN) read FEstatus write SetEstatus stored Estatus_Specified;
-    property Descripcion: string   Index (IS_OPTN or IS_NLBL) read FDescripcion write SetDescripcion stored Descripcion_Specified;
-  end;
-
-
-
   // ************************************************************************ //
   // XML       : Aviso, global, <element>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
@@ -549,8 +383,6 @@ type
   private
   published
   end;
-
-
 
   // ************************************************************************ //
   // XML       : TEcodexRespuestaAvisosNuevos, global, <element>
@@ -576,35 +408,6 @@ type
     property TransaccionID: Int64   Index (IS_OPTN) read FTransaccionID write SetTransaccionID stored TransaccionID_Specified;
   end;
 
-
-
-  // ************************************************************************ //
-  // XML       : FallaServicio, global, <element>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // Info      : Fault
-  // Base Types: FallaServicio
-  // ************************************************************************ //
-  FallaServicio = class(ERemotableException)
-  private
-    FRFC: string;
-    FNumero: Integer;
-    FDescripcion: string;
-    FDescripcion_Specified: boolean;
-    FEvento: string;
-    FEvento_Specified: boolean;
-    procedure SetDescripcion(Index: Integer; const Astring: string);
-    function  Descripcion_Specified(Index: Integer): boolean;
-    procedure SetEvento(Index: Integer; const Astring: string);
-    function  Evento_Specified(Index: Integer): boolean;
-  published
-    property RFC:         string   Index (IS_NLBL) read FRFC write FRFC;
-    property Numero:      Integer  read FNumero write FNumero;
-    property Descripcion: string   Index (IS_OPTN or IS_NLBL) read FDescripcion write SetDescripcion stored Descripcion_Specified;
-    property Evento:      string   Index (IS_OPTN or IS_NLBL) read FEvento write SetEvento stored Evento_Specified;
-  end;
-
-
-
   // ************************************************************************ //
   // XML       : CuentaEstatus, global, <element>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
@@ -613,8 +416,6 @@ type
   private
   published
   end;
-
-
 
   // ************************************************************************ //
   // XML       : TEcodexRespuestaEstatusCuenta, global, <element>
@@ -715,7 +516,7 @@ function GetWsEcodexClientes(UseWSDL: Boolean=System.False; Addr: string='';
     HTTPRIO: THTTPRIO = nil): IEcodexServicioClientes;
 const
   defWSDL = 'https://pruebas.ecodex.com.mx:2045/ServicioClientes.svc?wsdl';
-  defURL  = 'https://wsdexpruebas.ecodex.com.mx:2045/ServicioClientes.svc';
+  defURL  = 'https://pruebas.ecodex.com.mx:2045/ServicioClientes.svc';
   defSvc  = 'IEcodexServicioClientes';
   defPrt  = 'PuertoClientesSeguro';
 var
@@ -749,169 +550,70 @@ begin
 end;
 
 
-procedure ResultadoRegistroEmisor2.SetRFC(Index: Integer; const Astring: string);
+procedure TEcodexResultadoRegistroEmisor.SetRFC(Index: Integer; const Astring: string);
 begin
   FRFC := Astring;
   FRFC_Specified := True;
 end;
 
-function ResultadoRegistroEmisor2.RFC_Specified(Index: Integer): boolean;
+function TEcodexResultadoRegistroEmisor.RFC_Specified(Index: Integer): boolean;
 begin
   Result := FRFC_Specified;
 end;
 
-procedure ResultadoRegistroEmisor2.SetEstatus(Index: Integer; const Astring: string);
+procedure TEcodexResultadoRegistroEmisor.SetEstatus(Index: Integer; const Astring: string);
 begin
   FEstatus := Astring;
   FEstatus_Specified := True;
 end;
 
-function ResultadoRegistroEmisor2.Estatus_Specified(Index: Integer): boolean;
+function TEcodexResultadoRegistroEmisor.Estatus_Specified(Index: Integer): boolean;
 begin
   Result := FEstatus_Specified;
 end;
 
-procedure ResultadoRegistroEmisor2.SetClaveCertificado(Index: Integer; const Astring: string);
+procedure TEcodexResultadoRegistroEmisor.SetClaveCertificado(Index: Integer; const Astring: string);
 begin
   FClaveCertificado := Astring;
   FClaveCertificado_Specified := True;
 end;
 
-function ResultadoRegistroEmisor2.ClaveCertificado_Specified(Index: Integer): boolean;
+function TEcodexResultadoRegistroEmisor.ClaveCertificado_Specified(Index: Integer): boolean;
 begin
   Result := FClaveCertificado_Specified;
 end;
 
-procedure AltaEmisor2.SetRFC(Index: Integer; const Astring: string);
+procedure TEcodexNuevoEmisor.SetRFC(Index: Integer; const Astring: string);
 begin
   FRFC := Astring;
   FRFC_Specified := True;
 end;
 
-function AltaEmisor2.RFC_Specified(Index: Integer): boolean;
+function TEcodexNuevoEmisor.RFC_Specified(Index: Integer): boolean;
 begin
   Result := FRFC_Specified;
 end;
 
-procedure AltaEmisor2.SetRazonSocial(Index: Integer; const Astring: string);
+procedure TEcodexNuevoEmisor.SetRazonSocial(Index: Integer; const Astring: string);
 begin
   FRazonSocial := Astring;
   FRazonSocial_Specified := True;
 end;
 
-function AltaEmisor2.RazonSocial_Specified(Index: Integer): boolean;
+function TEcodexNuevoEmisor.RazonSocial_Specified(Index: Integer): boolean;
 begin
   Result := FRazonSocial_Specified;
 end;
 
-procedure AltaEmisor2.SetCorreoElectronico(Index: Integer; const Astring: string);
+procedure TEcodexNuevoEmisor.SetCorreoElectronico(Index: Integer; const Astring: string);
 begin
   FCorreoElectronico := Astring;
   FCorreoElectronico_Specified := True;
 end;
 
-function AltaEmisor2.CorreoElectronico_Specified(Index: Integer): boolean;
+function TEcodexNuevoEmisor.CorreoElectronico_Specified(Index: Integer): boolean;
 begin
   Result := FCorreoElectronico_Specified;
-end;
-
-procedure FallaValidacion2.SetDescripcion(Index: Integer; const Astring: string);
-begin
-  FDescripcion := Astring;
-  FDescripcion_Specified := True;
-end;
-
-function FallaValidacion2.Descripcion_Specified(Index: Integer): boolean;
-begin
-  Result := FDescripcion_Specified;
-end;
-
-procedure FallaValidacion2.SetNodo(Index: Integer; const Astring: string);
-begin
-  FNodo := Astring;
-  FNodo_Specified := True;
-end;
-
-function FallaValidacion2.Nodo_Specified(Index: Integer): boolean;
-begin
-  Result := FNodo_Specified;
-end;
-
-procedure FallaValidacion2.SetAntecedente(Index: Integer; const Astring: string);
-begin
-  FAntecedente := Astring;
-  FAntecedente_Specified := True;
-end;
-
-function FallaValidacion2.Antecedente_Specified(Index: Integer): boolean;
-begin
-  Result := FAntecedente_Specified;
-end;
-
-procedure FallaValidacion2.SetSugerencia(Index: Integer; const Astring: string);
-begin
-  FSugerencia := Astring;
-  FSugerencia_Specified := True;
-end;
-
-function FallaValidacion2.Sugerencia_Specified(Index: Integer): boolean;
-begin
-  Result := FSugerencia_Specified;
-end;
-
-procedure FallaValidacion2.SetEvento(Index: Integer; const Astring: string);
-begin
-  FEvento := Astring;
-  FEvento_Specified := True;
-end;
-
-function FallaValidacion2.Evento_Specified(Index: Integer): boolean;
-begin
-  Result := FEvento_Specified;
-end;
-
-procedure FallaServicio2.SetDescripcion(Index: Integer; const Astring: string);
-begin
-  FDescripcion := Astring;
-  FDescripcion_Specified := True;
-end;
-
-function FallaServicio2.Descripcion_Specified(Index: Integer): boolean;
-begin
-  Result := FDescripcion_Specified;
-end;
-
-procedure FallaServicio2.SetEvento(Index: Integer; const Astring: string);
-begin
-  FEvento := Astring;
-  FEvento_Specified := True;
-end;
-
-function FallaServicio2.Evento_Specified(Index: Integer): boolean;
-begin
-  Result := FEvento_Specified;
-end;
-
-procedure FallaSesion2.SetEstatus(Index: Integer; const AInteger: Integer);
-begin
-  FEstatus := AInteger;
-  FEstatus_Specified := True;
-end;
-
-function FallaSesion2.Estatus_Specified(Index: Integer): boolean;
-begin
-  Result := FEstatus_Specified;
-end;
-
-procedure FallaSesion2.SetDescripcion(Index: Integer; const Astring: string);
-begin
-  FDescripcion := Astring;
-  FDescripcion_Specified := True;
-end;
-
-function FallaSesion2.Descripcion_Specified(Index: Integer): boolean;
-begin
-  Result := FDescripcion_Specified;
 end;
 
 destructor Aviso2.Destroy;
@@ -1077,7 +779,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TEcodexRespuestaRegistro.SetRespuesta(Index: Integer; const AResultadoRegistroEmisor2: ResultadoRegistroEmisor2);
+procedure TEcodexRespuestaRegistro.SetRespuesta(Index: Integer; const AResultadoRegistroEmisor2: TEcodexResultadoRegistroEmisor);
 begin
   FRespuesta := AResultadoRegistroEmisor2;
   FRespuesta_Specified := True;
@@ -1111,7 +813,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TEcodexSolicitudRegistroCliente.SetEmisor(Index: Integer; const AAltaEmisor2: AltaEmisor2);
+procedure TEcodexSolicitudRegistroCliente.SetEmisor(Index: Integer; const AAltaEmisor2: TEcodexNuevoEmisor);
 begin
   FEmisor := AAltaEmisor2;
   FEmisor_Specified := True;
@@ -1255,83 +957,6 @@ begin
   Result := FTransaccionId_Specified;
 end;
 
-procedure FallaValidacion.SetDescripcion(Index: Integer; const Astring: string);
-begin
-  FDescripcion := Astring;
-  FDescripcion_Specified := True;
-end;
-
-function FallaValidacion.Descripcion_Specified(Index: Integer): boolean;
-begin
-  Result := FDescripcion_Specified;
-end;
-
-procedure FallaValidacion.SetNodo(Index: Integer; const Astring: string);
-begin
-  FNodo := Astring;
-  FNodo_Specified := True;
-end;
-
-function FallaValidacion.Nodo_Specified(Index: Integer): boolean;
-begin
-  Result := FNodo_Specified;
-end;
-
-procedure FallaValidacion.SetAntecedente(Index: Integer; const Astring: string);
-begin
-  FAntecedente := Astring;
-  FAntecedente_Specified := True;
-end;
-
-function FallaValidacion.Antecedente_Specified(Index: Integer): boolean;
-begin
-  Result := FAntecedente_Specified;
-end;
-
-procedure FallaValidacion.SetSugerencia(Index: Integer; const Astring: string);
-begin
-  FSugerencia := Astring;
-  FSugerencia_Specified := True;
-end;
-
-function FallaValidacion.Sugerencia_Specified(Index: Integer): boolean;
-begin
-  Result := FSugerencia_Specified;
-end;
-
-procedure FallaValidacion.SetEvento(Index: Integer; const Astring: string);
-begin
-  FEvento := Astring;
-  FEvento_Specified := True;
-end;
-
-function FallaValidacion.Evento_Specified(Index: Integer): boolean;
-begin
-  Result := FEvento_Specified;
-end;
-
-procedure FallaSesion.SetEstatus(Index: Integer; const AInteger: Integer);
-begin
-  FEstatus := AInteger;
-  FEstatus_Specified := True;
-end;
-
-function FallaSesion.Estatus_Specified(Index: Integer): boolean;
-begin
-  Result := FEstatus_Specified;
-end;
-
-procedure FallaSesion.SetDescripcion(Index: Integer; const Astring: string);
-begin
-  FDescripcion := Astring;
-  FDescripcion_Specified := True;
-end;
-
-function FallaSesion.Descripcion_Specified(Index: Integer): boolean;
-begin
-  Result := FDescripcion_Specified;
-end;
-
 constructor TEcodexRespuestaAvisosNuevos.Create;
 begin
   inherited Create;
@@ -1368,28 +993,6 @@ end;
 function TEcodexRespuestaAvisosNuevos.TransaccionID_Specified(Index: Integer): boolean;
 begin
   Result := FTransaccionID_Specified;
-end;
-
-procedure FallaServicio.SetDescripcion(Index: Integer; const Astring: string);
-begin
-  FDescripcion := Astring;
-  FDescripcion_Specified := True;
-end;
-
-function FallaServicio.Descripcion_Specified(Index: Integer): boolean;
-begin
-  Result := FDescripcion_Specified;
-end;
-
-procedure FallaServicio.SetEvento(Index: Integer; const Astring: string);
-begin
-  FEvento := Astring;
-  FEvento_Specified := True;
-end;
-
-function FallaServicio.Evento_Specified(Index: Integer): boolean;
-begin
-  Result := FEvento_Specified;
 end;
 
 constructor TEcodexRespuestaEstatusCuenta.Create;
@@ -1472,12 +1075,9 @@ initialization
   InvRegistry.RegisterInvokeOptions(TypeInfo(IEcodexServicioClientes), ioDocument);
   InvRegistry.RegisterInvokeOptions(TypeInfo(IEcodexServicioClientes), ioLiteral);
   RemClassRegistry.RegisterXSInfo(TypeInfo(Avisos), 'http://Ecodex.WS.Model/2011/CFDI', 'Avisos');
-  RemClassRegistry.RegisterXSClass(ResultadoRegistroEmisor2, 'http://Ecodex.WS.Model/2011/CFDI', 'ResultadoRegistroEmisor2', 'ResultadoRegistroEmisor');
-  RemClassRegistry.RegisterXSClass(AltaEmisor2, 'http://Ecodex.WS.Model/2011/CFDI', 'AltaEmisor2', 'AltaEmisor');
+  RemClassRegistry.RegisterXSClass(TEcodexResultadoRegistroEmisor, 'http://Ecodex.WS.Model/2011/CFDI', 'ResultadoRegistroEmisor', 'ResultadoRegistroEmisor');
+  RemClassRegistry.RegisterXSClass(TEcodexNuevoEmisor, 'http://Ecodex.WS.Model/2011/CFDI', 'AltaEmisor', 'AltaEmisor');
   RemClassRegistry.RegisterXSInfo(TypeInfo(ArrayOfstring), 'http://schemas.microsoft.com/2003/10/Serialization/Arrays', 'ArrayOfstring');
-  RemClassRegistry.RegisterXSClass(FallaValidacion2, 'http://Ecodex.WS.Model/2011/CFDI', 'FallaValidacion2', 'FallaValidacion');
-  RemClassRegistry.RegisterXSClass(FallaServicio2, 'http://Ecodex.WS.Model/2011/CFDI', 'FallaServicio2', 'FallaServicio');
-  RemClassRegistry.RegisterXSClass(FallaSesion2, 'http://Ecodex.WS.Model/2011/CFDI', 'FallaSesion2', 'FallaSesion');
   RemClassRegistry.RegisterXSClass(Aviso2, 'http://Ecodex.WS.Model/2011/CFDI', 'Aviso2', 'Aviso');
   RemClassRegistry.RegisterXSClass(CuentaEstatus2, 'http://Ecodex.WS.Model/2011/CFDI', 'CuentaEstatus2', 'CuentaEstatus');
   RemClassRegistry.RegisterExternalPropName(TypeInfo(CuentaEstatus2), 'Certificados', '[ArrayItemName="string"]');
@@ -1493,13 +1093,10 @@ initialization
   RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaAsignacionTimbres, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(TEcodexSolicitudAsignacionTimbres, 'http://Ecodex.WS.Model/2011/CFDI', 'TEcodexSolicitudAsignacionTimbres');
   RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudAsignacionTimbres, [xoLiteralParam]);
-  RemClassRegistry.RegisterXSClass(FallaValidacion, 'http://Ecodex.WS.Model/2011/CFDI', 'FallaValidacion');
-  RemClassRegistry.RegisterXSClass(FallaSesion, 'http://Ecodex.WS.Model/2011/CFDI', 'FallaSesion');
   RemClassRegistry.RegisterXSClass(Aviso, 'http://Ecodex.WS.Model/2011/CFDI', 'Aviso');
   RemClassRegistry.RegisterXSClass(TEcodexRespuestaAvisosNuevos, 'http://Ecodex.WS.Model/2011/CFDI', 'TEcodexRespuestaAvisosNuevos');
   RemClassRegistry.RegisterExternalPropName(TypeInfo(TEcodexRespuestaAvisosNuevos), 'Avisos', '[ArrayItemName="Aviso"]');
   RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaAvisosNuevos, [xoLiteralParam]);
-  RemClassRegistry.RegisterXSClass(FallaServicio, 'http://Ecodex.WS.Model/2011/CFDI', 'FallaServicio');
   RemClassRegistry.RegisterXSClass(CuentaEstatus, 'http://Ecodex.WS.Model/2011/CFDI', 'CuentaEstatus');
   RemClassRegistry.RegisterXSClass(TEcodexRespuestaEstatusCuenta, 'http://Ecodex.WS.Model/2011/CFDI', 'TEcodexRespuestaEstatusCuenta');
   RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaEstatusCuenta, [xoLiteralParam]);
