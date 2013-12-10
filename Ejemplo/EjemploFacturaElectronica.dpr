@@ -48,15 +48,14 @@ uses
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
   FacturacionHashes in '..\FacturacionHashes.pas',
   PACEcodex in '..\PACs\Ecodex\PACEcodex.pas',
-  PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas',
   PACEjemplo in '..\PACs\Ejemplo\PACEjemplo.pas',
   GeneradorCBB in '..\GeneradorCBB\GeneradorCBB.pas',
   QuricolAPI in '..\GeneradorCBB\QuricolAPI.pas',
   QuricolCode in '..\GeneradorCBB\QuricolCode.pas',
-  FinkOkWsTimbrado in '..\PACs\FinkOk\FinkOkWsTimbrado.pas',
-  PACFinkOk in '..\PACs\FinkOk\PACFinkOk.pas',
   FECancelaComercioDigital in '..\PACs\ComercioDigital\FECancelaComercioDigital.pas',
-  CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas';
+  CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas',
+  EcodexWsClientes in '..\PACs\Ecodex\EcodexWsClientes.pas',
+  EcodexWsComun in '..\PACs\Ecodex\EcodexWsComun.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
@@ -81,6 +80,9 @@ var
       if (SHGetPathFromIDList(pidList, buf)) then
         Result := buf;
    end;
+
+const
+  _URL_ECODEX_PRUEBAS = 'https://pruebas.ecodex.com.mx:2045';
 
 begin
   // Checamos la presencia de archivos necesarios para el ejemplo
@@ -216,7 +218,7 @@ begin
       // por cuestiones de ejemplo, usaremos al PAC "Ecodex"
 
       //ProveedorTimbrado := TPACFinkOk.Create;
-      ProveedorTimbrado := TPACEcodex.Create;
+      ProveedorTimbrado := TPACEcodex.Create(_URL_ECODEX_PRUEBAS);
       //ProveedorTimbrado := TPACComercioDigital.Create; // Si queremos usar a Comercio Digital solo des-comentamos aqui
 
       try

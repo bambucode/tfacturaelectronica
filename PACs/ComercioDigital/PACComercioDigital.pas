@@ -156,38 +156,53 @@ _ERROR_CD_FOLIO_NO_APLICA_CANCELACION              = '204';
 _ERROR_CD_FOLIO_NO_EXISTE                          = '205';
 
 begin
-  if AnsiPos(_ERROR_SAT_XML_INVALIDO, aRespuestaDePAC) > -1 then
-    raise ETimbradoXMLInvalidoException.Create(aRespuestaDePAC);
+  if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise EPACServicioNoDisponibleException.Create(mensajeExcepcion, 0, True);
 
-  if AnsiPos(_ERROR_SAT_SELLO_EMISOR_INVALIDO, aRespuestaDePAC) > -1 then
-    raise ETimbradoSelloEmisorInvalidoException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_XML_INVALIDO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise  ETimbradoXMLInvalidoException.Create(mensajeExcepcion, 301, False);
 
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, aRespuestaDePAC) > -1 then
-    raise ETimbradoCertificadoNoCorrespondeException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_SELLO_EMISOR_INVALIDO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoSelloEmisorInvalidoException.Create(mensajeExcepcion, 302, False);
 
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_REVOCADO, aRespuestaDePAC) > -1 then
-    raise ETimbradoCertificadoRevocadoException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoCertificadoNoCorrespondeException.Create(mensajeExcepcion, 303, False);
 
-  if AnsiPos(_ERROR_SAT_FECHA_EMISION_SIN_VIGENCIA, aRespuestaDePAC) > -1 then
-    raise ETimbradoFechaEmisionSinVigenciaException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_CERTIFICADO_REVOCADO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoCertificadoRevocadoException.Create(mensajeExcepcion, 304, False);
 
-  if AnsiPos(_ERROR_SAT_LLAVE_NO_CORRESPONDE, aRespuestaDePAC) > -1 then
-    raise ETimbradoLlaveInvalidaException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_FECHA_EMISION_SIN_VIGENCIA, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoFechaEmisionSinVigenciaException.Create(mensajeExcepcion, 305, False);
 
-  if AnsiPos(_ERROR_SAT_PREVIAMENTE_TIMBRADO, aRespuestaDePAC) > -1 then
-    raise ETimbradoPreviamenteException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_LLAVE_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoLlaveInvalidaException.Create(mensajeExcepcion, 306, False);
 
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_FIRMADO_POR_SAT, aRespuestaDePAC) > -1 then
-    raise ETimbradoCertificadoApocrifoException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_PREVIAMENTE_TIMBRADO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoPreviamenteException.Create(mensajeExcepcion, 307, False);
 
-  if AnsiPos(_ERROR_SAT_FECHA_FUERA_DE_RANGO, aRespuestaDePAC) > -1 then
-    raise ETimbradoFechaGeneracionMasDe72HorasException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_FIRMADO_POR_SAT, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoCertificadoApocrifoException.Create(mensajeExcepcion, 308, False);
 
-  if AnsiPos(_ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO, aRespuestaDePAC) > -1 then
-    raise ETimbradoRegimenEmisorNoValidoException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_FECHA_FUERA_DE_RANGO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoFechaGeneracionMasDe72HorasException.Create(mensajeExcepcion, 401, False);
 
-  if AnsiPos(_ERROR_SAT_FECHA_EMISION_EN_EL_PASADO, aRespuestaDePAC) > -1 then
-    raise ETimbradoFechaEnElPasadoException.Create(aRespuestaDePAC);
+  if AnsiPos(_ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoRegimenEmisorNoValidoException.Create(mensajeExcepcion, 402, False);
+
+  if AnsiPos(_ERROR_SAT_FECHA_EMISION_EN_EL_PASADO, mensajeExcepcion) > _NO_ECONTRADO then
+    raise ETimbradoFechaEnElPasadoException.Create(mensajeExcepcion, 403, False);
+
+  if AnsiPos(_ECODEX_RFC_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
+    raise EPACTimbradoRFCNoCorrespondeException.Create('El RFC del documento y el del emisor no corresponden', 0, False);
+
+  if AnsiPos(_ECODEX_VERSION_NO_SOPORTADA, mensajeExcepcion) > _NO_ECONTRADO then
+    raise EPACTimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
+                                                              mensajeExcepcion, 0, False);
+
+  // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
+  // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
+  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, True);
+
 /// errores generados de este pac
   if AnsiPos(_ERROR_CD_PETICION_VACIA, aRespuestaDePAC) > -1 then
     raise ECDNoPeticionVacia.Create(aRespuestaDePAC+' Petición Vacia');

@@ -9,6 +9,7 @@ type
 
   TEcodexManejadorDeSesion = class
   private
+    fDominioWebService: String;
     fCredenciales: TFEPACCredenciales;
     wsSeguridad : IEcodexServicioSeguridad;
     fNumeroTransaccion: Integer;
@@ -16,6 +17,7 @@ type
     function ObtenerNuevoTokenDeServicio: String;
     procedure ProcesarFallaEcodex(const aMensajeFalla: String);
   public
+    constructor Create(const aDominioWebService : String);
     procedure AfterConstruction; override;
     procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
     function ObtenerNuevoTokenDeUsuario: String;
@@ -30,10 +32,16 @@ uses SysUtils,
      {$ENDIF}
      FacturacionHashes;
 
+constructor TEcodexManejadorDeSesion.Create(const aDominioWebService : String);
+begin
+  fDominioWebService := aDominioWebService;
+end;
+
 procedure TEcodexManejadorDeSesion.AfterConstruction;
 begin
   inherited;
-  wsSeguridad := GetWsEcodexSeguridad();
+  // Obtenemos la instancia del WebService de Sesion usando el dominio especificado por el usuario
+  wsSeguridad := GetWsEcodexSeguridad(False, fDominioWebService + '/ServicioSeguridad.svc');
 
   // El numero de transacción comenzará como un numero aleatorio
   // (excepto en las pruebas de unidad)
@@ -114,10 +122,10 @@ const
   _ERROR_ECODEX_EMISOR_NO_INSCRITO = 'Emisor no encontrado';
 begin
    if AnsiPos(_ERROR_ECODEX_EMISOR_NO_INSCRITO, aMensajeFalla) > _NO_ECONTRADO then
-    raise EPACEmisorNoInscritoException.Create(aMensajeFalla);
+    raise EPACEmisorNoInscritoException.Create(aMensajeFalla, 0, False);
 
    // Si llegamos aqui y no se proceso ningun otro error generamos un error genérico de credenciales
-   raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + aMensajeFalla);
+   raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + aMensajeFalla, 0, True);
 end;
 
 
