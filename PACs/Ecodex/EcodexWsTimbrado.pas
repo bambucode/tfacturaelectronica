@@ -1,3 +1,15 @@
+{* *****************************************************************************
+  PROYECTO FACTURACION ELECTRONICA
+  Copyright (C) 2010-2014 - Bambú Code SA de CV
+
+  Este archivo pertenece al proyecto de codigo abierto de Bambú Code:
+  http://bambucode.com/codigoabierto
+
+  La licencia de este código fuente se encuentra en:
+  http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
+
+  ***************************************************************************** *}
+
 // ************************************************************************ //
 // The types declared in this file were generated from data read from the
 // WSDL File described below:
@@ -39,7 +51,6 @@ type
   // !:int             - "http://www.w3.org/2001/XMLSchema"[Gbl]
   // !:boolean         - "http://www.w3.org/2001/XMLSchema"[Gbl]
 
-  InformacionQR2       = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
   TEcodexComprobanteXML      = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
   ComprobanteXML       = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblElm] }
   TEcodexAdvertenciaValidacion = class;               { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
@@ -50,29 +61,13 @@ type
   ComprobanteEstatus   = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblElm] }
   RespuestaEstatusTimbrado = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   RespuestaObtenerTimbrado = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
-  InformacionQR        = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblElm] }
-  RespuestaObtenerQRTimbrado = class;           { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
-  SolicitudObtenerQRTimbrado = class;           { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   SolicitudEstatusTimbrado = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   AdvertenciaValidacion = class;                { "http://Ecodex.WS.Model/2011/CFDI"[GblElm] }
   TEcodexRespuestaCancelacion = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   TEcodexSolicitudCancelacion = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
 
-  // ************************************************************************ //
-  // XML       : InformacionQR, global, <complexType>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // ************************************************************************ //
-  InformacionQR2 = class(TRemotable)
-  private
-    FImagen: TByteDynArray;
-    FImagen_Specified: boolean;
-    procedure SetImagen(Index: Integer; const ATByteDynArray: TByteDynArray);
-    function  Imagen_Specified(Index: Integer): boolean;
-  published
-    property Imagen: TByteDynArray  Index (IS_OPTN or IS_NLBL) read FImagen write SetImagen stored Imagen_Specified;
-  end;
 
-  TEcodexAdvertenciasDeValidacion = array of TEcodexAdvertenciaValidacion;   { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
+  TEcodexAdvertenciasDeValidacion = Array of TEcodexAdvertenciaValidacion;   { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
 
 
   // ************************************************************************ //
@@ -90,8 +85,6 @@ type
         FDatosXML write SetDatosXML stored DatosXML_Specified;
   end;
 
-
-
   // ************************************************************************ //
   // XML       : ComprobanteXML, global, <element>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
@@ -100,8 +93,6 @@ type
   private
   published
   end;
-
-
 
   // ************************************************************************ //
   // XML       : AdvertenciaValidacion, global, <complexType>
@@ -324,80 +315,6 @@ type
     property TransaccionID:  Int64            Index (IS_OPTN) read FTransaccionID write SetTransaccionID stored TransaccionID_Specified;
   end;
 
-
-
-  // ************************************************************************ //
-  // XML       : InformacionQR, global, <element>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // ************************************************************************ //
-  InformacionQR = class(InformacionQR2)
-  private
-  published
-  end;
-
-
-
-  // ************************************************************************ //
-  // XML       : RespuestaObtenerQRTimbrado, global, <element>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // Serializtn: [xoLiteralParam]
-  // Info      : Wrapper
-  // ************************************************************************ //
-  RespuestaObtenerQRTimbrado = class(TRemotable)
-  private
-    FQR: InformacionQR2;
-    FQR_Specified: boolean;
-    FTransaccionID: Int64;
-    FTransaccionID_Specified: boolean;
-    procedure SetQR(Index: Integer; const AInformacionQR2: InformacionQR2);
-    function  QR_Specified(Index: Integer): boolean;
-    procedure SetTransaccionID(Index: Integer; const AInt64: Int64);
-    function  TransaccionID_Specified(Index: Integer): boolean;
-  public
-    constructor Create; override;
-    destructor Destroy; override;
-  published
-    property QR:            InformacionQR2  Index (IS_OPTN or IS_NLBL) read FQR write SetQR stored QR_Specified;
-    property TransaccionID: Int64           Index (IS_OPTN) read FTransaccionID write SetTransaccionID stored TransaccionID_Specified;
-  end;
-
-
-
-  // ************************************************************************ //
-  // XML       : SolicitudObtenerQRTimbrado, global, <element>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // Serializtn: [xoLiteralParam]
-  // Info      : Wrapper
-  // ************************************************************************ //
-  SolicitudObtenerQRTimbrado = class(TRemotable)
-  private
-    FRFC: string;
-    FRFC_Specified: boolean;
-    FToken: string;
-    FToken_Specified: boolean;
-    FTransaccionID: Int64;
-    FTransaccionID_Specified: boolean;
-    FUUID: string;
-    FUUID_Specified: boolean;
-    procedure SetRFC(Index: Integer; const Astring: string);
-    function  RFC_Specified(Index: Integer): boolean;
-    procedure SetToken(Index: Integer; const Astring: string);
-    function  Token_Specified(Index: Integer): boolean;
-    procedure SetTransaccionID(Index: Integer; const AInt64: Int64);
-    function  TransaccionID_Specified(Index: Integer): boolean;
-    procedure SetUUID(Index: Integer; const Astring: string);
-    function  UUID_Specified(Index: Integer): boolean;
-  public
-    constructor Create; override;
-  published
-    property RFC:           string  Index (IS_OPTN or IS_NLBL) read FRFC write SetRFC stored RFC_Specified;
-    property Token:         string  Index (IS_OPTN or IS_NLBL) read FToken write SetToken stored Token_Specified;
-    property TransaccionID: Int64   Index (IS_OPTN) read FTransaccionID write SetTransaccionID stored TransaccionID_Specified;
-    property UUID:          string  Index (IS_OPTN or IS_NLBL) read FUUID write SetUUID stored UUID_Specified;
-  end;
-
-
-
   // ************************************************************************ //
   // XML       : SolicitudEstatusTimbrado, global, <element>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
@@ -534,9 +451,8 @@ type
     //     - Input element wrapper name does not match operation's name
     function  ObtenerTimbrado(const parameters: SolicitudObtenerTimbrado): RespuestaObtenerTimbrado; stdcall;
 
-    // Cannot unwrap: 
-    //     - Input element wrapper name does not match operation's name
-    function  ObtenerQRTimbrado(const parameters: SolicitudObtenerQRTimbrado): RespuestaObtenerQRTimbrado; stdcall;
+    // NOTA: No implementamos el siguiente metodo ya que la libreria lo hace por cuenta propia
+    //function  ObtenerQRTimbrado(const parameters: SolicitudObtenerQRTimbrado): RespuestaObtenerQRTimbrado; stdcall;
   end;
 
 function GetWsEcodexTimbrado(UseWSDL: Boolean=System.False; Addr: string='';
@@ -586,18 +502,6 @@ begin
     if (Result = nil) and (HTTPRIO = nil) then
       RIO.Free;
   end;
-end;
-
-
-procedure InformacionQR2.SetImagen(Index: Integer; const ATByteDynArray: TByteDynArray);
-begin
-  FImagen := ATByteDynArray;
-  FImagen_Specified := True;
-end;
-
-function InformacionQR2.Imagen_Specified(Index: Integer): boolean;
-begin
-  Result := FImagen_Specified;
 end;
 
 procedure TEcodexComprobanteXML.SetDatosXML(Index: Integer; const Astring:
@@ -908,90 +812,6 @@ begin
   Result := FTransaccionID_Specified;
 end;
 
-constructor RespuestaObtenerQRTimbrado.Create;
-begin
-  inherited Create;
-  FSerializationOptions := [xoLiteralParam];
-end;
-
-destructor RespuestaObtenerQRTimbrado.Destroy;
-begin
-  SysUtils.FreeAndNil(FQR);
-  inherited Destroy;
-end;
-
-procedure RespuestaObtenerQRTimbrado.SetQR(Index: Integer; const AInformacionQR2: InformacionQR2);
-begin
-  FQR := AInformacionQR2;
-  FQR_Specified := True;
-end;
-
-function RespuestaObtenerQRTimbrado.QR_Specified(Index: Integer): boolean;
-begin
-  Result := FQR_Specified;
-end;
-
-procedure RespuestaObtenerQRTimbrado.SetTransaccionID(Index: Integer; const AInt64: Int64);
-begin
-  FTransaccionID := AInt64;
-  FTransaccionID_Specified := True;
-end;
-
-function RespuestaObtenerQRTimbrado.TransaccionID_Specified(Index: Integer): boolean;
-begin
-  Result := FTransaccionID_Specified;
-end;
-
-constructor SolicitudObtenerQRTimbrado.Create;
-begin
-  inherited Create;
-  FSerializationOptions := [xoLiteralParam];
-end;
-
-procedure SolicitudObtenerQRTimbrado.SetRFC(Index: Integer; const Astring: string);
-begin
-  FRFC := Astring;
-  FRFC_Specified := True;
-end;
-
-function SolicitudObtenerQRTimbrado.RFC_Specified(Index: Integer): boolean;
-begin
-  Result := FRFC_Specified;
-end;
-
-procedure SolicitudObtenerQRTimbrado.SetToken(Index: Integer; const Astring: string);
-begin
-  FToken := Astring;
-  FToken_Specified := True;
-end;
-
-function SolicitudObtenerQRTimbrado.Token_Specified(Index: Integer): boolean;
-begin
-  Result := FToken_Specified;
-end;
-
-procedure SolicitudObtenerQRTimbrado.SetTransaccionID(Index: Integer; const AInt64: Int64);
-begin
-  FTransaccionID := AInt64;
-  FTransaccionID_Specified := True;
-end;
-
-function SolicitudObtenerQRTimbrado.TransaccionID_Specified(Index: Integer): boolean;
-begin
-  Result := FTransaccionID_Specified;
-end;
-
-procedure SolicitudObtenerQRTimbrado.SetUUID(Index: Integer; const Astring: string);
-begin
-  FUUID := Astring;
-  FUUID_Specified := True;
-end;
-
-function SolicitudObtenerQRTimbrado.UUID_Specified(Index: Integer): boolean;
-begin
-  Result := FUUID_Specified;
-end;
-
 constructor SolicitudEstatusTimbrado.Create;
 begin
   inherited Create;
@@ -1137,7 +957,6 @@ initialization
   InvRegistry.RegisterDefaultSOAPAction(TypeInfo(IEcodexServicioTimbrado), 'http://Ecodex.WS.Model/2011/CFDI/Timbrado/%operationName%');
   InvRegistry.RegisterInvokeOptions(TypeInfo(IEcodexServicioTimbrado), ioDocument);
   InvRegistry.RegisterInvokeOptions(TypeInfo(IEcodexServicioTimbrado), ioLiteral);
-  RemClassRegistry.RegisterXSClass(InformacionQR2, 'http://Ecodex.WS.Model/2011/CFDI', 'InformacionQR2', 'InformacionQR');
   RemClassRegistry.RegisterXSInfo(TypeInfo(TEcodexAdvertenciasDeValidacion), 'http://Ecodex.WS.Model/2011/CFDI', 'AdvertenciasValidacion');
   RemClassRegistry.RegisterXSClass(TEcodexComprobanteXML, 'http://Ecodex.WS.Model/2011/CFDI', 'ComprobanteXML2', 'ComprobanteXML');
   RemClassRegistry.RegisterXSClass(ComprobanteXML, 'http://Ecodex.WS.Model/2011/CFDI', 'ComprobanteXML');
@@ -1156,11 +975,6 @@ initialization
   RemClassRegistry.RegisterSerializeOptions(RespuestaEstatusTimbrado, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(RespuestaObtenerTimbrado, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaObtenerTimbrado');
   RemClassRegistry.RegisterSerializeOptions(RespuestaObtenerTimbrado, [xoLiteralParam]);
-  RemClassRegistry.RegisterXSClass(InformacionQR, 'http://Ecodex.WS.Model/2011/CFDI', 'InformacionQR');
-  RemClassRegistry.RegisterXSClass(RespuestaObtenerQRTimbrado, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaObtenerQRTimbrado');
-  RemClassRegistry.RegisterSerializeOptions(RespuestaObtenerQRTimbrado, [xoLiteralParam]);
-  RemClassRegistry.RegisterXSClass(SolicitudObtenerQRTimbrado, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudObtenerQRTimbrado');
-  RemClassRegistry.RegisterSerializeOptions(SolicitudObtenerQRTimbrado, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(SolicitudEstatusTimbrado, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudEstatusTimbrado');
   RemClassRegistry.RegisterSerializeOptions(SolicitudEstatusTimbrado, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(AdvertenciaValidacion, 'http://Ecodex.WS.Model/2011/CFDI', 'AdvertenciaValidacion');

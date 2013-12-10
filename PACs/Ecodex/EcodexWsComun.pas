@@ -1,4 +1,16 @@
-﻿unit EcodexWsComun;
+﻿{* *****************************************************************************
+  PROYECTO FACTURACION ELECTRONICA
+  Copyright (C) 2010-2014 - Bambú Code SA de CV
+
+  Este archivo pertenece al proyecto de codigo abierto de Bambú Code:
+  http://bambucode.com/codigoabierto
+
+  La licencia de este código fuente se encuentra en:
+  http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
+
+  ***************************************************************************** *}
+
+unit EcodexWsComun;
 
 interface
 
