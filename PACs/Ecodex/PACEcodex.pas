@@ -63,6 +63,7 @@ public
 implementation
 
 uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
+     EcodexWsComun,
      feCFDv32,
      {$IFDEF CODESITE}
      CodeSiteLogging,
@@ -235,18 +236,18 @@ begin
       begin
         mensajeFalla := E.Message;
 
-        if (E Is EFallaValidacionException) Or (E Is EFallaServicioException) then
+        if (E Is EEcodexFallaValidacionException) Or (E Is EEcodexFallaServicioException) then
         begin
-            if (E Is EFallaValidacionException)  then
+            if (E Is EEcodexFallaValidacionException)  then
             begin
-              mensajeFalla := 'EFallaValidacionException (' + IntToStr(EFallaValidacionException(E).Numero) + ') ' +
-                              EFallaValidacionException(E).Descripcion;
+              mensajeFalla := 'EFallaValidacionException (' + IntToStr(EEcodexFallaValidacionException(E).Numero) + ') ' +
+                              EEcodexFallaValidacionException(E).Descripcion;
             end;
 
-            if (E Is EFallaServicioException)  then
+            if (E Is EEcodexFallaServicioException)  then
             begin
-              mensajeFalla := 'EFallaServicioException (' + IntToStr(EFallaServicioException(E).Numero) + ') ' +
-                              EFallaServicioException(E).Descripcion;
+              mensajeFalla := 'EFallaServicioException (' + IntToStr(EEcodexFallaServicioException(E).Numero) + ') ' +
+                              EEcodexFallaServicioException(E).Descripcion;
             end;
         end;
       end;
