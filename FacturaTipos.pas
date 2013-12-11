@@ -202,11 +202,13 @@ EComprobanteEstructuraIncorrectaException = class(Exception);
 EPACException = class(Exception)
 private
   fCodigoErrorSAT: Integer;
+  fCodigoErrorPAC: Integer;
   fReintentable : Boolean;
 public
   constructor Create(const aMensajeExcepcion: String; const aCodigoErrorSAT:
-      Integer; const aReintentable: Boolean);
+      Integer; const aCodigoErrorPAC: Integer; const aReintentable: Boolean);
   property CodigoErrorSAT: Integer read fCodigoErrorSAT;
+  property CodigoErrrorPAC: Integer read fCodigoErrorPAC;
   property Reintentable : Boolean read fReintentable;
 end;
 
@@ -249,6 +251,7 @@ EPACEmisorNoInscritoException = class(EPACException);
 EPACErrorGenericoDeAccesoException = class(EPACException);
 EPACTimbradoRFCNoCorrespondeException = class(EPACException);
 EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
+EPACTimbradoSinFoliosDisponiblesException = class(EPACException);
 
 {$REGION 'Documentation'}
 ///	<summary>
@@ -283,11 +286,12 @@ _ERROR_SAT_FECHA_EMISION_EN_EL_PASADO               = '403';
 implementation
 
 constructor EPACException.Create(const aMensajeExcepcion: String; const
-    aCodigoErrorSAT: Integer; const aReintentable: Boolean);
+    aCodigoErrorSAT: Integer; const aCodigoErrorPAC : Integer; const aReintentable: Boolean);
 begin
   inherited Create(aMensajeExcepcion);
   fReintentable := aReintentable;
   fCodigoErrorSAT := aCodigoErrorSAT;
+  fCodigoErrorPAC := aCodigoErrorPAC;
 end;
 
 end.

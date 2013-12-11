@@ -176,6 +176,7 @@ procedure TPACEcodex.ProcesarExcepcionDePAC(const aExcepcion: Exception);
 var
   mensajeExcepcion: string;
 const
+  _ECODEX_SIN_FOLIOS_DISPONIBLES = '(800)';
   _ECODEX_FUERA_DE_SERVICIO = '(22)';
   _ECODEX_ALTA_EMISOR_CORREO_USADO = '(97)';
   _ECODEX_ALTA_EMISOR_REPETIDO = '(98)';
@@ -205,61 +206,64 @@ begin
   end;
 
   if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EPACServicioNoDisponibleException.Create(mensajeExcepcion, 0, True);
+    raise EPACServicioNoDisponibleException.Create(mensajeExcepcion, 0, 22, True);
 
   if AnsiPos(_ERROR_SAT_XML_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise  ETimbradoXMLInvalidoException.Create(mensajeExcepcion, 301, False);
+    raise  ETimbradoXMLInvalidoException.Create(mensajeExcepcion, 301, 0, False);
 
   if AnsiPos(_ERROR_SAT_SELLO_EMISOR_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise ETimbradoSelloEmisorInvalidoException.Create(mensajeExcepcion, 302, False);
+    raise ETimbradoSelloEmisorInvalidoException.Create(mensajeExcepcion, 302, 0, False);
 
   if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise ETimbradoCertificadoNoCorrespondeException.Create(mensajeExcepcion, 303, False);
+    raise ETimbradoCertificadoNoCorrespondeException.Create(mensajeExcepcion, 303, 0, False);
 
   if AnsiPos(_ERROR_SAT_CERTIFICADO_REVOCADO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise ETimbradoCertificadoRevocadoException.Create(mensajeExcepcion, 304, False);
+    raise ETimbradoCertificadoRevocadoException.Create(mensajeExcepcion, 304, 0, False);
 
   if AnsiPos(_ERROR_SAT_FECHA_EMISION_SIN_VIGENCIA, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise ETimbradoFechaEmisionSinVigenciaException.Create(mensajeExcepcion, 305, False);
+    raise ETimbradoFechaEmisionSinVigenciaException.Create(mensajeExcepcion, 305, 0, False);
 
   if AnsiPos(_ERROR_SAT_LLAVE_NO_CORRESPONDE, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise ETimbradoLlaveInvalidaException.Create(mensajeExcepcion, 306, False);
+    raise ETimbradoLlaveInvalidaException.Create(mensajeExcepcion, 306, 0, False);
 
   if AnsiPos(_ERROR_SAT_PREVIAMENTE_TIMBRADO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise ETimbradoPreviamenteException.Create(mensajeExcepcion, 307, False);
+    raise ETimbradoPreviamenteException.Create(mensajeExcepcion, 307, 0, False);
 
   if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_FIRMADO_POR_SAT, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise ETimbradoCertificadoApocrifoException.Create(mensajeExcepcion, 308, False);
+    raise ETimbradoCertificadoApocrifoException.Create(mensajeExcepcion, 308, 0, False);
 
   if AnsiPos(_ERROR_SAT_FECHA_FUERA_DE_RANGO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise ETimbradoFechaGeneracionMasDe72HorasException.Create(mensajeExcepcion, 401, False);
+    raise ETimbradoFechaGeneracionMasDe72HorasException.Create(mensajeExcepcion, 401, 0, False);
 
   if AnsiPos(_ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise ETimbradoRegimenEmisorNoValidoException.Create(mensajeExcepcion, 402, False);
+    raise ETimbradoRegimenEmisorNoValidoException.Create(mensajeExcepcion, 402, 0, False);
 
   if AnsiPos(_ERROR_SAT_FECHA_EMISION_EN_EL_PASADO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise ETimbradoFechaEnElPasadoException.Create(mensajeExcepcion, 403, False);
+    raise ETimbradoFechaEnElPasadoException.Create(mensajeExcepcion, 403, 0, False);
 
   if AnsiPos(_ECODEX_RFC_NO_CORRESPONDE, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EPACTimbradoRFCNoCorrespondeException.Create('El RFC del documento y el del emisor no corresponden', 0, False);
+    raise EPACTimbradoRFCNoCorrespondeException.Create('El RFC del documento y el del emisor no corresponden', 0, 0, False);
 
   if AnsiPos(_ECODEX_VERSION_NO_SOPORTADA, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EPACTimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
-                                                              mensajeExcepcion, 0, False);
+                                                              mensajeExcepcion, 0, 0, False);
+
+  if AnsiPos(_ECODEX_SIN_FOLIOS_DISPONIBLES, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EPACTimbradoSinFoliosDisponiblesException.Create(mensajeExcepcion, 0, 800, False);
 
   {$REGION 'Excepciones de alta de emisores'}
 
   if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_USADO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorCorreoUsadoException.Create('El correo asignado ya está en uso por otro emisor', 0, False);
+    raise EEcodexAltaEmisorCorreoUsadoException.Create('El correo asignado ya está en uso por otro emisor', 0, 97, False);
 
   if AnsiPos(_ECODEX_ALTA_EMISOR_REPETIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta', 0, False);
+    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta', 0, 98, False);
 
   if AnsiPos(_ECODEX_ALTA_EMISOR_RFC_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorRFCInvalidoException.Create('El RFC del emisor no es válido', 0, False);
+    raise EEcodexAltaEmisorRFCInvalidoException.Create('El RFC del emisor no es válido', 0, 890, False);
 
   if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorCorreoInvalidoException.Create('El correo del emisor no es válido', 0, False);
+    raise EEcodexAltaEmisorCorreoInvalidoException.Create('El correo del emisor no es válido', 0, 891, False);
 
   {$ENDREGION}
 

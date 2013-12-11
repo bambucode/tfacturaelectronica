@@ -153,10 +153,10 @@ const
   _ERROR_ECODEX_EMISOR_NO_INSCRITO = 'Emisor no encontrado';
 begin
    if AnsiPos(_ERROR_ECODEX_EMISOR_NO_INSCRITO, aMensajeFalla) > _NO_ECONTRADO then
-    raise EPACEmisorNoInscritoException.Create(aMensajeFalla, 0, False);
+    raise EPACEmisorNoInscritoException.Create(aMensajeFalla, 0, 0, False);
 
    // Si llegamos aqui y no se proceso ningun otro error generamos un error genérico de credenciales
-   raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + aMensajeFalla, 0, True);
+   raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + aMensajeFalla, 0, 0, True);
 end;
 
 
