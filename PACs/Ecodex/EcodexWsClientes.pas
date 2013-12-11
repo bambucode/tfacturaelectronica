@@ -518,7 +518,7 @@ const
   defWSDL = 'https://pruebas.ecodex.com.mx:2045/ServicioClientes.svc?wsdl';
   defURL  = 'https://pruebas.ecodex.com.mx:2045/ServicioClientes.svc';
   defSvc  = 'IEcodexServicioClientes';
-  defPrt  = 'PuertoClientesSeguro';
+  defPrt  = '4043';
 var
   RIO: THTTPRIO;
 begin
@@ -1081,26 +1081,26 @@ initialization
   RemClassRegistry.RegisterXSClass(Aviso2, 'http://Ecodex.WS.Model/2011/CFDI', 'Aviso2', 'Aviso');
   RemClassRegistry.RegisterXSClass(CuentaEstatus2, 'http://Ecodex.WS.Model/2011/CFDI', 'CuentaEstatus2', 'CuentaEstatus');
   RemClassRegistry.RegisterExternalPropName(TypeInfo(CuentaEstatus2), 'Certificados', '[ArrayItemName="string"]');
-  RemClassRegistry.RegisterXSClass(TEcodexSolicitudAvisosNuevos, 'http://Ecodex.WS.Model/2011/CFDI', 'TEcodexSolicitudAvisosNuevos');
+  RemClassRegistry.RegisterXSClass(TEcodexSolicitudAvisosNuevos, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudAvisosNuevos');
   RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudAvisosNuevos, [xoLiteralParam]);
-  RemClassRegistry.RegisterXSClass(TEcodexRespuestaRegistro, 'http://Ecodex.WS.Model/2011/CFDI', 'TEcodexRespuestaRegistro');
+  RemClassRegistry.RegisterXSClass(TEcodexRespuestaRegistro, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaRegistro');
   RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaRegistro, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(AltaEmisor, 'http://Ecodex.WS.Model/2011/CFDI', 'AltaEmisor');
-  RemClassRegistry.RegisterXSClass(TEcodexSolicitudRegistroCliente, 'http://Ecodex.WS.Model/2011/CFDI', 'TEcodexSolicitudRegistroCliente');
+  RemClassRegistry.RegisterXSClass(TEcodexSolicitudRegistroCliente, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudRegistroCliente');
   RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudRegistroCliente, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(ResultadoRegistroEmisor, 'http://Ecodex.WS.Model/2011/CFDI', 'ResultadoRegistroEmisor');
-  RemClassRegistry.RegisterXSClass(TEcodexRespuestaAsignacionTimbres, 'http://Ecodex.WS.Model/2011/CFDI', 'TEcodexRespuestaAsignacionTimbres');
+  RemClassRegistry.RegisterXSClass(TEcodexRespuestaAsignacionTimbres, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaAsignacionTimbres');
   RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaAsignacionTimbres, [xoLiteralParam]);
-  RemClassRegistry.RegisterXSClass(TEcodexSolicitudAsignacionTimbres, 'http://Ecodex.WS.Model/2011/CFDI', 'TEcodexSolicitudAsignacionTimbres');
+  RemClassRegistry.RegisterXSClass(TEcodexSolicitudAsignacionTimbres, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudAsignacionTimbres');
   RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudAsignacionTimbres, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(Aviso, 'http://Ecodex.WS.Model/2011/CFDI', 'Aviso');
-  RemClassRegistry.RegisterXSClass(TEcodexRespuestaAvisosNuevos, 'http://Ecodex.WS.Model/2011/CFDI', 'TEcodexRespuestaAvisosNuevos');
+  RemClassRegistry.RegisterXSClass(TEcodexRespuestaAvisosNuevos, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaAvisosNuevos');
   RemClassRegistry.RegisterExternalPropName(TypeInfo(TEcodexRespuestaAvisosNuevos), 'Avisos', '[ArrayItemName="Aviso"]');
   RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaAvisosNuevos, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(CuentaEstatus, 'http://Ecodex.WS.Model/2011/CFDI', 'CuentaEstatus');
-  RemClassRegistry.RegisterXSClass(TEcodexRespuestaEstatusCuenta, 'http://Ecodex.WS.Model/2011/CFDI', 'TEcodexRespuestaEstatusCuenta');
+  RemClassRegistry.RegisterXSClass(TEcodexRespuestaEstatusCuenta, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaEstatusCuenta');
   RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaEstatusCuenta, [xoLiteralParam]);
-  RemClassRegistry.RegisterXSClass(TEcodexSolicitudEstatusCuenta, 'http://Ecodex.WS.Model/2011/CFDI', 'TEcodexSolicitudEstatusCuenta');
+  RemClassRegistry.RegisterXSClass(TEcodexSolicitudEstatusCuenta, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudEstatusCuenta');
   RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudEstatusCuenta, [xoLiteralParam]);
 
 end.

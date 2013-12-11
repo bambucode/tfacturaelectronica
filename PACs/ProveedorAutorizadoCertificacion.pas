@@ -43,7 +43,8 @@ TTipoComprobanteXML = String;
   procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); virtual; abstract;
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; virtual; abstract;
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; virtual; abstract;
-  function AgregaCliente(const aNuevoEmisor: TFEContribuyente; const aRFCIntegrador: string): Boolean; virtual; abstract;
+  function AgregaCliente(const aNuevoEmisor: TFEContribuyente; const
+      aCredencialesDistribuidor: TFEPACCredenciales): Boolean; virtual; abstract;
   function EditaCliente(const Activar: Boolean;const aRFC:String):String; virtual; abstract;
   function BorraCliente(const aRFC: String):String; virtual; abstract;
  end;

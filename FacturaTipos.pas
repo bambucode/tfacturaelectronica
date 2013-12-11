@@ -244,6 +244,7 @@ ETimbradoFechaEnElPasadoException = class(EPACException); // Error 403
 ///	</summary>
 {$ENDREGION}
 EPACServicioNoDisponibleException = class(EPACException);
+EPACCredencialesIncorrectasException = class(EPACException);
 EPACEmisorNoInscritoException = class(EPACException);
 EPACErrorGenericoDeAccesoException = class(EPACException);
 EPACTimbradoRFCNoCorrespondeException = class(EPACException);

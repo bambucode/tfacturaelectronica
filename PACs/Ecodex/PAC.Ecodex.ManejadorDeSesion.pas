@@ -14,12 +14,14 @@ type
     wsSeguridad : IEcodexServicioSeguridad;
     fNumeroTransaccion: Integer;
     function GetNumeroDeTransaccion: Integer;
-    function ObtenerNuevoTokenDeServicio: String;
+    function ObtenerNuevoTokenDeServicio(const aRFC: String): String;
     procedure ProcesarFallaEcodex(const aMensajeFalla: String);
   public
     constructor Create(const aDominioWebService : String);
     procedure AfterConstruction; override;
     procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
+    function ObtenerNuevoTokenAltaEmisores(const aRFC, aIdIntegrador,
+        aIdAltaEmisores: String): String;
     function ObtenerNuevoTokenDeUsuario: String;
     property NumeroDeTransaccion: Integer read GetNumeroDeTransaccion;
   end;
@@ -63,7 +65,8 @@ begin
   Result := fNumeroTransaccion;
 end;
 
-function TEcodexManejadorDeSesion.ObtenerNuevoTokenDeServicio: String;
+function TEcodexManejadorDeSesion.ObtenerNuevoTokenDeServicio(const aRFC:
+    String): String;
 var
   nuevaSolicitudDeToken: TEcodexSolicitudDeToken;
   respuestaSolicitudDeToken: TEcodexRespuestaObtenerToken;
@@ -73,7 +76,7 @@ begin
   {$IFDEF CODESITE} CodeSite.EnterMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
   try
     nuevaSolicitudDeToken := TEcodexSolicitudDeToken.Create;
-    nuevaSolicitudDeToken.RFC := fCredenciales.RFC;
+    nuevaSolicitudDeToken.RFC := aRFC;
     nuevaSolicitudDeToken.TransaccionID := fNumeroTransaccion;
 
     try
@@ -103,11 +106,39 @@ begin
   Inc(fNumeroTransaccion);
 
   try
-     tokenDeServicio := ObtenerNuevoTokenDeServicio();
+     tokenDeServicio := ObtenerNuevoTokenDeServicio(fCredenciales.RFC);
 
      // El token de usuario será la combinacion del token de servicio y el ID del integrador
      // concatenados por un "pipe" codificados con el agoritmo SHA1
      Result := TFacturacionHashing.CalcularHash(fCredenciales.DistribuidorID + '|' + tokenDeServicio,
+                                                haSHA1)
+  except
+    On E:Exception do
+      raise;
+  end;
+end;
+
+function TEcodexManejadorDeSesion.ObtenerNuevoTokenAltaEmisores(const aRFC,
+    aIdIntegrador, aIdAltaEmisores: String): String;
+var
+  tokenDeServicio: string;
+begin
+  Assert(fCredenciales.RFC <> '', 'Las credenciales del PAC no fueron asignadas');
+
+  // Incrementamos el numero de transaccion
+  Inc(fNumeroTransaccion);
+
+  try
+     tokenDeServicio := ObtenerNuevoTokenDeServicio(aRFC);
+
+     // El token de alta de emisores será la combinacion de:
+     // - El ID del integrador
+     // - El ID de alta de emisores
+     // - El token de servicio
+     // Todos concatenados con un pipe (|) y codificados con el agoritmo SHA1
+     Result := TFacturacionHashing.CalcularHash((aIdIntegrador) + '|' +
+                                                (aIdAltaEmisores) + '|' +
+                                                tokenDeServicio,
                                                 haSHA1)
   except
     On E:Exception do

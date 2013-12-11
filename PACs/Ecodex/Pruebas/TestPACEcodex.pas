@@ -141,12 +141,43 @@ procedure TestTPACEcodex.AgregaCliente_NuevoEmisor_GuardeClienteCorrectamente;
 var
   nuevoEmisor: TFEContribuyente;
   respuestaAltaEmisor: Boolean;
-begin
-  nuevoEmisor.Nombre := 'Mi empresa de prueba SA de CV';
-  nuevoEmisor.RFC := 'SUL010720JN8';
-  nuevoEmisor.CorreoElectronico := 'test@test.com';
+  credencialesDePrueba, credencialesDeDistribudor: TFEPACCredenciales;
 
-  respuestaAltaEmisor := cutPACEcodex.AgregaCliente(nuevoEmisor, fCredencialesDePrueba.RFC);
+  function regresaRFCInventado() : string;
+  var
+    diaInventado: Integer;
+  begin
+    Randomize;
+    diaInventado := 31;
+    while diaInventado <= 31 do
+      diaInventado := Random(99);
+
+    // Generamos un RFC que comienza con 3 letras aleatorias, seguidas del dia aleatorio del mes de Enero 2013.
+    Result := Chr(ord('a') + Random(26)) +
+              Chr(ord('a') + Random(26)) +
+              Chr(ord('A') + Random(26)) +
+              IntToStr(diaInventado) + '0113AAA';
+  end;
+
+const
+  _RFC_PRUEBAS_PARA_ALTA_EMISORES = 'BBB010101001';
+begin
+  // Definimos los datos de acceso de nuestro usuario
+  credencialesDePrueba.RFC            := 'AAA010101AAA';
+  credencialesDePrueba.Clave          := 'prueba';
+  credencialesDePrueba.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
+  cutPACEcodex.AsignarCredenciales(credencialesDePrueba);
+
+  // Asignamos las credenciales de distirbuidor para poder crear un nuevo cliente
+  credencialesDeDistribudor.RFC             := 'BBB010101001';
+  credencialesDeDistribudor.DistribuidorID  := 'DF627BC3-A872-4806-BF37-DBD040CBAC7C';
+
+  // Generamos un RFC de pruebas
+  nuevoEmisor.Nombre := 'Mi empresa de prueba SA de CV';
+  nuevoEmisor.RFC := regresaRFCInventado();
+  nuevoEmisor.CorreoElectronico := nuevoEmisor.RFC + '@default.com';
+
+  respuestaAltaEmisor := cutPACEcodex.AgregaCliente(nuevoEmisor, credencialesDeDistribudor);
 
   CheckEquals(True,
               respuestaAltaEmisor,
