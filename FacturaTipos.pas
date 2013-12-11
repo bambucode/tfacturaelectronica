@@ -269,6 +269,7 @@ EPACErrorGenericoException = class(EPACException);
 const
 _RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';
 _RFC_VENTA_EXTRANJEROS        = 'XEXX010101000';
+_URL_PRUEBAS_ECODEX           = 'https://pruebas.ecodex.com.mx:2045';
 
 // Códigos de error regresados por los PAC
 _ERROR_SAT_XML_INVALIDO                             = '301';
