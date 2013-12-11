@@ -34,6 +34,7 @@ Proveedores Autorizados de Certificación (PAC) Soportados
 -------------
 * Ecodex - <http://www.ecodex.com.mx>
 * Comercio Digital - <http://www.comercio-digital.com.mx>
+* FinkOk - <http://www.finkok.com>
 
 Completado
 -------------
