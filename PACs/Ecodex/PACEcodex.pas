@@ -64,6 +64,7 @@ type
   function AsignarTimbreDeRespuestaDeEcodex(const aRespuestaTimbrado:
       TEcodexRespuestaTimbrado): TFETimbre;
   procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
+protected
   function getNombre() : string; override;
 public
   destructor Destroy(); override;
@@ -72,7 +73,7 @@ public
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; override;
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; override;
   function AgregaCliente(const aNuevoEmisor: TFEContribuyente; const
-      aCredencialesDistribuidor: TFEPACCredenciales): Boolean; override;
+      aCredencialesDistribuidor: TFEPACCredenciales): string; override;
   property Nombre : String read getNombre;
   constructor Create(const aDominioWebService : String); overload;
  end;
@@ -269,7 +270,7 @@ begin
 
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
   // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
-  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, True);
+  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
 end;
 
 function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre;
@@ -278,14 +279,14 @@ var
   respuestaTimbrado: TEcodexRespuestaTimbrado;
   tokenDeUsuario, mensajeFalla: string;
 begin
+   // 1. Creamos la solicitud de timbrado
+   solicitudTimbrado := TSolicitudTimbradoEcodex.Create;
+
   try
-    // 1. Iniciamos una nueva sesion solicitando un nuevo token
+    // 2. Iniciamos una nueva sesion solicitando un nuevo token
     tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
 
-    // 1. Creamos la solicitud de timbrado
-    solicitudTimbrado := TSolicitudTimbradoEcodex.Create;
-
-    // 2. Asignamos el documento XML
+    // 3. Asignamos el documento XML
     solicitudTimbrado.ComprobanteXML := TEcodexComprobanteXML.Create;
     solicitudTimbrado.ComprobanteXML.DatosXML := aDocumento;
     solicitudTimbrado.RFC := fCredenciales.RFC;
@@ -295,10 +296,10 @@ begin
     try
       mensajeFalla := '';
 
-      // 3. Realizamos la solicitud de timbrado
+      // 4. Realizamos la solicitud de timbrado
       respuestaTimbrado := wsTimbradoEcodex.TimbraXML(solicitudTimbrado);
 
-      // 4. Extraemos las propiedades del timbre de la respuesta del WebService
+      // 5. Extraemos las propiedades del timbre de la respuesta del WebService
       Result := AsignarTimbreDeRespuestaDeEcodex(respuestaTimbrado);
       respuestaTimbrado.Free;
     except
@@ -313,7 +314,7 @@ end;
 
 function TPACEcodex.CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean;
 var
-  timbreUUID, mensajeFalla, tokenDeUsuario: String;
+  mensajeFalla, tokenDeUsuario: String;
   solicitudCancelacion : TEcodexSolicitudCancelacion;
   respuestaCancelacion : TEcodexRespuestaCancelacion;
 
@@ -329,15 +330,17 @@ var
 begin
   Result := False;
 
-  // 1. Iniciamos una nueva sesion solicitando un nuevo token
+  // 1. Creamos la solicitud de cancelacion
+  solicitudCancelacion := TEcodexSolicitudCancelacion.Create;
+
+  // 2. Iniciamos una nueva sesion solicitando un nuevo token
   tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
 
   try
-    // 2. Creamos la solicitud de cancelacion
-    solicitudCancelacion := TEcodexSolicitudCancelacion.Create;
     solicitudCancelacion.RFC := fCredenciales.RFC;
     solicitudCancelacion.Token := tokenDeUsuario;
     solicitudCancelacion.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+
     // Ecodex solo requiere que le enviemos el UUID del timbre anterior, lo extraemos para enviarlo
     solicitudCancelacion.UUID := ExtraerUUID(aDocumento);
 
@@ -358,7 +361,7 @@ begin
 end;
 
 function TPACEcodex.AgregaCliente(const aNuevoEmisor: TFEContribuyente; const
-    aCredencialesDistribuidor: TFEPACCredenciales): Boolean;
+    aCredencialesDistribuidor: TFEPACCredenciales): string;
 var
   nuevoEmisor : TEcodexNuevoEmisor;
   solicitudRegistroCliente : TEcodexSolicitudRegistroCliente;
@@ -374,6 +377,7 @@ begin
   Assert(aNuevoEmisor.RFC <> '', 'El RFC del nuevo emisor estuvo vacio');
   Assert(aNuevoEmisor.Nombre <> '', 'La razon social del nuevo emisor estuvo vacia');
 
+  solicitudRegistroCliente := TEcodexSolicitudRegistroCliente.Create;
   try
     try
       // Mandamos los dos IDs del integrador y el ID de alta de emisores
@@ -392,7 +396,6 @@ begin
       nuevoEmisor.CorreoElectronico := LowerCase(aNuevoEmisor.CorreoElectronico);
 
       // Creamos la solicitud de registro de emisor
-      solicitudRegistroCliente := TEcodexSolicitudRegistroCliente.Create;
       solicitudRegistroCliente.Token := tokenDeAltaDeEmisores;
       solicitudRegistroCliente.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
       solicitudRegistroCliente.Emisor := nuevoEmisor;
@@ -408,8 +411,8 @@ begin
       CodeSite.Send('Clave certificado', respuestaRegistroCliente.Respuesta.ClaveCertificado);
       {$ENDIF}
 
-      // Nos regreso la cadena de exito?
-      Result := respuestaRegistroCliente.Respuesta.Estatus = _CADENA_ALTA_EXITOSA;
+      // Si fue exitosa regresamos el token para la alta de certificados
+      Result := respuestaRegistroCliente.Respuesta.ClaveCertificado;
       respuestaRegistroCliente.Free;
     except
       // Si ocurrio cualquier error procesamos la excepcion

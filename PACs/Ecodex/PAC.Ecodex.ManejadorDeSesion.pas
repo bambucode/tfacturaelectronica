@@ -133,11 +133,11 @@ begin
 
      // El token de alta de emisores será la combinacion de:
      // - El ID del integrador
-     // - El ID de alta de emisores
+     // - El ID de alta de emisores (en mayusculas forzosamente)
      // - El token de servicio
      // Todos concatenados con un pipe (|) y codificados con el agoritmo SHA1
      Result := TFacturacionHashing.CalcularHash((aIdIntegrador) + '|' +
-                                                (aIdAltaEmisores) + '|' +
+                                                Uppercase(aIdAltaEmisores) + '|' +
                                                 tokenDeServicio,
                                                 haSHA1)
   except

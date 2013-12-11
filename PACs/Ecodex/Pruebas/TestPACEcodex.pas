@@ -140,7 +140,9 @@ end;
 procedure TestTPACEcodex.AgregaCliente_NuevoEmisor_GuardeClienteCorrectamente;
 var
   nuevoEmisor: TFEContribuyente;
-  respuestaAltaEmisor: Boolean;
+  respuestaAltaEmisor: String;
+  guidRespuesta: TGUID;
+  fueGuidValido : Boolean;
   credencialesDePrueba, credencialesDeDistribudor: TFEPACCredenciales;
 
   function regresaRFCInventado() : string;
@@ -179,9 +181,19 @@ begin
 
   respuestaAltaEmisor := cutPACEcodex.AgregaCliente(nuevoEmisor, credencialesDeDistribudor);
 
-  CheckEquals(True,
-              respuestaAltaEmisor,
-              'No se dio de alta al nuevo emisor correctamente');
+  CheckNotEquals('',
+                respuestaAltaEmisor,
+                'No se dio de alta al nuevo emisor correctamente');
+
+  try
+    guidRespuesta := StringToGuid('{'+ respuestaAltaEmisor + '}');
+    fueGuidValido := True;
+  except
+    fueGuidValido := False;
+  end;
+
+  CheckTrue(fueGuidValido,
+            'La funcion no regreso un GUID de token para alta de certificados correcto');
 end;
 
 procedure TestTPACEcodex.CancelarDocumento_Documento_CanceleCorrectamente;
