@@ -3,6 +3,7 @@ unit PAC.Ecodex.ManejadorDeSesion;
 interface
 
 uses EcodexWsSeguridad,
+     SysUtils,
      FacturaTipos;
 
 type
@@ -15,7 +16,7 @@ type
     fNumeroTransaccion: Integer;
     function GetNumeroDeTransaccion: Integer;
     function ObtenerNuevoTokenDeServicio(const aRFC: String): String;
-    procedure ProcesarFallaEcodex(const aMensajeFalla: String);
+    procedure ProcesarFallaEcodex(const aExcepcion: Exception);
   public
     constructor Create(const aDominioWebService : String);
     procedure AfterConstruction; override;
@@ -28,7 +29,7 @@ type
 
 implementation
 
-uses SysUtils,
+uses ManejadorDeErroresComunes,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
@@ -69,12 +70,11 @@ function TEcodexManejadorDeSesion.ObtenerNuevoTokenDeServicio(const aRFC:
 var
   nuevaSolicitudDeToken: TEcodexSolicitudDeToken;
   respuestaSolicitudDeToken: TEcodexRespuestaObtenerToken;
-  mensajeFalla: string;
 begin
   Assert(fCredenciales.RFC <> '', 'Las credenciales del PAC no fueron asignadas');
   {$IFDEF CODESITE} CodeSite.EnterMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
+  nuevaSolicitudDeToken := TEcodexSolicitudDeToken.Create;
   try
-    nuevaSolicitudDeToken := TEcodexSolicitudDeToken.Create;
     nuevaSolicitudDeToken.RFC := aRFC;
     nuevaSolicitudDeToken.TransaccionID := fNumeroTransaccion;
 
@@ -84,11 +84,8 @@ begin
       Result := respuestaSolicitudDeToken.Token;
     except
       on E:Exception do
-        mensajeFalla := E.Message;
+       ProcesarFallaEcodex(E);
     end;
-
-    if (mensajeFalla <> '') then
-      ProcesarFallaEcodex(mensajeFalla);
   finally
     nuevaSolicitudDeToken.Free;
     {$IFDEF CODESITE} CodeSite.ExitMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
@@ -145,17 +142,24 @@ begin
   end;
 end;
 
-procedure TEcodexManejadorDeSesion.ProcesarFallaEcodex(const aMensajeFalla:
-    String);
+procedure TEcodexManejadorDeSesion.ProcesarFallaEcodex(const aExcepcion:
+    Exception);
+var
+  mensajeFalla: string;
 const
   _NO_ECONTRADO = 0;
   _ERROR_ECODEX_EMISOR_NO_INSCRITO = 'Emisor no encontrado';
 begin
-   if AnsiPos(_ERROR_ECODEX_EMISOR_NO_INSCRITO, aMensajeFalla) > _NO_ECONTRADO then
-    raise EPACEmisorNoInscritoException.Create(aMensajeFalla, 0, 0, False);
+  mensajeFalla := aExcepcion.Message;
+
+   if AnsiPos(_ERROR_ECODEX_EMISOR_NO_INSCRITO, mensajeFalla) > _NO_ECONTRADO then
+    raise EPACEmisorNoInscritoException.Create(mensajeFalla, 0, 0, False);
+
+
+   TManejadorErroresComunes.LanzarExcepcionSiDetectaFallaInternet(aExcepcion);
 
    // Si llegamos aqui y no se proceso ningun otro error generamos un error genérico de credenciales
-   raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + aMensajeFalla, 0, 0, True);
+   raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + mensajeFalla, 0, 0, True);
 end;
 
 

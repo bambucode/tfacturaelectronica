@@ -252,7 +252,14 @@ EPACErrorGenericoDeAccesoException = class(EPACException);
 EPACTimbradoRFCNoCorrespondeException = class(EPACException);
 EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
 EPACTimbradoSinFoliosDisponiblesException = class(EPACException);
-EPACProblemaConInternetException = class(Exception);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Este tipo de excepcion se lanza cuando se detecta una falla con el
+///	  internet del usuario el cual es un problema de comunicación con el PAC.
+///	</summary>
+{$ENDREGION}
+EPACProblemaConInternetException = class(EPACException);
 
 {$REGION 'Documentation'}
 ///	<summary>
