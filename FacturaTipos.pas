@@ -37,7 +37,8 @@ TFESerie = String[10];
 TFEFormaDePago = (fpUnaSolaExhibicion, fpParcialidades);
 TFETipoComprobante = (tcIngreso, tcEgreso, tcTraslado);
 
-// Versiones de CFD soportadas
+// Versiones de CFD soportadas, en caso de que se lea un XML y no este dentro de estas versiones
+// se lanzara una excepcion
 TFEVersionComprobante = (fev20, fev22,fev32);
 
 TFEDireccion = record
@@ -161,7 +162,16 @@ TFEPACCredenciales = record
 end;
 
 {$REGION 'Errores durante generacion de CFD/I'}
-  EFEAtributoRequeridoNoPresenteException = class(Exception);
+EFEAtributoRequeridoNoPresenteException = class(Exception);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Esta excepción se lanza cuando se intenta leer un XML de un CFD/I de una
+///	  versión aun no soportada. Pensado para evitar leer futuras versiones aun
+///	  no implementadas.
+///	</summary>
+{$ENDREGION}
+EFEVersionComprobanteNoSoportadaException = class(Exception);
 {$ENDREGION}
 
 {$REGION 'Otras excepciones que se presentan al usar el comprobante fiscal'}

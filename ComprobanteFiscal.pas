@@ -122,6 +122,7 @@ type
     procedure EstablecerVersionDelComprobante;
     function GetCadenaOriginalTimbre: TStringCadenaOriginal;
     function GetTimbre: TFETimbre;
+    procedure LeerVersionDeComprobanteLeido(const aDocumentoXML: WideString);
     procedure ValidarCamposEmisor;
     procedure ValidarCamposReceptor;
   protected
@@ -1175,21 +1176,15 @@ begin
         {$ELSE}
         iXmlDoc:=LoadXMLData(UTF8Decode(Valor));
         {$IFEND}
+
         // Creamos el documento "dueño" del comprobante
         fDocumentoXML:=TXmlDocument.Create(nil);
         // Pasamos el XML para poder usarlo en la clase
         fDocumentoXML.XML:=iXmlDoc.XML;
-        //Assert(fDocumentoXML.Encoding = 'UTF-8', 'El Encoding del documento no fue correcto');
-
-        // Asignamos el XML a la variable interna del componente
-        if AnsiPos('version="2.0"', Valor) > 0 then
-          fXmlComprobante := GetComprobante(fDocumentoXML);
-
-        if AnsiPos('version="2.2"', Valor) > 0 then
-          fXmlComprobante := GetComprobanteV22(fDocumentoXML);
-
-        if AnsiPos('version="3.2"', Valor) > 0 then
-          fXmlComprobante := GetComprobanteV32(fDocumentoXML);
+        
+        // Leemos la interface XML adecuada segun la version del XML, si la version no está soportada
+        // lanzaremos una excepcion
+        LeerVersionDeComprobanteLeido(Valor);
 
         fDocumentoXML.Encoding := 'UTF-8';
         Assert(fXmlComprobante <> nil, 'No se obtuvo una instancia del comprobante ya que fue nula');
@@ -1602,6 +1597,34 @@ begin
       Result:=fDocumentoXML.XML.Text
   else
       Raise Exception.Create('No se puede obtener el XML cuando aún no se ha generado el archivo CFD');
+end;
+
+procedure TFEComprobanteFiscal.LeerVersionDeComprobanteLeido(const
+    aDocumentoXML: WideString);
+var
+  cadenaVersion : String;
+const
+  _LONGITUD_CADENA_VERSION = 3;
+  _CADENA_COMIENZO_VERSION = '.xsd" version="';
+begin
+  // Obtenemos la cadena de la version exclusivamente
+  cadenaVersion := Copy(aDocumentoXML,
+                        AnsiPos(_CADENA_COMIENZO_VERSION, aDocumentoXML) + Length(_CADENA_COMIENZO_VERSION),
+                        _LONGITUD_CADENA_VERSION);
+
+  if (cadenaVersion = '2.0') then
+    fXmlComprobante := GetComprobante(fDocumentoXML);
+
+  if (cadenaVersion = '2.2') then
+    fXmlComprobante := GetComprobanteV22(fDocumentoXML);
+
+  if (cadenaVersion = '3.2') then
+    fXmlComprobante := GetComprobanteV32(fDocumentoXML);
+
+  // Si llegamos aqui y la instancia fue nula es que no tuvimos una version compatible
+  if fXmlComprobante = nil then
+    raise EFEVersionComprobanteNoSoportadaException.Create('No es posible leer un CFD/I con version "' + cadenaVersion +
+                                                           '" ya que esta versión del programa no es capaz de leerla');
 end;
 
 procedure TFEComprobanteFiscal.ValidarCamposEmisor;
