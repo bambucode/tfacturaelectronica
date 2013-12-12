@@ -63,6 +63,7 @@ type
   fManejadorDeSesion : TEcodexManejadorDeSesion;
   function AsignarTimbreDeRespuestaDeEcodex(const aRespuestaTimbrado:
       TEcodexRespuestaTimbrado): TFETimbre;
+  procedure ManejarFallaDeInternet(const aExcepcion: Exception);
   procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
 protected
   function getNombre() : string; override;
@@ -268,6 +269,8 @@ begin
 
   {$ENDREGION}
 
+  ManejarFallaDeInternet(aExcepcion);
+
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
   // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
   raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
@@ -422,6 +425,21 @@ begin
   finally
     if Assigned(solicitudRegistroCliente) then
       solicitudRegistroCliente.Free;
+  end;
+end;
+
+procedure TPACEcodex.ManejarFallaDeInternet(const aExcepcion: Exception);
+begin
+  if aExcepcion <> nil then
+  begin
+    if aExcepcion Is Exception then
+    begin
+        {$IFDEF CODESITE}
+          CodeSite.SendError(aExcepcion);
+        {$ENDIF}
+        if AnsiPos('could not be established', aExcepcion.Message) > 0 then
+          raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC', 0, 0, True);
+    end;
   end;
 end;
 

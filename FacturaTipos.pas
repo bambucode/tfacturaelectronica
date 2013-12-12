@@ -252,6 +252,7 @@ EPACErrorGenericoDeAccesoException = class(EPACException);
 EPACTimbradoRFCNoCorrespondeException = class(EPACException);
 EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
 EPACTimbradoSinFoliosDisponiblesException = class(EPACException);
+EPACProblemaConInternetException = class(Exception);
 
 {$REGION 'Documentation'}
 ///	<summary>

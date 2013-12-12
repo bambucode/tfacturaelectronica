@@ -54,7 +54,6 @@ end;
 procedure TEcodexManejadorDeSesion.AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
 begin
   Assert(aCredenciales.RFC <> '', 'El RFC de las credenciales estuvo vacío');
-  Assert(aCredenciales.Clave <> '', 'La clave de las credenciales estuvo vacía');
   Assert(aCredenciales.DistribuidorID <> '', 'El ID de Integrador estuvo vacío');
 
   fCredenciales := aCredenciales;
