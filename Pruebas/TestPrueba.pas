@@ -57,7 +57,7 @@ begin
 
    // Asumimos que se va a ejecutar en subdirectorio Release\Win32 de la carpeta
    // donde se guarda el proyecto
-   fRutaFixtures:=fRutaEXE + '\..\..\Pruebas\fixtures\';
+   fRutaFixtures:=fRutaEXE + '\fixtures\';
 end;
 
 function TTestPrueba.QuitarRetornos(sCad: WideString): WideString;

@@ -34,6 +34,14 @@ program ProbarFacturaElectronica;
 
 uses
   Forms,
+  SysUtils,
+  {$IFDEF XMLOUTPUT}
+  // Soporte para Vsoft.DUnit.Xml el cual permite que las pruebas generen un archivo XML para los reportes
+  // Ref: https://github.com/VSoftTechnologies/DUnit-XML
+  // Solo se debe agregar la carpeta de dicho proyecto al "Library Path"
+  VSoft.DUnit.XMLTestRunner,
+  VSoft.MSXML6,
+  {$ENDIF}
   TestFramework,
   GUITestRunner,
   TextTestRunner,
@@ -65,11 +73,50 @@ uses
 
 {$R *.RES}
 
+{$IfDef XMLOUTPUT}
+var
+  OutputFile : string = DEFAULT_FILENAME;
+
+var
+  ConfigFile : string;
+{$EndIf}
+
+{$IFDEF ISCONSOLE}
+var
+  ExitBehavior: TRunnerExitBehavior;
+{$EndIf}
+
 begin
-  Application.Initialize;
-  if IsConsole then
-    with TextTestRunner.RunRegisteredTests do
-      Free
-  else
-    GUITestRunner.RunRegisteredTests;
+  {$IfDef ISCONSOLE}
+    {$IfDef XMLOUTPUT}
+      if ConfigFile <> '' then
+      begin
+        RegisteredTests.LoadConfiguration(ConfigFile, False, True);
+        WriteLn('Loaded config file ' + ConfigFile);
+      end;
+      if ParamCount > 0 then
+        OutputFile := ParamStr(1);
+      WriteLn('Writing output to ' + OutputFile);
+      WriteLn('Running ' + IntToStr(RegisteredTests.CountEnabledTestCases) + ' of ' + IntToStr(RegisteredTests.CountTestCases) + ' test cases');
+      TXMLTestListener.RunRegisteredTests(OutputFile);
+    {$else}
+      WriteLn('To run with rxbPause, use -p switch');
+      WriteLn('To run with rxbHaltOnFailures, use -h switch');
+      WriteLn('No switch runs as rxbContinue');
+
+      if FindCmdLineSwitch('p', ['-', '/'], true) then
+        ExitBehavior := rxbPause
+      else if FindCmdLineSwitch('h', ['-', '/'], true) then
+        ExitBehavior := rxbHaltOnFailures
+      else
+        ExitBehavior := rxbContinue;
+
+      TextTestRunner.RunRegisteredTests(ExitBehavior);
+      Readln;
+    {$endif}
+  {$Else}
+    Application.Initialize;
+    TGUITestRunner.RunRegisteredTests;
+  {$EndIf}
 end.
+
