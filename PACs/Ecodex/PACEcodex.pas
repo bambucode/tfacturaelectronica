@@ -178,7 +178,9 @@ procedure TPACEcodex.ProcesarExcepcionDePAC(const aExcepcion: Exception);
 var
   mensajeExcepcion: string;
 const
+  // Cadena del error: "no existen Folios disponibles para el contribuyente"
   _ECODEX_SIN_FOLIOS_DISPONIBLES = '(800)';
+
   _ECODEX_FUERA_DE_SERVICIO = '(22)';
   _ECODEX_ALTA_EMISOR_CORREO_USADO = '(97)';
   _ECODEX_ALTA_EMISOR_REPETIDO = '(98)';
@@ -187,12 +189,14 @@ const
   _ECODEX_SERVICIO_NO_DISPONIBLE = 'Servicio no disponible';
   _ECODEX_VERSION_NO_SOPORTADA = 'El driver no soporta esta version de cfdi';
   // Algunos errores no regresan código de error, los buscamos por cadena completa
-  _ECODEX_RFC_NO_CORRESPONDE = 'El rfc del Documento no corresponde al del encabezado';
+  _ECODEX_RFC_NO_CORRESPONDE = 'El RFC del Documento no corresponde al del encabezado';
   _NO_ENCONTRADO = 0;
 begin
   mensajeExcepcion := aExcepcion.Message;
 
-  if (aExcepcion Is EEcodexFallaValidacionException) Or (aExcepcion Is EEcodexFallaServicioException) then
+  if (aExcepcion Is EEcodexFallaValidacionException) Or
+     (aExcepcion Is EEcodexFallaServicioException) Or
+     (aExcepcion is EEcodexFallaSesionException) then
   begin
       if (aExcepcion Is EEcodexFallaValidacionException)  then
       begin
@@ -204,6 +208,12 @@ begin
       begin
         mensajeExcepcion := 'EFallaServicioException (' + IntToStr(EEcodexFallaServicioException(aExcepcion).Numero) + ') ' +
                         EEcodexFallaServicioException(aExcepcion).Descripcion;
+      end;
+
+       if (aExcepcion Is EEcodexFallaSesionException)  then
+      begin
+        mensajeExcepcion := 'EEcodexFallaSesionException (' + IntToStr(EEcodexFallaSesionException(aExcepcion).Estatus) + ') ' +
+                            EEcodexFallaSesionException(aExcepcion).Descripcion;
       end;
   end;
 
@@ -251,7 +261,7 @@ begin
                                                               mensajeExcepcion, 0, 0, False);
 
   if AnsiPos(_ECODEX_SIN_FOLIOS_DISPONIBLES, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EPACTimbradoSinFoliosDisponiblesException.Create(mensajeExcepcion, 0, 800, False);
+    raise EPACTimbradoSinFoliosDisponiblesException.Create(mensajeExcepcion, 0, 800, True);
 
   {$REGION 'Excepciones de alta de emisores'}
 
