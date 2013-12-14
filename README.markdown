@@ -61,6 +61,8 @@ El ejecutable que use esta libreria deberá contar con los archivos DLL de opens
 aplicación para que pueda funcionar. Considere esto cuando genere un instalador o vaya a distribuir su aplicación
 final.
 
+Icono proporcionado por: http://pc.de/icons/
+
 Compatibilidad con versiones
 ------------
 La libreria ha sido probada solamente con Delphi XE2 aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 2007 si se encuentra algún error favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2.
