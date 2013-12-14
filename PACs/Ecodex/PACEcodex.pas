@@ -184,12 +184,12 @@ const
   _ECODEX_FUERA_DE_SERVICIO = '(22)';
   _ECODEX_ALTA_EMISOR_CORREO_USADO = '(97)';
   _ECODEX_ALTA_EMISOR_REPETIDO = '(98)';
+  // El rfc del Documento no corresponde al del encabezado.
+  _ECODEX_RFC_NO_CORRESPONDE = '(500)';
   _ECODEX_ALTA_EMISOR_RFC_INVALIDO = '(890)';
   _ECODEX_ALTA_EMISOR_CORREO_INVALIDO = '(891)';
   _ECODEX_SERVICIO_NO_DISPONIBLE = 'Servicio no disponible';
   _ECODEX_VERSION_NO_SOPORTADA = 'El driver no soporta esta version de cfdi';
-  // Algunos errores no regresan código de error, los buscamos por cadena completa
-  _ECODEX_RFC_NO_CORRESPONDE = 'El RFC del Documento no corresponde al del encabezado';
   _NO_ENCONTRADO = 0;
 begin
   mensajeExcepcion := aExcepcion.Message;
@@ -254,7 +254,8 @@ begin
     raise ETimbradoFechaEnElPasadoException.Create(mensajeExcepcion, 403, 0, False);
 
   if AnsiPos(_ECODEX_RFC_NO_CORRESPONDE, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EPACTimbradoRFCNoCorrespondeException.Create('El RFC del documento y el del emisor no corresponden', 0, 0, False);
+    raise EPACTimbradoRFCNoCorrespondeException.Create('El RFC del documento y el del emisor no corresponden', 0, 500,
+                                                      False);
 
   if AnsiPos(_ECODEX_VERSION_NO_SOPORTADA, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EPACTimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
