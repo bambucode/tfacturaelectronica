@@ -3,7 +3,6 @@
 *.~*
 *.bdsproj
 *.cfg
-*.dproj
 *.dproj.local
 *.exe
 *.identcache
