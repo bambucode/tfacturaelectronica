@@ -1,9 +1,10 @@
 (******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
 
- Copyright (C) 2011-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2011-2014 - Bambu Code SA de CV
 
- Proyecto que concentra todas las pruebas de unidad de la libreria.
+ Proyecto que concentra las pruebas de unidad especificas de la generación
+ del XML del CFD/I y su sellado
 
  Este archivo pertenece al proyecto de abierto fuente de BambuCode:
  http://bambucode.com/codigoabierto
