@@ -70,7 +70,8 @@ uses
   UtileriasPruebas in 'UtileriasPruebas.pas',
   FacturacionHashes in '..\FacturacionHashes.pas',
   FeTimbreFiscalDigital in '..\CFD\FeTimbreFiscalDigital.pas',
-  CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas';
+  CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas',
+  InformeMensual in '..\InformeMensual.pas';
 
 {$R *.RES}
 
