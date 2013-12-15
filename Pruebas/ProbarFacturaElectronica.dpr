@@ -12,8 +12,6 @@
  La licencia de este codigo fuente se encuentra en:
  http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
  ******************************************************************************)
-{$DEFINE VERSION_DE_PRUEBA}
-
 program ProbarFacturaElectronica;
 {
 
@@ -29,16 +27,25 @@ program ProbarFacturaElectronica;
 // Creamos el define para que podamos acceder a las variables privadas de las clases
 // para que sean probadas
 
+{$DEFINE VERSION_DE_PRUEBA}
+
 {$IFDEF CONSOLE_TESTRUNNER}
 {$APPTYPE CONSOLE}
 {$ENDIF}
 
+// Especificamos que estamos en modo prueba para tener acceso a algunas
+// variables privadas que modificaremos con el proposito de pruebas
+{$DEFINE TESTING}
+
 uses
-  Forms,
   SysUtils,
+  VSoft.DUnit.XMLTestRunner in '..\..\..\externos\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas',
+  VSoft.MSXML6 in '..\..\..\externos\DUnit-XML\VSoft.MSXML6.pas',
+  TextTestRunner,
   TestFramework,
   GUITestRunner,
-  TextTestRunner,
+  Forms,
+  CodeSiteLogging,
   TestSelloDigital in 'TestSelloDigital.pas',
   TestCadenaOriginalDeTimbre in 'TestCadenaOriginalDeTimbre.pas',
   FacturaTipos in '..\FacturaTipos.pas',
@@ -64,9 +71,7 @@ uses
   FacturacionHashes in '..\FacturacionHashes.pas',
   FeTimbreFiscalDigital in '..\CFD\FeTimbreFiscalDigital.pas',
   CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas',
-  InformeMensual in '..\InformeMensual.pas',
-  VSoft.DUnit.XMLTestRunner in '..\..\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas',
-  VSoft.MSXML6 in '..\..\DUnit-XML\VSoft.MSXML6.pas';
+  InformeMensual in '..\InformeMensual.pas';
 
 {$R *.RES}
 
@@ -109,7 +114,6 @@ begin
         ExitBehavior := rxbContinue;
 
       TextTestRunner.RunRegisteredTests(ExitBehavior);
-      Readln;
     {$endif}
   {$Else}
     Application.Initialize;
