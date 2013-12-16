@@ -3,7 +3,7 @@
 			<ProjectGuid>{665A03AB-92A6-4A8E-AEE0-D3F492F186EA}</ProjectGuid>
 			<MainSource>ProbarFacturaElectronica.dpr</MainSource>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<TargetedPlatforms>1</TargetedPlatforms>
 			<AppType>Application</AppType>
 			<FrameworkType>VCL</FrameworkType>
@@ -86,6 +86,8 @@
 			<DelphiCompile Include="$(MainSource)">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
+			<DCCReference Include="..\..\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas"/>
+			<DCCReference Include="..\..\DUnit-XML\VSoft.MSXML6.pas"/>
 			<DCCReference Include="TestSelloDigital.pas"/>
 			<DCCReference Include="TestCadenaOriginalDeTimbre.pas"/>
 			<DCCReference Include="..\FacturaTipos.pas"/>
