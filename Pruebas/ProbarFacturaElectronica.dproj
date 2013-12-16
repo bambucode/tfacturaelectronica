@@ -83,8 +83,6 @@
 			<DelphiCompile Include="$(MainSource)">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="..\..\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas"/>
-			<DCCReference Include="..\..\DUnit-XML\VSoft.MSXML6.pas"/>
 			<DCCReference Include="TestSelloDigital.pas"/>
 			<DCCReference Include="TestCadenaOriginalDeTimbre.pas"/>
 			<DCCReference Include="..\FacturaTipos.pas"/>

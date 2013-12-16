@@ -85,6 +85,8 @@ var
 {$EndIf}
 
 begin
+  CodeSite.Clear;
+
   {$IfDef ISCONSOLE}
     {$IfDef XMLOUTPUT}
       if ConfigFile <> '' then
