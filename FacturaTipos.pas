@@ -115,6 +115,7 @@ TFECertificado = record
     VigenciaInicio: TDateTime;
     VigenciaFin: TDateTime;
     NumeroSerie: String;
+    RFCAlQuePertenece: string;
 end;
 
 TFEBloqueFolios = record
@@ -160,6 +161,11 @@ TFEPACCredenciales = record
   Clave: String;
   DistribuidorID: string; // Usado por algunos PAC para la comunicacion (Ej: Ecodex)
 end;
+
+EFECertificadoNoExisteException = class(Exception);
+EFECertificadoNoVigente =  class(Exception);
+EFECertificadoNoCorrespondeAEmisor = class(Exception);
+EFECertificadoNoFueLeidoException = class(Exception);
 
 {$REGION 'Errores durante generacion de CFD/I'}
 EFEAtributoRequeridoNoPresenteException = class(Exception);

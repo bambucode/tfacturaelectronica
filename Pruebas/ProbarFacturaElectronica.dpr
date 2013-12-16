@@ -30,13 +30,6 @@ program ProbarFacturaElectronica;
 
 uses
   SysUtils,
-  {$IFDEF XMLOUTPUT}
-  // Soporte para Vsoft.DUnit.Xml el cual permite que las pruebas generen un archivo XML para los reportes
-  // Ref: https://github.com/VSoftTechnologies/DUnit-XML
-  // Solo se debe agregar la carpeta de dicho proyecto al "Library Path"
-  VSoft.DUnit.XMLTestRunner in '..\..\..\externos\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas',
-  VSoft.MSXML6 in '..\..\..\externos\DUnit-XML\VSoft.MSXML6.pas',
-  {$ENDIF}
   TextTestRunner,
   TestFramework,
   GUITestRunner,
@@ -67,7 +60,8 @@ uses
   FacturacionHashes in '..\FacturacionHashes.pas',
   FeTimbreFiscalDigital in '..\CFD\FeTimbreFiscalDigital.pas',
   CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas',
-  InformeMensual in '..\InformeMensual.pas';
+  InformeMensual in '..\InformeMensual.pas',
+  ClaseCertificadoSAT in '..\ClaseCertificadoSAT.pas';
 
 {$R *.RES}
 

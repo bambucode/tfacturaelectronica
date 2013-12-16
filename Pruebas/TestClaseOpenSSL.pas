@@ -39,7 +39,8 @@ implementation
 
 uses
   Windows, SysUtils, Classes, FacturaTipos, Forms, OpenSSLUtils, DateUtils,
-  ConstantesFixtures;
+  ConstantesFixtures,
+  CodeSiteLogging;
 
 
 procedure TestTOpenSSL.SetUp;
@@ -218,7 +219,7 @@ var
 
   function leerFechaDeArchivo(sRuta: String) : TDateTime;
   var
-     sFecha, sTxt, sMes, sHora, sAno, sDia: String;
+     sFecha, sTxt, sMes, sHora, sAno, sDia, hora, min, seg: String;
   begin
       // Leemos el archivo y convertimos el contenido a una fecha de Delphi
       sTxt:=leerContenidoDeArchivo(sRuta);
@@ -229,8 +230,19 @@ var
       sDia:=Copy(sFecha, 5, 2);
       sHora:=Copy(sFecha, 8, 8);
       sAno:=Copy(sFecha, 17, 4);
+
+      hora := Copy(sHora, 1, 2);
+      min := Copy(sHora, 4, 2);
+      seg := Copy(sHora, 7, 2);
+
       // Procesamos la fecha que regresa OpenSSL para convertirla a formato Delphi
-      Result:=StrToDateTime(sDia + '/' + IntToStr(NombreMesANumero(sMes)) + '/' + sAno + ' ' + sHora);
+      Result:=EncodeDateTime(StrToInt(sAno),
+                             NombreMesANumero(sMes),
+                             StrToInt(sDia),
+                             StrToInt(hora),
+                             StrToInt(min),
+                             StrToInt(seg),
+                             0);
   end;
 
   // Convertimos el num de serie que regresa OpenSSL en hexadecimal
@@ -278,6 +290,7 @@ begin
 
   Certificado := fOpenSSL.ObtenerCertificado(fRutaFixtures + _RUTA_CERTIFICADO);
   try
+    CodeSite.Send(Certificado.AsBase64);
     CheckTrue(Certificado <> nil, 'Se debio haber obtenido una instancia al certificado');
     // Checamos las propiedades que nos interesan
     CheckEquals(dtInicioVigencia, Certificado.NotBefore, 'El inicio de vigencia del certificado no fue el mismo que regreso OpenSSL');

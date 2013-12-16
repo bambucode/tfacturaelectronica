@@ -26,9 +26,6 @@ uses FacturaTipos, SysUtils,
 type
 
   // Excepciones que pueden ser generadas
-  EFECertificadoNoExisteException = class(Exception);
-  EFECertificadoNoVigente =  class(Exception);
-  EFECertificadoNoFueLeidoException = class(Exception);
   EFEFolioFueraDeRango = class(Exception);
   EXMLVacio = class(Exception);
 
@@ -65,6 +62,7 @@ type
     fDesglosarTotalesImpuestos: Boolean;
     bIncluirCertificadoEnXML: Boolean;
     fAutoAsignarFechaGeneracion: Boolean;
+    FVerificarRFCDelCertificado: Boolean;
 
 
     {$REGION 'Documentation'}
@@ -165,6 +163,8 @@ type
     property CadenaOriginalTimbre: TStringCadenaOriginal read
         GetCadenaOriginalTimbre;
     property Timbre: TFETimbre read GetTimbre;
+    property VerificarRFCDelCertificado: Boolean read FVerificarRFCDelCertificado
+        write FVerificarRFCDelCertificado;
     property Version : TFEVersionComprobante read fVersion;
 
     {$REGION 'Documentation'}
@@ -186,7 +186,8 @@ const
 implementation
 
 uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
-  OpenSSLUtils, Classes, CadenaOriginal,
+  Classes, CadenaOriginal,
+  ClaseCertificadoSAT,
   CadenaOriginalTimbre,
   {$IFDEF DEBUG} Dialogs, {$ENDIF}
   FeTimbreFiscalDigital,
@@ -687,45 +688,21 @@ begin
 end;
 
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
-const
-    _CADENA_INICIO_CERTIFICADO = '-----BEGIN CERTIFICATE-----';
-    _CADENA_FIN_CERTIFICADO    = '-----END CERTIFICATE-----';
-    _ERROR_LECTURA_CERTIFICADO = 'Unable to read certificate';
 var
-  x509Certificado: TX509Certificate;
-
-  // Quita los encabezados, pie y retornos de carro del certificado
-  function QuitarCaracteresNoUsadosEnCertificado(sCertificadoBase64: WideString) : WideString;
-  begin
-      sCertificadoBase64:=StringReplace(sCertificadoBase64, #13, '', [rfReplaceAll, rfIgnoreCase]);
-      sCertificadoBase64:=StringReplace(sCertificadoBase64, #10, '', [rfReplaceAll, rfIgnoreCase]);
-      // Quitamos encabezado del certificado
-      sCertificadoBase64:=StringReplace(sCertificadoBase64, _CADENA_INICIO_CERTIFICADO, '', [rfReplaceAll, rfIgnoreCase]);
-      // Quitamos el pie del certificado
-      Result:=StringReplace(sCertificadoBase64, _CADENA_FIN_CERTIFICADO, '', [rfReplaceAll, rfIgnoreCase]);
-  end;
-
+  certificadoSAT: TCertificadoSAT;
 begin
   // Ya que tenemos los datos del certificado, lo procesamos para obtener los datos
   // necesarios
-  x509Certificado := TX509Certificate.Create;
   try
-    if Not FileExists(Certificado.Ruta) then
-      raise EFECertificadoNoExisteException.Create('No existe el archivo del certificado')
-    else
-      x509Certificado.LoadFromFile(Certificado.Ruta);
-
-    fCertificado := Certificado;
-
-    // Llenamos las propiedades
-    fCertificado.VigenciaInicio := x509Certificado.NotBefore;
-    fCertificado.VigenciaFin := x509Certificado.NotAfter;
+    certificadoSAT := TCertificadoSAT.Create(Certificado.Ruta);
 
     // Checamos que el certificado este dentro de la vigencia
-    if Not((Now >= fCertificado.VigenciaInicio) and (Now <= fCertificado.VigenciaFin)) then
+    if Not certificadoSAT.Vigente then
       raise EFECertificadoNoVigente.Create('El certificado no tiene vigencia actual');
 
-    fCertificado.NumeroSerie := x509Certificado.SerialNumber;
+    // Almacenamos la propiedad interna del certificado
+    fCertificado := certificadoSAT.paraFacturar;
+    fCertificado.LlavePrivada := Certificado.LlavePrivada;
 
     // Ya procesado llenamos su propiedad en el XML
     Assert(Assigned(fXmlComprobante), 'El Nodo comprobante no est asignado!');
@@ -733,27 +710,11 @@ begin
 
     // Incluir el certificado en el XML?
     if bIncluirCertificadoEnXML = True then
-    begin
-       // Obtenemos el certificado codificado en Base64 para incluirlo en el comprobante
-       fCertificadoTexto:=X509Certificado.AsBase64;
-       fCertificadoTexto:=QuitarCaracteresNoUsadosEnCertificado(X509Certificado.AsBase64);
-       //CodeSite.Send('Certificado Base64', CertificadoBase64);
-       //CodeSite.Send('length', Length(CertificadoBase64));
-    end;
+      fCertificadoTexto:=certificadoSAT.ComoBase64;
 
-  except
-     // Pasamos la excepcion tal y como esta
-     On E: Exception do
-     begin
-        FreeAndNil(x509Certificado);
-        // Checamos los posibles errores
-        if AnsiPos(_ERROR_LECTURA_CERTIFICADO, E.Message) > 0 then
-            raise EFECertificadoNoFueLeidoException.Create('No fue posible leer el certificado: ' + E.Message)
-        else
-            raise Exception.Create(E.Message);
-     end;
+  finally
+    certificadoSAT.Free;
   end;
-  FreeAndNil(x509Certificado);
 end;
 
 // Asignamos la serie, el no y año de aprobacion al XML...
@@ -1086,6 +1047,16 @@ begin
   else
   begin
       fSelloDigitalCalculado:='';
+
+      // Si tiene activada la opcion de "VerificarRFCDelCertificado" checamos que el
+      // RFC del emisor del CFD corresponda al RFC para el que fue generado el Emisor
+      if fVerificarRFCDelCertificado then
+        if UpperCase(fCertificado.RFCAlQuePertenece) <> UpperCase(fEmisor.RFC) then
+        begin
+          raise EFECertificadoNoCorrespondeAEmisor.Create('Al parecer el certificado no corresponde al emisor, ' +
+                                                          'el RFC del certificado es ' + fCertificado.RFCAlQuePertenece + ' y el del ' +
+                                                          'emisor es ' + fEmisor.RFC);
+        end;
 
       // Obtenemos la cadena Original del CFD primero
       CadenaOriginal := Self.CadenaOriginal;
