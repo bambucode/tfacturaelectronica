@@ -1051,11 +1051,11 @@ begin
       // Si tiene activada la opcion de "VerificarRFCDelCertificado" checamos que el
       // RFC del emisor del CFD corresponda al RFC para el que fue generado el Emisor
       if fVerificarRFCDelCertificado then
-        if UpperCase(fCertificado.RFCAlQuePertenece) <> UpperCase(fEmisor.RFC) then
+        if UpperCase(fCertificado.RFCAlQuePertenece) <> UpperCase(inherited Emisor.RFC) then
         begin
           raise EFECertificadoNoCorrespondeAEmisor.Create('Al parecer el certificado no corresponde al emisor, ' +
                                                           'el RFC del certificado es ' + fCertificado.RFCAlQuePertenece + ' y el del ' +
-                                                          'emisor es ' + fEmisor.RFC);
+                                                          'emisor es ' + (inherited Emisor.RFC));
         end;
 
       // Obtenemos la cadena Original del CFD primero
