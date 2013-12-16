@@ -3,7 +3,7 @@
 			<ProjectGuid>{665A03AB-92A6-4A8E-AEE0-D3F492F186EA}</ProjectGuid>
 			<MainSource>ProbarFacturaElectronica.dpr</MainSource>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<TargetedPlatforms>1</TargetedPlatforms>
 			<AppType>Application</AppType>
 			<FrameworkType>VCL</FrameworkType>
@@ -59,14 +59,14 @@
 			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<Manifest_File>None</Manifest_File>
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
 			<DCC_DebugInformation>false</DCC_DebugInformation>
-			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+			<DCC_Define>VERSION_DE_PRUEBA;CONSOLE_TESTRUNNER;ISCONSOLE;XMLOUTPUT;TESTING;RELEASE;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-			<DCC_Define>VERSION_DE_PRUEBA;CONSOLE_TESTRUNNER;ISCONSOLE;XMLOUTPUT;TESTING;$(DCC_Define)</DCC_Define>
 			<VerInfo_Locale>1033</VerInfo_Locale>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
