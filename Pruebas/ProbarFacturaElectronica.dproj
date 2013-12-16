@@ -41,6 +41,8 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_Define>VERSION_DE_PRUEBA;CONSOLE_TESTRUNNER;ISCONSOLE;XMLOUTPUT;TESTING;$(DCC_Define)</DCC_Define>
+			<Manifest_File>None</Manifest_File>
 			<DCC_N>false</DCC_N>
 			<DCC_E>false</DCC_E>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
@@ -56,10 +58,8 @@
 			<DCC_Namespace>System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
-			<Manifest_File>None</Manifest_File>
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
 			<DCC_DebugInformation>false</DCC_DebugInformation>
@@ -83,6 +83,8 @@
 			<DelphiCompile Include="$(MainSource)">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
+			<DCCReference Include="..\..\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas"/>
+			<DCCReference Include="..\..\DUnit-XML\VSoft.MSXML6.pas"/>
 			<DCCReference Include="TestSelloDigital.pas"/>
 			<DCCReference Include="TestCadenaOriginalDeTimbre.pas"/>
 			<DCCReference Include="..\FacturaTipos.pas"/>
@@ -161,6 +163,7 @@
 						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
 						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40WSDT_D2012.bpl">IB Objects Web Snap Extensions</Excluded_Packages>
+						<Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\TMS Aurelius\library\bpl\Win32\dclaureliusxe2.bpl">TMS Aurelius - Design-Time Core Package</Excluded_Packages>
 					</Excluded_Packages>
 				</Delphi.Personality>
 				<Platforms>

@@ -89,6 +89,7 @@ begin
 
   {$IfDef ISCONSOLE}
     {$IfDef XMLOUTPUT}
+      {$Message Hint 'Compilando version generadora de XML'}
       if ConfigFile <> '' then
       begin
         RegisteredTests.LoadConfiguration(ConfigFile, False, True);
@@ -114,6 +115,7 @@ begin
       TextTestRunner.RunRegisteredTests(ExitBehavior);
     {$endif}
   {$Else}
+    {$Message Hint 'Generando version GUI de pruebas'}
     Application.Initialize;
     TGUITestRunner.RunRegisteredTests;
   {$EndIf}
