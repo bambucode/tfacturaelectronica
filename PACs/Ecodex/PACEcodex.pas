@@ -61,8 +61,7 @@ type
   wsClientesEcodex : IEcodexServicioClientes;
   wsTimbradoEcodex: IEcodexServicioTimbrado;
   fManejadorDeSesion : TEcodexManejadorDeSesion;
-  function AsignarTimbreDeRespuestaDeEcodex(const aRespuestaTimbrado:
-      TEcodexRespuestaTimbrado): TFETimbre;
+  function AsignarTimbreDeRespuestaDeEcodex(const aRespuestaTimbrado: TEcodexRespuestaTimbrado): TFETimbre;
   procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
 protected
   function getNombre() : string; override;
@@ -74,6 +73,7 @@ public
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; override;
   function AgregaCliente(const aNuevoEmisor: TFEContribuyente; const
       aCredencialesDistribuidor: TFEPACCredenciales): string; override;
+  function SaldoCliente(const aRFC: String) : Integer; override;
   property Nombre : String read getNombre;
   constructor Create(const aDominioWebService : String); overload;
  end;
@@ -371,6 +371,59 @@ begin
   finally
     if Assigned(solicitudCancelacion) then
       solicitudCancelacion.Free;
+  end;
+end;
+
+function TPACEcodex.SaldoCliente(const aRFC: String) : Integer;
+var
+  solicitudEdoCuenta: TEcodexSolicitudEstatusCuenta;
+  respuestaEdoCuenta: TEcodexRespuestaEstatusCuenta;
+  tokenDeUsuario : string;
+  I: Integer;
+begin
+  Assert(Trim(aRFC) <> '', 'El RFC para la solicitud de saldo fue vacio');
+
+  Result := 0;
+
+  // 1. Creamos la solicitud del edo de cuenta
+  solicitudEdoCuenta := TEcodexSolicitudEstatusCuenta.Create;
+
+  // 2. Iniciamos una nueva sesion solicitando un nuevo token
+  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+
+  try
+    solicitudEdoCuenta.RFC := aRFC;
+    solicitudEdoCuenta.Token := tokenDeUsuario;
+    solicitudEdoCuenta.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+
+    try
+      respuestaEdoCuenta := wsClientesEcodex.EstatusCuenta(solicitudEdoCuenta);
+      {$IFDEF CODESITE}
+        CodeSite.Send('Codigo', respuestaEdoCuenta.Estatus.Codigo);
+        CodeSite.Send('Descripcion', respuestaEdoCuenta.Estatus.Descripcion);
+        CodeSite.Send('Fecha de Inicio', respuestaEdoCuenta.Estatus.FechaInicio);
+        CodeSite.Send('Fecha de fin', respuestaEdoCuenta.Estatus.FechaFin);
+        CodeSite.Send('Timbres asignados', respuestaEdoCuenta.Estatus.TimbresAsignados);
+        CodeSite.Send('Timbres disponibles', respuestaEdoCuenta.Estatus.TimbresDisponibles);
+        CodeSite.Send('Num certificados cargados', Length(respuestaEdoCuenta.Estatus.Certificados));
+        // Mostramos los certificados cargados
+        for I := 0 to Length(respuestaEdoCuenta.Estatus.Certificados) - 1 do
+        begin
+          CodeSite.Send('Certificado cargado Num. ' + IntToStr(I), respuestaEdoCuenta.Estatus.Certificados[I]);
+        end;
+      {$ENDIF}
+
+      // 3. Regresamos los timbres disponibles y no los asignados
+      Result := respuestaEdoCuenta.Estatus.TimbresDisponibles;
+    except
+      On E:Exception do
+         if Not (E Is EPACException) then
+          ProcesarExcepcionDePAC(E)
+        else
+          raise;
+    end;
+  finally
+    solicitudEdoCuenta.Free;
   end;
 end;
 

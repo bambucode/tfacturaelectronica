@@ -47,6 +47,7 @@ TTipoComprobanteXML = String;
                          const aCredencialesDistribuidor: TFEPACCredenciales): String; virtual; abstract;
   function EditaCliente(const Activar: Boolean;const aRFC:String):String; virtual; abstract;
   function BorraCliente(const aRFC: String):String; virtual; abstract;
+  function SaldoCliente(const aRFC: String) : Integer; virtual; abstract;
  end;
 
 implementation

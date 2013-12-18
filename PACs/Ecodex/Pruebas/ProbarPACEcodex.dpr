@@ -63,7 +63,8 @@ uses
   CadenaOriginal in '..\..\..\CadenaOriginal.pas',
   ComprobanteFiscal in '..\..\..\ComprobanteFiscal.pas',
   EcodexWsClientes in '..\EcodexWsClientes.pas',
-  EcodexWsComun in '..\EcodexWsComun.pas';
+  EcodexWsComun in '..\EcodexWsComun.pas',
+  ManejadorDeErroresComunes in '..\..\ManejadorDeErroresComunes.pas';
 
 {$R *.RES}
 

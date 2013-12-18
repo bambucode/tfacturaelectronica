@@ -36,6 +36,7 @@ type
   published
     procedure AgregaCliente_NuevoEmisor_GuardeClienteCorrectamente;
     procedure CancelarDocumento_Documento_CanceleCorrectamente;
+    procedure SaldoCliente_EmisorConSaldo_RegreseSaldoDeTimbres;
     procedure TimbrarDocumento_ConRFCIncorrecto_CauseExcepcionDeRFC;
     procedure TimbrarDocumento_ConXMLMalformado_CauseExcepcion;
     procedure TimbrarDocumento_DePrueba_RegreseDatosDeTimbre;
@@ -195,6 +196,19 @@ begin
   CheckTrue(fueGuidValido,
             'La funcion no regreso un GUID de token para alta de certificados correcto');
 end;
+
+procedure TestTPACEcodex.SaldoCliente_EmisorConSaldo_RegreseSaldoDeTimbres;
+var
+  saldoDeTimbres: Integer;
+const
+  _RFC_CLIENTE_EXISTENTE = 'AAA010101AAA';
+begin
+  // Mandamos solicitar el saldo
+  saldoDeTimbres := cutPACEcodex.SaldoCliente(_RFC_CLIENTE_EXISTENTE);
+
+  CheckTrue(saldoDeTimbres > 0, 'El saldo en timbres fue cero');
+end;
+
 
 procedure TestTPACEcodex.CancelarDocumento_Documento_CanceleCorrectamente;
 var

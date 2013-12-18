@@ -53,7 +53,7 @@ type
   TEcodexResultadoRegistroEmisor = class;             { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
   TEcodexNuevoEmisor          = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
   Aviso2               = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
-  CuentaEstatus2       = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
+  TEcodexCuentaEstatus       = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
   TEcodexSolicitudAvisosNuevos = class;                { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   TEcodexRespuestaRegistro    = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   AltaEmisor           = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblElm] }
@@ -146,7 +146,7 @@ type
   // XML       : CuentaEstatus, global, <complexType>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
   // ************************************************************************ //
-  CuentaEstatus2 = class(TRemotable)
+  TEcodexCuentaEstatus = class(TRemotable)
   private
     FRFC: string;
     FRFC_Specified: boolean;
@@ -412,7 +412,7 @@ type
   // XML       : CuentaEstatus, global, <element>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
   // ************************************************************************ //
-  CuentaEstatus = class(CuentaEstatus2)
+  CuentaEstatus = class(TEcodexCuentaEstatus)
   private
   published
   end;
@@ -425,11 +425,11 @@ type
   // ************************************************************************ //
   TEcodexRespuestaEstatusCuenta = class(TRemotable)
   private
-    FEstatus: CuentaEstatus2;
+    FEstatus: TEcodexCuentaEstatus;
     FEstatus_Specified: boolean;
     FTransaccionID: Int64;
     FTransaccionID_Specified: boolean;
-    procedure SetEstatus(Index: Integer; const ACuentaEstatus2: CuentaEstatus2);
+    procedure SetEstatus(Index: Integer; const ACuentaEstatus2: TEcodexCuentaEstatus);
     function  Estatus_Specified(Index: Integer): boolean;
     procedure SetTransaccionID(Index: Integer; const AInt64: Int64);
     function  TransaccionID_Specified(Index: Integer): boolean;
@@ -437,7 +437,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
   published
-    property Estatus:       CuentaEstatus2  Index (IS_OPTN or IS_NLBL) read FEstatus write SetEstatus stored Estatus_Specified;
+    property Estatus:       TEcodexCuentaEstatus  Index (IS_OPTN or IS_NLBL) read FEstatus write SetEstatus stored Estatus_Specified;
     property TransaccionID: Int64           Index (IS_OPTN) read FTransaccionID write SetTransaccionID stored TransaccionID_Specified;
   end;
 
@@ -633,97 +633,97 @@ begin
   Result := FVigencia_Specified;
 end;
 
-destructor CuentaEstatus2.Destroy;
+destructor TEcodexCuentaEstatus.Destroy;
 begin
   SysUtils.FreeAndNil(FFechaInicio);
   SysUtils.FreeAndNil(FFechaFin);
   inherited Destroy;
 end;
 
-procedure CuentaEstatus2.SetRFC(Index: Integer; const Astring: string);
+procedure TEcodexCuentaEstatus.SetRFC(Index: Integer; const Astring: string);
 begin
   FRFC := Astring;
   FRFC_Specified := True;
 end;
 
-function CuentaEstatus2.RFC_Specified(Index: Integer): boolean;
+function TEcodexCuentaEstatus.RFC_Specified(Index: Integer): boolean;
 begin
   Result := FRFC_Specified;
 end;
 
-procedure CuentaEstatus2.SetCodigo(Index: Integer; const Astring: string);
+procedure TEcodexCuentaEstatus.SetCodigo(Index: Integer; const Astring: string);
 begin
   FCodigo := Astring;
   FCodigo_Specified := True;
 end;
 
-function CuentaEstatus2.Codigo_Specified(Index: Integer): boolean;
+function TEcodexCuentaEstatus.Codigo_Specified(Index: Integer): boolean;
 begin
   Result := FCodigo_Specified;
 end;
 
-procedure CuentaEstatus2.SetDescripcion(Index: Integer; const Astring: string);
+procedure TEcodexCuentaEstatus.SetDescripcion(Index: Integer; const Astring: string);
 begin
   FDescripcion := Astring;
   FDescripcion_Specified := True;
 end;
 
-function CuentaEstatus2.Descripcion_Specified(Index: Integer): boolean;
+function TEcodexCuentaEstatus.Descripcion_Specified(Index: Integer): boolean;
 begin
   Result := FDescripcion_Specified;
 end;
 
-procedure CuentaEstatus2.SetFechaInicio(Index: Integer; const ATXSDateTime: TXSDateTime);
+procedure TEcodexCuentaEstatus.SetFechaInicio(Index: Integer; const ATXSDateTime: TXSDateTime);
 begin
   FFechaInicio := ATXSDateTime;
   FFechaInicio_Specified := True;
 end;
 
-function CuentaEstatus2.FechaInicio_Specified(Index: Integer): boolean;
+function TEcodexCuentaEstatus.FechaInicio_Specified(Index: Integer): boolean;
 begin
   Result := FFechaInicio_Specified;
 end;
 
-procedure CuentaEstatus2.SetFechaFin(Index: Integer; const ATXSDateTime: TXSDateTime);
+procedure TEcodexCuentaEstatus.SetFechaFin(Index: Integer; const ATXSDateTime: TXSDateTime);
 begin
   FFechaFin := ATXSDateTime;
   FFechaFin_Specified := True;
 end;
 
-function CuentaEstatus2.FechaFin_Specified(Index: Integer): boolean;
+function TEcodexCuentaEstatus.FechaFin_Specified(Index: Integer): boolean;
 begin
   Result := FFechaFin_Specified;
 end;
 
-procedure CuentaEstatus2.SetTimbresAsignados(Index: Integer; const AInteger: Integer);
+procedure TEcodexCuentaEstatus.SetTimbresAsignados(Index: Integer; const AInteger: Integer);
 begin
   FTimbresAsignados := AInteger;
   FTimbresAsignados_Specified := True;
 end;
 
-function CuentaEstatus2.TimbresAsignados_Specified(Index: Integer): boolean;
+function TEcodexCuentaEstatus.TimbresAsignados_Specified(Index: Integer): boolean;
 begin
   Result := FTimbresAsignados_Specified;
 end;
 
-procedure CuentaEstatus2.SetTimbresDisponibles(Index: Integer; const AInteger: Integer);
+procedure TEcodexCuentaEstatus.SetTimbresDisponibles(Index: Integer; const AInteger: Integer);
 begin
   FTimbresDisponibles := AInteger;
   FTimbresDisponibles_Specified := True;
 end;
 
-function CuentaEstatus2.TimbresDisponibles_Specified(Index: Integer): boolean;
+function TEcodexCuentaEstatus.TimbresDisponibles_Specified(Index: Integer): boolean;
 begin
   Result := FTimbresDisponibles_Specified;
 end;
 
-procedure CuentaEstatus2.SetCertificados(Index: Integer; const AArrayOfstring: ArrayOfstring);
+procedure TEcodexCuentaEstatus.SetCertificados(Index: Integer; const AArrayOfstring: ArrayOfstring);
 begin
   FCertificados := AArrayOfstring;
   FCertificados_Specified := True;
 end;
 
-function CuentaEstatus2.Certificados_Specified(Index: Integer): boolean;
+function TEcodexCuentaEstatus.Certificados_Specified(Index: Integer): boolean;
 begin
   Result := FCertificados_Specified;
 end;
@@ -1007,7 +1007,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TEcodexRespuestaEstatusCuenta.SetEstatus(Index: Integer; const ACuentaEstatus2: CuentaEstatus2);
+procedure TEcodexRespuestaEstatusCuenta.SetEstatus(Index: Integer; const ACuentaEstatus2: TEcodexCuentaEstatus);
 begin
   FEstatus := ACuentaEstatus2;
   FEstatus_Specified := True;
@@ -1079,8 +1079,8 @@ initialization
   RemClassRegistry.RegisterXSClass(TEcodexNuevoEmisor, 'http://Ecodex.WS.Model/2011/CFDI', 'AltaEmisor', 'AltaEmisor');
   RemClassRegistry.RegisterXSInfo(TypeInfo(ArrayOfstring), 'http://schemas.microsoft.com/2003/10/Serialization/Arrays', 'ArrayOfstring');
   RemClassRegistry.RegisterXSClass(Aviso2, 'http://Ecodex.WS.Model/2011/CFDI', 'Aviso2', 'Aviso');
-  RemClassRegistry.RegisterXSClass(CuentaEstatus2, 'http://Ecodex.WS.Model/2011/CFDI', 'CuentaEstatus2', 'CuentaEstatus');
-  RemClassRegistry.RegisterExternalPropName(TypeInfo(CuentaEstatus2), 'Certificados', '[ArrayItemName="string"]');
+  RemClassRegistry.RegisterXSClass(TEcodexCuentaEstatus, 'http://Ecodex.WS.Model/2011/CFDI', 'CuentaEstatus', 'CuentaEstatus');
+  RemClassRegistry.RegisterExternalPropName(TypeInfo(TEcodexCuentaEstatus), 'Certificados', '[ArrayItemName="string"]');
   RemClassRegistry.RegisterXSClass(TEcodexSolicitudAvisosNuevos, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudAvisosNuevos');
   RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudAvisosNuevos, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(TEcodexRespuestaRegistro, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaRegistro');

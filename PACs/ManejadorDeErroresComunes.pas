@@ -37,7 +37,7 @@ begin
   if aExcepcion <> nil then
   begin
     {$IFDEF CODESITE}
-      CodeSite.SendError(aExcepcion);
+      CodeSite.SendException(aExcepcion);
     {$ENDIF}
 
     if aExcepcion Is ESOAPHttpException then
