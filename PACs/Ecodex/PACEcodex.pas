@@ -58,6 +58,7 @@ type
  private
   fDominioWebService : string;
   fCredenciales : TFEPACCredenciales;
+  fCredencialesIntegrador : TFEPACCredenciales;
   wsClientesEcodex : IEcodexServicioClientes;
   wsTimbradoEcodex: IEcodexServicioTimbrado;
   fManejadorDeSesion : TEcodexManejadorDeSesion;
@@ -68,11 +69,11 @@ protected
 public
   destructor Destroy(); override;
   procedure AfterConstruction; override;
-  procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); override;
+  procedure AsignarCredenciales(const aCredenciales, aCredencialesIntegrador:
+      TFEPACCredenciales);
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; override;
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; override;
-  function AgregaCliente(const aNuevoEmisor: TFEContribuyente; const
-      aCredencialesDistribuidor: TFEPACCredenciales): string; override;
+  function AgregaCliente(const aNuevoEmisor: TFEContribuyente): string; override;
   function SaldoCliente(const aRFC: String) : Integer; override;
   property Nombre : String read getNombre;
   constructor Create(const aDominioWebService : String); overload;
@@ -118,9 +119,11 @@ begin
   inherited;
 end;
 
-procedure TPACEcodex.AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
+procedure TPACEcodex.AsignarCredenciales(const aCredenciales,
+    aCredencialesIntegrador: TFEPACCredenciales);
 begin
   fCredenciales := aCredenciales;
+  fCredencialesIntegrador := aCredencialesIntegrador;
   fManejadorDeSesion.AsignarCredenciales(aCredenciales);
 end;
 
@@ -427,8 +430,7 @@ begin
   end;
 end;
 
-function TPACEcodex.AgregaCliente(const aNuevoEmisor: TFEContribuyente; const
-    aCredencialesDistribuidor: TFEPACCredenciales): string;
+function TPACEcodex.AgregaCliente(const aNuevoEmisor: TFEContribuyente): string;
 var
   nuevoEmisor : TEcodexNuevoEmisor;
   solicitudRegistroCliente : TEcodexSolicitudRegistroCliente;
@@ -440,7 +442,7 @@ const
 begin
   Assert(fManejadorDeSesion <> nil, 'El manejador de sesion de Ecodex es nulo');
   Assert(wsClientesEcodex <> nil, 'La referencia al servicio de Ecodex de clientes fue nula');
-  Assert(aCredencialesDistribuidor.RFC <> '', 'El RFC del integrador estuvo vacio');
+  Assert(fCredencialesIntegrador.RFC <> '', 'El RFC del integrador estuvo vacio');
   Assert(aNuevoEmisor.RFC <> '', 'El RFC del nuevo emisor estuvo vacio');
   Assert(aNuevoEmisor.Nombre <> '', 'La razon social del nuevo emisor estuvo vacia');
 
@@ -448,9 +450,9 @@ begin
   try
     try
       // Mandamos los dos IDs del integrador y el ID de alta de emisores
-      tokenDeAltaDeEmisores := fManejadorDeSesion.ObtenerNuevoTokenAltaEmisores(aCredencialesDistribuidor.RFC,
+      tokenDeAltaDeEmisores := fManejadorDeSesion.ObtenerNuevoTokenAltaEmisores(fCredencialesIntegrador.RFC,
                                                                                 fCredenciales.DistribuidorID,
-                                                                                aCredencialesDistribuidor.DistribuidorID);
+                                                                                fCredencialesIntegrador.DistribuidorID);
 
       // Creamos el objeto Emisor que enviaremos
       nuevoEmisor := TEcodexNuevoEmisor.Create;
@@ -466,7 +468,7 @@ begin
       solicitudRegistroCliente.Token := tokenDeAltaDeEmisores;
       solicitudRegistroCliente.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
       solicitudRegistroCliente.Emisor := nuevoEmisor;
-      solicitudRegistroCliente.RfcIntegrador := aCredencialesDistribuidor.RFC;
+      solicitudRegistroCliente.RfcIntegrador := fCredencialesIntegrador.RFC;
 
       // Mandamos registrar al emisor
       respuestaRegistroCliente := wsClientesEcodex.Registrar(solicitudRegistroCliente);
