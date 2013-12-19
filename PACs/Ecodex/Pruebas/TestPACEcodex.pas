@@ -25,6 +25,7 @@ type
     fDirectorioFixtures: string;
     fDocumentoDePrueba: WideString;
     fCredencialesDePrueba : TFEPACCredenciales;
+    fCredencialesDeIntegrador : TFEPACCredenciales;
     cutPACEcodex: TPACEcodex;
   private
     function ObtenerNuevaFacturaATimbrar(const aFechaGeneracion: TDateTime = 0):
@@ -66,8 +67,12 @@ begin
   fCredencialesDePrueba.Clave          := 'prueba';
   fCredencialesDePrueba.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
 
+  // Asignamos las credenciales de distirbuidor para poder crear un nuevo cliente
+  fCredencialesDeIntegrador.RFC             := 'BBB010101001';
+  fCredencialesDeIntegrador.DistribuidorID  := 'DF627BC3-A872-4806-BF37-DBD040CBAC7C';
+
   // Asignamos las credenciales a Ecodex
-  cutPACEcodex.AsignarCredenciales(fCredencialesDePrueba);
+  cutPACEcodex.AsignarCredenciales(fCredencialesDePrueba, fCredencialesDeIntegrador);
 end;
 
 procedure TestTPACEcodex.TearDown;
@@ -169,18 +174,19 @@ begin
   credencialesDePrueba.RFC            := 'AAA010101AAA';
   credencialesDePrueba.Clave          := 'prueba';
   credencialesDePrueba.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
-  cutPACEcodex.AsignarCredenciales(credencialesDePrueba);
 
   // Asignamos las credenciales de distirbuidor para poder crear un nuevo cliente
   credencialesDeDistribudor.RFC             := 'BBB010101001';
   credencialesDeDistribudor.DistribuidorID  := 'DF627BC3-A872-4806-BF37-DBD040CBAC7C';
+
+  cutPACEcodex.AsignarCredenciales(credencialesDePrueba, credencialesDeDistribudor);
 
   // Generamos un RFC de pruebas
   nuevoEmisor.Nombre := 'Mi empresa de prueba SA de CV';
   nuevoEmisor.RFC := regresaRFCInventado();
   nuevoEmisor.CorreoElectronico := nuevoEmisor.RFC + '@default.com';
 
-  respuestaAltaEmisor := cutPACEcodex.AgregaCliente(nuevoEmisor, credencialesDeDistribudor);
+  respuestaAltaEmisor := cutPACEcodex.AgregaCliente(nuevoEmisor);
 
   CheckNotEquals('',
                 respuestaAltaEmisor,
@@ -238,7 +244,7 @@ begin
   credencialesDiferentes.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
 
   // Asignamos las nuevas credenciales a Ecodex con un RFC diferente al del documento a timbrar
-  cutPACEcodex.AsignarCredenciales(credencialesDiferentes);
+  cutPACEcodex.AsignarCredenciales(credencialesDiferentes, credencialesDiferentes);
 
   try
     // Mandamos timbrar
