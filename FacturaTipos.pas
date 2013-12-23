@@ -295,6 +295,10 @@ _RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';
 _RFC_VENTA_EXTRANJEROS        = 'XEXX010101000';
 _URL_PRUEBAS_ECODEX           = 'https://pruebas.ecodex.com.mx:2045';
 
+// Errores ecodex
+_ERROR_ECODEX_CERTIFICADO_NUEVO = 'Error en Certificado:402';
+_ERROR_ECODEX_CERTIFICADO_306   = '306 Certificado utilizado no es de sello';
+
 // Códigos de error regresados por los PAC
 _ERROR_SAT_XML_INVALIDO                             = '301';
 _ERROR_SAT_SELLO_EMISOR_INVALIDO                    = '302';
