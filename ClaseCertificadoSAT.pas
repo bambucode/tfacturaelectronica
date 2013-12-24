@@ -115,7 +115,7 @@ begin
              (Now <= fCertificadoFacturas.VigenciaFin));}
 
   // De momento solo checamos que la fecha de vigencia sea mayor a hoy
-  Result := (Now <= fCertificadoFacturas.VigenciaFin));
+  Result := (Now <= fCertificadoFacturas.VigenciaFin);
 end;
 
 end.
