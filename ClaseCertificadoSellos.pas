@@ -11,7 +11,7 @@
  http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
  ******************************************************************************)
 
-unit ClaseCertificadoSAT;
+unit ClaseCertificadoSellos;
 
 interface
 
@@ -20,26 +20,35 @@ uses FacturaTipos,
 
 type
 
-  TCertificadoSAT = class
+  TCertificadoSellos = class
   private
     fx509Certificado : TX509Certificate;
+    fTipoCertificado : TFETipoCertificado;
     fCertificadoFacturas: TFECertificado;
+    FVigenteDesde: TDateTime;
+    FVigenteHasta: TDateTime;
     function GetComoBase64: String;
+    function GetEsValido: Boolean;
+    function GetTipo: TFETipoCertificado;
     function GetVigente: Boolean;
+    procedure IdentificarTipoDeCertificado(const aContenidoCertificado: String);
   public
     constructor Create(const aRutaCertificado: String);
     destructor Destroy; override;
     property ComoBase64: String read GetComoBase64;
     property paraFacturar: TFECertificado read fCertificadoFacturas;
+    property Tipo: TFETipoCertificado read GetTipo;
     property Vigente: Boolean read GetVigente;
-
+    property VigenteDesde: TDateTime read FVigenteDesde;
+    property VigenteHasta: TDateTime read FVigenteHasta;
   end;
 
 implementation
 
-uses SysUtils;
+uses SysUtils,
+     CodeSiteLogging;
 
-constructor TCertificadoSAT.Create(const aRutaCertificado: String);
+constructor TCertificadoSellos.Create(const aRutaCertificado: String);
 const
   _ERROR_LECTURA_CERTIFICADO = 'Unable to read certificate';
   _CADENA_INICIO_RFC_EN_CERTIFICADO = 'UniqueIdentifier=';
@@ -56,9 +65,22 @@ begin
 
     fCertificadoFacturas.Ruta := aRutaCertificado;
 
+    {$IFDEF CODESITE}
+    CodeSite.AddSeparator;
+    CodeSite.Send('Issuer', fx509Certificado.Issuer);
+    CodeSite.Send('Subject', fx509Certificado.Subject);
+    CodeSite.Send('Text', fx509Certificado.Text);
+    CodeSite.AddSeparator;
+    {$ENDIF}
+
+    // Identificamos el tipo de certificado (FIEL o sellos)
+    IdentificarTipoDeCertificado(fx509Certificado.Text);
+
     // Leemos las propiedades
-    fCertificadoFacturas.VigenciaInicio := fx509Certificado.NotBefore;
-    fCertificadoFacturas.VigenciaFin := fx509Certificado.NotAfter;
+    fVigenteDesde := fx509Certificado.NotBefore;
+    fCertificadoFacturas.VigenciaInicio := fVigenteDesde;
+    fVigenteHasta := fx509Certificado.NotAfter;
+    fCertificadoFacturas.VigenciaFin := fVigenteHasta;
 
     fCertificadoFacturas.NumeroSerie := fx509Certificado.SerialNumber;
 
@@ -82,7 +104,7 @@ begin
   end;
 end;
 
-destructor TCertificadoSAT.Destroy;
+destructor TCertificadoSellos.Destroy;
 begin
   inherited;
 
@@ -90,7 +112,7 @@ begin
      FreeAndNil(fx509Certificado);
 end;
 
-function TCertificadoSAT.GetComoBase64: String;
+function TCertificadoSellos.GetComoBase64: String;
 const
   _CADENA_INICIO_CERTIFICADO = '-----BEGIN CERTIFICATE-----';
   _CADENA_FIN_CERTIFICADO    = '-----END CERTIFICATE-----';
@@ -109,13 +131,35 @@ begin
   Result:=StringReplace(sCertificadoBase64, _CADENA_FIN_CERTIFICADO, '', [rfReplaceAll, rfIgnoreCase]);
 end;
 
-function TCertificadoSAT.GetVigente: Boolean;
+function TCertificadoSellos.GetEsValido: Boolean;
 begin
-  {Result := ((Now >= fCertificadoFacturas.VigenciaInicio) And
-             (Now <= fCertificadoFacturas.VigenciaFin));}
+  Result := True;
+end;
 
-  // De momento solo checamos que la fecha de vigencia sea mayor a hoy
-  Result := (Now <= fCertificadoFacturas.VigenciaFin);
+function TCertificadoSellos.GetTipo: TFETipoCertificado;
+begin
+  Result := fTipoCertificado;
+end;
+
+function TCertificadoSellos.GetVigente: Boolean;
+begin
+  Result := ((Now >= fCertificadoFacturas.VigenciaInicio) And
+             (Now <= fCertificadoFacturas.VigenciaFin));
+end;
+
+procedure TCertificadoSellos.IdentificarTipoDeCertificado(const
+    aContenidoCertificado: String);
+const
+  // Las siguientes cadenas solo se encuentran en un certificado de FIEL
+  // despues de X509v3 Key Usage
+  _CADENA_USO_X509V3_CIFRADO = 'Data Encipherment';
+  _CADENA_USO_X509V3_LLAVE = 'Key Agreement';
+begin
+  if ((AnsiPos(_CADENA_USO_X509V3_CIFRADO, aContenidoCertificado) > 0) And
+     (AnsiPos(_CADENA_USO_X509V3_LLAVE, aContenidoCertificado) > 0)) then
+    fTipoCertificado := tcFIEL
+  else
+    fTipoCertificado := tcSellos;
 end;
 
 end.

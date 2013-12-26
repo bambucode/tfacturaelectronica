@@ -187,7 +187,7 @@ implementation
 
 uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
   Classes, CadenaOriginal,
-  ClaseCertificadoSAT,
+  ClaseCertificadoSellos,
   CadenaOriginalTimbre,
   {$IFDEF DEBUG} Dialogs, {$ENDIF}
   FeTimbreFiscalDigital,
@@ -689,19 +689,23 @@ end;
 
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
 var
-  certificadoSAT: TCertificadoSAT;
+  certificadoSellos: TCertificadoSellos;
 begin
   // Ya que tenemos los datos del certificado, lo procesamos para obtener los datos
   // necesarios
   try
-    certificadoSAT := TCertificadoSAT.Create(Certificado.Ruta);
+    certificadoSellos := TCertificadoSellos.Create(Certificado.Ruta);
 
     // Checamos que el certificado este dentro de la vigencia
-    if Not certificadoSAT.Vigente then
+    if Not certificadoSellos.Vigente then
       raise EFECertificadoNoVigente.Create('El certificado no tiene vigencia actual');
 
+    // Checamos que el certificado no sea el de la FIEL
+    if Not (certificadoSellos.Tipo = tcSellos) then
+      raise EFECertificadoNoEsDeSellosException.Create('El certificado leido no es de sellos' );
+
     // Almacenamos la propiedad interna del certificado
-    fCertificado := certificadoSAT.paraFacturar;
+    fCertificado := certificadoSellos.paraFacturar;
     fCertificado.LlavePrivada := Certificado.LlavePrivada;
 
     // Ya procesado llenamos su propiedad en el XML
@@ -710,10 +714,10 @@ begin
 
     // Incluir el certificado en el XML?
     if bIncluirCertificadoEnXML = True then
-      fCertificadoTexto:=certificadoSAT.ComoBase64;
+      fCertificadoTexto:=certificadoSellos.ComoBase64;
 
   finally
-    certificadoSAT.Free;
+    certificadoSellos.Free;
   end;
 end;
 

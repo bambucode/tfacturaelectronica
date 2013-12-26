@@ -109,6 +109,9 @@ TFELlavePrivada = record
    Clave: String;
 end;
 
+// Tipo del certificado leido (usado por Clase TCertificadoSellos)
+TFETipoCertificado = (tcSellos, tcFIEL);
+
 TFECertificado = record
     Ruta: String;
     LlavePrivada: TFELlavePrivada;
@@ -163,6 +166,7 @@ TFEPACCredenciales = record
 end;
 
 EFECertificadoNoExisteException = class(Exception);
+EFECertificadoNoEsDeSellosException = class(Exception);
 EFECertificadoNoVigente =  class(Exception);
 EFECertificadoNoCorrespondeAEmisor = class(Exception);
 EFECertificadoNoFueLeidoException = class(Exception);

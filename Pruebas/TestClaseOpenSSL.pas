@@ -80,6 +80,8 @@ begin
   BorrarArchivoTempSiExiste(_ARCHIVO_TEMPORAL_RESULTADO_OPENSSL);
   BorrarArchivoTempSiExiste(TipoEncripcion + '_cadena_de_prueba.bin');
 
+  Sleep(100);
+
   // Guardamos el contenido de la cadena de prueba a un archivo temporal
   guardarArchivoEnUTF8(UTF8Encode(aCadena),
                                   _ARCHIVO_CADENA_TEMPORAL);

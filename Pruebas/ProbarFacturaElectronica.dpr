@@ -68,7 +68,9 @@ uses
   FeTimbreFiscalDigital in '..\CFD\FeTimbreFiscalDigital.pas',
   CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas',
   InformeMensual in '..\InformeMensual.pas',
-  ClaseCertificadoSAT in '..\ClaseCertificadoSAT.pas';
+  ClaseCertificadoSellos in '..\ClaseCertificadoSellos.pas',
+  TestCertificadoSellos in 'TestCertificadoSellos.pas';
+
 
 {$R *.RES}
 

@@ -3,7 +3,7 @@
 			<ProjectGuid>{665A03AB-92A6-4A8E-AEE0-D3F492F186EA}</ProjectGuid>
 			<MainSource>ProbarFacturaElectronica.dpr</MainSource>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Release</Config>
+			<Config Condition="'$(Config)'==''">Debug</Config>
 			<TargetedPlatforms>1</TargetedPlatforms>
 			<AppType>Application</AppType>
 			<FrameworkType>VCL</FrameworkType>
@@ -86,8 +86,6 @@
 			<DelphiCompile Include="$(MainSource)">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
-			<DCCReference Include="..\..\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas"/>
-			<DCCReference Include="..\..\DUnit-XML\VSoft.MSXML6.pas"/>
 			<DCCReference Include="TestSelloDigital.pas"/>
 			<DCCReference Include="TestCadenaOriginalDeTimbre.pas"/>
 			<DCCReference Include="..\FacturaTipos.pas"/>
@@ -114,7 +112,8 @@
 			<DCCReference Include="..\CFD\FeTimbreFiscalDigital.pas"/>
 			<DCCReference Include="..\CadenaOriginalTimbre.pas"/>
 			<DCCReference Include="..\InformeMensual.pas"/>
-			<DCCReference Include="..\ClaseCertificadoSAT.pas"/>
+			<DCCReference Include="..\ClaseCertificadoSellos.pas"/>
+			<DCCReference Include="TestCertificadoSellos.pas"/>
 			<BuildConfiguration Include="Debug">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
@@ -177,8 +176,8 @@
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
 		</ProjectExtensions>
-		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
-		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
 	</Project>
 
 <!-- EurekaLog First Line
