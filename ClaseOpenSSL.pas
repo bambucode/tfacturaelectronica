@@ -112,13 +112,16 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
         ///	  Ruta del archivo .PEM a guardar
         ///	</param>
         {$ENDREGION}
-        procedure GuardarLlavePrivadaEnPEM(const aLlaveAbierta: pPKCS8_Priv_Key_Info;
-            const aArchivoDestino: String);
+        procedure GuardarLlavePrivadaEnPEM(const aLlaveAbierta: pPKCS8_Priv_Key_Info; const aArchivoDestino: String);
+        function ObtenerModulusDeLlavePrivada(const aLlaveDesencriptada: pEVP_PKEY): String;
     end;
+
 
 implementation
 
-uses  StrUtils;
+uses
+  {$IFDEF CODESITE} CodeSiteLogging, {$ENDIF}
+  StrUtils;
 
 constructor TOpenSSL.Create();
 begin
@@ -342,6 +345,37 @@ begin
           Result:=nil;
       end;
   end;
+end;
+
+
+function TOpenSSL.ObtenerModulusDeLlavePrivada(const aLlaveDesencriptada:
+    pEVP_PKEY): String;
+var
+  resLlave: pEVP_PKEY;
+  rsaInfo: pRSA;
+  bioModulus: pBIO;
+  Inbuf: Array[0..9999] of AnsiChar;
+begin
+  // Obtenemos las propiedades RSA de la Llave privada
+  rsaInfo := EVP_PKEY_get1_RSA(resLlave);
+  // Creamos un BIO en memoria para almacenar el dato del Modulus
+  bioModulus := BIO_new(BIO_s_mem());
+
+  // Asignamos el Modulus (propieda N del record RSA, rsa.c linea 336)
+  if rsaInfo.n <> nil then
+    if BN_print(bioModulus, rsaInfo.n) <= 0 then
+      raise Exception.Create('No fue posible obtner el Modulus de la Llave Privada');
+
+  // Leemos el Modulus del BIO en el buffer de cadena
+  BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
+
+  // Liberamos el BIO que teniamos en memoria
+  BIO_free_all(bioModulus);
+
+  {$IFDEF CODESITE}
+    CodeSite.Send('Modulos', InBuf);
+  {$ENDIF};
+  Result := InBuf;
 end;
 
 function TOpenSSL.HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String; sCadena: TCadenaUTF8;
