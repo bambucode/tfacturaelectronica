@@ -1,4 +1,4 @@
-﻿TFACTURACIONELECTRONICA v1.0 (Beta) 
+﻿TFACTURACIONELECTRONICA v1.1 (Beta) 
 ===================================
 Con soporte para CFD 2.2 y CFDI 3.2     
 --------------------------------------
