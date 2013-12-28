@@ -337,6 +337,7 @@ begin
   CertX509:=TX509Certificate.Create;
   try
       CertX509.LoadFromFile(sArchivo, DER);
+
       Result:=CertX509;
   except
       On E:Exception do
@@ -384,6 +385,7 @@ begin
   finally
      // Liberamos el BIO que teniamos en memoria
      BIO_free_all(bioModulus);
+     EVP_PKEY_free(llaveDesencriptada);
   end;
 end;
 
