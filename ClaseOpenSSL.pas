@@ -337,7 +337,6 @@ begin
   CertX509:=TX509Certificate.Create;
   try
       CertX509.LoadFromFile(sArchivo, DER);
-
       Result:=CertX509;
   except
       On E:Exception do
@@ -369,6 +368,7 @@ begin
     // Asignamos el Modulus (propieda N del record RSA, rsa.c linea 336)
     if rsaInfo.n <> nil then
     begin
+      // La funcion BN_print copia el apuntador del BIGNUMBER del modulus con un formato amigable dentro del BIO
       if BN_print(bioModulus, rsaInfo.n) <= 0 then
         raise Exception.Create('No fue posible obtner el Modulus de la Llave Privada');
 
