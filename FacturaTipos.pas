@@ -167,6 +167,7 @@ end;
 
 EFECertificadoNoExisteException = class(Exception);
 EFECertificadoNoEsDeSellosException = class(Exception);
+EFELlavePrivadaNoCorrespondeACertificadoException = class(Exception);
 EFECertificadoNoVigente =  class(Exception);
 EFECertificadoNoCorrespondeAEmisor = class(Exception);
 EFECertificadoNoFueLeidoException = class(Exception);
