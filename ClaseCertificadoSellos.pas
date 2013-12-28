@@ -35,6 +35,7 @@ type
   public
     constructor Create(const aRutaCertificado: String);
     destructor Destroy; override;
+    function esParejaDe(const aLlavePrivada: TFELlavePrivada): Boolean;
     property ComoBase64: String read GetComoBase64;
     property paraFacturar: TFECertificado read fCertificadoFacturas;
     property Tipo: TFETipoCertificado read GetTipo;
@@ -46,6 +47,7 @@ type
 implementation
 
 uses SysUtils,
+     ClaseOpenSSL,
      CodeSiteLogging;
 
 constructor TCertificadoSellos.Create(const aRutaCertificado: String);
@@ -110,6 +112,29 @@ begin
 
   if Assigned(fx509Certificado) then
      FreeAndNil(fx509Certificado);
+end;
+
+function TCertificadoSellos.esParejaDe(const aLlavePrivada: TFELlavePrivada):
+    Boolean;
+var
+  openSSL: TOpenSSL;
+  moduloLlavePrivada, moduloCertificado: string;
+begin
+  Result := False;
+
+  if Not FileExists(aLlavePrivada.Ruta) then
+    raise Exception.Create('El archivo de llave privada no existe');
+
+  try
+    openSSL := TOpenSSL.Create;
+
+    moduloLlavePrivada := openSSL.ObtenerModulusDeLlavePrivada(aLlavePrivada.Ruta, aLlavePrivada.Clave);
+    moduloCertificado := openSSL.ObtenerModulusDeCertificado(fCertificadoFacturas.Ruta);
+
+    Result := (moduloLlavePrivada = moduloCertificado);
+  finally
+    openSSL.Free;
+  end;
 end;
 
 function TCertificadoSellos.GetComoBase64: String;

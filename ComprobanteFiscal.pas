@@ -62,6 +62,7 @@ type
     fDesglosarTotalesImpuestos: Boolean;
     bIncluirCertificadoEnXML: Boolean;
     fAutoAsignarFechaGeneracion: Boolean;
+    FValidarCertificadoYLlavePrivada: Boolean;
     FVerificarRFCDelCertificado: Boolean;
 
 
@@ -160,9 +161,10 @@ type
     property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
     property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML default true;
     property AutoAsignarFechaGeneracion : Boolean read fAutoAsignarFechaGeneracion write fAutoAsignarFechaGeneracion default true;
-    property CadenaOriginalTimbre: TStringCadenaOriginal read
-        GetCadenaOriginalTimbre;
+    property CadenaOriginalTimbre: TStringCadenaOriginal read GetCadenaOriginalTimbre;
     property Timbre: TFETimbre read GetTimbre;
+    property ValidarCertificadoYLlavePrivada: Boolean read FValidarCertificadoYLlavePrivada write FValidarCertificadoYLlavePrivada
+        default true;
     property VerificarRFCDelCertificado: Boolean read FVerificarRFCDelCertificado
         write FVerificarRFCDelCertificado;
     property Version : TFEVersionComprobante read fVersion;
@@ -220,6 +222,7 @@ begin
   fCadenaOriginalCalculada:='';
   fSelloDigitalCalculado:='';
   fFueTimbrado := False;
+  FValidarCertificadoYLlavePrivada := True;
 
   // Creamos el objeto XML
   fDocumentoXML := TXMLDocument.Create(nil);
@@ -700,9 +703,17 @@ begin
     if Not certificadoSellos.Vigente then
       raise EFECertificadoNoVigente.Create('El certificado no tiene vigencia actual');
 
-    // Checamos que el certificado no sea el de la FIEL
-    if Not (certificadoSellos.Tipo = tcSellos) then
-      raise EFECertificadoNoEsDeSellosException.Create('El certificado leido no es de sellos' );
+    // Solo realizamos las validaciones del certificado y llave privada si así se especificó
+    if fValidarCertificadoYLlavePrivada then
+    begin
+      // Checamos que el certificado no sea el de la FIEL
+      if Not (certificadoSellos.Tipo = tcSellos) then
+        raise EFECertificadoNoEsDeSellosException.Create('El certificado leido no es de sellos' );
+
+      // Checamos que la Llave Privada sea pareja del Certificado
+      if Not certificadoSellos.esParejaDe(Certificado.LlavePrivada) then
+        raise EFELlavePrivadaNoCorrespondeACertificadoException.Create('La llave privada no corresponde al certificado');
+    end;
 
     // Almacenamos la propiedad interna del certificado
     fCertificado := certificadoSellos.paraFacturar;
@@ -1080,14 +1091,15 @@ begin
       try
         // Creamos la clase SelloDigital que nos ayudara a "sellar" la factura en XML
         SelloDigital := TSelloDigital.Create(CadenaOriginal, fCertificado, TipoDigestion);
-
-        // Finalmente regresamos la factura en XML con todas sus propiedades llenas
-        fSelloDigitalCalculado := SelloDigital.SelloCalculado;
-
-        result := fSelloDigitalCalculado;
-        // Liberamos la clase de sello usada previamente
-        FreeAndNil(SelloDigital);
-        FacturaGenerada:=True;
+        try
+          // Finalmente regresamos la factura en XML con todas sus propiedades llenas
+          fSelloDigitalCalculado := SelloDigital.SelloCalculado;
+          result := fSelloDigitalCalculado;
+          FacturaGenerada:=True;
+        finally
+           // Liberamos la clase de sello usada previamente
+          FreeAndNil(SelloDigital);
+        end;
       except
         // TODO: Manejar los diferentes tipos de excepciones...
         on E:Exception do
