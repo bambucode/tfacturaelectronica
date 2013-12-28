@@ -33,6 +33,7 @@ type
     procedure HacerDigestion_TipoSHA1_FuncioneCorrectamente;
     procedure HacerDigestion_ConClaveIncorrecta_CauseExcepcion;
     procedure ObtenerCertificado_CertificadoDePrueba_RegreseElCertificadoConPropiedades;
+    procedure ObtenerModulusDeCertificado_DeCertificado_RegreseValorCorrecto;
     procedure ObtenerModulusDeLlavePrivada_DeLlave_RegreseValorCorrecto;
   end;
 
@@ -309,16 +310,55 @@ begin
 end;
 
 procedure
+    TestTOpenSSL.ObtenerModulusDeCertificado_DeCertificado_RegreseValorCorrecto;
+var
+  openSSL: TOpenSSL;
+  modulusCertificado, modulusCertificadoEsperado: string;
+begin
+  // Obtenemos el modulus del Certificado usando OpenSSL.exe
+  EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _RUTA_CERTIFICADO +
+                          '" -noout -modulus > "' + fDirTemporal + 'ModulusCertificado.txt" ');
+  modulusCertificadoEsperado := leerContenidoDeArchivo(fDirTemporal + 'ModulusCertificado.txt');
+  // Quitamos la palabra "Modulus=" que regresa OpenSSL
+  modulusCertificadoEsperado := StringReplace(modulusCertificadoEsperado, 'Modulus=', '', [rfReplaceAll]);
+  try
+    openSSL := TOpenSSL.Create;
+    modulusCertificado := openSSL.ObtenerModulusDeCertificado(fRutaFixtures + _RUTA_CERTIFICADO);
+
+    CheckTrue(modulusCertificado <> '', 'No se obtuvo el Modulus del Certificado');
+    CheckEquals(modulusCertificadoEsperado,
+                modulusCertificado,
+                'El modulus del certificado obtenido no fue el mismo que regresó OpenSSL.exe');
+  finally
+    openSSL.Free;
+  end;
+end;
+
+procedure
     TestTOpenSSL.ObtenerModulusDeLlavePrivada_DeLlave_RegreseValorCorrecto;
 var
   openSSL: TOpenSSL;
-  modulus: string;
+  modulusDeLlave, modulusDeLlaveEsperado: string;
 begin
+  // Desencriptamos la llave privada
+  EjecutarComandoOpenSSL(' pkcs8 -inform DER -in "' + fArchivoLlavePrivada +
+                          '" -passin pass:'+ fClaveLlavePrivada + ' -out "' + fDirTemporal + 'llaveprivada.key" ');
+
+  // Obtenemos el modulus de la Llave Privada usando OpenSSL.exe para corroborarlo
+  EjecutarComandoOpenSSL(' rsa -in  "' + fDirTemporal + 'llaveprivada.key"' +
+                          ' -noout -modulus > "' + fDirTemporal + 'ModulusLlave.txt" ');
+
+  modulusDeLlaveEsperado := leerContenidoDeArchivo(fDirTemporal + 'ModulusLlave.txt');
+  // Quitamos la palabra "Modulus=" que regresa OpenSSL
+  modulusDeLlaveEsperado := StringReplace(modulusDeLlaveEsperado, 'Modulus=', '', [rfReplaceAll]);
   try
     openSSL := TOpenSSL.Create;
-    modulus := openSSL.ObtenerModulusDeLlavePrivada(fArchivoLlavePrivada, fClaveLlavePrivada);
+    modulusDeLlave := openSSL.ObtenerModulusDeLlavePrivada(fArchivoLlavePrivada, fClaveLlavePrivada);
 
-    CheckTrue(modulus <> '', 'No se obtuvo el Modulus de la Llave Privada');
+    CheckTrue(modulusDeLlave <> '', 'No se obtuvo el Modulus de la Llave Privada');
+    CheckEquals(modulusDeLlaveEsperado,
+                modulusDeLlave,
+                'El modulus de la Llave Privada obtenido no fue el mismo que regresó OpenSSL.exe');
   finally
     openSSL.Free;
   end;
