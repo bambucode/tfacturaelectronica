@@ -43,7 +43,8 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
         fArchivoLlavePrivada: String;
         fClaveLlavePrivada: String;
     private
-        function ObtenerLlavePrivadaDesencriptada() : pEVP_PKEY;
+        function ObtenerLlavePrivadaDesencriptada(const aRutaLlavePrivada,
+            aClaveLlavePrivada: String): pEVP_PKEY;
         ///<summary>Funcion usada para convertir un buffer de bytes
         /// en caracteres 'imprimibles' (codificacion base64).
         ///</summary>
@@ -112,13 +113,18 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
         ///	  Ruta del archivo .PEM a guardar
         ///	</param>
         {$ENDREGION}
-        procedure GuardarLlavePrivadaEnPEM(const aLlaveAbierta: pPKCS8_Priv_Key_Info;
-            const aArchivoDestino: String);
+        procedure GuardarLlavePrivadaEnPEM(const aLlaveAbierta: pPKCS8_Priv_Key_Info; const aArchivoDestino: String);
+        function ObtenerModulusDeCertificado(const aRutaCertificado: string): String;
+        function ObtenerModulusDeLlavePrivada(const aRutaLlavePrivada,
+            aClaveLlavePrivada: String): String;
     end;
+
 
 implementation
 
-uses  StrUtils;
+uses
+  {$IFDEF CODESITE} CodeSiteLogging, {$ENDIF}
+  StrUtils;
 
 constructor TOpenSSL.Create();
 begin
@@ -195,15 +201,15 @@ end;
 procedure TOpenSSL.GuardarLlavePrivadaEnPEM(const aLlaveAbierta:
     pPKCS8_Priv_Key_Info; const aArchivoDestino: String);
 var
-  archivoPEM: pEVP_PKEY;
   bioArchivoPEM: pBIO;
 begin
   bioArchivoPEM := BIO_new(BIO_s_file());
-  if BIO_write_filename(bioArchivoPEM, ToChar(aArchivoDestino)) = 0 then
-    raise Exception.Create('Error al intentar guardar llave privada en formato PEM:' + ObtenerUltimoMensajeDeError())
-  else
-  begin
-    PEM_write_bio_PKCS8_PRIV_KEY_INFO(bioArchivoPEM, aLlaveAbierta);
+  try
+    if BIO_write_filename(bioArchivoPEM, ToChar(aArchivoDestino)) = 0 then
+      raise Exception.Create('Error al intentar guardar llave privada en formato PEM:' + ObtenerUltimoMensajeDeError())
+    else
+      PEM_write_bio_PKCS8_PRIV_KEY_INFO(bioArchivoPEM, aLlaveAbierta);
+  finally
     BIO_free(bioArchivoPEM);
   end;
 end;
@@ -304,13 +310,14 @@ end;
 // Lee una llave binaria (.key) que tiene formato DER en memoria
 // para ser usada para hacer una digestion MD5, SHA1, etc. sin necesidad
 // de crear y usar un archivo PEM primero
-function TOpenSSL.ObtenerLlavePrivadaDesencriptada() : pEVP_PKEY;
+function TOpenSSL.ObtenerLlavePrivadaDesencriptada(const aRutaLlavePrivada,
+    aClaveLlavePrivada: String): pEVP_PKEY;
 var
     p8inf : pPKCS8_Priv_Key_Info;
     resLlave   : pEVP_PKEY;
 begin
     // Abrimos la llave privada
-    p8inf:=AbrirLlavePrivada(fArchivoLlavePrivada, fClaveLlavePrivada);
+    p8inf:=AbrirLlavePrivada(aRutaLlavePrivada, aClaveLlavePrivada);
 
     // Convierte la llave de formato PKCS8 a PEM (en memoria)
     resLlave := EVP_PKCS82PKEY(p8inf);
@@ -325,6 +332,11 @@ end;
 function TOpenSSL.ObtenerCertificado(sArchivo: String) : TX509Certificate;
 var
   CertX509: TX509Certificate;
+
+  llavePublica: PEVP_PKEY;
+  bioModulus: pBIO;
+  rsaInfo: pRSA;
+  Inbuf: Array[0..255] of AnsiChar;
 const
   _ERROR_LECTURA_CERTIFICADO = 'Unable to read certificate';
 begin
@@ -341,6 +353,48 @@ begin
           end;
           Result:=nil;
       end;
+  end;
+end;
+
+
+function TOpenSSL.ObtenerModulusDeLlavePrivada(const aRutaLlavePrivada,
+    aClaveLlavePrivada: String): String;
+var
+  rsaInfo: pRSA;
+  bioModulus: pBIO;
+  llaveDesencriptada: pEVP_PKEY;
+  Inbuf: Array[0..500] of AnsiChar;
+  longitudModulus : Integer;
+begin
+  llaveDesencriptada := ObtenerLlavePrivadaDesencriptada(aRutaLlavePrivada, aClaveLlavePrivada);
+  // Obtenemos las propiedades RSA de la Llave privada
+  rsaInfo := EVP_PKEY_get1_RSA(llaveDesencriptada);
+  // Creamos un BIO en memoria para almacenar el dato del Modulus
+  bioModulus := BIO_new(BIO_s_mem());
+  try
+    // Asignamos el Modulus (propieda N del record RSA, rsa.c linea 336)
+    if rsaInfo.n <> nil then
+    begin
+      // La funcion BN_print copia el apuntador del BIGNUMBER del modulus con un formato amigable dentro del BIO
+      if BN_print(bioModulus, rsaInfo.n) <= 0 then
+        raise Exception.Create('No fue posible obtner el Modulus de la Llave Privada');
+
+      // Leemos el Modulus del BIO en el buffer de cadena
+      longitudModulus := BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
+      // Quitamos los caracteres invalidos
+      Inbuf[longitudModulus] := #0;
+
+      {$IFDEF CODESITE}
+        CodeSite.Send('Modulus Llave Privada', InBuf);
+      {$ENDIF};
+
+      Result := StrPas(InBuf);
+    end else
+      Result := '';
+  finally
+     // Liberamos el BIO que teniamos en memoria
+     BIO_free_all(bioModulus);
+     EVP_PKEY_free(llaveDesencriptada);
   end;
 end;
 
@@ -362,7 +416,7 @@ begin
   fClaveLlavePrivada:= ClaveLlavePrivada;
 
   Len:=0;
-  ekLlavePrivada := ObtenerLlavePrivadaDesencriptada;
+  ekLlavePrivada := ObtenerLlavePrivadaDesencriptada(fArchivoLlavePrivada, fClaveLlavePrivada);
 
   //SetLength(Inbuf, 8192); // StrLen(@sCadena)
   //SetCodePage(sCadena, 0, False); // Forzamos a eliminar el "Code Page" de la cadena
@@ -396,6 +450,51 @@ begin
   EVP_PKEY_free(ekLlavePrivada);
   // Regresa los resultados en formato Base64
   Result := BinToBase64(@outbuf,Len);
+end;
+
+function TOpenSSL.ObtenerModulusDeCertificado(const aRutaCertificado: string):
+    String;
+var
+  llavePublica: PEVP_PKEY;
+  bioModulus: pBIO;
+  rsaInfo: pRSA;
+  Inbuf: Array[0..500] of AnsiChar;
+  certificadoX509: TX509Certificate;
+  longitudModulus: Integer;
+begin
+  bioModulus := BIO_new(BIO_s_mem());
+  try
+    certificadoX509 := TX509Certificate.Create;
+    certificadoX509.LoadFromFile(aRutaCertificado);
+
+    // Obtenemos la llave publica del certificado
+    llavePublica := X509_get_pubkey(certificadoX509.fCertificate);
+    if (llavePublica <> nil) then
+    begin
+      // Replicamos el codigo de x509.c lineas 820 -> 830
+      if llavePublica.ktype = EVP_PKEY_RSA then
+      begin
+         rsaInfo := EVP_PKEY_get1_RSA(llavePublica);
+         if BN_print(bioModulus, rsaInfo.n) <= 0 then
+           raise Exception.Create('No fue posible obtener el Modulus del Certificado');
+
+        // Leemos el Modulus del BIO en el buffer de cadena
+        longitudModulus := BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
+        // Quitamos los caracteres invalidos
+        Inbuf[longitudModulus] := #0;
+
+        {$IFDEF CODESITE}
+          CodeSite.Send('Modulus Certificado', InBuf);
+        {$ENDIF};
+
+        Result := InBuf;
+      end else
+        raise Exception.Create('No se soporta la lectura de certificados que no son RSA');
+  end;
+  finally
+    BIO_free_all(bioModulus);
+    certificadoX509.Free;
+  end;
 end;
 
 end.

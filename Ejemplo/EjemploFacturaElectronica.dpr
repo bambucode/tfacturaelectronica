@@ -48,15 +48,15 @@ uses
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
   FacturacionHashes in '..\FacturacionHashes.pas',
   PACEcodex in '..\PACs\Ecodex\PACEcodex.pas',
-  PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas',
   PACEjemplo in '..\PACs\Ejemplo\PACEjemplo.pas',
   GeneradorCBB in '..\GeneradorCBB\GeneradorCBB.pas',
   QuricolAPI in '..\GeneradorCBB\QuricolAPI.pas',
   QuricolCode in '..\GeneradorCBB\QuricolCode.pas',
-  FinkOkWsTimbrado in '..\PACs\FinkOk\FinkOkWsTimbrado.pas',
-  PACFinkOk in '..\PACs\FinkOk\PACFinkOk.pas',
   FECancelaComercioDigital in '..\PACs\ComercioDigital\FECancelaComercioDigital.pas',
-  CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas';
+  CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas',
+  EcodexWsClientes in '..\PACs\Ecodex\EcodexWsClientes.pas',
+  EcodexWsComun in '..\PACs\Ecodex\EcodexWsComun.pas',
+  ManejadorDeErroresComunes in '..\PACs\ManejadorDeErroresComunes.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
@@ -81,6 +81,9 @@ var
       if (SHGetPathFromIDList(pidList, buf)) then
         Result := buf;
    end;
+
+const
+  _URL_ECODEX_PRUEBAS = 'https://pruebas.ecodex.com.mx:2045';
 
 begin
   // Checamos la presencia de archivos necesarios para el ejemplo
@@ -160,7 +163,6 @@ begin
       Receptor.Direccion.Pais:='México';
       Receptor.Direccion.Localidad:='Boca del Rio';
 
-
       // 4. Definimos el certificado junto con su llave privada
       Certificado.Ruta:=ExtractFilePath(Application.ExeName) + '\' + Emisor.RFC + '.cer';
       Certificado.LlavePrivada.Ruta:=ExtractFilePath(Application.ExeName) + '\' + Emisor.RFC + '.key';
@@ -216,7 +218,7 @@ begin
       // por cuestiones de ejemplo, usaremos al PAC "Ecodex"
 
       //ProveedorTimbrado := TPACFinkOk.Create;
-      ProveedorTimbrado := TPACEcodex.Create;
+      ProveedorTimbrado := TPACEcodex.Create(_URL_ECODEX_PRUEBAS);
       //ProveedorTimbrado := TPACComercioDigital.Create; // Si queremos usar a Comercio Digital solo des-comentamos aqui
 
       try
@@ -225,8 +227,8 @@ begin
 
         // Este es el "ID de Integrador" de pruebas de Ecodex
         CredencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
-        // Asignamos nuestras credenciales de acceso con el PAC
-        ProveedorTimbrado.AsignarCredenciales(CredencialesPAC);
+        // Asignamos nuestras credenciales de acceso con el PAC (en caso de Ecodex asignamos la credencial como usuario e integrador)
+        ProveedorTimbrado.AsignarCredenciales(CredencialesPAC, CredencialesPAC);
         // Mandamos timbrar el documento al PAC
         TimbreDeFactura := ProveedorTimbrado.TimbrarDocumento(Factura.XML);
 

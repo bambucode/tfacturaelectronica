@@ -26,9 +26,6 @@ uses FacturaTipos, SysUtils,
 type
 
   // Excepciones que pueden ser generadas
-  EFECertificadoNoExisteException = class(Exception);
-  EFECertificadoNoVigente =  class(Exception);
-  EFECertificadoNoFueLeidoException = class(Exception);
   EFEFolioFueraDeRango = class(Exception);
   EXMLVacio = class(Exception);
 
@@ -65,6 +62,8 @@ type
     fDesglosarTotalesImpuestos: Boolean;
     bIncluirCertificadoEnXML: Boolean;
     fAutoAsignarFechaGeneracion: Boolean;
+    FValidarCertificadoYLlavePrivada: Boolean;
+    FVerificarRFCDelCertificado: Boolean;
 
 
     {$REGION 'Documentation'}
@@ -122,6 +121,7 @@ type
     procedure EstablecerVersionDelComprobante;
     function GetCadenaOriginalTimbre: TStringCadenaOriginal;
     function GetTimbre: TFETimbre;
+    procedure LeerVersionDeComprobanteLeido(const aDocumentoXML: WideString);
     procedure ValidarCamposEmisor;
     procedure ValidarCamposReceptor;
   protected
@@ -161,9 +161,12 @@ type
     property DesglosarTotalesImpuestos: Boolean read fDesglosarTotalesImpuestos write fDesglosarTotalesImpuestos;
     property IncluirCertificadoEnXml: Boolean read bIncluirCertificadoEnXML write bIncluirCertificadoEnXML default true;
     property AutoAsignarFechaGeneracion : Boolean read fAutoAsignarFechaGeneracion write fAutoAsignarFechaGeneracion default true;
-    property CadenaOriginalTimbre: TStringCadenaOriginal read
-        GetCadenaOriginalTimbre;
+    property CadenaOriginalTimbre: TStringCadenaOriginal read GetCadenaOriginalTimbre;
     property Timbre: TFETimbre read GetTimbre;
+    property ValidarCertificadoYLlavePrivada: Boolean read FValidarCertificadoYLlavePrivada write FValidarCertificadoYLlavePrivada
+        default true;
+    property VerificarRFCDelCertificado: Boolean read FVerificarRFCDelCertificado
+        write FVerificarRFCDelCertificado;
     property Version : TFEVersionComprobante read fVersion;
 
     {$REGION 'Documentation'}
@@ -185,7 +188,8 @@ const
 implementation
 
 uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
-  OpenSSLUtils, Classes, CadenaOriginal,
+  Classes, CadenaOriginal,
+  ClaseCertificadoSellos,
   CadenaOriginalTimbre,
   {$IFDEF DEBUG} Dialogs, {$ENDIF}
   FeTimbreFiscalDigital,
@@ -218,6 +222,7 @@ begin
   fCadenaOriginalCalculada:='';
   fSelloDigitalCalculado:='';
   fFueTimbrado := False;
+  FValidarCertificadoYLlavePrivada := True;
 
   // Creamos el objeto XML
   fDocumentoXML := TXMLDocument.Create(nil);
@@ -686,45 +691,33 @@ begin
 end;
 
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
-const
-    _CADENA_INICIO_CERTIFICADO = '-----BEGIN CERTIFICATE-----';
-    _CADENA_FIN_CERTIFICADO    = '-----END CERTIFICATE-----';
-    _ERROR_LECTURA_CERTIFICADO = 'Unable to read certificate';
 var
-  x509Certificado: TX509Certificate;
-
-  // Quita los encabezados, pie y retornos de carro del certificado
-  function QuitarCaracteresNoUsadosEnCertificado(sCertificadoBase64: WideString) : WideString;
-  begin
-      sCertificadoBase64:=StringReplace(sCertificadoBase64, #13, '', [rfReplaceAll, rfIgnoreCase]);
-      sCertificadoBase64:=StringReplace(sCertificadoBase64, #10, '', [rfReplaceAll, rfIgnoreCase]);
-      // Quitamos encabezado del certificado
-      sCertificadoBase64:=StringReplace(sCertificadoBase64, _CADENA_INICIO_CERTIFICADO, '', [rfReplaceAll, rfIgnoreCase]);
-      // Quitamos el pie del certificado
-      Result:=StringReplace(sCertificadoBase64, _CADENA_FIN_CERTIFICADO, '', [rfReplaceAll, rfIgnoreCase]);
-  end;
-
+  certificadoSellos: TCertificadoSellos;
 begin
   // Ya que tenemos los datos del certificado, lo procesamos para obtener los datos
   // necesarios
-  x509Certificado := TX509Certificate.Create;
   try
-    if Not FileExists(Certificado.Ruta) then
-      raise EFECertificadoNoExisteException.Create('No existe el archivo del certificado')
-    else
-      x509Certificado.LoadFromFile(Certificado.Ruta);
-
-    fCertificado := Certificado;
-
-    // Llenamos las propiedades
-    fCertificado.VigenciaInicio := x509Certificado.NotBefore;
-    fCertificado.VigenciaFin := x509Certificado.NotAfter;
+    certificadoSellos := TCertificadoSellos.Create(Certificado.Ruta);
 
     // Checamos que el certificado este dentro de la vigencia
-    if Not((Now >= fCertificado.VigenciaInicio) and (Now <= fCertificado.VigenciaFin)) then
+    if Not certificadoSellos.Vigente then
       raise EFECertificadoNoVigente.Create('El certificado no tiene vigencia actual');
 
-    fCertificado.NumeroSerie := x509Certificado.SerialNumber;
+    // Solo realizamos las validaciones del certificado y llave privada si así se especificó
+    if fValidarCertificadoYLlavePrivada then
+    begin
+      // Checamos que el certificado no sea el de la FIEL
+      if Not (certificadoSellos.Tipo = tcSellos) then
+        raise EFECertificadoNoEsDeSellosException.Create('El certificado leido no es de sellos' );
+
+      // Checamos que la Llave Privada sea pareja del Certificado
+      if Not certificadoSellos.esParejaDe(Certificado.LlavePrivada) then
+        raise EFELlavePrivadaNoCorrespondeACertificadoException.Create('La llave privada no corresponde al certificado');
+    end;
+
+    // Almacenamos la propiedad interna del certificado
+    fCertificado := certificadoSellos.paraFacturar;
+    fCertificado.LlavePrivada := Certificado.LlavePrivada;
 
     // Ya procesado llenamos su propiedad en el XML
     Assert(Assigned(fXmlComprobante), 'El Nodo comprobante no est asignado!');
@@ -732,27 +725,11 @@ begin
 
     // Incluir el certificado en el XML?
     if bIncluirCertificadoEnXML = True then
-    begin
-       // Obtenemos el certificado codificado en Base64 para incluirlo en el comprobante
-       fCertificadoTexto:=X509Certificado.AsBase64;
-       fCertificadoTexto:=QuitarCaracteresNoUsadosEnCertificado(X509Certificado.AsBase64);
-       //CodeSite.Send('Certificado Base64', CertificadoBase64);
-       //CodeSite.Send('length', Length(CertificadoBase64));
-    end;
+      fCertificadoTexto:=certificadoSellos.ComoBase64;
 
-  except
-     // Pasamos la excepcion tal y como esta
-     On E: Exception do
-     begin
-        FreeAndNil(x509Certificado);
-        // Checamos los posibles errores
-        if AnsiPos(_ERROR_LECTURA_CERTIFICADO, E.Message) > 0 then
-            raise EFECertificadoNoFueLeidoException.Create('No fue posible leer el certificado: ' + E.Message)
-        else
-            raise Exception.Create(E.Message);
-     end;
+  finally
+    certificadoSellos.Free;
   end;
-  FreeAndNil(x509Certificado);
 end;
 
 // Asignamos la serie, el no y año de aprobacion al XML...
@@ -1086,6 +1063,16 @@ begin
   begin
       fSelloDigitalCalculado:='';
 
+      // Si tiene activada la opcion de "VerificarRFCDelCertificado" checamos que el
+      // RFC del emisor del CFD corresponda al RFC para el que fue generado el Emisor
+      if fVerificarRFCDelCertificado then
+        if UpperCase(fCertificado.RFCAlQuePertenece) <> UpperCase(inherited Emisor.RFC) then
+        begin
+          raise EFECertificadoNoCorrespondeAEmisor.Create('Al parecer el certificado no corresponde al emisor, ' +
+                                                          'el RFC del certificado es ' + fCertificado.RFCAlQuePertenece + ' y el del ' +
+                                                          'emisor es ' + (inherited Emisor.RFC));
+        end;
+
       // Obtenemos la cadena Original del CFD primero
       CadenaOriginal := Self.CadenaOriginal;
 
@@ -1104,14 +1091,15 @@ begin
       try
         // Creamos la clase SelloDigital que nos ayudara a "sellar" la factura en XML
         SelloDigital := TSelloDigital.Create(CadenaOriginal, fCertificado, TipoDigestion);
-
-        // Finalmente regresamos la factura en XML con todas sus propiedades llenas
-        fSelloDigitalCalculado := SelloDigital.SelloCalculado;
-
-        result := fSelloDigitalCalculado;
-        // Liberamos la clase de sello usada previamente
-        FreeAndNil(SelloDigital);
-        FacturaGenerada:=True;
+        try
+          // Finalmente regresamos la factura en XML con todas sus propiedades llenas
+          fSelloDigitalCalculado := SelloDigital.SelloCalculado;
+          result := fSelloDigitalCalculado;
+          FacturaGenerada:=True;
+        finally
+           // Liberamos la clase de sello usada previamente
+          FreeAndNil(SelloDigital);
+        end;
       except
         // TODO: Manejar los diferentes tipos de excepciones...
         on E:Exception do
@@ -1175,21 +1163,15 @@ begin
         {$ELSE}
         iXmlDoc:=LoadXMLData(UTF8Decode(Valor));
         {$IFEND}
+
         // Creamos el documento "dueño" del comprobante
         fDocumentoXML:=TXmlDocument.Create(nil);
         // Pasamos el XML para poder usarlo en la clase
         fDocumentoXML.XML:=iXmlDoc.XML;
-        //Assert(fDocumentoXML.Encoding = 'UTF-8', 'El Encoding del documento no fue correcto');
-
-        // Asignamos el XML a la variable interna del componente
-        if AnsiPos('version="2.0"', Valor) > 0 then
-          fXmlComprobante := GetComprobante(fDocumentoXML);
-
-        if AnsiPos('version="2.2"', Valor) > 0 then
-          fXmlComprobante := GetComprobanteV22(fDocumentoXML);
-
-        if AnsiPos('version="3.2"', Valor) > 0 then
-          fXmlComprobante := GetComprobanteV32(fDocumentoXML);
+        
+        // Leemos la interface XML adecuada segun la version del XML, si la version no está soportada
+        // lanzaremos una excepcion
+        LeerVersionDeComprobanteLeido(Valor);
 
         fDocumentoXML.Encoding := 'UTF-8';
         Assert(fXmlComprobante <> nil, 'No se obtuvo una instancia del comprobante ya que fue nula');
@@ -1602,6 +1584,34 @@ begin
       Result:=fDocumentoXML.XML.Text
   else
       Raise Exception.Create('No se puede obtener el XML cuando aún no se ha generado el archivo CFD');
+end;
+
+procedure TFEComprobanteFiscal.LeerVersionDeComprobanteLeido(const
+    aDocumentoXML: WideString);
+var
+  cadenaVersion : String;
+const
+  _LONGITUD_CADENA_VERSION = 3;
+  _CADENA_COMIENZO_VERSION = '.xsd" version="';
+begin
+  // Obtenemos la cadena de la version exclusivamente
+  cadenaVersion := Copy(aDocumentoXML,
+                        AnsiPos(_CADENA_COMIENZO_VERSION, aDocumentoXML) + Length(_CADENA_COMIENZO_VERSION),
+                        _LONGITUD_CADENA_VERSION);
+
+  if (cadenaVersion = '2.0') then
+    fXmlComprobante := GetComprobante(fDocumentoXML);
+
+  if (cadenaVersion = '2.2') then
+    fXmlComprobante := GetComprobanteV22(fDocumentoXML);
+
+  if (cadenaVersion = '3.2') then
+    fXmlComprobante := GetComprobanteV32(fDocumentoXML);
+
+  // Si llegamos aqui y la instancia fue nula es que no tuvimos una version compatible
+  if fXmlComprobante = nil then
+    raise EFEVersionComprobanteNoSoportadaException.Create('No es posible leer un CFD/I con version "' + cadenaVersion +
+                                                           '" ya que esta versión del programa no es capaz de leerla');
 end;
 
 procedure TFEComprobanteFiscal.ValidarCamposEmisor;

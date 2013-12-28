@@ -25,6 +25,7 @@ type
     fDirectorioFixtures: string;
     fDocumentoDePrueba: WideString;
     fCredencialesDePrueba : TFEPACCredenciales;
+    fCredencialesDeIntegrador : TFEPACCredenciales;
     cutPACEcodex: TPACEcodex;
   private
     function ObtenerNuevaFacturaATimbrar(const aFechaGeneracion: TDateTime = 0):
@@ -34,7 +35,9 @@ type
     procedure SetUp; override;
     procedure TearDown; override;
   published
+    procedure AgregaCliente_NuevoEmisor_GuardeClienteCorrectamente;
     procedure CancelarDocumento_Documento_CanceleCorrectamente;
+    procedure SaldoCliente_EmisorConSaldo_RegreseSaldoDeTimbres;
     procedure TimbrarDocumento_ConRFCIncorrecto_CauseExcepcionDeRFC;
     procedure TimbrarDocumento_ConXMLMalformado_CauseExcepcion;
     procedure TimbrarDocumento_DePrueba_RegreseDatosDeTimbre;
@@ -49,10 +52,11 @@ uses
   System.DateUtils,
   FacturaElectronica;
 
+
 procedure TestTPACEcodex.SetUp;
 begin
   inherited;
-  cutPACEcodex := TPACEcodex.Create;
+  cutPACEcodex := TPACEcodex.Create('https://pruebas.ecodex.com.mx:2045');
 
   // Definimos el directorio donde estan los archivos de prueba
   fDirectorioFixtures := ExtractFilePath(Application.ExeName) + '..\..\Fixtures\';
@@ -63,15 +67,18 @@ begin
   fCredencialesDePrueba.Clave          := 'prueba';
   fCredencialesDePrueba.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
 
+  // Asignamos las credenciales de distirbuidor para poder crear un nuevo cliente
+  fCredencialesDeIntegrador.RFC             := 'BBB010101001';
+  fCredencialesDeIntegrador.DistribuidorID  := 'DF627BC3-A872-4806-BF37-DBD040CBAC7C';
+
   // Asignamos las credenciales a Ecodex
-  cutPACEcodex.AsignarCredenciales(fCredencialesDePrueba);
+  cutPACEcodex.AsignarCredenciales(fCredencialesDePrueba, fCredencialesDeIntegrador);
 end;
 
 procedure TestTPACEcodex.TearDown;
 begin
   FreeAndNil(cutPACEcodex);
 end;
-
 
 function TestTPACEcodex.ObtenerNuevaFacturaATimbrar(const aFechaGeneracion:
     TDateTime = 0): WideString;
@@ -136,6 +143,79 @@ begin
   Result := Factura.XML;
 end;
 
+procedure TestTPACEcodex.AgregaCliente_NuevoEmisor_GuardeClienteCorrectamente;
+var
+  nuevoEmisor: TFEContribuyente;
+  respuestaAltaEmisor: String;
+  guidRespuesta: TGUID;
+  fueGuidValido : Boolean;
+  credencialesDePrueba, credencialesDeDistribudor: TFEPACCredenciales;
+
+  function regresaRFCInventado() : string;
+  var
+    diaInventado: Integer;
+  begin
+    Randomize;
+    diaInventado := 31;
+    while diaInventado <= 31 do
+      diaInventado := Random(99);
+
+    // Generamos un RFC que comienza con 3 letras aleatorias, seguidas del dia aleatorio del mes de Enero 2013.
+    Result := Chr(ord('a') + Random(26)) +
+              Chr(ord('a') + Random(26)) +
+              Chr(ord('A') + Random(26)) +
+              IntToStr(diaInventado) + '0113AAA';
+  end;
+
+const
+  _RFC_PRUEBAS_PARA_ALTA_EMISORES = 'BBB010101001';
+begin
+  // Definimos los datos de acceso de nuestro usuario
+  credencialesDePrueba.RFC            := 'AAA010101AAA';
+  credencialesDePrueba.Clave          := 'prueba';
+  credencialesDePrueba.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
+
+  // Asignamos las credenciales de distirbuidor para poder crear un nuevo cliente
+  credencialesDeDistribudor.RFC             := 'BBB010101001';
+  credencialesDeDistribudor.DistribuidorID  := 'DF627BC3-A872-4806-BF37-DBD040CBAC7C';
+
+  cutPACEcodex.AsignarCredenciales(credencialesDePrueba, credencialesDeDistribudor);
+
+  // Generamos un RFC de pruebas
+  nuevoEmisor.Nombre := 'Mi empresa de prueba SA de CV';
+  nuevoEmisor.RFC := regresaRFCInventado();
+  nuevoEmisor.CorreoElectronico := nuevoEmisor.RFC + '@default.com';
+
+  respuestaAltaEmisor := cutPACEcodex.AgregaCliente(nuevoEmisor);
+
+  CheckNotEquals('',
+                respuestaAltaEmisor,
+                'No se dio de alta al nuevo emisor correctamente');
+
+  try
+    guidRespuesta := StringToGuid('{'+ respuestaAltaEmisor + '}');
+    fueGuidValido := True;
+  except
+    fueGuidValido := False;
+  end;
+
+  CheckTrue(fueGuidValido,
+            'La funcion no regreso un GUID de token para alta de certificados correcto');
+end;
+
+procedure TestTPACEcodex.SaldoCliente_EmisorConSaldo_RegreseSaldoDeTimbres;
+var
+  saldoDeTimbres: Integer;
+const
+  _RFC_CLIENTE_EXISTENTE = 'AAA010101AAA';
+begin
+  // Mandamos solicitar el saldo
+  saldoDeTimbres := cutPACEcodex.SaldoCliente(_RFC_CLIENTE_EXISTENTE);
+
+  CheckTrue(saldoDeTimbres > 0, 'El saldo en timbres fue cero');
+end;
+
+
 procedure TestTPACEcodex.CancelarDocumento_Documento_CanceleCorrectamente;
 var
   resultadoCancelacion: Boolean;
@@ -164,13 +244,13 @@ begin
   credencialesDiferentes.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
 
   // Asignamos las nuevas credenciales a Ecodex con un RFC diferente al del documento a timbrar
-  cutPACEcodex.AsignarCredenciales(credencialesDiferentes);
+  cutPACEcodex.AsignarCredenciales(credencialesDiferentes, credencialesDiferentes);
 
   try
     // Mandamos timbrar
     cutPACEcodex.TimbrarDocumento(fDocumentoDePrueba);
   except
-    On E:ETimbradoRFCNoCorrespondeException do
+    On E:EPACTimbradoRFCNoCorrespondeException do
     begin
        excepcionLanzada := True;
     end;

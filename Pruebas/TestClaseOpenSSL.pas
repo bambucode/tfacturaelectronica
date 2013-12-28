@@ -33,13 +33,16 @@ type
     procedure HacerDigestion_TipoSHA1_FuncioneCorrectamente;
     procedure HacerDigestion_ConClaveIncorrecta_CauseExcepcion;
     procedure ObtenerCertificado_CertificadoDePrueba_RegreseElCertificadoConPropiedades;
+    procedure ObtenerModulusDeCertificado_DeCertificado_RegreseValorCorrecto;
+    procedure ObtenerModulusDeLlavePrivada_DeLlave_RegreseValorCorrecto;
   end;
 
 implementation
 
 uses
   Windows, SysUtils, Classes, FacturaTipos, Forms, OpenSSLUtils, DateUtils,
-  ConstantesFixtures;
+  ConstantesFixtures,
+  CodeSiteLogging;
 
 
 procedure TestTOpenSSL.SetUp;
@@ -78,6 +81,8 @@ begin
   BorrarArchivoTempSiExiste(_ARCHIVO_CADENA_TEMPORAL);
   BorrarArchivoTempSiExiste(_ARCHIVO_TEMPORAL_RESULTADO_OPENSSL);
   BorrarArchivoTempSiExiste(TipoEncripcion + '_cadena_de_prueba.bin');
+
+  Sleep(100);
 
   // Guardamos el contenido de la cadena de prueba a un archivo temporal
   guardarArchivoEnUTF8(UTF8Encode(aCadena),
@@ -218,7 +223,7 @@ var
 
   function leerFechaDeArchivo(sRuta: String) : TDateTime;
   var
-     sFecha, sTxt, sMes, sHora, sAno, sDia: String;
+     sFecha, sTxt, sMes, sHora, sAno, sDia, hora, min, seg: String;
   begin
       // Leemos el archivo y convertimos el contenido a una fecha de Delphi
       sTxt:=leerContenidoDeArchivo(sRuta);
@@ -229,8 +234,19 @@ var
       sDia:=Copy(sFecha, 5, 2);
       sHora:=Copy(sFecha, 8, 8);
       sAno:=Copy(sFecha, 17, 4);
+
+      hora := Copy(sHora, 1, 2);
+      min := Copy(sHora, 4, 2);
+      seg := Copy(sHora, 7, 2);
+
       // Procesamos la fecha que regresa OpenSSL para convertirla a formato Delphi
-      Result:=StrToDateTime(sDia + '/' + IntToStr(NombreMesANumero(sMes)) + '/' + sAno + ' ' + sHora);
+      Result:=EncodeDateTime(StrToInt(sAno),
+                             NombreMesANumero(sMes),
+                             StrToInt(sDia),
+                             StrToInt(hora),
+                             StrToInt(min),
+                             StrToInt(seg),
+                             0);
   end;
 
   // Convertimos el num de serie que regresa OpenSSL en hexadecimal
@@ -278,6 +294,7 @@ begin
 
   Certificado := fOpenSSL.ObtenerCertificado(fRutaFixtures + _RUTA_CERTIFICADO);
   try
+    CodeSite.Send(Certificado.AsBase64);
     CheckTrue(Certificado <> nil, 'Se debio haber obtenido una instancia al certificado');
     // Checamos las propiedades que nos interesan
     CheckEquals(dtInicioVigencia, Certificado.NotBefore, 'El inicio de vigencia del certificado no fue el mismo que regreso OpenSSL');
@@ -289,6 +306,61 @@ begin
                 'La longitud del numero de serie no fue la correcta');
   finally
      FreeAndNil(Certificado);
+  end;
+end;
+
+procedure
+    TestTOpenSSL.ObtenerModulusDeCertificado_DeCertificado_RegreseValorCorrecto;
+var
+  openSSL: TOpenSSL;
+  modulusCertificado, modulusCertificadoEsperado: string;
+begin
+  // Obtenemos el modulus del Certificado usando OpenSSL.exe
+  EjecutarComandoOpenSSL(' x509 -inform DER -in "' + fRutaFixtures + _RUTA_CERTIFICADO +
+                          '" -noout -modulus > "' + fDirTemporal + 'ModulusCertificado.txt" ');
+  modulusCertificadoEsperado := leerContenidoDeArchivo(fDirTemporal + 'ModulusCertificado.txt');
+  // Quitamos la palabra "Modulus=" que regresa OpenSSL
+  modulusCertificadoEsperado := StringReplace(modulusCertificadoEsperado, 'Modulus=', '', [rfReplaceAll]);
+  try
+    openSSL := TOpenSSL.Create;
+    modulusCertificado := openSSL.ObtenerModulusDeCertificado(fRutaFixtures + _RUTA_CERTIFICADO);
+
+    CheckTrue(modulusCertificado <> '', 'No se obtuvo el Modulus del Certificado');
+    CheckEquals(modulusCertificadoEsperado,
+                modulusCertificado,
+                'El modulus del certificado obtenido no fue el mismo que regresó OpenSSL.exe');
+  finally
+    openSSL.Free;
+  end;
+end;
+
+procedure
+    TestTOpenSSL.ObtenerModulusDeLlavePrivada_DeLlave_RegreseValorCorrecto;
+var
+  openSSL: TOpenSSL;
+  modulusDeLlave, modulusDeLlaveEsperado: string;
+begin
+  // Desencriptamos la llave privada
+  EjecutarComandoOpenSSL(' pkcs8 -inform DER -in "' + fArchivoLlavePrivada +
+                          '" -passin pass:'+ fClaveLlavePrivada + ' -out "' + fDirTemporal + 'llaveprivada.key" ');
+
+  // Obtenemos el modulus de la Llave Privada usando OpenSSL.exe para corroborarlo
+  EjecutarComandoOpenSSL(' rsa -in  "' + fDirTemporal + 'llaveprivada.key"' +
+                          ' -noout -modulus > "' + fDirTemporal + 'ModulusLlave.txt" ');
+
+  modulusDeLlaveEsperado := leerContenidoDeArchivo(fDirTemporal + 'ModulusLlave.txt');
+  // Quitamos la palabra "Modulus=" que regresa OpenSSL
+  modulusDeLlaveEsperado := StringReplace(modulusDeLlaveEsperado, 'Modulus=', '', [rfReplaceAll]);
+  try
+    openSSL := TOpenSSL.Create;
+    modulusDeLlave := openSSL.ObtenerModulusDeLlavePrivada(fArchivoLlavePrivada, fClaveLlavePrivada);
+
+    CheckTrue(modulusDeLlave <> '', 'No se obtuvo el Modulus de la Llave Privada');
+    CheckEquals(modulusDeLlaveEsperado,
+                modulusDeLlave,
+                'El modulus de la Llave Privada obtenido no fue el mismo que regresó OpenSSL.exe');
+  finally
+    openSSL.Free;
   end;
 end;
 

@@ -576,6 +576,9 @@ begin
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
   sXMLConNumSerieCertificado := leerContenidoDeFixture('comprobante_fiscal/v22/numeroserie.xml');
 
+  // Indicamos que no queremos validar el certificado y la llave para que no falle por omision de la llave privada
+  fComprobanteFiscal.ValidarCertificadoYLlavePrivada := False;
+
   // Especificamos que NO incluya el certificado en el XML (esa es otra prueba independiente)
   fComprobanteFiscal.IncluirCertificadoEnXml:=False;
   // Especificamos el certificado que usaremos a la clase comprobante
@@ -596,6 +599,9 @@ begin
 
   // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
   sXMLConCertificado := leerContenidoDeFixture('comprobante_fiscal/v22/con_certificado.xml');
+
+  // Indicamos que no queremos validar el certificado y la llave para que no falle por omision de la llave privada
+  fComprobanteFiscal.ValidarCertificadoYLlavePrivada := False;
 
   // Especificamos que Si incluya el certificado en el XML
   fComprobanteFiscal.IncluirCertificadoEnXml:=True;

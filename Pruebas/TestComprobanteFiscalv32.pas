@@ -315,7 +315,6 @@ var
   sSelloDigitalCorrecto, archivoComprobanteGuardado, hashComprobanteOriginal, hashComprobanteGuardado: String;
   archivoComprobantePrueba : string;
   Certificado: TFECertificado;
-  xmlPrueba : TXMLDocument;
 begin
   ConfigurarCertificadoDePrueba(Certificado);
   archivoComprobantePrueba := fRutaFixtures + 'comprobante_fiscal/v32/comprobante_timbrado.xml';

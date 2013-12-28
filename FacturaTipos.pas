@@ -37,7 +37,8 @@ TFESerie = String[10];
 TFEFormaDePago = (fpUnaSolaExhibicion, fpParcialidades);
 TFETipoComprobante = (tcIngreso, tcEgreso, tcTraslado);
 
-// Versiones de CFD soportadas
+// Versiones de CFD soportadas, en caso de que se lea un XML y no este dentro de estas versiones
+// se lanzara una excepcion
 TFEVersionComprobante = (fev20, fev22,fev32);
 
 TFEDireccion = record
@@ -75,6 +76,8 @@ TFEContribuyente = record
   ExpedidoEn: TFEExpedidoEn;
   // Un contribuyente puede tener muchos regímenes fiscales
   Regimenes : TFERegimenes;
+  // Atributo opcional para almacenar el correo del contribuyente
+  CorreoElectronico : String;
 end;
 
 // Pre-definimos los tipos de contribuyentes de Publico en General y Extranjero
@@ -106,12 +109,16 @@ TFELlavePrivada = record
    Clave: String;
 end;
 
+// Tipo del certificado leido (usado por Clase TCertificadoSellos)
+TFETipoCertificado = (tcSellos, tcFIEL);
+
 TFECertificado = record
     Ruta: String;
     LlavePrivada: TFELlavePrivada;
     VigenciaInicio: TDateTime;
     VigenciaFin: TDateTime;
     NumeroSerie: String;
+    RFCAlQuePertenece: string;
 end;
 
 TFEBloqueFolios = record
@@ -158,8 +165,24 @@ TFEPACCredenciales = record
   DistribuidorID: string; // Usado por algunos PAC para la comunicacion (Ej: Ecodex)
 end;
 
+EFECertificadoNoExisteException = class(Exception);
+EFECertificadoNoEsDeSellosException = class(Exception);
+EFELlavePrivadaNoCorrespondeACertificadoException = class(Exception);
+EFECertificadoNoVigente =  class(Exception);
+EFECertificadoNoCorrespondeAEmisor = class(Exception);
+EFECertificadoNoFueLeidoException = class(Exception);
+
 {$REGION 'Errores durante generacion de CFD/I'}
-  EFEAtributoRequeridoNoPresenteException = class(Exception);
+EFEAtributoRequeridoNoPresenteException = class(Exception);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Esta excepción se lanza cuando se intenta leer un XML de un CFD/I de una
+///	  versión aun no soportada. Pensado para evitar leer futuras versiones aun
+///	  no implementadas.
+///	</summary>
+{$ENDREGION}
+EFEVersionComprobanteNoSoportadaException = class(Exception);
 {$ENDREGION}
 
 {$REGION 'Otras excepciones que se presentan al usar el comprobante fiscal'}
@@ -182,6 +205,34 @@ EComprobanteNoSoportaPropiedadException = class(Exception);
 EComprobanteEstructuraIncorrectaException = class(Exception);
 {$ENDREGION}
 
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  <para>
+///	    Excepcion heredable que tiene la propiedad Reintentable para saber si
+///	    dicha falla es temporal y el programa cliente debe de re-intentar la
+///	    última petición.
+///	  </para>
+///	  <para>
+///	    Si su valor es Falso es debido a que la falla está del lado del cliente
+///	    y el PAC no puede procesar dicha petición (XML incorrecto, Sello mal
+///	    generado, etc.)
+///	  </para>
+///	</summary>
+{$ENDREGION}
+EPACException = class(Exception)
+private
+  fCodigoErrorSAT: Integer;
+  fCodigoErrorPAC: Integer;
+  fReintentable : Boolean;
+public
+  constructor Create(const aMensajeExcepcion: String; const aCodigoErrorSAT:
+      Integer; const aCodigoErrorPAC: Integer; const aReintentable: Boolean);
+  property CodigoErrorSAT: Integer read fCodigoErrorSAT;
+  property CodigoErrrorPAC: Integer read fCodigoErrorPAC;
+  property Reintentable : Boolean read fReintentable;
+end;
+
 // Excepciones que se lanzan durante el proceso de timbrado de un CFDI
 {$REGION 'Documentation'}
 ///	<summary>
@@ -189,10 +240,7 @@ EComprobanteEstructuraIncorrectaException = class(Exception);
 ///	  PAC no fue válido.
 ///	</summary>
 {$ENDREGION}
-ETimbradoXMLInvalidoException = class(Exception);
-ETimbradoRFCNoCorrespondeException = class(Exception);
-ETimbradoVersionNoSoportadaPorPACException = class(Exception);
-
+ETimbradoXMLInvalidoException = class(EPACException);
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Error estándard del SAT (302) cuando el sello del comprobante no se
@@ -200,39 +248,61 @@ ETimbradoVersionNoSoportadaPorPACException = class(Exception);
 ///	  sello.
 ///	</summary>
 {$ENDREGION}
-ETimbradoSelloEmisorInvalidoException = class(Exception); // Error 302
-ETimbradoCertificadoNoCorrespondeException = class(Exception); // Error 303
-ETimbradoCertificadoRevocadoException = class(Exception); // Error 304
-ETimbradoFechaEmisionSinVigenciaException = class(Exception); // Error 305
-ETimbradoLlaveInvalidaException = class(Exception); // Error 306
-ETimbradoPreviamenteException = class(Exception); // Error 307
-ETimbradoCertificadoApocrifoException = class(Exception); // Error 308
-ETimbradoFechaGeneracionMasDe72HorasException = class(Exception); // Error 401
-ETimbradoRegimenEmisorNoValidoException = class(Exception); // Error 402
-ETimbradoFechaEnElPasadoException = class(Exception); // Error 403
+ETimbradoSelloEmisorInvalidoException = class(EPACException); // Error 302
+ETimbradoCertificadoNoCorrespondeException = class(EPACException); // Error 303
+ETimbradoCertificadoRevocadoException = class(EPACException); // Error 304
+ETimbradoFechaEmisionSinVigenciaException = class(EPACException); // Error 305
+ETimbradoLlaveInvalidaException = class(EPACException); // Error 306
+ETimbradoPreviamenteException = class(EPACException); // Error 307
+ETimbradoCertificadoApocrifoException = class(EPACException); // Error 308
+ETimbradoFechaGeneracionMasDe72HorasException = class(EPACException); // Error 401
+ETimbradoRegimenEmisorNoValidoException = class(EPACException); // Error 402
+ETimbradoFechaEnElPasadoException = class(EPACException); // Error 403
 
 // Excepciones comunes para todos los PAC
-
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Representa una "caida" general del servicio del PAC. Es decir
 ///	  temporalmente fuera de servicio
 ///	</summary>
 {$ENDREGION}
-EPACServicioNoDisponibleException = class(Exception);
-EPACEmisorNoInscritoException = class(Exception);
-EPACErrorGenericoDeAccesoException = class(Exception);
+EPACServicioNoDisponibleException = class(EPACException);
+EPACCredencialesIncorrectasException = class(EPACException);
+EPACEmisorNoInscritoException = class(EPACException);
+EPACErrorGenericoDeAccesoException = class(EPACException);
+EPACTimbradoRFCNoCorrespondeException = class(EPACException);
+EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
+EPACTimbradoSinFoliosDisponiblesException = class(EPACException);
+
+{$REGION 'Documentation'}
+///	<summary>
+///	  Este tipo de excepcion se lanza cuando se detecta una falla con el
+///	  internet del usuario el cual es un problema de comunicación con el PAC.
+///	</summary>
+{$ENDREGION}
+EPACProblemaConInternetException = class(EPACException);
 
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Excepcion general para errores no programados/manejados.
 ///	</summary>
+///	<remarks>
+///	  <note type="important">
+///	    Por defecto se establece que esta excepción es "re-intentable" para
+///	    indicarle al cliente que debe de re-intentar realizar el ultimo proceso
+///	  </note>
+///	</remarks>
 {$ENDREGION}
-ETimbradoErrorGenericoException = class(Exception);
+EPACErrorGenericoException = class(EPACException);
 
 const
 _RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';
 _RFC_VENTA_EXTRANJEROS        = 'XEXX010101000';
+_URL_PRUEBAS_ECODEX           = 'https://pruebas.ecodex.com.mx:2045';
+
+// Errores ecodex
+_ERROR_ECODEX_CERTIFICADO_NUEVO = 'Error en Certificado:402';
+_ERROR_ECODEX_CERTIFICADO_306   = '306 Certificado utilizado no es de sello';
 
 // Códigos de error regresados por los PAC
 _ERROR_SAT_XML_INVALIDO                             = '301';
@@ -248,5 +318,14 @@ _ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO                 = '402';
 _ERROR_SAT_FECHA_EMISION_EN_EL_PASADO               = '403';
 
 implementation
+
+constructor EPACException.Create(const aMensajeExcepcion: String; const
+    aCodigoErrorSAT: Integer; const aCodigoErrorPAC : Integer; const aReintentable: Boolean);
+begin
+  inherited Create(aMensajeExcepcion);
+  fReintentable := aReintentable;
+  fCodigoErrorSAT := aCodigoErrorSAT;
+  fCodigoErrorPAC := aCodigoErrorPAC;
+end;
 
 end.

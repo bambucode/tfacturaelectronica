@@ -1,9 +1,10 @@
 (******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
 
- Copyright (C) 2011-2012 - Bambu Code SA de CV - Ing. Luis Carrasco
+ Copyright (C) 2011-2014 - Bambu Code SA de CV
 
- Proyecto que concentra todas las pruebas de unidad de la libreria.
+ Proyecto que concentra las pruebas de unidad especificas de la generación
+ del XML del CFD/I y su sellado
 
  Este archivo pertenece al proyecto de abierto fuente de BambuCode:
  http://bambucode.com/codigoabierto
@@ -11,8 +12,6 @@
  La licencia de este codigo fuente se encuentra en:
  http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
  ******************************************************************************)
-{$DEFINE VERSION_DE_PRUEBA}
-
 program ProbarFacturaElectronica;
 {
 
@@ -25,18 +24,24 @@ program ProbarFacturaElectronica;
 
 }
 
-// Creamos el define para que podamos acceder a las variables privadas de las clases
-// para que sean probadas
-
 {$IFDEF CONSOLE_TESTRUNNER}
 {$APPTYPE CONSOLE}
 {$ENDIF}
 
 uses
-  Forms,
+  SysUtils,
+  {$IFDEF XMLOUTPUT}
+  // Soporte para Vsoft.DUnit.Xml el cual permite que las pruebas generen un archivo XML para los reportes
+  // Ref: https://github.com/VSoftTechnologies/DUnit-XML
+  // Solo se debe agregar la carpeta de dicho proyecto al "Library Path"
+  VSoft.DUnit.XMLTestRunner in '..\..\..\externos\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas',
+  VSoft.MSXML6 in '..\..\..\externos\DUnit-XML\VSoft.MSXML6.pas',
+  {$ENDIF}
+  TextTestRunner,
   TestFramework,
   GUITestRunner,
-  TextTestRunner,
+  Forms,
+  CodeSiteLogging,
   TestSelloDigital in 'TestSelloDigital.pas',
   TestCadenaOriginalDeTimbre in 'TestCadenaOriginalDeTimbre.pas',
   FacturaTipos in '..\FacturaTipos.pas',
@@ -61,15 +66,61 @@ uses
   UtileriasPruebas in 'UtileriasPruebas.pas',
   FacturacionHashes in '..\FacturacionHashes.pas',
   FeTimbreFiscalDigital in '..\CFD\FeTimbreFiscalDigital.pas',
-  CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas';
+  CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas',
+  InformeMensual in '..\InformeMensual.pas',
+  ClaseCertificadoSellos in '..\ClaseCertificadoSellos.pas',
+  TestCertificadoSellos in 'TestCertificadoSellos.pas';
+
 
 {$R *.RES}
 
+{$IfDef XMLOUTPUT}
+var
+  OutputFile : string = DEFAULT_FILENAME;
+
+var
+  ConfigFile : string;
+{$EndIf}
+
+{$IFDEF ISCONSOLE}
+var
+  ExitBehavior: TRunnerExitBehavior;
+{$EndIf}
+
 begin
-  Application.Initialize;
-  if IsConsole then
-    with TextTestRunner.RunRegisteredTests do
-      Free
-  else
-    GUITestRunner.RunRegisteredTests;
+  CodeSite.Clear;
+
+  {$IfDef ISCONSOLE}
+    {$IfDef XMLOUTPUT}
+      {$Message Hint 'Compilando version generadora de XML'}
+      if ConfigFile <> '' then
+      begin
+        RegisteredTests.LoadConfiguration(ConfigFile, False, True);
+        WriteLn('Loaded config file ' + ConfigFile);
+      end;
+      if ParamCount > 0 then
+        OutputFile := ParamStr(1);
+      WriteLn('Writing output to ' + OutputFile);
+      WriteLn('Running ' + IntToStr(RegisteredTests.CountEnabledTestCases) + ' of ' + IntToStr(RegisteredTests.CountTestCases) + ' test cases');
+      TXMLTestListener.RunRegisteredTests(OutputFile);
+    {$else}
+      WriteLn('To run with rxbPause, use -p switch');
+      WriteLn('To run with rxbHaltOnFailures, use -h switch');
+      WriteLn('No switch runs as rxbContinue');
+
+      if FindCmdLineSwitch('p', ['-', '/'], true) then
+        ExitBehavior := rxbPause
+      else if FindCmdLineSwitch('h', ['-', '/'], true) then
+        ExitBehavior := rxbHaltOnFailures
+      else
+        ExitBehavior := rxbContinue;
+
+      TextTestRunner.RunRegisteredTests(ExitBehavior);
+    {$endif}
+  {$Else}
+    {$Message Hint 'Generando version GUI de pruebas'}
+    Application.Initialize;
+    TGUITestRunner.RunRegisteredTests;
+  {$EndIf}
 end.
+

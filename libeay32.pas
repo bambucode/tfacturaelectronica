@@ -277,13 +277,13 @@ type
   BN_ULONG = array of byte; // system dependent, consider it as a opaque pointer
   pBIGNUM = ^BIGNUM;
   BIGNUM = record
-	d: pBN_ULONG;	// Pointer to an array of 'BN_BITS2' bit chunks.
-	top: integer;	// Index of last used d +1.
-                        // The next are internal book keeping for bn_expand.
-	dmax: integer;	// Size of the d array.
-	neg: integer;	// one if the number is negative
-	flags: integer;
-        end;
+    d: pBN_ULONG;	// Pointer to an array of 'BN_BITS2' bit chunks.
+    top: integer;	// Index of last used d +1.
+                          // The next are internal book keeping for bn_expand.
+    dmax: integer;	// Size of the d array.
+    neg: integer;	// one if the number is negative
+    flags: integer;
+  end;
 
   pBN_CTX = ^BN_CTX;
   BN_CTX = record
@@ -306,13 +306,13 @@ type
   // Used for montgomery multiplication
   pBN_MONT_CTX = ^BN_MONT_CTX;
   BN_MONT_CTX = record
-	ri: integer;    // number of bits in R
-	RR: BIGNUM;     // used to convert to montgomery form
-	N: BIGNUM;      // The modulus
-	Ni: BIGNUM;     // R*(1/R mod N) - N*Ni = 1
-	                // (Ni is only stored for bignum algorithm)
-	n0: BN_ULONG;   // least significant word of Ni
-	flags: integer;
+    ri: integer;    // number of bits in R
+    RR: BIGNUM;     // used to convert to montgomery form
+    N: BIGNUM;      // The modulus
+    Ni: BIGNUM;     // R*(1/R mod N) - N*Ni = 1
+                    // (Ni is only stored for bignum algorithm)
+    n0: BN_ULONG;   // least significant word of Ni
+    flags: integer;
 	end;
 
   // Used for reciprocal division/mod functions
@@ -386,35 +386,31 @@ type
     dummy: integer;
     end;
 
-  pRSA = pointer;
+  pRSA = ^RSA;
   pRSA_METHOD = pointer;
   RSA = record
-	// The first parameter is used to pickup errors where
-	// this is passed instead of aEVP_PKEY, it is set to 0
-	pad: integer;
-	version: integer;
-	meth: pRSA_METHOD;
-	n: pBIGNUM;
-	e: pBIGNUM;
-	d: pBIGNUM;
-	p: pBIGNUM;
-	q: pBIGNUM;
-	dmp1: pBIGNUM;
-	dmq1: pBIGNUM;
-	iqmp: pBIGNUM;
-	// be careful using this if the RSA structure is shared
-	ex_data: CRYPTO_EX_DATA;
-	references: integer;
-	flags: integer;
-	// Used to cache montgomery values
-	_method_mod_n: pBN_MONT_CTX;
-	_method_mod_p: pBN_MONT_CTX;
-	_method_mod_q: pBN_MONT_CTX;
-        // all BIGNUM values are actually in the following data, if it is not
-	// NULL
-	bignum_data: ^byte;
-	blinding: ^BN_BLINDING;
-	end;
+    pad : Integer;
+    version : Integer;
+    meth : PRSA_METHOD;
+    engine : Pointer;
+    n : PBIGNUM;
+    e : PBIGNUM;
+    d : PBIGNUM;
+    p : PBIGNUM;
+    q : PBIGNUM;
+    dmp1 : PBIGNUM;
+    dmq1 : PBIGNUM;
+    iqmp : PBIGNUM;
+    ex_data : CRYPTO_EX_DATA;
+    references : Integer;
+    flags : Integer;
+    _method_mod_n : PBN_MONT_CTX;
+    _method_mod_p : PBN_MONT_CTX;
+    _method_mod_q : PBN_MONT_CTX;
+    bignum_data : PAnsiChar;
+    blinding : PBN_BLINDING;
+    mt_blinding : PBN_BLINDING;
+  end;
 
   pDSA = ^DSA;
   DSA = record
@@ -881,7 +877,7 @@ function BIO_ctrl(bp: pBIO; cmd: Integer; larg: Longint;
 function BIO_read(b: pBIO; buf: pointer; len: integer): integer; cdecl;
 function BIO_gets(b: pBIO; buf: PChar; size: integer): integer; cdecl;
 function BIO_write(b: pBIO; const buf: pointer; len: integer): integer; cdecl;
-function BIO_puts(b: pBIO; const buf: PChar): integer; cdecl;
+function BIO_puts(b: pBIO; const buf: PAnsiChar): integer; cdecl;
 function BIO_flush(b: pBIO): integer;
 
 function BIO_reset(bp: pBIO): integer;
