@@ -364,6 +364,7 @@ var
   bioModulus: pBIO;
   llaveDesencriptada: pEVP_PKEY;
   Inbuf: Array[0..500] of AnsiChar;
+  longitudModulus : Integer;
 begin
   llaveDesencriptada := ObtenerLlavePrivadaDesencriptada(aRutaLlavePrivada, aClaveLlavePrivada);
   // Obtenemos las propiedades RSA de la Llave privada
@@ -379,13 +380,15 @@ begin
         raise Exception.Create('No fue posible obtner el Modulus de la Llave Privada');
 
       // Leemos el Modulus del BIO en el buffer de cadena
-      BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
+      longitudModulus := BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
+      // Quitamos los caracteres invalidos
+      Inbuf[longitudModulus] := #0;
 
       {$IFDEF CODESITE}
         CodeSite.Send('Modulus Llave Privada', InBuf);
       {$ENDIF};
 
-      Result := InBuf;
+      Result := StrPas(InBuf);
     end else
       Result := '';
   finally
@@ -457,6 +460,7 @@ var
   rsaInfo: pRSA;
   Inbuf: Array[0..500] of AnsiChar;
   certificadoX509: TX509Certificate;
+  longitudModulus: Integer;
 begin
   bioModulus := BIO_new(BIO_s_mem());
   try
@@ -475,7 +479,9 @@ begin
            raise Exception.Create('No fue posible obtener el Modulus del Certificado');
 
         // Leemos el Modulus del BIO en el buffer de cadena
-        BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
+        longitudModulus := BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
+        // Quitamos los caracteres invalidos
+        Inbuf[longitudModulus] := #0;
 
         {$IFDEF CODESITE}
           CodeSite.Send('Modulus Certificado', InBuf);
