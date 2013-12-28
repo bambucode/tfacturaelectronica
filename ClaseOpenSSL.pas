@@ -43,7 +43,8 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
         fArchivoLlavePrivada: String;
         fClaveLlavePrivada: String;
     private
-        function ObtenerLlavePrivadaDesencriptada() : pEVP_PKEY;
+        function ObtenerLlavePrivadaDesencriptada(const aRutaLlavePrivada,
+            aClaveLlavePrivada: String): pEVP_PKEY;
         ///<summary>Funcion usada para convertir un buffer de bytes
         /// en caracteres 'imprimibles' (codificacion base64).
         ///</summary>
@@ -113,7 +114,8 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
         ///	</param>
         {$ENDREGION}
         procedure GuardarLlavePrivadaEnPEM(const aLlaveAbierta: pPKCS8_Priv_Key_Info; const aArchivoDestino: String);
-        function ObtenerModulusDeLlavePrivada(const aLlaveDesencriptada: pEVP_PKEY): String;
+        function ObtenerModulusDeLlavePrivada(const aRutaLlavePrivada,
+            aClaveLlavePrivada: String): String;
     end;
 
 
@@ -307,13 +309,14 @@ end;
 // Lee una llave binaria (.key) que tiene formato DER en memoria
 // para ser usada para hacer una digestion MD5, SHA1, etc. sin necesidad
 // de crear y usar un archivo PEM primero
-function TOpenSSL.ObtenerLlavePrivadaDesencriptada() : pEVP_PKEY;
+function TOpenSSL.ObtenerLlavePrivadaDesencriptada(const aRutaLlavePrivada,
+    aClaveLlavePrivada: String): pEVP_PKEY;
 var
     p8inf : pPKCS8_Priv_Key_Info;
     resLlave   : pEVP_PKEY;
 begin
     // Abrimos la llave privada
-    p8inf:=AbrirLlavePrivada(fArchivoLlavePrivada, fClaveLlavePrivada);
+    p8inf:=AbrirLlavePrivada(aRutaLlavePrivada, aClaveLlavePrivada);
 
     // Convierte la llave de formato PKCS8 a PEM (en memoria)
     resLlave := EVP_PKCS82PKEY(p8inf);
@@ -348,34 +351,40 @@ begin
 end;
 
 
-function TOpenSSL.ObtenerModulusDeLlavePrivada(const aLlaveDesencriptada:
-    pEVP_PKEY): String;
+function TOpenSSL.ObtenerModulusDeLlavePrivada(const aRutaLlavePrivada,
+    aClaveLlavePrivada: String): String;
 var
-  resLlave: pEVP_PKEY;
   rsaInfo: pRSA;
   bioModulus: pBIO;
+  llaveDesencriptada: pEVP_PKEY;
   Inbuf: Array[0..9999] of AnsiChar;
 begin
+  llaveDesencriptada := ObtenerLlavePrivadaDesencriptada(aRutaLlavePrivada, aClaveLlavePrivada);
   // Obtenemos las propiedades RSA de la Llave privada
-  rsaInfo := EVP_PKEY_get1_RSA(resLlave);
+  rsaInfo := EVP_PKEY_get1_RSA(llaveDesencriptada);
   // Creamos un BIO en memoria para almacenar el dato del Modulus
   bioModulus := BIO_new(BIO_s_mem());
+  try
+    // Asignamos el Modulus (propieda N del record RSA, rsa.c linea 336)
+    if rsaInfo.n <> nil then
+    begin
+      if BN_print(bioModulus, rsaInfo.n) <= 0 then
+        raise Exception.Create('No fue posible obtner el Modulus de la Llave Privada');
 
-  // Asignamos el Modulus (propieda N del record RSA, rsa.c linea 336)
-  if rsaInfo.n <> nil then
-    if BN_print(bioModulus, rsaInfo.n) <= 0 then
-      raise Exception.Create('No fue posible obtner el Modulus de la Llave Privada');
+      // Leemos el Modulus del BIO en el buffer de cadena
+      BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
 
-  // Leemos el Modulus del BIO en el buffer de cadena
-  BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
+      {$IFDEF CODESITE}
+        CodeSite.Send('Modulus', InBuf);
+      {$ENDIF};
 
-  // Liberamos el BIO que teniamos en memoria
-  BIO_free_all(bioModulus);
-
-  {$IFDEF CODESITE}
-    CodeSite.Send('Modulos', InBuf);
-  {$ENDIF};
-  Result := InBuf;
+      Result := InBuf;
+    end else
+      Result := '';
+  finally
+     // Liberamos el BIO que teniamos en memoria
+     BIO_free_all(bioModulus);
+  end;
 end;
 
 function TOpenSSL.HacerDigestion(ArchivoLlavePrivada, ClaveLlavePrivada: String; sCadena: TCadenaUTF8;
@@ -396,7 +405,7 @@ begin
   fClaveLlavePrivada:= ClaveLlavePrivada;
 
   Len:=0;
-  ekLlavePrivada := ObtenerLlavePrivadaDesencriptada;
+  ekLlavePrivada := ObtenerLlavePrivadaDesencriptada(fArchivoLlavePrivada, fClaveLlavePrivada);
 
   //SetLength(Inbuf, 8192); // StrLen(@sCadena)
   //SetCodePage(sCadena, 0, False); // Forzamos a eliminar el "Code Page" de la cadena

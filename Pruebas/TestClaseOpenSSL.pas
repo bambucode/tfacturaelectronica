@@ -33,6 +33,7 @@ type
     procedure HacerDigestion_TipoSHA1_FuncioneCorrectamente;
     procedure HacerDigestion_ConClaveIncorrecta_CauseExcepcion;
     procedure ObtenerCertificado_CertificadoDePrueba_RegreseElCertificadoConPropiedades;
+    procedure ObtenerModulusDeLlavePrivada_DeLlave_RegreseValorCorrecto;
   end;
 
 implementation
@@ -304,6 +305,22 @@ begin
                 'La longitud del numero de serie no fue la correcta');
   finally
      FreeAndNil(Certificado);
+  end;
+end;
+
+procedure
+    TestTOpenSSL.ObtenerModulusDeLlavePrivada_DeLlave_RegreseValorCorrecto;
+var
+  openSSL: TOpenSSL;
+  modulus: string;
+begin
+  try
+    openSSL := TOpenSSL.Create;
+    modulus := openSSL.ObtenerModulusDeLlavePrivada(fArchivoLlavePrivada, fClaveLlavePrivada);
+
+    CheckTrue(modulus <> '', 'No se obtuvo el Modulus de la Llave Privada');
+  finally
+    openSSL.Free;
   end;
 end;
 
