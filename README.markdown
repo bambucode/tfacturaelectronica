@@ -22,21 +22,19 @@ Más información sobre este proyecto en:
 Requerimientos técnicos
 ------------
 - Contar con alguna edición de Delphi.
-- Contar con librerias libeay32.dll, ssleay32.dll y el ejecutable openssl.exe (solo para las pruebas automatizadas)
-las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/binaries.html>
+- Contar con librerias libeay32.dll, ssleay32.dll y el ejecutable openssl.exe (solo para las pruebas automatizadas) las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/binaries.html>
 
 ¿Qué falta por implementar?
 -------------
 - Manejo de Adendas.
 - Manejo y pruebas de conceptos con datos aduanales.
 - Manejo y pruebas de articulos con cuenta predial.
-- Método de Cancelar para  los PAC de Ecodex y Comercio Digital
 
 Proveedores Autorizados de Certificación (PAC) Soportados
 -------------
 * Ecodex - <http://www.ecodex.com.mx>
-* Comercio Digital - <http://www.comercio-digital.com.mx>
-* FinkOk - <http://www.finkok.com>
+* Comercio Digital - <http://www.comercio-digital.com.mx> - Solo timbrado
+* FinkOk - <http://www.finkok.com> - Solo timbrado
 
 Completado
 -------------
@@ -44,10 +42,11 @@ Completado
 - Implementar soporte para la versión 2.2 de CFD - Completado Junio 2012.
 - Implementar la lectura de un CFD y que al mismo tiempo verifique si es válido o no. <- Completado 12 Dic 2010>
 - Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT. < Completado 26 Ene 2011 >
+- Se agregaron validaciones para verificar que el certificado sea de sellos y que el certificado y llave privada sean pareja <Completado 28 Diciembre 2013>
 
 ¿Cómo puedo ayudar?
 -------------
-Actualmente la librería se encuentra en estado "beta" en la implementación de CFDI. La manera en que puedes ayudar es en realizar más pruebas de unidad para probar los diferentes casos y corroborar que la librería funcione como debe. También puedes implementar más PACs basándote en los actuales y el ejemplo incluído.
+Actualmente la librería se encuentra en estado "beta" en la implementación de CFDI. La manera en que puedes ayudar es en realizar más pruebas de unidad para probar los diferentes casos y corroborar que la librería funcione como debe. También puedes implementar más PACs basándote en los actuales y el ejemplo incluído. Así como en agregar documentación técnica o colaborar en la implementación de Adendas, conceptos con datos aduanales, etc.
 
 Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a mi correo: <luis@bambucode.com> ya sea para envío de código realizado o bien si lo deseas puedes mandarme un "pull request" de tu "fork" de la librería.
 
@@ -70,4 +69,5 @@ La libreria ha sido probada solamente con Delphi XE2 aunque se ha tratado de man
 Colaboradores actuales.
 -------------
 * Ing. Luis Carrasco - Bambú Code SA de CV - <http://github.com/lcarrasco>
+* Ing. Eduardo  Padilla - Bambú Code SA de CV - <https://github.com/epadillac>
 *  Ing. Pablo Torres - <http://www.tecsisnet.net>
