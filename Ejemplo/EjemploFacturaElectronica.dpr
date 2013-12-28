@@ -55,7 +55,8 @@ uses
   FECancelaComercioDigital in '..\PACs\ComercioDigital\FECancelaComercioDigital.pas',
   CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas',
   EcodexWsClientes in '..\PACs\Ecodex\EcodexWsClientes.pas',
-  EcodexWsComun in '..\PACs\Ecodex\EcodexWsComun.pas';
+  EcodexWsComun in '..\PACs\Ecodex\EcodexWsComun.pas',
+  ManejadorDeErroresComunes in '..\PACs\ManejadorDeErroresComunes.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
@@ -162,7 +163,6 @@ begin
       Receptor.Direccion.Pais:='México';
       Receptor.Direccion.Localidad:='Boca del Rio';
 
-
       // 4. Definimos el certificado junto con su llave privada
       Certificado.Ruta:=ExtractFilePath(Application.ExeName) + '\' + Emisor.RFC + '.cer';
       Certificado.LlavePrivada.Ruta:=ExtractFilePath(Application.ExeName) + '\' + Emisor.RFC + '.key';
@@ -227,8 +227,8 @@ begin
 
         // Este es el "ID de Integrador" de pruebas de Ecodex
         CredencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
-        // Asignamos nuestras credenciales de acceso con el PAC
-        ProveedorTimbrado.AsignarCredenciales(CredencialesPAC);
+        // Asignamos nuestras credenciales de acceso con el PAC (en caso de Ecodex asignamos la credencial como usuario e integrador)
+        ProveedorTimbrado.AsignarCredenciales(CredencialesPAC, CredencialesPAC);
         // Mandamos timbrar el documento al PAC
         TimbreDeFactura := ProveedorTimbrado.TimbrarDocumento(Factura.XML);
 

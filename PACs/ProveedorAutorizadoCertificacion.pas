@@ -40,7 +40,8 @@ TTipoComprobanteXML = String;
  public
   property Nombre : String read getNombre;
   constructor Create(const aDominioWebService : String); virtual; abstract;
-  procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); virtual; abstract;
+  procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); overload; virtual; abstract;
+  procedure AsignarCredenciales(const aCredenciales, aCredencialesIntegrador: TFEPACCredenciales); overload; virtual; abstract;
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; virtual; abstract;
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; virtual; abstract;
   function AgregaCliente(const aNuevoEmisor: TFEContribuyente): String; virtual; abstract;

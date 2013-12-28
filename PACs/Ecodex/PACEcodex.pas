@@ -17,8 +17,7 @@ unit PACEcodex;
 
 interface
 
-uses HTTPSend,
-     Classes,
+uses Classes,
      xmldom,
      XMLIntf,
      msxmldom,
@@ -69,8 +68,7 @@ protected
 public
   destructor Destroy(); override;
   procedure AfterConstruction; override;
-  procedure AsignarCredenciales(const aCredenciales, aCredencialesIntegrador:
-      TFEPACCredenciales);
+  procedure AsignarCredenciales(const aCredenciales, aCredencialesIntegrador: TFEPACCredenciales); override;
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; override;
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; override;
   function AgregaCliente(const aNuevoEmisor: TFEContribuyente): string; override;
