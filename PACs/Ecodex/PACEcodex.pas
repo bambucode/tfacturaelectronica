@@ -304,7 +304,9 @@ begin
   obtenerDocumentoTimbradoPreviamente := False;
 
   // 1. Intentamos timbrar el documento por primera vez
+  {$IFDEF CODESITE}
   CodeSite.Send('Documento a timbrar por primera vez', aDocumento);
+  {$ENDIF}
   try
     timbreDocumento := TimbrarDocumentoPorPrimeraVez(aDocumento);
   except
@@ -317,7 +319,9 @@ begin
   // 2. Si por algun motivo fue timbrado previamente obtenemos el timbre
   if obtenerDocumentoTimbradoPreviamente then
   begin
+    {$IFDEF CODESITE}
     CodeSite.Send('Documento a obtener timbre previo', aDocumento);
+    {$ENDIF}
 
     try
       timbreDocumento := ObtenerTimbrePrevio(aDocumento);
