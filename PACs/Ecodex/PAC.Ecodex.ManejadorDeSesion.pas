@@ -18,7 +18,8 @@ type
     function ObtenerNuevoTokenDeServicio(const aRFC: String): String;
     procedure ProcesarFallaEcodex(const aExcepcion: Exception);
   public
-    constructor Create(const aDominioWebService : String);
+    constructor Create(const aDominioWebService: String; const
+        aIdTransaccionInicial: Integer);
     procedure AfterConstruction; override;
     procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
     function ObtenerNuevoTokenAltaEmisores(const aRFC, aIdIntegrador,
@@ -35,9 +36,12 @@ uses ManejadorDeErroresComunes,
      {$ENDIF}
      FacturacionHashes;
 
-constructor TEcodexManejadorDeSesion.Create(const aDominioWebService : String);
+constructor TEcodexManejadorDeSesion.Create(const aDominioWebService: String;
+    const aIdTransaccionInicial: Integer);
 begin
   fDominioWebService := aDominioWebService;
+  // Establecemos el numero de transaccion con que comenzaremos para que sea un consecutivo
+  fNumeroTransaccion := aIdTransaccionInicial;
 end;
 
 procedure TEcodexManejadorDeSesion.AfterConstruction;
@@ -45,11 +49,6 @@ begin
   inherited;
   // Obtenemos la instancia del WebService de Sesion usando el dominio especificado por el usuario
   wsSeguridad := GetWsEcodexSeguridad(False, fDominioWebService + '/ServicioSeguridad.svc');
-
-  // El numero de transacción comenzará como un numero aleatorio
-  // (excepto en las pruebas de unidad)
-  Randomize;
-  fNumeroTransaccion := Random(10000);
 end;
 
 procedure TEcodexManejadorDeSesion.AsignarCredenciales(const aCredenciales: TFEPACCredenciales);

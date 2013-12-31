@@ -42,7 +42,7 @@ uses
 procedure TestTEcodexManejadorDeSesion.SetUp;
 begin
   inherited;
-  cutManejador := TEcodexManejadorDeSesion.Create('https://pruebas.ecodex.com.mx:2045');
+  cutManejador := TEcodexManejadorDeSesion.Create('https://pruebas.ecodex.com.mx:2045', 1);
 
   // Asignamos las credenciales de prueba
   // tomadas del documento "Guia de integracion ECODEX_v2.0.1.pdf" Página 28
