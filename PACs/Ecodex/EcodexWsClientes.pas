@@ -507,10 +507,15 @@ type
 
 function GetWsEcodexClientes(UseWSDL: Boolean=System.False; Addr: string='';
     HTTPRIO: THTTPRIO = nil): IEcodexServicioClientes;
+function GetUltimoXMLEnviadoEcodexWsClientes: string;
+function GetUltimoXMLRecibidoEcodexWsClientes: string;
 
 
 implementation
-  uses SysUtils;
+  uses SysUtils, uWSHelper;
+
+var
+  wsHelper: TWSHelper;
 
 function GetWsEcodexClientes(UseWSDL: Boolean=System.False; Addr: string='';
     HTTPRIO: THTTPRIO = nil): IEcodexServicioClientes;
@@ -534,6 +539,9 @@ begin
     RIO := THTTPRIO.Create(nil)
   else
     RIO := HTTPRIO;
+
+  RIO.OnBeforeExecute := wsHelper.BeforeExecute;
+  RIO.OnAfterExecute := wsHelper.AfterExecute;
   try
     Result := (RIO as IEcodexServicioClientes);
     if UseWSDL then
@@ -547,6 +555,16 @@ begin
     if (Result = nil) and (HTTPRIO = nil) then
       RIO.Free;
   end;
+end;
+
+function GetUltimoXMLEnviadoEcodexWsClientes: string;
+begin
+  Result := wsHelper.UltimoXMLEnviado;
+end;
+
+function GetUltimoXMLRecibidoEcodexWsClientes: string;
+begin
+  Result := wsHelper.UltimoXMLRecibido;
 end;
 
 
