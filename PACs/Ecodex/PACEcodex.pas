@@ -61,12 +61,8 @@ type
   wsClientesEcodex : IEcodexServicioClientes;
   wsTimbradoEcodex: IEcodexServicioTimbrado;
   fManejadorDeSesion : TEcodexManejadorDeSesion;
-  function AsignarTimbreDeRespuestaDeEcodex(const aComprobanteTimbrado:
-      TEcodexComprobanteXML): TFETimbre;
-  function ObtenerTimbrePrevio(const aDocumento: TTipoComprobanteXML): TFETimbre;
+  function AsignarTimbreDeRespuestaDeEcodex(const aComprobanteTimbrado: TEcodexComprobanteXML): TFETimbre;
   procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
-  function TimbrarDocumentoPorPrimeraVez(const aDocumento: TTipoComprobanteXML):
-      TFETimbre;
 protected
   function getNombre() : string; override;
 public
@@ -74,12 +70,14 @@ public
   procedure AfterConstruction; override;
   procedure AsignarCredenciales(const aCredenciales, aCredencialesIntegrador: TFEPACCredenciales); override;
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; override;
-  function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; override;
+  function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; overload; override;
+  function TimbrarDocumento(const aDocumento: TTipoComprobanteXML; const aIdTransaccionAUsar: Integer): TFETimbre; overload;
+  function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Integer): TFETimbre;
   function AgregaCliente(const aNuevoEmisor: TFEContribuyente): string; override;
   function SaldoCliente(const aRFC: String) : Integer; override;
   property Nombre : String read getNombre;
   constructor Create(const aDominioWebService : String); overload;
- end;
+end;
 
 implementation
 
@@ -296,44 +294,6 @@ begin
   raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
 end;
 
-function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre;
-var
-  timbreDocumento: TFETimbre;
-  obtenerDocumentoTimbradoPreviamente: Boolean;
-begin
-  obtenerDocumentoTimbradoPreviamente := False;
-
-  // 1. Intentamos timbrar el documento por primera vez
-  {$IFDEF CODESITE}
-  CodeSite.Send('Documento a timbrar por primera vez', aDocumento);
-  {$ENDIF}
-  try
-    timbreDocumento := TimbrarDocumentoPorPrimeraVez(aDocumento);
-  except
-    On E: ETimbradoPreviamenteException do
-      obtenerDocumentoTimbradoPreviamente := True
-    else
-      raise;
-  end;
-
-  // 2. Si por algun motivo fue timbrado previamente obtenemos el timbre
-  if obtenerDocumentoTimbradoPreviamente then
-  begin
-    {$IFDEF CODESITE}
-    CodeSite.Send('Documento a obtener timbre previo', aDocumento);
-    {$ENDIF}
-
-    try
-      timbreDocumento := ObtenerTimbrePrevio(aDocumento);
-    except
-      On E:Exception do
-        ProcesarExcepcionDePAC(E);
-    end;
-  end;
-
-  Result := timbreDocumento;
-end;
-
 function TPACEcodex.CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean;
 var
   mensajeFalla, tokenDeUsuario: String;
@@ -502,31 +462,27 @@ begin
   end;
 end;
 
-function TPACEcodex.ObtenerTimbrePrevio(const aDocumento: TTipoComprobanteXML):
+function TPACEcodex.ObtenerTimbrePrevio(const aIdTransaccionOriginal: Integer):
     TFETimbre;
 var
   solicitudObtenerTimbre: TEcodexSolicitudObtenerTimbrado;
   respuestaObtenerTimbre: TEcodexRespuestaObtenerTimbrado;
-  idTransaccionOriginal: Integer;
   tokenDeUsuario: string;
 begin
   // 1. Creamos la solicitud de obtener timbrado
   solicitudObtenerTimbre := TEcodexSolicitudObtenerTimbrado.Create;
 
-  // 2. Almacenamos el numero de la transaccion original
-  idTransaccionOriginal := fManejadorDeSesion.NumeroDeTransaccion;
-
-  // 3. Generamos un nuevo token para esta peticion
+  // 2. Generamos un nuevo token para esta peticion
   tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
 
   try
     //4. Asignamos los datos de la solicitud usando el ultimo token y transaccion usada
-    solicitudObtenerTimbre.TransaccionOriginal := idTransaccionOriginal;
+    solicitudObtenerTimbre.TransaccionOriginal := aIdTransaccionOriginal;
     solicitudObtenerTimbre.RFC := fCredenciales.RFC;
     solicitudObtenerTimbre.Token := tokenDeUsuario;
     solicitudObtenerTimbre.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
     // Dejamos vacio el UUID pues vamos a obtener el timbre por transaccion
-    solicitudObtenerTimbre.UUID := '';
+    //solicitudObtenerTimbre.UUID := '';
 
     try
       // 5. Realizamos la solicitud de timbre previo
@@ -545,8 +501,13 @@ begin
   end;
 end;
 
-function TPACEcodex.TimbrarDocumentoPorPrimeraVez(const aDocumento:
-    TTipoComprobanteXML): TFETimbre;
+function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre;
+begin
+  // Si se uso este metodo obtenemos el siguiente numero de transaccion del manejador de sesion
+  Result := TimbrarDocumento(aDocumento, fManejadorDeSesion.NumeroDeTransaccion);
+end;
+
+function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML; const aIdTransaccionAUsar: Integer): TFETimbre;
 var
   solicitudTimbrado: TSolicitudTimbradoEcodex;
   respuestaTimbrado: TEcodexRespuestaTimbrado;
@@ -558,14 +519,14 @@ begin
 
   try
     // 2. Iniciamos una nueva sesion solicitando un nuevo token
-    tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+    tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
 
     // 3. Asignamos el documento XML
     solicitudTimbrado.ComprobanteXML := TEcodexComprobanteXML.Create;
     solicitudTimbrado.ComprobanteXML.DatosXML := aDocumento;
     solicitudTimbrado.RFC := fCredenciales.RFC;
     solicitudTimbrado.Token := tokenDeUsuario;
-    solicitudTimbrado.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+    solicitudTimbrado.TransaccionID := aIdTransaccionAUsar;
 
     try
       mensajeFalla := '';

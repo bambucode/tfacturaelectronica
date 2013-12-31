@@ -37,12 +37,13 @@ type
   published
     procedure AgregaCliente_NuevoEmisor_GuardeClienteCorrectamente;
     procedure CancelarDocumento_Documento_CanceleCorrectamente;
+    procedure ObtenerTimbre_DeDocumentoTimbradoPreviamente_RegreseElTimbre;
     procedure SaldoCliente_EmisorConSaldo_RegreseSaldoDeTimbres;
     procedure TimbrarDocumento_ConRFCIncorrecto_CauseExcepcionDeRFC;
     procedure TimbrarDocumento_ConXMLMalformado_CauseExcepcion;
     procedure TimbrarDocumento_DePrueba_RegreseDatosDeTimbre;
     procedure TimbrarDocumento_GeneradoHaceMasDe72Horas_CauseExcepcion;
-    procedure TimbrarDocumento_PreviamenteTimbrado_ObtengaElTimbrePrevio;
+    procedure TimbrarDocumento_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
   end;
 
 implementation
@@ -334,29 +335,57 @@ begin
 end;
 
 procedure
-    TestTPACEcodex.TimbrarDocumento_PreviamenteTimbrado_ObtengaElTimbrePrevio;
+    TestTPACEcodex.TimbrarDocumento_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
 var
   excepcionLanzada: Boolean;
-  nuevoDocumentoATimbrar : WideString;
-  resultadoTimbreOriginal, resultadoTimbreDeNuevo: TFETimbre;
 begin
-  // Creamos un comprobante nuevo para mandarlo timbrar
-  nuevoDocumentoATimbrar := ObtenerNuevaFacturaATimbrar();
+  excepcionLanzada := False;
+  // Leemos el XML de un documento previamente timbrado
+  fDocumentoDePrueba := Self.leerContenidoDeArchivo(fDirectorioFixtures + '\comprobante_previamente_timbrado.xml');
 
-  // ** Mandamos realizar el timbre **
-  resultadoTimbreOriginal := cutPACEcodex.TimbrarDocumento(nuevoDocumentoATimbrar);
+  try
+    // Mandamos timbrar
+    cutPACEcodex.TimbrarDocumento(fDocumentoDePrueba);
+  except
+    On E:ETimbradoPreviamenteException do
+    begin
+       excepcionLanzada := True;
+    end;
+  end;
 
-  Sleep(4000);
+  CheckTrue(excepcionLanzada, 'Se debio haber lanzado la excepcion de ETimbradoPreviamenteException al ' +
+                              'enviar un documento previamente timbrado');
+end;
 
-  // Lo mandamos timbrar de nuevo para obtener los datos del timbre
-  resultadoTimbreDeNuevo := cutPACEcodex.TimbrarDocumento(nuevoDocumentoATimbrar);
+procedure TestTPACEcodex.ObtenerTimbre_DeDocumentoTimbradoPreviamente_RegreseElTimbre;
+var
+  documentoATimbrar: WideString;
+  timbreOriginal, timbreObtenido: TFETimbre;
+  transaccionUsadaAlTimbrar: Integer;
+begin
+  documentoATimbrar := ObtenerNuevaFacturaATimbrar();
 
-  CheckEquals(resultadoTimbreOriginal.Version,
-              resultadoTimbreDeNuevo.Version,
-              'La version del timbre original y el obtenido previamente no fue el mismo');
-  CheckEquals(resultadoTimbreOriginal.UUID,
-              resultadoTimbreDeNuevo.UUID,
-              'El UUID del timbre original y el obtenido previamente no fue el mismo');
+  Randomize;
+  transaccionUsadaAlTimbrar := Random(9999999);
+
+  // Mandamos timbrar el documento especificando nuestro propio Id de transaccion
+  timbreOriginal := cutPACEcodex.TimbrarDocumento(documentoATimbrar, transaccionUsadaAlTimbrar);
+
+  // Mandamos obtener el timbre del documento que acabamos de mandar buscandolo por Id de transaccion
+  timbreObtenido := cutPACEcodex.ObtenerTimbrePrevio(transaccionUsadaAlTimbrar);
+
+  CheckEquals(timbreOriginal.Version,
+              timbreObtenido.Version,
+              'El numero de version del timbre original y obtenido no fue el mismo');
+
+  CheckEquals(timbreOriginal.UUID,
+              timbreObtenido.UUID,
+              'El UUID del timbre original y obtenido no fue el mismo');
+
+  CheckEquals(timbreOriginal.FechaTimbrado,
+              timbreObtenido.FechaTimbrado,
+              'La fecha de timbrado del timbre original y obtenido no fue el mismo');
+
 end;
 
 initialization
