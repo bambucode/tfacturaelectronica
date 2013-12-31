@@ -56,6 +56,7 @@ type
  TPACEcodex = class(TProveedorAutorizadoCertificacion)
  private
   fDominioWebService : string;
+  fIdTransaccionInicial: Integer;
   fCredenciales : TFEPACCredenciales;
   fCredencialesIntegrador : TFEPACCredenciales;
   wsClientesEcodex : IEcodexServicioClientes;
@@ -79,6 +80,7 @@ public
   function SaldoCliente(const aRFC: String) : Integer; override;
   property Nombre : String read getNombre;
   constructor Create(const aDominioWebService : String); overload;
+  constructor Create(const aDominioWebService : String; const aIdTransaccionInicial: Integer); overload;
 end;
 
 implementation
@@ -100,12 +102,19 @@ begin
   fDominioWebService := aDominioWebService;
 end;
 
+constructor TPACEcodex.Create(const aDominioWebService : String; const aIdTransaccionInicial: Integer);
+begin
+  Create(aDominioWebService);
+  // Establecemos el id de transaccion inicial para todas las operaciones
+  fIdTransaccionInicial := aIdTransaccionInicial;
+end;
+
 procedure TPACEcodex.AfterConstruction;
 begin
   // Obtenemos una instancia del WebService de Timbrado de Ecodex
   wsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
   wsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService + '/ServicioClientes.svc');
-  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService);
+  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService, fIdTransaccionInicial);
 end;
 
 function TPACEcodex.getNombre() : string;
