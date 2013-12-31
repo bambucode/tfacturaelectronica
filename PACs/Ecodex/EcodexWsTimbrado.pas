@@ -57,10 +57,10 @@ type
   TSolicitudTimbradoEcodex   = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   TEcodexEstadoComprobante  = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
   TEcodexRespuestaTimbrado   = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
-  SolicitudObtenerTimbrado = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
+  TEcodexSolicitudObtenerTimbrado = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   ComprobanteEstatus   = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblElm] }
   RespuestaEstatusTimbrado = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
-  RespuestaObtenerTimbrado = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
+  TEcodexRespuestaObtenerTimbrado = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   SolicitudEstatusTimbrado = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   AdvertenciaValidacion = class;                { "http://Ecodex.WS.Model/2011/CFDI"[GblElm] }
   TEcodexRespuestaCancelacion = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
@@ -215,12 +215,12 @@ type
 
 
   // ************************************************************************ //
-  // XML       : SolicitudObtenerTimbrado, global, <element>
+  // XML       : TEcodexSolicitudObtenerTimbrado, global, <element>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
   // Serializtn: [xoLiteralParam]
   // Info      : Wrapper
   // ************************************************************************ //
-  SolicitudObtenerTimbrado = class(TRemotable)
+  TEcodexSolicitudObtenerTimbrado = class(TRemotable)
   private
     FRFC: string;
     FRFC_Specified: boolean;
@@ -292,12 +292,12 @@ type
 
 
   // ************************************************************************ //
-  // XML       : RespuestaObtenerTimbrado, global, <element>
+  // XML       : TEcodexRespuestaObtenerTimbrado, global, <element>
   // Namespace : http://Ecodex.WS.Model/2011/CFDI
   // Serializtn: [xoLiteralParam]
   // Info      : Wrapper
   // ************************************************************************ //
-  RespuestaObtenerTimbrado = class(TRemotable)
+  TEcodexRespuestaObtenerTimbrado = class(TRemotable)
   private
     FComprobanteXML: TEcodexComprobanteXML;
     FComprobanteXML_Specified: boolean;
@@ -449,7 +449,7 @@ type
 
     // Cannot unwrap:
     //     - Input element wrapper name does not match operation's name
-    function  ObtenerTimbrado(const parameters: SolicitudObtenerTimbrado): RespuestaObtenerTimbrado; stdcall;
+    function  ObtenerTimbrado(const parameters: TEcodexSolicitudObtenerTimbrado): TEcodexRespuestaObtenerTimbrado; stdcall;
 
     // NOTA: No implementamos el siguiente metodo ya que la libreria lo hace por cuenta propia
     //function  ObtenerQRTimbrado(const parameters: SolicitudObtenerQRTimbrado): RespuestaObtenerQRTimbrado; stdcall;
@@ -683,63 +683,63 @@ begin
   Result := FTransaccionID_Specified;
 end;
 
-constructor SolicitudObtenerTimbrado.Create;
+constructor TEcodexSolicitudObtenerTimbrado.Create;
 begin
   inherited Create;
   FSerializationOptions := [xoLiteralParam];
 end;
 
-procedure SolicitudObtenerTimbrado.SetRFC(Index: Integer; const Astring: string);
+procedure TEcodexSolicitudObtenerTimbrado.SetRFC(Index: Integer; const Astring: string);
 begin
   FRFC := Astring;
   FRFC_Specified := True;
 end;
 
-function SolicitudObtenerTimbrado.RFC_Specified(Index: Integer): boolean;
+function TEcodexSolicitudObtenerTimbrado.RFC_Specified(Index: Integer): boolean;
 begin
   Result := FRFC_Specified;
 end;
 
-procedure SolicitudObtenerTimbrado.SetToken(Index: Integer; const Astring: string);
+procedure TEcodexSolicitudObtenerTimbrado.SetToken(Index: Integer; const Astring: string);
 begin
   FToken := Astring;
   FToken_Specified := True;
 end;
 
-function SolicitudObtenerTimbrado.Token_Specified(Index: Integer): boolean;
+function TEcodexSolicitudObtenerTimbrado.Token_Specified(Index: Integer): boolean;
 begin
   Result := FToken_Specified;
 end;
 
-procedure SolicitudObtenerTimbrado.SetTransaccionID(Index: Integer; const AInt64: Int64);
+procedure TEcodexSolicitudObtenerTimbrado.SetTransaccionID(Index: Integer; const AInt64: Int64);
 begin
   FTransaccionID := AInt64;
   FTransaccionID_Specified := True;
 end;
 
-function SolicitudObtenerTimbrado.TransaccionID_Specified(Index: Integer): boolean;
+function TEcodexSolicitudObtenerTimbrado.TransaccionID_Specified(Index: Integer): boolean;
 begin
   Result := FTransaccionID_Specified;
 end;
 
-procedure SolicitudObtenerTimbrado.SetTransaccionOriginal(Index: Integer; const AInt64: Int64);
+procedure TEcodexSolicitudObtenerTimbrado.SetTransaccionOriginal(Index: Integer; const AInt64: Int64);
 begin
   FTransaccionOriginal := AInt64;
   FTransaccionOriginal_Specified := True;
 end;
 
-function SolicitudObtenerTimbrado.TransaccionOriginal_Specified(Index: Integer): boolean;
+function TEcodexSolicitudObtenerTimbrado.TransaccionOriginal_Specified(Index: Integer): boolean;
 begin
   Result := FTransaccionOriginal_Specified;
 end;
 
-procedure SolicitudObtenerTimbrado.SetUUID(Index: Integer; const Astring: string);
+procedure TEcodexSolicitudObtenerTimbrado.SetUUID(Index: Integer; const Astring: string);
 begin
   FUUID := Astring;
   FUUID_Specified := True;
 end;
 
-function SolicitudObtenerTimbrado.UUID_Specified(Index: Integer): boolean;
+function TEcodexSolicitudObtenerTimbrado.UUID_Specified(Index: Integer): boolean;
 begin
   Result := FUUID_Specified;
 end;
@@ -778,36 +778,36 @@ begin
   Result := FTransaccionID_Specified;
 end;
 
-constructor RespuestaObtenerTimbrado.Create;
+constructor TEcodexRespuestaObtenerTimbrado.Create;
 begin
   inherited Create;
   FSerializationOptions := [xoLiteralParam];
 end;
 
-destructor RespuestaObtenerTimbrado.Destroy;
+destructor TEcodexRespuestaObtenerTimbrado.Destroy;
 begin
   SysUtils.FreeAndNil(FComprobanteXML);
   inherited Destroy;
 end;
 
-procedure RespuestaObtenerTimbrado.SetComprobanteXML(Index: Integer; const AComprobanteXML2: TEcodexComprobanteXML);
+procedure TEcodexRespuestaObtenerTimbrado.SetComprobanteXML(Index: Integer; const AComprobanteXML2: TEcodexComprobanteXML);
 begin
   FComprobanteXML := AComprobanteXML2;
   FComprobanteXML_Specified := True;
 end;
 
-function RespuestaObtenerTimbrado.ComprobanteXML_Specified(Index: Integer): boolean;
+function TEcodexRespuestaObtenerTimbrado.ComprobanteXML_Specified(Index: Integer): boolean;
 begin
   Result := FComprobanteXML_Specified;
 end;
 
-procedure RespuestaObtenerTimbrado.SetTransaccionID(Index: Integer; const AInt64: Int64);
+procedure TEcodexRespuestaObtenerTimbrado.SetTransaccionID(Index: Integer; const AInt64: Int64);
 begin
   FTransaccionID := AInt64;
   FTransaccionID_Specified := True;
 end;
 
-function RespuestaObtenerTimbrado.TransaccionID_Specified(Index: Integer): boolean;
+function TEcodexRespuestaObtenerTimbrado.TransaccionID_Specified(Index: Integer): boolean;
 begin
   Result := FTransaccionID_Specified;
 end;
@@ -968,13 +968,13 @@ initialization
   RemClassRegistry.RegisterXSClass(TEcodexRespuestaTimbrado, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaTimbraXML');
   RemClassRegistry.RegisterExternalPropName(TypeInfo(TEcodexRespuestaTimbrado), 'Advertencias', '[ArrayItemName="AdvertenciaValidacion"]');
   RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaTimbrado, [xoLiteralParam]);
-  RemClassRegistry.RegisterXSClass(SolicitudObtenerTimbrado, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudObtenerTimbrado');
-  RemClassRegistry.RegisterSerializeOptions(SolicitudObtenerTimbrado, [xoLiteralParam]);
+  RemClassRegistry.RegisterXSClass(TEcodexSolicitudObtenerTimbrado, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudObtenerTimbrado');
+  RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudObtenerTimbrado, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(ComprobanteEstatus, 'http://Ecodex.WS.Model/2011/CFDI', 'ComprobanteEstatus');
   RemClassRegistry.RegisterXSClass(RespuestaEstatusTimbrado, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaEstatusTimbrado');
   RemClassRegistry.RegisterSerializeOptions(RespuestaEstatusTimbrado, [xoLiteralParam]);
-  RemClassRegistry.RegisterXSClass(RespuestaObtenerTimbrado, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaObtenerTimbrado');
-  RemClassRegistry.RegisterSerializeOptions(RespuestaObtenerTimbrado, [xoLiteralParam]);
+  RemClassRegistry.RegisterXSClass(TEcodexRespuestaObtenerTimbrado, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaObtenerTimbrado');
+  RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaObtenerTimbrado, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(SolicitudEstatusTimbrado, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudEstatusTimbrado');
   RemClassRegistry.RegisterSerializeOptions(SolicitudEstatusTimbrado, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(AdvertenciaValidacion, 'http://Ecodex.WS.Model/2011/CFDI', 'AdvertenciaValidacion');

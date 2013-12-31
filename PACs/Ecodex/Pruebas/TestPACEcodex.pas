@@ -37,6 +37,7 @@ type
   published
     procedure AgregaCliente_NuevoEmisor_GuardeClienteCorrectamente;
     procedure CancelarDocumento_Documento_CanceleCorrectamente;
+    procedure ObtenerTimbre_DeDocumentoTimbradoPreviamente_RegreseElTimbre;
     procedure SaldoCliente_EmisorConSaldo_RegreseSaldoDeTimbres;
     procedure TimbrarDocumento_ConRFCIncorrecto_CauseExcepcionDeRFC;
     procedure TimbrarDocumento_ConXMLMalformado_CauseExcepcion;
@@ -49,6 +50,7 @@ implementation
 
 uses
   Windows, SysUtils, Classes, Forms,
+  CodeSiteLogging,
   System.DateUtils,
   FacturaElectronica;
 
@@ -118,7 +120,7 @@ begin
   Concepto.Cantidad:=10.25;
   Concepto.Unidad:='Kilo';
   Concepto.Descripcion:='Arroz blanco precocido';
-  Concepto.ValorUnitario:=12.23;
+  Concepto.ValorUnitario:=Random(9999)/100;
   Factura.AgregarConcepto(Concepto);
 
   // Agregamos el impuesto del concepto 1
@@ -353,6 +355,37 @@ begin
 
   CheckTrue(excepcionLanzada, 'Se debio haber lanzado la excepcion de ETimbradoPreviamenteException al ' +
                               'enviar un documento previamente timbrado');
+end;
+
+procedure TestTPACEcodex.ObtenerTimbre_DeDocumentoTimbradoPreviamente_RegreseElTimbre;
+var
+  documentoATimbrar: WideString;
+  timbreOriginal, timbreObtenido: TFETimbre;
+  transaccionUsadaAlTimbrar: Integer;
+begin
+  documentoATimbrar := ObtenerNuevaFacturaATimbrar();
+
+  Randomize;
+  transaccionUsadaAlTimbrar := Random(9999999);
+
+  // Mandamos timbrar el documento especificando nuestro propio Id de transaccion
+  timbreOriginal := cutPACEcodex.TimbrarDocumento(documentoATimbrar, transaccionUsadaAlTimbrar);
+
+  // Mandamos obtener el timbre del documento que acabamos de mandar buscandolo por Id de transaccion
+  timbreObtenido := cutPACEcodex.ObtenerTimbrePrevio(transaccionUsadaAlTimbrar);
+
+  CheckEquals(timbreOriginal.Version,
+              timbreObtenido.Version,
+              'El numero de version del timbre original y obtenido no fue el mismo');
+
+  CheckEquals(timbreOriginal.UUID,
+              timbreObtenido.UUID,
+              'El UUID del timbre original y obtenido no fue el mismo');
+
+  CheckEquals(timbreOriginal.FechaTimbrado,
+              timbreObtenido.FechaTimbrado,
+              'La fecha de timbrado del timbre original y obtenido no fue el mismo');
+
 end;
 
 initialization
