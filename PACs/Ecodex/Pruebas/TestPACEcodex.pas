@@ -44,6 +44,8 @@ type
     procedure TimbrarDocumento_DePrueba_RegreseDatosDeTimbre;
     procedure TimbrarDocumento_GeneradoHaceMasDe72Horas_CauseExcepcion;
     procedure TimbrarDocumento_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
+    procedure
+        TimbrarDocumento_PreviamenteTimbrado_ObtenegaYRegreseTimbrePrevioAutomaticamente;
   end;
 
 implementation
@@ -385,7 +387,51 @@ begin
   CheckEquals(timbreOriginal.FechaTimbrado,
               timbreObtenido.FechaTimbrado,
               'La fecha de timbrado del timbre original y obtenido no fue el mismo');
+end;
 
+procedure TestTPACEcodex.TimbrarDocumento_PreviamenteTimbrado_ObtenegaYRegreseTimbrePrevioAutomaticamente;
+var
+  documentoATimbrar: WideString;
+  timbreOriginal, timbreDeRetimbrado: TFETimbre;
+  transaccionUsadaAlTimbrar: Integer;
+begin
+//  *********************************************************************************************
+//  NOTA: En el servidor de pruebas, Ecodex NO realiza el chequeo para detectar
+//  si un documento fue timbrado previamente por lo que la siguiente prueba nunca funcionará
+//  con los servidores de prueba, si deja el codigo por si se desea probar cambiando el servidor
+//  y las credenciales por los de produccion
+//  **********************************************************************************************
+
+  {
+  documentoATimbrar := ObtenerNuevaFacturaATimbrar();
+
+  Randomize;
+  transaccionUsadaAlTimbrar := Random(9999999);
+
+  // Mandamos timbrar el documento por primera vez
+  timbreOriginal := cutPACEcodex.TimbrarDocumento(documentoATimbrar, transaccionUsadaAlTimbrar);
+
+  Sleep(500);
+
+  // Si hubo un timeout, falla de internet etc, el programa deberá de mandar timbrar el mismo documento
+  // ***CON EL MISMO** numero de transaccion previo para que funcione el obtener timbrado automatico
+  timbreDeRetimbrado := cutPACEcodex.TimbrarDocumento(documentoATimbrar, transaccionUsadaAlTimbrar);
+
+  CheckEquals(timbreOriginal.Version,
+              timbreDeRetimbrado.Version,
+              'El numero de version del timbre original y del retimbrado no fue el mismo');
+
+  CheckEquals(timbreOriginal.UUID,
+              timbreDeRetimbrado.UUID,
+              'El UUID del timbre original y del retimbrado no fue el mismo');
+
+  CheckEquals(timbreOriginal.FechaTimbrado,
+              timbreDeRetimbrado.FechaTimbrado,
+              'La fecha de timbrado del timbre original y del retimbrado no fue el mismo');
+
+  }
+
+  Check(True);
 end;
 
 initialization

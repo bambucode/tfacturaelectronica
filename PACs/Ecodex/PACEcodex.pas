@@ -63,6 +63,8 @@ type
   fManejadorDeSesion : TEcodexManejadorDeSesion;
   function AsignarTimbreDeRespuestaDeEcodex(const aComprobanteTimbrado: TEcodexComprobanteXML): TFETimbre;
   procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
+  function TimbrarPorPrimeraVez(const aDocumento: TTipoComprobanteXML; const
+      aIdTransaccionAUsar: Integer): TFETimbre;
 protected
   function getNombre() : string; override;
 public
@@ -508,6 +510,43 @@ begin
 end;
 
 function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML; const aIdTransaccionAUsar: Integer): TFETimbre;
+var
+  documentoTimbradoPreviamente : Boolean;
+const
+  _ECODEX_DOCUMENTO_TIMBRADO_NO_ENCONTRADO = 'EFallaValidacionException (505)';
+begin
+  documentoTimbradoPreviamente := False;
+  try
+    Result := TimbrarPorPrimeraVez(aDocumento, aIdTransaccionAUsar);
+  except
+    // Si es una falla de timbrado previo, la evitamos lanzar, cualquier otra falla la re-lanzamos
+    On E:ETimbradoPreviamenteException do
+      documentoTimbradoPreviamente := True
+    else
+      raise;
+  end;
+
+  // Si hubo una falla porque ya habiamos timbrado el documento previamente, tratamos de obtener
+  // el timbre previo
+  if documentoTimbradoPreviamente then
+  begin
+    try
+      Result := ObtenerTimbrePrevio(aIdTransaccionAUsar);
+    except
+      On E:Exception do
+      begin
+        // Como fallamos al obtener el timbre previo re-lanzamos la excepcion de timbrado previamente
+        if AnsiPos(_ECODEX_DOCUMENTO_TIMBRADO_NO_ENCONTRADO, E.Message) > 0 then
+           raise ETimbradoPreviamenteException.Create(E.Message, 0, 505, False)
+        else
+          raise;
+      end;
+    end;
+  end;
+end;
+
+function TPACEcodex.TimbrarPorPrimeraVez(const aDocumento: TTipoComprobanteXML;
+    const aIdTransaccionAUsar: Integer): TFETimbre;
 var
   solicitudTimbrado: TSolicitudTimbradoEcodex;
   respuestaTimbrado: TEcodexRespuestaTimbrado;
