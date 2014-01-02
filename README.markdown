@@ -48,11 +48,11 @@ Completado
 -------------
 Actualmente la librería se encuentra en estado "beta" en la implementación de CFDI. La manera en que puedes ayudar es en realizar más pruebas de unidad para probar los diferentes casos y corroborar que la librería funcione como debe. También puedes implementar más PACs basándote en los actuales y el ejemplo incluído. Así como en agregar documentación técnica o colaborar en la implementación de Adendas, conceptos con datos aduanales, etc.
 
-Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a mi correo: <luis@bambucode.com> ya sea para envío de código realizado o bien si lo deseas puedes mandarme un "pull request" de tu "fork" de la librería.
+Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a través del foro oficial de la librería en <https://groups.google.com/forum/#!forum/tfacturaelectronica> o bien si lo deseas puedes mandarme un "pull request" de tu "fork" de la librería.
 
 Soporte Técnico
 ------------
-El soporte es limitado y por la misma razón la librería es de código abierto, para que puedas estudiarla, mejorarla y corregirla en donde encuentres alguna falla. Si encuentras alguna falla favor de reportarla en esta página en la sección de "Issues" para que otros usuarios puedan colaborar y encontrar una solución como comunidad, te agradecemos intentes corregir cualquier problema primero antes de reportarlo para al menos saber que has intentado solucionarlo por tu cuenta.
+El soporte técnico se hace a través de la comunidad en el foro oficial de la librería al cual se puede acceder en: <https://groups.google.com/forum/#!forum/tfacturaelectronica> . De manera adicional, si encuentras alguna falla favor de reportarla en esta página en la sección de "Issues" para que otros usuarios puedan colaborar y encontrar una solución como comunidad, te agradecemos intentes corregir cualquier problema primero antes de reportarlo para al menos saber que has intentado solucionarlo por tu cuenta.
 
 Notas adicionales
 ------------
