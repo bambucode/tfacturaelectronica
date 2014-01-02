@@ -457,11 +457,15 @@ type
 
 function GetWsEcodexTimbrado(UseWSDL: Boolean=System.False; Addr: string='';
     HTTPRIO: THTTPRIO = nil): IEcodexServicioTimbrado;
-
+function GetUltimoXMLEnviadoEcodexWsTimbrado: string;
+function GetUltimoXMLRecibidoEcodexWsTimbrado: string;
 
 implementation
 
-uses SysUtils;
+uses SysUtils, uWSHelper;
+
+var
+  wsHelper: TWSHelper;
 
 function GetWsEcodexTimbrado(UseWSDL: Boolean=System.False; Addr: string='';
     HTTPRIO: THTTPRIO = nil): IEcodexServicioTimbrado;
@@ -488,6 +492,8 @@ begin
 
   // Configuramos uso de UTF8 (Probablemente solo para Delphi 2010 y menores)
   //RIO.HTTPWebNode.UseUTF8InHeader := True;
+  RIO.OnBeforeExecute := wsHelper.BeforeExecute;
+  RIO.OnAfterExecute := wsHelper.AfterExecute;
 
   try
     Result := (RIO as IEcodexServicioTimbrado);
@@ -502,6 +508,16 @@ begin
     if (Result = nil) and (HTTPRIO = nil) then
       RIO.Free;
   end;
+end;
+
+function GetUltimoXMLEnviadoEcodexWsTimbrado: string;
+begin
+  Result := wsHelper.UltimoXMLEnviado;
+end;
+
+function GetUltimoXMLRecibidoEcodexWsTimbrado: string;
+begin
+  Result := wsHelper.UltimoXMLRecibido;
 end;
 
 procedure TEcodexComprobanteXML.SetDatosXML(Index: Integer; const Astring:

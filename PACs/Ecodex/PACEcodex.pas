@@ -62,7 +62,11 @@ type
   wsClientesEcodex : IEcodexServicioClientes;
   wsTimbradoEcodex: IEcodexServicioTimbrado;
   fManejadorDeSesion : TEcodexManejadorDeSesion;
+  FUltimoXMLEnviado: string;
+  fUltimoXMLRecibido: string;
   function AsignarTimbreDeRespuestaDeEcodex(const aComprobanteTimbrado: TEcodexComprobanteXML): TFETimbre;
+  function GetUltimoXMLEnviado: string;
+  function GetUltimoXMLRecibido: string;
   procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
   function TimbrarPorPrimeraVez(const aDocumento: TTipoComprobanteXML; const
       aIdTransaccionAUsar: Integer): TFETimbre;
@@ -78,6 +82,8 @@ public
   function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Integer): TFETimbre;
   function AgregaCliente(const aNuevoEmisor: TFEContribuyente): string; override;
   function SaldoCliente(const aRFC: String) : Integer; override;
+  property UltimoXMLEnviado: string read GetUltimoXMLEnviado;
+  property UltimoXMLRecibido: string read GetUltimoXMLRecibido;
   property Nombre : String read getNombre;
   constructor Create(const aDominioWebService : String); overload;
   constructor Create(const aDominioWebService : String; const aIdTransaccionInicial: Integer); overload;
@@ -340,14 +346,17 @@ begin
     try
       mensajeFalla := '';
       respuestaCancelacion := wsTimbradoEcodex.CancelaTimbrado(solicitudCancelacion);
-
       Result := respuestaCancelacion.Cancelada;
       respuestaCancelacion.Free;
     except
       On E:Exception do
+      begin
         ProcesarExcepcionDePAC(E);
+      end;
     end;
   finally
+    fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+    fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
     if Assigned(solicitudCancelacion) then
       solicitudCancelacion.Free;
   end;
@@ -402,6 +411,8 @@ begin
           raise;
     end;
   finally
+    fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsClientes;
+    fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsClientes;
     solicitudEdoCuenta.Free;
   end;
 end;
@@ -468,9 +479,21 @@ begin
           raise;
     end;
   finally
+    fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsClientes;
+    fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsClientes;
     if Assigned(solicitudRegistroCliente) then
       solicitudRegistroCliente.Free;
   end;
+end;
+
+function TPACEcodex.GetUltimoXMLEnviado: string;
+begin
+  Result := fUltimoXMLEnviado;
+end;
+
+function TPACEcodex.GetUltimoXMLRecibido: string;
+begin
+  Result := fUltimoXMLRecibido;
 end;
 
 function TPACEcodex.ObtenerTimbrePrevio(const aIdTransaccionOriginal: Integer):
@@ -507,6 +530,8 @@ begin
         ProcesarExcepcionDePAC(E);
     end;
   finally
+    fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+    fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
     if Assigned(solicitudObtenerTimbre) then
       solicitudObtenerTimbre.Free;
   end;
@@ -525,32 +550,43 @@ const
   _ECODEX_DOCUMENTO_TIMBRADO_NO_ENCONTRADO = 'EFallaValidacionException (505)';
 begin
   documentoTimbradoPreviamente := False;
+
   try
-    Result := TimbrarPorPrimeraVez(aDocumento, aIdTransaccionAUsar);
-  except
-    // Si es una falla de timbrado previo, la evitamos lanzar, cualquier otra falla la re-lanzamos
-    On E:ETimbradoPreviamenteException do
-      documentoTimbradoPreviamente := True
-    else
-      raise;
+    try
+      Result := TimbrarPorPrimeraVez(aDocumento, aIdTransaccionAUsar);
+    except
+      // Si es una falla de timbrado previo, la evitamos lanzar, cualquier otra falla la re-lanzamos
+      On E:ETimbradoPreviamenteException do
+        documentoTimbradoPreviamente := True
+      else
+        raise;
+    end;
+  finally
+    fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+    fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
   end;
 
-  // Si hubo una falla porque ya habiamos timbrado el documento previamente, tratamos de obtener
-  // el timbre previo
-  if documentoTimbradoPreviamente then
-  begin
-    try
-      Result := ObtenerTimbrePrevio(aIdTransaccionAUsar);
-    except
-      On E:Exception do
-      begin
-        // Como fallamos al obtener el timbre previo re-lanzamos la excepcion de timbrado previamente
-        if AnsiPos(_ECODEX_DOCUMENTO_TIMBRADO_NO_ENCONTRADO, E.Message) > 0 then
-           raise ETimbradoPreviamenteException.Create(E.Message, 0, 505, False)
-        else
-          raise;
+  try
+    // Si hubo una falla porque ya habiamos timbrado el documento previamente, tratamos de obtener
+    // el timbre previo
+    if documentoTimbradoPreviamente then
+    begin
+      try
+        Result := ObtenerTimbrePrevio(aIdTransaccionAUsar);
+      except
+        On E:Exception do
+        begin
+          // Como fallamos al obtener el timbre previo re-lanzamos la excepcion de timbrado previamente
+          if AnsiPos(_ECODEX_DOCUMENTO_TIMBRADO_NO_ENCONTRADO, E.Message) > 0 then
+             raise ETimbradoPreviamenteException.Create(E.Message, 0, 505, False)
+          else
+            raise;
+        end;
       end;
     end;
+  finally
+    fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+    fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
   end;
 end;
 
@@ -590,6 +626,8 @@ begin
         ProcesarExcepcionDePAC(E);
     end;
   finally
+    fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+    fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
     if Assigned(solicitudTimbrado) then
       solicitudTimbrado.Free;
   end;
