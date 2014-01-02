@@ -28,7 +28,7 @@ type
 implementation
 
 uses
-  CodeSiteLogging, Recargas.Tipos, System.SysUtils;
+  CodeSiteLogging, System.SysUtils;
 
 procedure TWSHelper.BeforeExecute(const MethodName: string; SOAPRequest: TStream);
 var
