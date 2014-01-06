@@ -33,6 +33,9 @@ implementation
 uses SOAPHTTPTrans;
 
 class procedure TManejadorErroresComunes.LanzarExcepcionSiDetectaFallaInternet(const aExcepcion: Exception);
+const
+  _SIN_INTERNET = 'No se pudo establecer una conexi';
+  _SIN_INTERNET_INGLES = 'A connection with the server could not be established ';
 begin
   if aExcepcion <> nil then
   begin
@@ -49,6 +52,13 @@ begin
                                                            aExcepcion.Message, 0, 0, True);
       end;
 
+    end else
+    begin
+      if (AnsiPos(_SIN_INTERNET, aExcepcion.Message) > 0) or
+         (AnsiPos(_SIN_INTERNET_INGLES, aExcepcion.Message) > 0)
+      then
+        raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' +
+                                                      aExcepcion.Message, 0, 0, True);
     end;
   end;
 end;
