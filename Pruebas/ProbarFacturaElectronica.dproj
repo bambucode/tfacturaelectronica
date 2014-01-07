@@ -41,6 +41,7 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_ExeOutput>.\</DCC_ExeOutput>
 			<DCC_Define>VERSION_DE_PRUEBA;TESTING;$(DCC_Define)</DCC_Define>
 			<Manifest_File>None</Manifest_File>
 			<DCC_N>false</DCC_N>
@@ -71,13 +72,11 @@
 			<VerInfo_Locale>1033</VerInfo_Locale>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
-			<DCC_ExeOutput>C:\Delphi\eleventa\externos\TFacturaElectronica\Pruebas</DCC_ExeOutput>
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 			<DCC_Optimize>false</DCC_Optimize>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-			<DCC_ExeOutput>C:\Delphi\eleventa\externos\TFacturaElectronica\Pruebas</DCC_ExeOutput>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<VerInfo_Locale>1033</VerInfo_Locale>
@@ -162,11 +161,21 @@
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
 					<Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40CDT_D2012.bpl">IB Objects Core Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40ADT_D2012.bpl">IB Objects Native Data Access Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40TDT_D2012.bpl">IB Objects Tools Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40VDT_D2012.bpl">IB Objects Visual Controls</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40FDT_D2012.bpl">IB Objects Forms and Dialogs</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40XDT_D2012.bpl">IB Objects TDataset</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40WDT_D2012.bpl">IB Objects Internet Extensions</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40WXDT_D2012.bpl">IB Objects TDataset Internet Extensions</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40EDT_D2012.bpl">IB Objects Editors</Excluded_Packages>
 						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\iOSComps.bpl">Components for iOS</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
 						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40WSDT_D2012.bpl">IB Objects Web Snap Extensions</Excluded_Packages>
 						<Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\TMS Aurelius\library\bpl\Win32\dclaureliusxe2.bpl">TMS Aurelius - Design-Time Core Package</Excluded_Packages>
+						<Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\IBObjects\lib\d2012\Win32\Release\ibo5wsdt_d2012.bpl">IB Objects 5.3.1 Web Snap Extensions</Excluded_Packages>
 					</Excluded_Packages>
 				</Delphi.Personality>
 				<Platforms>
@@ -176,8 +185,8 @@
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
 		</ProjectExtensions>
-		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
-		<Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
 	</Project>
 
 <!-- EurekaLog First Line
