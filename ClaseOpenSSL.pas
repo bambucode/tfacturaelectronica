@@ -128,15 +128,10 @@ uses
 
 constructor TOpenSSL.Create();
 begin
-  OpenSSL_add_all_algorithms;
-  OpenSSL_add_all_ciphers;
-  OpenSSL_add_all_digests;
-  ERR_load_crypto_strings;
 end;
 
 destructor TOpenSSL.Destroy;
 begin
-  	EVP_cleanup;
     inherited;
 end;
 
@@ -298,7 +293,6 @@ begin
         // Liberamos las variables usadas en memoria
         X509_SIG_free(p8);
 	      BIO_free(bioArchivoLlave);
-        EVP_cleanup;
     end;
 
     Result:=p8inf;
@@ -363,7 +357,7 @@ var
   rsaInfo: pRSA;
   bioModulus: pBIO;
   llaveDesencriptada: pEVP_PKEY;
-  Inbuf: Array[0..500] of AnsiChar;
+  Inbuf: Array[0..1000] of AnsiChar;
   longitudModulus : Integer;
 begin
   llaveDesencriptada := ObtenerLlavePrivadaDesencriptada(aRutaLlavePrivada, aClaveLlavePrivada);
@@ -458,7 +452,7 @@ var
   llavePublica: PEVP_PKEY;
   bioModulus: pBIO;
   rsaInfo: pRSA;
-  Inbuf: Array[0..500] of AnsiChar;
+  Inbuf: Array[0..1000] of AnsiChar;
   certificadoX509: TX509Certificate;
   longitudModulus: Integer;
 begin
@@ -481,7 +475,7 @@ begin
         // Leemos el Modulus del BIO en el buffer de cadena
         longitudModulus := BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
         // Quitamos los caracteres invalidos
-        Inbuf[longitudModulus] := #0;
+        Inbuf[longitudModulus - 1] := #0;
 
         {$IFDEF CODESITE}
           CodeSite.Send('Modulus Certificado', InBuf);
@@ -497,4 +491,11 @@ begin
   end;
 end;
 
+initialization
+  OpenSSL_add_all_algorithms;
+  OpenSSL_add_all_ciphers;
+  OpenSSL_add_all_digests;
+  ERR_load_crypto_strings;
+finalization
+  EVP_cleanup;
 end.
