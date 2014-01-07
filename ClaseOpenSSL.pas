@@ -382,7 +382,7 @@ begin
       // Leemos el Modulus del BIO en el buffer de cadena
       longitudModulus := BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
       // Quitamos los caracteres invalidos
-      Inbuf[longitudModulus] := #0;
+      Inbuf[longitudModulus - 1] := #0;
 
       {$IFDEF CODESITE}
         CodeSite.Send('Modulus Llave Privada', InBuf);
