@@ -375,14 +375,12 @@ begin
 
       // Leemos el Modulus del BIO en el buffer de cadena
       longitudModulus := BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
-      // Quitamos los caracteres invalidos
-      Inbuf[longitudModulus - 1] := #0;
 
       {$IFDEF CODESITE}
-        CodeSite.Send('Modulus Llave Privada', InBuf);
+        CodeSite.Send('Modulus Llave Privada', Copy(StrPas(InBuf), 1, longitudModulus));
       {$ENDIF};
 
-      Result := StrPas(InBuf);
+      Result := Copy(StrPas(InBuf), 1, longitudModulus);
     end else
       Result := '';
   finally
@@ -474,14 +472,12 @@ begin
 
         // Leemos el Modulus del BIO en el buffer de cadena
         longitudModulus := BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
-        // Quitamos los caracteres invalidos
-        Inbuf[longitudModulus - 1] := #0;
-
+        
         {$IFDEF CODESITE}
-          CodeSite.Send('Modulus Certificado', InBuf);
+          CodeSite.Send('Modulus Certificado', Copy(StrPas(InBuf), 1, longitudModulus));
         {$ENDIF};
 
-        Result := InBuf;
+        Result := Copy(StrPas(InBuf), 1, longitudModulus);
       end else
         raise Exception.Create('No se soporta la lectura de certificados que no son RSA');
   end;
