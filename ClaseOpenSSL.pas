@@ -128,11 +128,16 @@ uses
 
 constructor TOpenSSL.Create();
 begin
+  OpenSSL_add_all_algorithms;
+  OpenSSL_add_all_ciphers;
+  OpenSSL_add_all_digests;
+  ERR_load_crypto_strings;
 end;
 
 destructor TOpenSSL.Destroy;
 begin
-    inherited;
+   EVP_cleanup;
+   inherited;
 end;
 
 // Funcion obtenida de: DelphiAccess - http://www.delphiaccess.com/forum/index.php?topic=3092.0
@@ -282,12 +287,6 @@ begin
               else
                 raise ELlaveLecturaException.Create('Error desconocido al desencriptar llave privada. Error reportado: '+
                       ObtenerUltimoMensajeDeError);
-
-           // Nos estan dando un certificado de la FIEL??
-           {if AnsiPos('bad decrypt', sMsgErr) > 0 then
-              raise TCertificadoLlaveEsFiel.Create('El certificado (archivo de llave) pertenece a la FIEL. + '
-              'Use el certificado de Llave Privada')
-           else}
         end;
     finally
         // Liberamos las variables usadas en memoria
@@ -488,10 +487,7 @@ begin
 end;
 
 initialization
-  OpenSSL_add_all_algorithms;
-  OpenSSL_add_all_ciphers;
-  OpenSSL_add_all_digests;
-  ERR_load_crypto_strings;
+
 finalization
-  EVP_cleanup;
+
 end.
