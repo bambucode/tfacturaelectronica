@@ -36,6 +36,7 @@ type
     procedure TearDown; override;
   published
     procedure AgregaCliente_NuevoEmisor_GuardeClienteCorrectamente;
+    procedure AgregarTimbres_DeRFC_AgregueTimbresYRegreseNuevoSaldo;
     procedure CancelarDocumento_Documento_CanceleCorrectamente;
     procedure ObtenerTimbre_DeDocumentoTimbradoPreviamente_RegreseElTimbre;
     procedure SaldoCliente_EmisorConSaldo_RegreseSaldoDeTimbres;
@@ -44,8 +45,8 @@ type
     procedure TimbrarDocumento_DePrueba_RegreseDatosDeTimbre;
     procedure TimbrarDocumento_GeneradoHaceMasDe72Horas_CauseExcepcion;
     procedure TimbrarDocumento_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
-    procedure
-        TimbrarDocumento_PreviamenteTimbrado_ObtenegaYRegreseTimbrePrevioAutomaticamente;
+    procedure TimbrarDocumento_PreviamenteTimbrado_ObtenegaYRegreseTimbrePrevioAutomaticamente;
+
   end;
 
 implementation
@@ -205,6 +206,22 @@ begin
 
   CheckTrue(fueGuidValido,
             'La funcion no regreso un GUID de token para alta de certificados correcto');
+end;
+
+procedure TestTPACEcodex.AgregarTimbres_DeRFC_AgregueTimbresYRegreseNuevoSaldo;
+var
+  saldoAnterior, nuevoSaldo : Integer;
+const
+  _RFC_CLIENTE_EXISTENTE = 'AAA010101AAA';
+  _TIMBRES_A_ASIGNAR =  100;
+begin
+  saldoAnterior := cutPACEcodex.SaldoCliente(_RFC_CLIENTE_EXISTENTE);
+
+  nuevoSaldo := cutPACEcodex.AgregarTimbres(_RFC_CLIENTE_EXISTENTE, _TIMBRES_A_ASIGNAR);
+
+  CheckEquals(saldoAnterior + _TIMBRES_A_ASIGNAR,
+              nuevoSaldo,
+              'No se agrego el saldo en timbres esperado');
 end;
 
 procedure TestTPACEcodex.SaldoCliente_EmisorConSaldo_RegreseSaldoDeTimbres;

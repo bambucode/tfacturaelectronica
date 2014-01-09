@@ -87,6 +87,8 @@ public
   property Nombre : String read getNombre;
   constructor Create(const aDominioWebService : String); overload;
   constructor Create(const aDominioWebService : String; const aIdTransaccionInicial: Integer); overload;
+  function AgregarTimbres(const aRFC: String; const aTimbresAAsignar: Integer):
+      Integer;
 end;
 
 implementation
@@ -362,6 +364,41 @@ begin
   end;
 end;
 
+function TPACEcodex.AgregarTimbres(const aRFC: String; const aTimbresAAsignar:
+    Integer): Integer;
+var
+  solicitudAsignacion: TEcodexSolicitudAsignacionTimbres;
+  respuestaAsignacion: TEcodexRespuestaAsignacionTimbres;
+  tokenDeUsuario : string;
+begin
+  Result := -1;
+  try
+    // 1. Solicitamos un nuevo token de usuario
+    tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+
+    // 2. Creamos la solicitud
+    solicitudAsignacion := TEcodexSolicitudAsignacionTimbres.Create;
+    solicitudAsignacion.RFC := aRFC;
+    solicitudAsignacion.TimbresAsignar := aTimbresAAsignar;
+    solicitudAsignacion.Token := tokenDeUsuario;
+    solicitudAsignacion.TransaccionId := fManejadorDeSesion.NumeroDeTransaccion;
+
+    try
+      respuestaAsignacion := wsClientesEcodex.AsignacionTimbres(solicitudAsignacion);
+      Result := respuestaAsignacion.SaldoNuevo;
+      respuestaAsignacion.Free;
+    except
+      On E:Exception do
+         if Not (E Is EPACException) then
+          ProcesarExcepcionDePAC(E)
+        else
+          raise;
+    end;
+  finally
+    solicitudAsignacion.Free;
+  end;
+end;
+
 function TPACEcodex.SaldoCliente(const aRFC: String) : Integer;
 var
   solicitudEdoCuenta: TEcodexSolicitudEstatusCuenta;
@@ -485,6 +522,7 @@ begin
       solicitudRegistroCliente.Free;
   end;
 end;
+
 
 function TPACEcodex.GetUltimoXMLEnviado: string;
 begin
