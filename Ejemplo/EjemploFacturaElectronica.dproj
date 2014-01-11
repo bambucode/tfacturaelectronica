@@ -189,6 +189,7 @@
 			<DCCReference Include="..\CadenaOriginalTimbre.pas"/>
 			<DCCReference Include="..\PACs\Ecodex\EcodexWsClientes.pas"/>
 			<DCCReference Include="..\PACs\Ecodex\EcodexWsComun.pas"/>
+			<DCCReference Include="..\PACs\ManejadorDeErroresComunes.pas"/>
 			<RcCompile Include="..\CadenaOriginalTimbre.rc">
 				<Form>CadenaOriginalTimbre.res</Form>
 			</RcCompile>

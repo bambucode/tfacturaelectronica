@@ -1131,6 +1131,7 @@ var
   feConcepto: TFEConcepto;
   feRegimen: String;
   iXmlDoc: IXMLDocument;
+  tieneNodoDomicilio : Boolean;
   ValorExpedidoEn: TFEExpedidoEn;
   ImpuestoTrasladado: TFEImpuestoTrasladado;
   ImpuestoRetenido: TFEImpuestoRetenido;
@@ -1146,6 +1147,14 @@ var
       Result:=NodoPadre.HasAttribute(NombreAtributo)
     else
       Result:=False;
+  end;
+
+  function TieneHijo(const aNodoPadre: IXMLNode; const aNombreHijo: String) : Boolean;
+  begin
+    if Assigned(aNodoPadre) then
+      Result := aNodoPadre.ChildNodes.FindNode(aNombreHijo) <> nil
+    else
+      Result := False;
   end;
 
 begin
@@ -1308,26 +1317,30 @@ begin
                   if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'rfc') then
                      ValorEmisor.RFC:=IFEXmlComprobanteV32(fXmlComprobante).Emisor.RFC;
 
-                  with IFEXmlComprobanteV32(fXmlComprobante).Emisor do
+                  // Checamos si tuvo Domicilio Fiscal el Emisor
+                  if TieneHijo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'DomicilioFiscal')  then
                   begin
-                      if TieneAtributo(DomicilioFiscal, 'calle') then
-                        ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
-                      if TieneAtributo(DomicilioFiscal, 'noExterior') then
-                        ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
-                      if TieneAtributo(DomicilioFiscal, 'noInterior') then
-                        ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
-                      if TieneAtributo(DomicilioFiscal, 'codigoPostal') then
-                        ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
-                      if TieneAtributo(DomicilioFiscal, 'colonia') then
-                        ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
-                      if TieneAtributo(DomicilioFiscal, 'localidad') then
-                        ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
-                      if TieneAtributo(DomicilioFiscal, 'municipio') then
-                        ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
-                      if TieneAtributo(DomicilioFiscal, 'estado') then
-                        ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
-                      if TieneAtributo(DomicilioFiscal, 'pais') then
-                        ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
+                    with IFEXmlComprobanteV32(fXmlComprobante).Emisor do
+                    begin
+                        if TieneAtributo(DomicilioFiscal, 'calle') then
+                          ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
+                        if TieneAtributo(DomicilioFiscal, 'noExterior') then
+                          ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
+                        if TieneAtributo(DomicilioFiscal, 'noInterior') then
+                          ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
+                        if TieneAtributo(DomicilioFiscal, 'codigoPostal') then
+                          ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
+                        if TieneAtributo(DomicilioFiscal, 'colonia') then
+                          ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
+                        if TieneAtributo(DomicilioFiscal, 'localidad') then
+                          ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
+                        if TieneAtributo(DomicilioFiscal, 'municipio') then
+                          ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
+                        if TieneAtributo(DomicilioFiscal, 'estado') then
+                          ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
+                        if TieneAtributo(DomicilioFiscal, 'pais') then
+                          ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
+                    end;
                   end;
               end;
             end;
@@ -1363,26 +1376,33 @@ begin
                   if TieneAtributo(Receptor, 'nombre') then
                       ValorReceptor.Nombre:=Receptor.Nombre;
 
-                  with Receptor do
+                  tieneNodoDomicilio := (fVersion In [fev20, fev22]);
+                  if fVersion = fev32 then
+                    tieneNodoDomicilio := TieneHijo(IFEXmlComprobanteV32(fXmlComprobante).Receptor, 'Domicilio');
+
+                  if tieneNodoDomicilio then
                   begin
-                      if TieneAtributo(Domicilio, 'calle') then
-                        ValorReceptor.Direccion.Calle := Domicilio.Calle;
-                      if TieneAtributo(Domicilio, 'noExterior') then
-                        ValorReceptor.Direccion.NoExterior := Domicilio.NoExterior;
-                      if TieneAtributo(Domicilio, 'noInterior') then
-                        ValorReceptor.Direccion.NoInterior := Domicilio.NoInterior;
-                      if TieneAtributo(Domicilio, 'codigoPostal') then
-                       ValorReceptor.Direccion.CodigoPostal := Domicilio.CodigoPostal;
-                      if TieneAtributo(Domicilio, 'colonia') then
-                        ValorReceptor.Direccion.Colonia := Domicilio.Colonia;
-                      if TieneAtributo(Domicilio, 'localidad') then
-                        ValorReceptor.Direccion.Localidad := Domicilio.Localidad;
-                      if TieneAtributo(Domicilio, 'municipio') then
-                        ValorReceptor.Direccion.Municipio := Domicilio.Municipio;
-                      if TieneAtributo(Domicilio, 'estado') then
-                        ValorReceptor.Direccion.Estado := Domicilio.Estado;
-                      if TieneAtributo(Domicilio, 'pais') then
-                        ValorReceptor.Direccion.Pais := Domicilio.Pais;
+                    with Receptor do
+                    begin
+                        if TieneAtributo(Domicilio, 'calle') then
+                          ValorReceptor.Direccion.Calle := Domicilio.Calle;
+                        if TieneAtributo(Domicilio, 'noExterior') then
+                          ValorReceptor.Direccion.NoExterior := Domicilio.NoExterior;
+                        if TieneAtributo(Domicilio, 'noInterior') then
+                          ValorReceptor.Direccion.NoInterior := Domicilio.NoInterior;
+                        if TieneAtributo(Domicilio, 'codigoPostal') then
+                         ValorReceptor.Direccion.CodigoPostal := Domicilio.CodigoPostal;
+                        if TieneAtributo(Domicilio, 'colonia') then
+                          ValorReceptor.Direccion.Colonia := Domicilio.Colonia;
+                        if TieneAtributo(Domicilio, 'localidad') then
+                          ValorReceptor.Direccion.Localidad := Domicilio.Localidad;
+                        if TieneAtributo(Domicilio, 'municipio') then
+                          ValorReceptor.Direccion.Municipio := Domicilio.Municipio;
+                        if TieneAtributo(Domicilio, 'estado') then
+                          ValorReceptor.Direccion.Estado := Domicilio.Estado;
+                        if TieneAtributo(Domicilio, 'pais') then
+                          ValorReceptor.Direccion.Pais := Domicilio.Pais;
+                    end;
                   end;
             end;
             inherited Receptor:=ValorReceptor;

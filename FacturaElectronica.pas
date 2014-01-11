@@ -41,6 +41,9 @@ TFacturaElectronica = class(TFEComprobanteFiscal)
   function GetonComprobanteTimbrado: TOnComprobanteTimbrado;
   function obtenerCertificado() : TFECertificado;
   procedure SetonComprobanteTimbrado(const Value: TOnComprobanteTimbrado);
+protected
+  function getXML: WideString; override;
+  procedure setXML(const Valor: WideString); override;
 public
   property FechaGeneracion;
   property FacturaGenerada;
@@ -168,6 +171,18 @@ begin
   // Mandamos llamar el evento de que se asigno el timbrado
   if Assigned(fOnComprobanteTimbrado) then
     fOnComprobanteTimbrado(Self);
+end;
+
+function TFacturaElectronica.getXML: WideString;
+begin
+  Result := inherited getXML;
+end;
+
+procedure TFacturaElectronica.setXML(const Valor: WideString);
+begin
+  inherited setXML(Valor);
+  // Si se establece un XML indicamos que ya se genero(sello) la factura
+  fComprobanteGenerado := True;
 end;
 
 function TFacturaElectronica.GetonComprobanteTimbrado: TOnComprobanteTimbrado;
