@@ -65,7 +65,8 @@ var
    Factura: TFacturaElectronica;
    Emisor, Receptor: TFEContribuyente;
    Certificado: TFECertificado;
-   Impuesto1, Impuesto2: TFEImpuestoTrasladado;
+   Impuesto1: TFEImpuestoRetenido;
+   Impuesto2 : TFEImpuestoTrasladado;
    Concepto1, Concepto2 : TFEConcepto;
    generadorCBB: TGeneradorCBB;
    CredencialesPAC: TFEPACCredenciales;
@@ -189,11 +190,21 @@ begin
       Concepto1.ValorUnitario:=12.23;
       Factura.AgregarConcepto(Concepto1);
 
-      // Agregamos el impuesto del concepto 1
-      Impuesto1.Nombre:='IVA';
-      Impuesto1.Tasa:=16;
-      Impuesto1.Importe:=(Concepto1.ValorUnitario * Concepto1.Cantidad) * (Impuesto1.Tasa/100);
-      Factura.AgregarImpuestoTrasladado(Impuesto1);
+      Concepto2.Cantidad:=2;
+      Concepto2.Unidad:='No identificado';
+      Concepto2.Descripcion:='Servicio de mantenimiento';
+      Concepto2.ValorUnitario:=100;
+      Factura.AgregarConcepto(Concepto2);
+
+      // Agregamos, para fines de ejemplo, un impuesto retenido
+      Impuesto1.Nombre:='ISR';
+      Impuesto1.Importe:=(Concepto2.ValorUnitario * Concepto2.Cantidad);
+      Factura.AgregarImpuestoRetenido(Impuesto1);
+
+      Impuesto2.Nombre:='IVA';
+      Impuesto2.Tasa:=16;
+      Impuesto2.Importe:=(Concepto1.ValorUnitario * Concepto1.Cantidad) * (Impuesto2.Tasa/100);;
+      Factura.AgregarImpuestoTrasladado(Impuesto2);
 
       Concepto2.Cantidad:=5;
       Concepto2.Unidad:='PZA';
@@ -256,13 +267,22 @@ begin
         // Generamos la Cadena Original del Timbre:
         Writeln('Cadena Original del Timbre Fiscal:');
         Writeln(Factura.CadenaOriginalTimbre);
+
+        WriteLn('CFDI generado con éxito en ' + archivoFacturaXML + '. Presiona cualquier tecla para cancelarlo');
+        Readln;
+
+        // Para cancelar el CFDI simplemente hacemos la siguiente llamada
+        Writeln('Mandando cancelar la factura con el PAC...');
+        if ProveedorTimbrado.CancelarDocumento(Factura.XML) then
+          Writeln('El CFDI fue cancelado correctamente. Presiona cualquier tecla para salir')
+        else
+          Writeln('El CFDI no pudo ser cancelado.');
+
+        Readln;
       finally
         ProveedorTimbrado.Free;
+        FreeAndNil(Factura);
       end;
-
-      FreeAndNil(Factura);
-      WriteLn('CFDI generado con éxito en ' + archivoFacturaXML + '. Presiona cualquier tecla para salir');
-      Readln;
   except
     on E: Exception do
     begin
