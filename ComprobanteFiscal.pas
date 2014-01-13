@@ -949,8 +949,8 @@ begin
         AsignarConceptos;
 
         // Atributo Impuestos
-        AsignarImpuestosTrasladados;
         AsignarImpuestosRetenidos;
+        AsignarImpuestosTrasladados;
 
         if (fDesglosarTotalesImpuestos = True) then
            AsignarTotalesImpuestos;
