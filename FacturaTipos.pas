@@ -136,10 +136,13 @@ end;
 
 TFEImpuestosRetenidos = Array of TFEImpuestoRetenido;
 
+TTipoImpuestoLocal = (tiRetenido, tiTrasladado);
+
 TFEImpuestoLocal = record
   Nombre: String;
   Tasa: Double;
   Importe : Currency;
+  Tipo: TTipoImpuestoLocal;
 end;
 
 TFEImpuestosLocales = Array of TFEImpuestoLocal;

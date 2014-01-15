@@ -40,7 +40,8 @@ RAZON PARA CAMBIAR:
         fSubTotal: Currency;
         fTotalImpuestosRetenidos: Currency;
         fTotalImpuestosTrasladados: Currency;
-        fTotalImpuestosLocales : Currency;
+        fTotalImpuestosLocalesTrasladados : Currency;
+        fTotalImpuestosLocalesRetenidos : Currency;
 
         // Variables "cache"
         bHuboRetenciones: Boolean;
@@ -85,6 +86,10 @@ RAZON PARA CAMBIAR:
         property LugarDeExpedicion: String read FLugarDeExpedicion write
             FLugarDeExpedicion;
         property NumeroDeCuenta: String read FNumeroDeCuenta write FNumeroDeCuenta;
+        property TotalImpuestosLocalesRetenidos: Currency read
+            FTotalImpuestosLocalesRetenidos;
+        property TotalImpuestosLocalesTrasladados: Currency read
+            FTotalImpuestosLocalesTrasladados;
         /// <summary>Agrega un nuevo concepto a la factura, regresa la posicion de dicho concepto en
         /// el arreglo de 'Conceptos'</summary>
         /// <param name="NuevoConcepto">Este es el nuevo concepto a agregar a la factura
@@ -146,7 +151,11 @@ function TDocumentoComprobanteFiscal.AgregarImpuestoLocal(aNuevoImpuestoLocal:
 begin
   SetLength(fImpuestosLocales, Length(fImpuestosLocales) + 1);
   fImpuestosLocales[Length(fImpuestosLocales) - 1] := aNuevoImpuestoLocal;
-  fTotalImpuestosLocales:=fTotalImpuestosLocales + aNuevoImpuestoLocal.Importe;
+
+  case aNuevoImpuestoLocal.Tipo of
+    tiRetenido    : fTotalImpuestosLocalesRetenidos := fTotalImpuestosLocalesRetenidos + aNuevoImpuestoLocal.Importe;
+    tiTrasladado  : fTotalImpuestosLocalesTrasladados := fTotalImpuestosLocalesTrasladados + aNuevoImpuestoLocal.Importe;
+  end;
   Result:=Length(fImpuestosLocales) - 1;
 end;
 
@@ -177,7 +186,8 @@ begin
     // Anexo 20:
     // Atributo requerido para representar la suma del subtotal, menos los descuentos aplicables,
     // más los impuestos trasladados, menos los impuestos retenidos.
-    Result:=fSubTotal - fDescuento + fTotalImpuestosTrasladados - fTotalImpuestosRetenidos;
+    Result:=fSubTotal - fDescuento + (fTotalImpuestosTrasladados - fTotalImpuestosRetenidos) +
+                                     (fTotalImpuestosLocalesTrasladados - fTotalImpuestosLocalesRetenidos);
 end;
 
 function TDocumentoComprobanteFiscal.ObtenerImporte(Concepto: TFEConcepto) : Currency;
