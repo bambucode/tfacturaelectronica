@@ -40,6 +40,7 @@ RAZON PARA CAMBIAR:
         fSubTotal: Currency;
         fTotalImpuestosRetenidos: Currency;
         fTotalImpuestosTrasladados: Currency;
+        fTotalImpuestosLocales : Currency;
 
         // Variables "cache"
         bHuboRetenciones: Boolean;
@@ -48,6 +49,7 @@ RAZON PARA CAMBIAR:
         fArrConceptos: TFEConceptos;
         fArrImpuestosTrasladados: TFEImpuestosTrasladados;
         fArrImpuestosRetenidos: TFEImpuestosRetenidos;
+        FImpuestosLocales: TFEImpuestosLocales;
         FLugarDeExpedicion: String;
         FNumeroDeCuenta: String;
 
@@ -79,6 +81,7 @@ RAZON PARA CAMBIAR:
         property TotalImpuestosTrasladados: Currency read fTotalImpuestosTrasladados;
         property DescuentoMonto: Currency read fDescuento;
         property DescuentoMotivo: String read fMotivoDescuento;
+        property ImpuestosLocales: TFEImpuestosLocales read FImpuestosLocales;
         property LugarDeExpedicion: String read FLugarDeExpedicion write
             FLugarDeExpedicion;
         property NumeroDeCuenta: String read FNumeroDeCuenta write FNumeroDeCuenta;
@@ -87,6 +90,13 @@ RAZON PARA CAMBIAR:
         /// <param name="NuevoConcepto">Este es el nuevo concepto a agregar a la factura
         ///   el parametro es un "record" del tipo TFEConcepto.</param>
         function AgregarConcepto(NuevoConcepto: TFeConcepto) : Integer;
+
+        {$REGION 'Documentation'}
+        ///	<summary>
+        ///	  Agrega un nuevo impuesto local (ISH, etc)
+        ///	</summary>
+        {$ENDREGION}
+        function AgregarImpuestoLocal(aNuevoImpuestoLocal: TFEImpuestoLocal): Integer;
         /// <summary>Agrega un nuevo impuesto de retención (ISR, IVA) al comprobante</summary>
         /// <param name="NuevoImpuesto">El nuevo Impuesto con los datos de nombre e importe del mismo</param>
         function AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoRetenido) : Integer;
@@ -129,6 +139,15 @@ begin
     fTotal:=fTotal + ObtenerImporte(NuevoConcepto);
 
     Result:=Length(fArrConceptos) - 1;
+end;
+
+function TDocumentoComprobanteFiscal.AgregarImpuestoLocal(aNuevoImpuestoLocal:
+    TFEImpuestoLocal): Integer;
+begin
+  SetLength(fImpuestosLocales, Length(fImpuestosLocales) + 1);
+  fImpuestosLocales[Length(fImpuestosLocales) - 1] := aNuevoImpuestoLocal;
+  fTotalImpuestosLocales:=fTotalImpuestosLocales + aNuevoImpuestoLocal.Importe;
+  Result:=Length(fImpuestosLocales) - 1;
 end;
 
 function TDocumentoComprobanteFiscal.AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoRetenido) : Integer;

@@ -56,7 +56,8 @@ uses
   CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas',
   EcodexWsClientes in '..\PACs\Ecodex\EcodexWsClientes.pas',
   EcodexWsComun in '..\PACs\Ecodex\EcodexWsComun.pas',
-  ManejadorDeErroresComunes in '..\PACs\ManejadorDeErroresComunes.pas';
+  ManejadorDeErroresComunes in '..\PACs\ManejadorDeErroresComunes.pas',
+  FEImpuestosLocales in '..\CFD\FEImpuestosLocales.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
@@ -67,6 +68,7 @@ var
    Certificado: TFECertificado;
    Impuesto1: TFEImpuestoRetenido;
    Impuesto2 : TFEImpuestoTrasladado;
+   ImpuestoLocal: TFEImpuestoLocal;
    Concepto1, Concepto2 : TFEConcepto;
    generadorCBB: TGeneradorCBB;
    CredencialesPAC: TFEPACCredenciales;
@@ -88,27 +90,7 @@ const
 
 begin
   // Checamos la presencia de archivos necesarios para el ejemplo
-  if Not FileExists('./libeay32.dll') then
-  begin
-    WriteLn('Favor de copiar el archivo libeay32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
-    Readln;
-    exit;
-  end;
 
-  if Not FileExists('./libssl32.dll') then
-  begin
-    WriteLn('Favor de copiar el archivo libssl32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
-    Readln;
-    exit;
-  end;
-
-  // Checamos la presencia del DLL de la libreria para generacion de CBB
-  if Not FileExists('../GeneradorCBB/quricol32.dll') then
-  begin
-    WriteLn('Favor de copiar el archivo quricol32.dll de la subcarpeta \GeneradorCBB a la carpeta donde esta el ejecutable');
-    Readln;
-    exit;
-  end;
 
   {$IF CompilerVersion < 20}  // se movio porque no alcanza a mostrar el mensaje de error de librerias
       // Bajo Delphi < 2009 tenemos que mandar llamar la siguiente rutina
@@ -205,6 +187,12 @@ begin
       Impuesto2.Tasa:=16;
       Impuesto2.Importe:=(Concepto1.ValorUnitario * Concepto1.Cantidad) * (Impuesto2.Tasa/100);;
       Factura.AgregarImpuestoTrasladado(Impuesto2);
+
+      // Si queremos agregar un impuesto local lo hacemos de la siguiente manera:
+      ImpuestoLocal.Nombre := 'ISH';
+      ImpuestoLocal.Tasa := 3;
+      ImpuestoLocal.Importe := ((Concepto1.ValorUnitario * Concepto1.Cantidad) + (Concepto2.ValorUnitario * Concepto2.Cantidad)) * (ImpuestoLocal.Tasa/100);;
+      Factura.AgregarImpuestoLocal(ImpuestoLocal);
 
       Concepto2.Cantidad:=5;
       Concepto2.Unidad:='PZA';

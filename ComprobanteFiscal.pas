@@ -111,6 +111,7 @@ type
     {$ENDREGION}
     procedure AgregarDireccionFiscalv32(const aNodoContribuyente: IXMLNode; const
         aDireccionContribuyente: TFEDireccion);
+    procedure AsignarImpuestosLocales;
     {$REGION 'Documentation'}
     ///	<summary>
     ///	  Este metodo es llamado cuando leemos un XML (a través del metodo
@@ -192,7 +193,8 @@ uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
   ClaseCertificadoSellos,
   CadenaOriginalTimbre,
   {$IFDEF DEBUG} Dialogs, {$ENDIF}
-  FeTimbreFiscalDigital,
+  FETimbreFiscalDigital,
+  FEImpuestosLocales,
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
@@ -679,6 +681,48 @@ begin
     end;
 end;
 
+procedure TFEComprobanteFiscal.AsignarImpuestosLocales;
+var
+  NuevoImpuesto: TFEImpuestoLocal;
+  I: Integer;
+  nodoImpuestosLocales: IXMLImpuestosLocales;
+  documentoImpuestosLocales : TXMLDocument;
+  nodoImpuestoTrasladado: IXMLImpuestosLocales_TrasladosLocales;
+begin
+    if Length(inherited ImpuestosLocales) > 0 then
+    begin
+      try
+         documentoImpuestosLocales := TXMLDocument.Create(nil);
+         documentoImpuestosLocales.Active := True;
+
+         // Creamos el nodo de totales de impuestos locales
+         nodoImpuestosLocales := NuevoNodoImpuestosLocales(documentoImpuestosLocales);
+         nodoImpuestosLocales.Version := '1.0';
+         nodoImpuestosLocales.TotaldeRetenciones := TFEReglamentacion.ComoMoneda(0);
+         nodoImpuestosLocales.TotaldeTraslados := TFEReglamentacion.ComoMoneda(11.70);
+
+         // Agregamos el detalle de los impuestos "hijo"
+         for I := 0 to Length(inherited ImpuestosLocales) - 1 do
+         begin
+            nuevoImpuesto:=(inherited ImpuestosLocales)[I];
+
+            with nodoImpuestosLocales.TrasladosLocales.Add do
+            begin
+              ImpLocTrasladado := TFEReglamentacion.ComoCadena(nuevoImpuesto.Nombre);
+              TasadeTraslado := TFEReglamentacion.ComoTasaImpuesto(nuevoImpuesto.Tasa); 
+              Importe := '2.33';
+            end;
+         end;
+      finally
+         //documentoImpuestosLocales.Free;
+      end;
+
+      // Agregamos como complemento el nodo de los impuestos locales
+      IFEXmlComprobanteV32(fXmlComprobante).Complemento.ChildNodes.Add(nodoImpuestosLocales);
+    end;
+end;
+
+
 procedure TFEComprobanteFiscal.AsignarTimbreFiscal(const aTimbre: TFETimbre);
 begin
   Assert(fVersion In [fev32], 'No es posible asignar un timbre a un CFD que no es v3.2');
@@ -847,6 +891,7 @@ begin
     fXmlComprobante.Fecha := TFEReglamentacion.ComoFechaHora(FechaGeneracion);
 end;
 
+
 procedure TFEComprobanteFiscal.AsignarLugarExpedicion;
 begin
   case fVersion of
@@ -951,6 +996,7 @@ begin
         // Atributo Impuestos
         AsignarImpuestosRetenidos;
         AsignarImpuestosTrasladados;
+        AsignarImpuestosLocales;
 
         if (fDesglosarTotalesImpuestos = True) then
            AsignarTotalesImpuestos;
