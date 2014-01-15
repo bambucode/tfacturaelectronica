@@ -190,8 +190,9 @@ begin
 
       // Si queremos agregar un impuesto local lo hacemos de la siguiente manera:
       ImpuestoLocal.Nombre := 'ISH';
+      ImpuestoLocal.Tipo := tiTrasladado;
       ImpuestoLocal.Tasa := 3;
-      ImpuestoLocal.Importe := ((Concepto1.ValorUnitario * Concepto1.Cantidad) + (Concepto2.ValorUnitario * Concepto2.Cantidad)) * (ImpuestoLocal.Tasa/100);;
+      ImpuestoLocal.Importe := ((Concepto1.ValorUnitario * Concepto1.Cantidad) + (Concepto2.ValorUnitario * Concepto2.Cantidad)) * (ImpuestoLocal.Tasa/100);
       Factura.AgregarImpuestoLocal(ImpuestoLocal);
 
       Concepto2.Cantidad:=5;
