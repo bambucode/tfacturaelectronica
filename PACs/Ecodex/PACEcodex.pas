@@ -97,6 +97,7 @@ uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
      EcodexWsComun,
      ManejadorDeErroresComunes,
      feCFDv32,
+     System.RegularExpressions,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
@@ -152,6 +153,7 @@ var
   comprobanteTimbrado: IFEXMLComprobanteV32;
   nodoXMLTimbre: IFEXMLtimbreFiscalDigital;
   documentoXMLTimbrado, documentoXMLTimbre: TXmlDocument;
+  xmlComplemento, xmlTimbre: string;
 begin
   Assert(aComprobanteTimbrado <> nil, 'La respuesta del servicio de timbrado fue nula');
 
@@ -175,12 +177,15 @@ begin
   // Extraemos solamente el nodo del timbre
   Assert(IFEXMLComprobanteV32(comprobanteTimbrado).Complemento.HasChildNodes,
         'No se recibio correctamente el timbre');
-  Assert(IFEXMLComprobanteV32(comprobanteTimbrado).Complemento.ChildNodes.Count = 1,
-        'Se debio haber tenido solo el timbre como complemento');
+
+  xmlComplemento := IFEXMLComprobanteV32(comprobanteTimbrado).Complemento.XML;
+  Assert(xmlComplemento <> '', 'El XML del documento estuvo vacio');
+  xmlTimbre := TRegEx.Match(xmlComplemento, '<tfd:TimbreFiscalDigital.*?/>').Value;
+  Assert(xmlTimbre <> '', 'El XML del timbre estuvo vacio');
 
   // Creamos el documento XML solamente del timbre
   documentoXMLTimbre := TXMLDocument.Create(nil);
-  documentoXMLTimbre.XML.Text := IFEXMLComprobanteV32(comprobanteTimbrado).Complemento.ChildNodes.First.XML;
+  documentoXMLTimbre.XML.Text := xmlTimbre;
   documentoXMLTimbre.Active := True;
 
   // Convertimos el XML del nodo a la interfase del Timbre v3.2
