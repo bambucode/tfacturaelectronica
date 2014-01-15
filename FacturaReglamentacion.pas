@@ -27,7 +27,8 @@ type
       class function ComoFechaHora(dtFecha: TDateTime) : String;
       class function DeFechaHoraISO8601(const aFechaISO8601: String) : TDateTime;
       class function ComoFechaAduanera(dtFecha: TDateTime) : String;
-      class function ComoTasaImpuesto(dTasa: Double) : String;
+      class function ComoTasaImpuesto(dTasa: Double; const aDecimalesDefault: Integer
+          = 6): String;
       class function ComoDateTime(sFechaISO8601: String): TDateTime;
       class function ComoFechaHoraInforme(dtFecha: TDateTime) : String;
   end;
@@ -96,14 +97,13 @@ begin
    Result:=CurrToStrF(dMonto, ffFixed, aDecimalesDefault);
 end;
 
-class function TFEReglamentacion.ComoTasaImpuesto(dTasa: Double) : String;
-const
-  _NUMERO_DECIMALES_TASA = 6;
+class function TFEReglamentacion.ComoTasaImpuesto(dTasa: Double; const
+    aDecimalesDefault: Integer = 6): String;
 begin
    // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
    // http://www.sat.gob.mx/cfd/3/cfdv32.xsd
    // http://www.sat.gob.mx/cfd/2/cfdv22.xsd
-   Result:=FloatToStrF(dTasa,ffFixed, 10, _NUMERO_DECIMALES_TASA);
+   Result:=FloatToStrF(dTasa,ffFixed, 10, aDecimalesDefault);
 end;
 
 // Las cadenas usadas en el XML deben de escapar caracteres incorrectos

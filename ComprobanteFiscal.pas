@@ -102,6 +102,7 @@ type
     procedure AsignarNumeroDeCuenta;
     procedure AgregarAtributoOpcionalSiNoEstaVacio(const nodoXML: IXMLNode; const aPropiedad: string;
                                                   const aValorAsignar : String);
+    procedure AgregarComplementos;
 
     {$REGION 'Documentation'}
     ///	<summary>
@@ -257,6 +258,11 @@ begin
   begin
     nodoXML.Attributes[aPropiedad] := aValorAsignar;
   end;
+end;
+
+procedure TFEComprobanteFiscal.AgregarComplementos;
+begin
+  AsignarImpuestosLocales;
 end;
 
 procedure TFEComprobanteFiscal.AgregarDireccionFiscalv32(const
@@ -688,32 +694,60 @@ var
   nodoImpuestosLocales: IXMLImpuestosLocales;
   documentoImpuestosLocales : TXMLDocument;
   nodoImpuestoTrasladado: IXMLImpuestosLocales_TrasladosLocales;
+  schemaLocationAnterior: string;
+const
+  _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL = 2;
 begin
     if Length(inherited ImpuestosLocales) > 0 then
     begin
       try
+         // Agregamos al Schema que estamos usando impuestos locales
+         schemaLocationAnterior := fXmlComprobante.Attributes['xsi:schemaLocation'];
+         fXmlComprobante.SetAttribute('xsi:schemaLocation',
+                                      schemaLocationAnterior + ' http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
+         fXmlComprobante.SetAttribute('xmlns:implocal', 'http://www.sat.gob.mx/implocal');
+
          documentoImpuestosLocales := TXMLDocument.Create(nil);
          documentoImpuestosLocales.Active := True;
 
          // Creamos el nodo de totales de impuestos locales
          nodoImpuestosLocales := NuevoNodoImpuestosLocales(documentoImpuestosLocales);
          nodoImpuestosLocales.Version := '1.0';
-         nodoImpuestosLocales.TotaldeRetenciones := TFEReglamentacion.ComoMoneda(0);
-         nodoImpuestosLocales.TotaldeTraslados := TFEReglamentacion.ComoMoneda(11.70);
+         nodoImpuestosLocales.TotaldeRetenciones := TFEReglamentacion.ComoMoneda(inherited TotalImpuestosLocalesRetenidos,
+                                                                                 _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
+         nodoImpuestosLocales.TotaldeTraslados := TFEReglamentacion.ComoMoneda(inherited TotalImpuestosLocalesTrasladados, 
+                                                                               _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
 
          // Agregamos el detalle de los impuestos "hijo"
          for I := 0 to Length(inherited ImpuestosLocales) - 1 do
          begin
             nuevoImpuesto:=(inherited ImpuestosLocales)[I];
 
-            with nodoImpuestosLocales.TrasladosLocales.Add do
-            begin
-              ImpLocTrasladado := TFEReglamentacion.ComoCadena(nuevoImpuesto.Nombre);
-              TasadeTraslado := TFEReglamentacion.ComoTasaImpuesto(nuevoImpuesto.Tasa); 
-              Importe := '2.33';
+            // Agregamos el nodo de impuesto segun el tipo de impuesto...
+            case nuevoImpuesto.Tipo of
+              tiRetenido    : 
+              begin
+                with nodoImpuestosLocales.RetencionesLocales.Add do
+                begin
+                  ImpLocRetenido := TFEReglamentacion.ComoCadena(nuevoImpuesto.Nombre);
+                  TasadeRetencion := TFEReglamentacion.ComoTasaImpuesto(nuevoImpuesto.Tasa, _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
+                  Importe := TFEReglamentacion.ComoMoneda(nuevoImpuesto.Importe, _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
+                end;
+              end;
+              tiTrasladado  : 
+              begin
+                with nodoImpuestosLocales.TrasladosLocales.Add do
+                begin
+                  ImpLocTrasladado := TFEReglamentacion.ComoCadena(nuevoImpuesto.Nombre);
+                  TasadeTraslado := TFEReglamentacion.ComoTasaImpuesto(nuevoImpuesto.Tasa, _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
+                  Importe := TFEReglamentacion.ComoMoneda(nuevoImpuesto.Importe, _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
+                end;
+              end;
             end;
          end;
+         
       finally
+         // No liberamos el TXMLDocument por que impleneta a un TInterfacedObject y Delphi lo libera solo
          //documentoImpuestosLocales.Free;
       end;
 
@@ -996,7 +1030,7 @@ begin
         // Atributo Impuestos
         AsignarImpuestosRetenidos;
         AsignarImpuestosTrasladados;
-        AsignarImpuestosLocales;
+        AgregarComplementos;
 
         if (fDesglosarTotalesImpuestos = True) then
            AsignarTotalesImpuestos;
