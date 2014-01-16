@@ -136,6 +136,17 @@ end;
 
 TFEImpuestosRetenidos = Array of TFEImpuestoRetenido;
 
+TTipoImpuestoLocal = (tiRetenido, tiTrasladado);
+
+TFEImpuestoLocal = record
+  Nombre: String;
+  Tasa: Double;
+  Importe : Currency;
+  Tipo: TTipoImpuestoLocal;
+end;
+
+TFEImpuestosLocales = Array of TFEImpuestoLocal;
+
 TFETimbre = record
   Version : WideString;
   UUID : WideString;
