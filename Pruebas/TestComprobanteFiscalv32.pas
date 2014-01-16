@@ -34,6 +34,7 @@ type
     procedure GuardarEnArchivo_DeComprobanteTimbrado_GenereXMLIgualAlLeido;
     procedure setXML_DeComprobanteTimbrado_AsignePropiedadesDelTimbre;
     procedure setXML_DeComprobanteV32_EstablezcaLasPropiedadesCorrectamente;
+    procedure setXML_DeComprobanteConImpuestosLocales_EstablezcaImpuestosCorrectamente;
   end;
 
 implementation
@@ -233,6 +234,25 @@ begin
                   'El XML del timbre fue vacio!');
 end;
 
+procedure TestTFEComprobanteFiscalV32.setXML_DeComprobanteConImpuestosLocales_EstablezcaImpuestosCorrectamente;
+var
+  contenidoXML: WideString;
+  Certificado: TFECertificado;
+  fComprobanteComparacion:  TFEComprobanteFiscal;
+begin
+  ConfigurarCertificadoDePrueba(Certificado);
+
+  // Leemos el XML de nuestro Fixture en memoria
+  contenidoXML := leerContenidoDeFixture('comprobante_fiscal/v32/comprobante_con_impuestos_locales.xml');
+
+  // Leemos el XML en nuestro comprobante
+  fComprobanteFiscalv32.XML:=UTF8ToString(contenidoXML);
+
+  // Corroboramos tener los impuestos configurados correctamente
+  CheckTrue(Length(fComprobanteFiscalv32.ImpuestosLocales) > 0,
+            'Se debio de haber tenido al menos 1 impuesto local');
+end;
+
 procedure
     TestTFEComprobanteFiscalV32.setXML_DeComprobanteV32_EstablezcaLasPropiedadesCorrectamente;
 var
@@ -354,6 +374,8 @@ begin
 
   FreeAndNil(NuevoComprobante);
 end;
+
+
 
 
 

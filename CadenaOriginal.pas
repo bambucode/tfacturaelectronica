@@ -415,9 +415,9 @@ var
   nodoImpuestosLocales : IXMLNode;
   xmlImpuestosLocales: String;
   IXMLDoc: IXMLDocument;
-  impuestosLocales: IXMLImpuestosLocales;
+  impuestosLocales: IFEXMLImpuestosLocales;
   nodoComplemento: IFEXmlComplemento;
-  trasladoLocal: IXMLImpuestosLocales_TrasladosLocales;
+  trasladoLocal: IFEXMLImpuestosLocales_TrasladosLocales;
 const
   _CADENA_XML_INICIO_IMPUESTOS_LOCALES = '<implocal:ImpuestosLocales';
   _CADENA_XML_FIN_IMPUESTOS_LOCALES    = '</implocal:ImpuestosLocales>';
@@ -446,15 +446,12 @@ begin
     AgregarACadenaOriginal(impuestosLocales.TotaldeTraslados);
 
     // Agregamos todos los impuestos trasladados/retenidos
-//    for I := 0 to impuestosLocales.RetencionesLocales.ChildNodes.Count - 1 do
-//    begin
-//      with impuestosLocales.RetencionesLocales[I] do
-//      begin
-//        AgregarACadenaOriginal(ImpLocRetenido);
-//        AgregarACadenaOriginal(TasadeRetencion);
-//        AgregarACadenaOriginal(Importe);
-//      end;
-//    end;
+    {for I := 0 to impuestosLocales.RetencionesLocales.ChildNodes.Count - 1 do
+    begin
+      AgregarAtributo(impuestosLocales.RetencionesLocales.ChildNodes[I], 'ImpRetTrasladado');
+      AgregarAtributo(impuestosLocales.RetencionesLocales.ChildNodes[I], 'TasadeRetencion');
+      AgregarAtributo(impuestosLocales.RetencionesLocales.ChildNodes[I], 'Importe');
+    end;  }
 
     for I := 0 to impuestosLocales.TrasladosLocales.ChildNodes.Count - 1 do
     begin

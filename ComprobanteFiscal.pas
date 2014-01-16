@@ -123,6 +123,7 @@ type
     procedure EstablecerVersionDelComprobante;
     function GetCadenaOriginalTimbre: TStringCadenaOriginal;
     function GetTimbre: TFETimbre;
+    procedure LeerImpuestosLocales;
     procedure LeerVersionDeComprobanteLeido(const aDocumentoXML: WideString);
     procedure ValidarCamposEmisor;
     procedure ValidarCamposReceptor;
@@ -691,9 +692,9 @@ procedure TFEComprobanteFiscal.AsignarImpuestosLocales;
 var
   NuevoImpuesto: TFEImpuestoLocal;
   I: Integer;
-  nodoImpuestosLocales: IXMLImpuestosLocales;
+  nodoImpuestosLocales: IFEXMLImpuestosLocales;
   documentoImpuestosLocales : TXMLDocument;
-  nodoImpuestoTrasladado: IXMLImpuestosLocales_TrasladosLocales;
+  nodoImpuestoTrasladado: IFEXMLImpuestosLocales_TrasladosLocales;
   schemaLocationAnterior: string;
 const
   _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL = 2;
@@ -958,6 +959,10 @@ procedure TFEComprobanteFiscal.LeerPropiedadesDeTimbre;
 var
   complementoTimbre: IFEXMLtimbreFiscalDigital;
   documentoXMLTimbre: TXmlDocument;
+  nodoTimbreFiscal: IXMLNode;
+const
+  _NOMBRE_NODO_TIMBRE     = 'TimbreFiscalDigital';
+  _NAMESPACE_NODO_TIMBRE  = 'http://www.sat.gob.mx/TimbreFiscalDigital';
 begin
   Assert(fVersion = fev32, 'Solo es posible asignar el timbre de un CFD v3.2');
 
@@ -965,31 +970,91 @@ begin
   begin
     // Creamos el documento XML solamente del timbre
     documentoXMLTimbre := TXMLDocument.Create(nil);
-    documentoXMLTimbre.XML.Text := IFEXMLComprobanteV32(fXmlComprobante).Complemento.ChildNodes.First.XML;
-    documentoXMLTimbre.Active := True;
+    nodoTimbreFiscal := IFEXMLComprobanteV32(fXmlComprobante).Complemento.ChildNodes.FindNode(_NOMBRE_NODO_TIMBRE,
+                                                                                              _NAMESPACE_NODO_TIMBRE);
+    if nodoTimbreFiscal <> nil then
+    begin
+      documentoXMLTimbre.XML.Text := nodoTimbreFiscal.XML;
+      documentoXMLTimbre.Active := True;
 
-    try
-      // Convertimos el XML del nodo a la interfase del Timbre v3.2
-      complementoTimbre := GetTimbreFiscalDigital(documentoXMLTimbre);
+      try
+        // Convertimos el XML del nodo a la interfase del Timbre v3.2
+        complementoTimbre := GetTimbreFiscalDigital(documentoXMLTimbre);
 
-      // Asignamos las propiedades del XMl del timbre a las internas
-      fTimbre.Version := complementoTimbre.Version;
-      fTimbre.UUID := complementoTimbre.UUID;
-      fTimbre.FechaTimbrado := TFEReglamentacion.DeFechaHoraISO8601(complementoTimbre.FechaTimbrado);
-      fTimbre.SelloCFD := complementoTimbre.SelloCFD;
-      fTimbre.NoCertificadoSAT := complementoTimbre.NoCertificadoSAT;
-      fTimbre.SelloSAT := complementoTimbre.SelloSAT;
-      fTimbre.XML := documentoXMLTimbre.XML.Text;
+        // Asignamos las propiedades del XMl del timbre a las internas
+        fTimbre.Version := complementoTimbre.Version;
+        fTimbre.UUID := complementoTimbre.UUID;
+        fTimbre.FechaTimbrado := TFEReglamentacion.DeFechaHoraISO8601(complementoTimbre.FechaTimbrado);
+        fTimbre.SelloCFD := complementoTimbre.SelloCFD;
+        fTimbre.NoCertificadoSAT := complementoTimbre.NoCertificadoSAT;
+        fTimbre.SelloSAT := complementoTimbre.SelloSAT;
+        fTimbre.XML := documentoXMLTimbre.XML.Text;
 
-      fFueTimbrado := True;
-    except
-      On E:Exception do
-        raise;
+        fFueTimbrado := True;
+      except
+        On E:Exception do
+          raise;
+      end;
     end;
   end else
     fFueTimbrado := False;
 end;
 
+procedure TFEComprobanteFiscal.LeerImpuestosLocales;
+var
+  complementoImpuestosLocales: IFEXMLImpuestosLocales;
+  documentoXML: TXmlDocument;
+  nodoImpuestosLocales : IXMLNode;
+  I: Integer;
+  impuestoLocal : TFEImpuestoLocal;
+const
+  _NOMBRE_NODO_IMPUESTOS_LOCALES    = 'ImpuestosLocales';
+  _NAMESPACE_NODO_IMPUESTOS_LOCALES = 'http://www.sat.gob.mx/implocal';
+begin
+  nodoImpuestosLocales := fXmlComprobante.Complemento.ChildNodes.FindNode(_NOMBRE_NODO_IMPUESTOS_LOCALES,
+                                                                          _NAMESPACE_NODO_IMPUESTOS_LOCALES);
+
+  if Assigned(nodoImpuestosLocales) then
+  begin
+     // Creamos el documento XML para poder leer el XML de impuestos locales con su correspondiente interfase
+     documentoXML := TXMLDocument.Create(nil);
+     documentoXML.XML.Text := nodoImpuestosLocales.XML;
+     documentoXML.Active := True;
+
+     complementoImpuestosLocales := NuevoNodoImpuestosLocales(documentoXML);
+
+   {  for I := 0 to complementoImpuestosLocales.RetencionesLocales.Count - 1 do
+     begin
+        impuestoLocal.Nombre := complementoImpuestosLocales.RetencionesLocales[I].ImpLocRetenido;
+        impuestoLocal.Tasa := 0;
+        impuestoLocal.Importe := 0;
+        impuestoLocal.Tipo := tiRetenido;
+        inherited AgregarImpuestoLocal(impuestoLocal);
+     end;    }
+
+     for I := 0 to complementoImpuestosLocales.ChildNodes.Count - 1 do
+     begin
+        if complementoImpuestosLocales.ChildNodes[I].HasAttribute('ImpLocTrasladado') then
+        begin
+          impuestoLocal.Nombre := complementoImpuestosLocales.ChildNodes[I].Attributes['ImpLocTrasladado'];
+          impuestoLocal.Tasa := complementoImpuestosLocales.ChildNodes[I].Attributes['TasadeTraslado'];
+          impuestoLocal.Importe :=  complementoImpuestosLocales.ChildNodes[I].Attributes['Importe'];
+          impuestoLocal.Tipo := tiTrasladado;
+        end;
+
+//        if complementoImpuestosLocales.ChildNodes[I].HasAttribute('ImpLocRetenido') then
+//        begin
+//          impuestoLocal.Nombre := complementoImpuestosLocales.TrasladosLocales[I].ImpLocTrasladado;
+//          impuestoLocal.Tasa := 0;
+//          impuestoLocal.Importe := 0;
+//          impuestoLocal.Tipo := tiRetenido;
+//        end;
+
+        inherited AgregarImpuestoLocal(impuestoLocal);
+     end;
+
+  end;
+end;
 
 // Funcion encargada de llenar el comprobante fiscal EN EL ORDEN que se especifica en el XSD
 // ya que si no es asi, el XML se va llenando en el orden en que se establecen las propiedades de la clase
@@ -1643,10 +1708,16 @@ begin
             // Asignamos el subtotal de la factura
             inherited SubTotal := StrToFloat(Subtotal);
 
-            // Leemos el timbre del CFDI
-            if fVersion In [fev32] then
+            // Leemos los complementos
+            if TieneHijo(fXmlComprobante, 'Complemento') then
             begin
-              LeerPropiedadesDeTimbre;
+              LeerImpuestosLocales;
+
+              // Leemos el timbre del CFDI
+              if fVersion In [fev32] then
+              begin
+                LeerPropiedadesDeTimbre;
+              end;
             end;
 
             // Indicamos que el comprobante XML ya fue "llenado"
@@ -1685,6 +1756,8 @@ begin
   else
       Raise Exception.Create('No se puede obtener el XML cuando aún no se ha generado el archivo CFD');
 end;
+
+
 
 procedure TFEComprobanteFiscal.LeerVersionDeComprobanteLeido(const
     aDocumentoXML: WideString);

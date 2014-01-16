@@ -19,22 +19,22 @@ type
 
 { Forward Decls }
 
-  IXMLImpuestosLocales = interface;
-  IXMLImpuestosLocales_RetencionesLocales = interface;
-  IXMLImpuestosLocales_RetencionesLocalesList = interface;
-  IXMLImpuestosLocales_TrasladosLocales = interface;
-  IXMLImpuestosLocales_TrasladosLocalesList = interface;
+  IFEXMLImpuestosLocales = interface;
+  IFEXMLImpuestosLocales_RetencionesLocales = interface;
+  IFEXMLImpuestosLocales_RetencionesLocalesList = interface;
+  IFEXMLImpuestosLocales_TrasladosLocales = interface;
+  IFEXMLImpuestosLocales_TrasladosLocalesList = interface;
 
-{ IXMLImpuestosLocales }
+{ IFEXMLImpuestosLocales }
 
-  IXMLImpuestosLocales = interface(IXMLNode)
-    ['{EFA58A15-A8BC-466D-B6B7-B0003072659A}']
+  IFEXMLImpuestosLocales = interface(IXMLNode)
+  ['{EFA58A15-A8BC-466D-B6B7-B0003072659A}']
     { Property Accessors }
     function Get_Version: UnicodeString;
     function Get_TotaldeRetenciones: UnicodeString;
     function Get_TotaldeTraslados: UnicodeString;
-    function Get_RetencionesLocales: IXMLImpuestosLocales_RetencionesLocalesList;
-    function Get_TrasladosLocales: IXMLImpuestosLocales_TrasladosLocalesList;
+    function Get_RetencionesLocales: IFEXMLImpuestosLocales_RetencionesLocalesList;
+    function Get_TrasladosLocales: IFEXMLImpuestosLocales_TrasladosLocalesList;
     procedure Set_Version(Value: UnicodeString);
     procedure Set_TotaldeRetenciones(Value: UnicodeString);
     procedure Set_TotaldeTraslados(Value: UnicodeString);
@@ -42,13 +42,13 @@ type
     property Version: UnicodeString read Get_Version write Set_Version;
     property TotaldeRetenciones: UnicodeString read Get_TotaldeRetenciones write Set_TotaldeRetenciones;
     property TotaldeTraslados: UnicodeString read Get_TotaldeTraslados write Set_TotaldeTraslados;
-    property RetencionesLocales: IXMLImpuestosLocales_RetencionesLocalesList read Get_RetencionesLocales;
-    property TrasladosLocales: IXMLImpuestosLocales_TrasladosLocalesList read Get_TrasladosLocales;
+    property RetencionesLocales: IFEXMLImpuestosLocales_RetencionesLocalesList read Get_RetencionesLocales;
+    property TrasladosLocales: IFEXMLImpuestosLocales_TrasladosLocalesList read Get_TrasladosLocales;
   end;
 
-{ IXMLImpuestosLocales_RetencionesLocales }
+{ IFEXMLImpuestosLocales_RetencionesLocales }
 
-  IXMLImpuestosLocales_RetencionesLocales = interface(IXMLNode)
+  IFEXMLImpuestosLocales_RetencionesLocales = interface(IXMLNode)
     ['{DF5ACEE7-B902-4DE7-BA92-287D3BF51CFB}']
     { Property Accessors }
     function Get_ImpLocRetenido: UnicodeString;
@@ -63,21 +63,21 @@ type
     property Importe: UnicodeString read Get_Importe write Set_Importe;
   end;
 
-{ IXMLImpuestosLocales_RetencionesLocalesList }
+{ IFEXMLImpuestosLocales_RetencionesLocalesList }
 
-  IXMLImpuestosLocales_RetencionesLocalesList = interface(IXMLNodeCollection)
+  IFEXMLImpuestosLocales_RetencionesLocalesList = interface(IXMLNodeCollection)
     ['{D25D079F-41E4-40DA-8C1F-1B19197E20F4}']
     { Methods & Properties }
-    function Add: IXMLImpuestosLocales_RetencionesLocales;
-    function Insert(const Index: Integer): IXMLImpuestosLocales_RetencionesLocales;
+    function Add: IFEXMLImpuestosLocales_RetencionesLocales;
+    function Insert(const Index: Integer): IFEXMLImpuestosLocales_RetencionesLocales;
 
-    function Get_Item(Index: Integer): IXMLImpuestosLocales_RetencionesLocales;
-    property Items[Index: Integer]: IXMLImpuestosLocales_RetencionesLocales read Get_Item; default;
+    function Get_Item(Index: Integer): IFEXMLImpuestosLocales_RetencionesLocales;
+    property Items[Index: Integer]: IFEXMLImpuestosLocales_RetencionesLocales read Get_Item; default;
   end;
 
-{ IXMLImpuestosLocales_TrasladosLocales }
+{ IFEXMLImpuestosLocales_TrasladosLocales }
 
-  IXMLImpuestosLocales_TrasladosLocales = interface(IXMLNode)
+  IFEXMLImpuestosLocales_TrasladosLocales = interface(IXMLNode)
     ['{F2668E73-6083-4FBC-B1DD-66E2343962AA}']
     { Property Accessors }
     function Get_ImpLocTrasladado: UnicodeString;
@@ -92,39 +92,39 @@ type
     property Importe: UnicodeString read Get_Importe write Set_Importe;
   end;
 
-{ IXMLImpuestosLocales_TrasladosLocalesList }
+{ IFEXMLImpuestosLocales_TrasladosLocalesList }
 
-  IXMLImpuestosLocales_TrasladosLocalesList = interface(IXMLNodeCollection)
+  IFEXMLImpuestosLocales_TrasladosLocalesList = interface(IXMLNodeCollection)
     ['{0CE814EB-6501-4530-8B4F-F795DE23B78C}']
     { Methods & Properties }
-    function Add: IXMLImpuestosLocales_TrasladosLocales;
-    function Insert(const Index: Integer): IXMLImpuestosLocales_TrasladosLocales;
+    function Add: IFEXMLImpuestosLocales_TrasladosLocales;
+    function Insert(const Index: Integer): IFEXMLImpuestosLocales_TrasladosLocales;
 
-    function Get_Item(Index: Integer): IXMLImpuestosLocales_TrasladosLocales;
-    property Items[Index: Integer]: IXMLImpuestosLocales_TrasladosLocales read Get_Item; default;
+    function Get_Item(Index: Integer): IFEXMLImpuestosLocales_TrasladosLocales;
+    property Items[Index: Integer]: IFEXMLImpuestosLocales_TrasladosLocales read Get_Item; default;
   end;
 
 { Forward Decls }
 
-  TXMLImpuestosLocales = class;
-  TXMLImpuestosLocales_RetencionesLocales = class;
-  TXMLImpuestosLocales_RetencionesLocalesList = class;
-  TXMLImpuestosLocales_TrasladosLocales = class;
-  TXMLImpuestosLocales_TrasladosLocalesList = class;
+  TFEXMLImpuestosLocales = class;
+  TFEXMLImpuestosLocales_RetencionesLocales = class;
+  TFEXMLImpuestosLocales_RetencionesLocalesList = class;
+  TFEXMLImpuestosLocales_TrasladosLocales = class;
+  TFEXMLImpuestosLocales_TrasladosLocalesList = class;
 
-{ TXMLImpuestosLocales }
+{ TFEXMLImpuestosLocales }
 
-  TXMLImpuestosLocales = class(TXMLNode, IXMLImpuestosLocales)
+  TFEXMLImpuestosLocales = class(TXMLNode, IFEXMLImpuestosLocales)
   private
-    FRetencionesLocales: IXMLImpuestosLocales_RetencionesLocalesList;
-    FTrasladosLocales: IXMLImpuestosLocales_TrasladosLocalesList;
+    FRetencionesLocales: IFEXMLImpuestosLocales_RetencionesLocalesList;
+    FTrasladosLocales: IFEXMLImpuestosLocales_TrasladosLocalesList;
   protected
-    { IXMLImpuestosLocales }
+    { IFEXMLImpuestosLocales }
     function Get_Version: UnicodeString;
     function Get_TotaldeRetenciones: UnicodeString;
     function Get_TotaldeTraslados: UnicodeString;
-    function Get_RetencionesLocales: IXMLImpuestosLocales_RetencionesLocalesList;
-    function Get_TrasladosLocales: IXMLImpuestosLocales_TrasladosLocalesList;
+    function Get_RetencionesLocales: IFEXMLImpuestosLocales_RetencionesLocalesList;
+    function Get_TrasladosLocales: IFEXMLImpuestosLocales_TrasladosLocalesList;
     procedure Set_Version(Value: UnicodeString);
     procedure Set_TotaldeRetenciones(Value: UnicodeString);
     procedure Set_TotaldeTraslados(Value: UnicodeString);
@@ -132,11 +132,12 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TXMLImpuestosLocales_RetencionesLocales }
+{ TFEXMLImpuestosLocales_RetencionesLocales }
 
-  TXMLImpuestosLocales_RetencionesLocales = class(TXMLNode, IXMLImpuestosLocales_RetencionesLocales)
+  TFEXMLImpuestosLocales_RetencionesLocales = class(TXMLNode,
+      IFEXMLImpuestosLocales_RetencionesLocales)
   protected
-    { IXMLImpuestosLocales_RetencionesLocales }
+    { IFEXMLImpuestosLocales_RetencionesLocales }
     function Get_ImpLocRetenido: UnicodeString;
     function Get_TasadeRetencion: UnicodeString;
     function Get_Importe: UnicodeString;
@@ -145,22 +146,24 @@ type
     procedure Set_Importe(Value: UnicodeString);
   end;
 
-{ TXMLImpuestosLocales_RetencionesLocalesList }
+{ TFEXMLImpuestosLocales_RetencionesLocalesList }
 
-  TXMLImpuestosLocales_RetencionesLocalesList = class(TXMLNodeCollection, IXMLImpuestosLocales_RetencionesLocalesList)
+  TFEXMLImpuestosLocales_RetencionesLocalesList = class(TXMLNodeCollection,
+      IFEXMLImpuestosLocales_RetencionesLocalesList)
   protected
-    { IXMLImpuestosLocales_RetencionesLocalesList }
-    function Add: IXMLImpuestosLocales_RetencionesLocales;
-    function Insert(const Index: Integer): IXMLImpuestosLocales_RetencionesLocales;
+    { IFEXMLImpuestosLocales_RetencionesLocalesList }
+    function Add: IFEXMLImpuestosLocales_RetencionesLocales;
+    function Insert(const Index: Integer): IFEXMLImpuestosLocales_RetencionesLocales;
 
-    function Get_Item(Index: Integer): IXMLImpuestosLocales_RetencionesLocales;
+    function Get_Item(Index: Integer): IFEXMLImpuestosLocales_RetencionesLocales;
   end;
 
-{ TXMLImpuestosLocales_TrasladosLocales }
+{ TFEXMLImpuestosLocales_TrasladosLocales }
 
-  TXMLImpuestosLocales_TrasladosLocales = class(TXMLNode, IXMLImpuestosLocales_TrasladosLocales)
+  TFEXMLImpuestosLocales_TrasladosLocales = class(TXMLNode,
+      IFEXMLImpuestosLocales_TrasladosLocales)
   protected
-    { IXMLImpuestosLocales_TrasladosLocales }
+    { IFEXMLImpuestosLocales_TrasladosLocales }
     function Get_ImpLocTrasladado: UnicodeString;
     function Get_TasadeTraslado: UnicodeString;
     function Get_Importe: UnicodeString;
@@ -169,22 +172,23 @@ type
     procedure Set_Importe(Value: UnicodeString);
   end;
 
-{ TXMLImpuestosLocales_TrasladosLocalesList }
+{ TFEXMLImpuestosLocales_TrasladosLocalesList }
 
-  TXMLImpuestosLocales_TrasladosLocalesList = class(TXMLNodeCollection, IXMLImpuestosLocales_TrasladosLocalesList)
+  TFEXMLImpuestosLocales_TrasladosLocalesList = class(TXMLNodeCollection,
+      IFEXMLImpuestosLocales_TrasladosLocalesList)
   protected
-    { IXMLImpuestosLocales_TrasladosLocalesList }
-    function Add: IXMLImpuestosLocales_TrasladosLocales;
-    function Insert(const Index: Integer): IXMLImpuestosLocales_TrasladosLocales;
+    { IFEXMLImpuestosLocales_TrasladosLocalesList }
+    function Add: IFEXMLImpuestosLocales_TrasladosLocales;
+    function Insert(const Index: Integer): IFEXMLImpuestosLocales_TrasladosLocales;
 
-    function Get_Item(Index: Integer): IXMLImpuestosLocales_TrasladosLocales;
+    function Get_Item(Index: Integer): IFEXMLImpuestosLocales_TrasladosLocales;
   end;
 
 { Global Functions }
 
-function NuevoNodoImpuestosLocales(Doc: IXMLDocument): IXMLImpuestosLocales;
-function LoadImpuestosLocales(const FileName: string): IXMLImpuestosLocales;
-function NewImpuestosLocales: IXMLImpuestosLocales;
+function NuevoNodoImpuestosLocales(Doc: IXMLDocument): IFEXMLImpuestosLocales;
+function LoadImpuestosLocales(const FileName: string): IFEXMLImpuestosLocales;
+function NewImpuestosLocales: IFEXMLImpuestosLocales;
 
 const
   TargetNamespace = 'http://www.sat.gob.mx/implocal';
@@ -193,174 +197,173 @@ implementation
 
 { Global Functions }
 
-function NuevoNodoImpuestosLocales(Doc: IXMLDocument): IXMLImpuestosLocales;
+function NuevoNodoImpuestosLocales(Doc: IXMLDocument): IFEXMLImpuestosLocales;
 begin
-  Result := Doc.GetDocBinding('implocal:ImpuestosLocales', TXMLImpuestosLocales, TargetNamespace) as IXMLImpuestosLocales;
+  Result := Doc.GetDocBinding('implocal:ImpuestosLocales', TFEXMLImpuestosLocales, TargetNamespace) as IFEXMLImpuestosLocales;
 end;
 
-function LoadImpuestosLocales(const FileName: string): IXMLImpuestosLocales;
+function LoadImpuestosLocales(const FileName: string): IFEXMLImpuestosLocales;
 begin
-  Result := LoadXMLDocument(FileName).GetDocBinding('implocal:ImpuestosLocales', TXMLImpuestosLocales, TargetNamespace) as IXMLImpuestosLocales;
+  Result := LoadXMLDocument(FileName).GetDocBinding('implocal:ImpuestosLocales', TFEXMLImpuestosLocales, TargetNamespace) as IFEXMLImpuestosLocales;
 end;
 
-function NewImpuestosLocales: IXMLImpuestosLocales;
+function NewImpuestosLocales: IFEXMLImpuestosLocales;
 begin
-  Result := NewXMLDocument.GetDocBinding('implocal:ImpuestosLocales', TXMLImpuestosLocales, TargetNamespace) as IXMLImpuestosLocales;
+  Result := NewXMLDocument.GetDocBinding('implocal:ImpuestosLocales', TFEXMLImpuestosLocales, TargetNamespace) as IFEXMLImpuestosLocales;
 end;
 
-{ TXMLImpuestosLocales }
+{ TFEXMLImpuestosLocales }
 
-procedure TXMLImpuestosLocales.AfterConstruction;
+procedure TFEXMLImpuestosLocales.AfterConstruction;
 begin
-  RegisterChildNode('RetencionesLocales', TXMLImpuestosLocales_RetencionesLocales);
-  RegisterChildNode('TrasladosLocales', TXMLImpuestosLocales_TrasladosLocales);
-  FRetencionesLocales := CreateCollection(TXMLImpuestosLocales_RetencionesLocalesList, IXMLImpuestosLocales_RetencionesLocales, 'implocal:RetencionesLocales') as IXMLImpuestosLocales_RetencionesLocalesList;
-  FTrasladosLocales := CreateCollection(TXMLImpuestosLocales_TrasladosLocalesList, IXMLImpuestosLocales_TrasladosLocales, 'implocal:TrasladosLocales') as IXMLImpuestosLocales_TrasladosLocalesList;
+  RegisterChildNode('RetencionesLocales', TFEXMLImpuestosLocales_RetencionesLocales);
+  RegisterChildNode('TrasladosLocales', TFEXMLImpuestosLocales_TrasladosLocales);
+  FRetencionesLocales := CreateCollection(TFEXMLImpuestosLocales_RetencionesLocalesList, IFEXMLImpuestosLocales_RetencionesLocales, 'implocal:RetencionesLocales') as IFEXMLImpuestosLocales_RetencionesLocalesList;
+  FTrasladosLocales := CreateCollection(TFEXMLImpuestosLocales_TrasladosLocalesList, IFEXMLImpuestosLocales_TrasladosLocales, 'implocal:TrasladosLocales') as IFEXMLImpuestosLocales_TrasladosLocalesList;
 
   // Declaramos el NameSpace de CFDI para que agregue el prefijo "cfdi:" a los nodos del complemento
   // Ref: https://forums.embarcadero.com/thread.jspa?threadID=64760
   //DeclareNamespace('implocal', 'http://www.sat.gob.mx/implocal');
-  //RegisterChildNode('ImpuestosLocales', TXMLImpuestosLocales, 'http://www.sat.gob.mx/implocal');
-  
-  inherited;
+  //RegisterChildNode('ImpuestosLocales', TFEXMLImpuestosLocales, 'http://www.sat.gob.mx/implocal');
+
 end;
 
-function TXMLImpuestosLocales.Get_Version: UnicodeString;
+function TFEXMLImpuestosLocales.Get_Version: UnicodeString;
 begin
   Result := AttributeNodes['version'].Text;
 end;
 
-procedure TXMLImpuestosLocales.Set_Version(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales.Set_Version(Value: UnicodeString);
 begin
   SetAttribute('version', Value);
 end;
 
-function TXMLImpuestosLocales.Get_TotaldeRetenciones: UnicodeString;
+function TFEXMLImpuestosLocales.Get_TotaldeRetenciones: UnicodeString;
 begin
   Result := AttributeNodes['TotaldeRetenciones'].Text;
 end;
 
-procedure TXMLImpuestosLocales.Set_TotaldeRetenciones(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales.Set_TotaldeRetenciones(Value: UnicodeString);
 begin
   SetAttribute('TotaldeRetenciones', Value);
 end;
 
-function TXMLImpuestosLocales.Get_TotaldeTraslados: UnicodeString;
+function TFEXMLImpuestosLocales.Get_TotaldeTraslados: UnicodeString;
 begin
   Result := AttributeNodes['TotaldeTraslados'].Text;
 end;
 
-procedure TXMLImpuestosLocales.Set_TotaldeTraslados(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales.Set_TotaldeTraslados(Value: UnicodeString);
 begin
   SetAttribute('TotaldeTraslados', Value);
 end;
 
-function TXMLImpuestosLocales.Get_RetencionesLocales: IXMLImpuestosLocales_RetencionesLocalesList;
+function TFEXMLImpuestosLocales.Get_RetencionesLocales: IFEXMLImpuestosLocales_RetencionesLocalesList;
 begin
   Result := FRetencionesLocales;
 end;
 
-function TXMLImpuestosLocales.Get_TrasladosLocales: IXMLImpuestosLocales_TrasladosLocalesList;
+function TFEXMLImpuestosLocales.Get_TrasladosLocales: IFEXMLImpuestosLocales_TrasladosLocalesList;
 begin
   Result := FTrasladosLocales;
 end;
 
-{ TXMLImpuestosLocales_RetencionesLocales }
+{ TFEXMLImpuestosLocales_RetencionesLocales }
 
-function TXMLImpuestosLocales_RetencionesLocales.Get_ImpLocRetenido: UnicodeString;
+function TFEXMLImpuestosLocales_RetencionesLocales.Get_ImpLocRetenido: UnicodeString;
 begin
   Result := AttributeNodes['ImpLocRetenido'].Text;
 end;
 
-procedure TXMLImpuestosLocales_RetencionesLocales.Set_ImpLocRetenido(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_RetencionesLocales.Set_ImpLocRetenido(Value: UnicodeString);
 begin
   SetAttribute('ImpLocRetenido', Value);
 end;
 
-function TXMLImpuestosLocales_RetencionesLocales.Get_TasadeRetencion: UnicodeString;
+function TFEXMLImpuestosLocales_RetencionesLocales.Get_TasadeRetencion: UnicodeString;
 begin
   Result := AttributeNodes['TasadeRetencion'].Text;
 end;
 
-procedure TXMLImpuestosLocales_RetencionesLocales.Set_TasadeRetencion(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_RetencionesLocales.Set_TasadeRetencion(Value: UnicodeString);
 begin
   SetAttribute('TasadeRetencion', Value);
 end;
 
-function TXMLImpuestosLocales_RetencionesLocales.Get_Importe: UnicodeString;
+function TFEXMLImpuestosLocales_RetencionesLocales.Get_Importe: UnicodeString;
 begin
   Result := AttributeNodes['Importe'].Text;
 end;
 
-procedure TXMLImpuestosLocales_RetencionesLocales.Set_Importe(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_RetencionesLocales.Set_Importe(Value: UnicodeString);
 begin
   SetAttribute('Importe', Value);
 end;
 
-{ TXMLImpuestosLocales_RetencionesLocalesList }
+{ TFEXMLImpuestosLocales_RetencionesLocalesList }
 
-function TXMLImpuestosLocales_RetencionesLocalesList.Add: IXMLImpuestosLocales_RetencionesLocales;
+function TFEXMLImpuestosLocales_RetencionesLocalesList.Add: IFEXMLImpuestosLocales_RetencionesLocales;
 begin
-  Result := AddItem(-1) as IXMLImpuestosLocales_RetencionesLocales;
+  Result := AddItem(-1) as IFEXMLImpuestosLocales_RetencionesLocales;
 end;
 
-function TXMLImpuestosLocales_RetencionesLocalesList.Insert(const Index: Integer): IXMLImpuestosLocales_RetencionesLocales;
+function TFEXMLImpuestosLocales_RetencionesLocalesList.Insert(const Index: Integer): IFEXMLImpuestosLocales_RetencionesLocales;
 begin
-  Result := AddItem(Index) as IXMLImpuestosLocales_RetencionesLocales;
+  Result := AddItem(Index) as IFEXMLImpuestosLocales_RetencionesLocales;
 end;
 
-function TXMLImpuestosLocales_RetencionesLocalesList.Get_Item(Index: Integer): IXMLImpuestosLocales_RetencionesLocales;
+function TFEXMLImpuestosLocales_RetencionesLocalesList.Get_Item(Index: Integer): IFEXMLImpuestosLocales_RetencionesLocales;
 begin
-  Result := List[Index] as IXMLImpuestosLocales_RetencionesLocales;
+  Result := List[Index] as IFEXMLImpuestosLocales_RetencionesLocales;
 end;
 
-{ TXMLImpuestosLocales_TrasladosLocales }
+{ TFEXMLImpuestosLocales_TrasladosLocales }
 
-function TXMLImpuestosLocales_TrasladosLocales.Get_ImpLocTrasladado: UnicodeString;
+function TFEXMLImpuestosLocales_TrasladosLocales.Get_ImpLocTrasladado: UnicodeString;
 begin
   Result := AttributeNodes['ImpLocTrasladado'].Text;
 end;
 
-procedure TXMLImpuestosLocales_TrasladosLocales.Set_ImpLocTrasladado(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_TrasladosLocales.Set_ImpLocTrasladado(Value: UnicodeString);
 begin
   SetAttribute('ImpLocTrasladado', Value);
 end;
 
-function TXMLImpuestosLocales_TrasladosLocales.Get_TasadeTraslado: UnicodeString;
+function TFEXMLImpuestosLocales_TrasladosLocales.Get_TasadeTraslado: UnicodeString;
 begin
   Result := AttributeNodes['TasadeTraslado'].Text;
 end;
 
-procedure TXMLImpuestosLocales_TrasladosLocales.Set_TasadeTraslado(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_TrasladosLocales.Set_TasadeTraslado(Value: UnicodeString);
 begin
   SetAttribute('TasadeTraslado', Value);
 end;
 
-function TXMLImpuestosLocales_TrasladosLocales.Get_Importe: UnicodeString;
+function TFEXMLImpuestosLocales_TrasladosLocales.Get_Importe: UnicodeString;
 begin
   Result := AttributeNodes['Importe'].Text;
 end;
 
-procedure TXMLImpuestosLocales_TrasladosLocales.Set_Importe(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_TrasladosLocales.Set_Importe(Value: UnicodeString);
 begin
   SetAttribute('Importe', Value);
 end;
 
-{ TXMLImpuestosLocales_TrasladosLocalesList }
+{ TFEXMLImpuestosLocales_TrasladosLocalesList }
 
-function TXMLImpuestosLocales_TrasladosLocalesList.Add: IXMLImpuestosLocales_TrasladosLocales;
+function TFEXMLImpuestosLocales_TrasladosLocalesList.Add: IFEXMLImpuestosLocales_TrasladosLocales;
 begin
-  Result := AddItem(-1) as IXMLImpuestosLocales_TrasladosLocales;
+  Result := AddItem(-1) as IFEXMLImpuestosLocales_TrasladosLocales;
 end;
 
-function TXMLImpuestosLocales_TrasladosLocalesList.Insert(const Index: Integer): IXMLImpuestosLocales_TrasladosLocales;
+function TFEXMLImpuestosLocales_TrasladosLocalesList.Insert(const Index: Integer): IFEXMLImpuestosLocales_TrasladosLocales;
 begin
-  Result := AddItem(Index) as IXMLImpuestosLocales_TrasladosLocales;
+  Result := AddItem(Index) as IFEXMLImpuestosLocales_TrasladosLocales;
 end;
 
-function TXMLImpuestosLocales_TrasladosLocalesList.Get_Item(Index: Integer): IXMLImpuestosLocales_TrasladosLocales;
+function TFEXMLImpuestosLocales_TrasladosLocalesList.Get_Item(Index: Integer): IFEXMLImpuestosLocales_TrasladosLocales;
 begin
-  Result := List[Index] as IXMLImpuestosLocales_TrasladosLocales;
+  Result := List[Index] as IFEXMLImpuestosLocales_TrasladosLocales;
 end;
 
 end.
