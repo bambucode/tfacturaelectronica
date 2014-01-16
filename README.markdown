@@ -38,6 +38,7 @@ Proveedores Autorizados de Certificación (PAC) Soportados
 
 Completado
 -------------
+- Implementar soporte para impuestos locales/estatales. <Enero 2014>
 - Implementar la version 3.2 de los CFD (o comprobantes digitales en linea) con colaboración de Ing. Pablo Torres - <Completado a finales de Noviembre 2013>
 - Implementar soporte para la versión 2.2 de CFD - Completado Junio 2012.
 - Implementar la lectura de un CFD y que al mismo tiempo verifique si es válido o no. <- Completado 12 Dic 2010>
@@ -70,4 +71,4 @@ Colaboradores actuales.
 -------------
 * Ing. Luis Carrasco - Bambú Code SA de CV - <http://github.com/lcarrasco>
 * Ing. Eduardo  Padilla - Bambú Code SA de CV - <https://github.com/epadillac>
-*  Ing. Pablo Torres - <http://www.tecsisnet.net>
+* Ing. Pablo Torres - <http://www.tecsisnet.net>
