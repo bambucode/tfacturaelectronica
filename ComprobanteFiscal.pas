@@ -697,6 +697,9 @@ var
   nodoImpuestoTrasladado: IFEXMLImpuestosLocales_TrasladosLocales;
   schemaLocationAnterior: string;
 const
+  _SCHEMA_IMPUESTOS_NS      = 'http://www.sat.gob.mx/implocal';
+  _SCHEMA_IMPUESTOS_LOCALES = _SCHEMA_IMPUESTOS_NS + ' http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd';
+const
   _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL = 2;
 begin
     if Length(inherited ImpuestosLocales) > 0 then
@@ -705,8 +708,8 @@ begin
          // Agregamos al Schema que estamos usando impuestos locales
          schemaLocationAnterior := fXmlComprobante.Attributes['xsi:schemaLocation'];
          fXmlComprobante.SetAttribute('xsi:schemaLocation',
-                                      schemaLocationAnterior + ' http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
-         fXmlComprobante.SetAttribute('xmlns:implocal', 'http://www.sat.gob.mx/implocal');
+                                      schemaLocationAnterior + ' ' + _SCHEMA_IMPUESTOS_LOCALES);
+         fXmlComprobante.SetAttribute('xmlns:implocal', _SCHEMA_IMPUESTOS_NS);
 
          documentoImpuestosLocales := TXMLDocument.Create(nil);
          documentoImpuestosLocales.Active := True;
@@ -1023,33 +1026,21 @@ begin
 
      complementoImpuestosLocales := NuevoNodoImpuestosLocales(documentoXML);
 
-   {  for I := 0 to complementoImpuestosLocales.RetencionesLocales.Count - 1 do
+     for I := 0 to complementoImpuestosLocales.RetencionesLocales.Count - 1 do
      begin
         impuestoLocal.Nombre := complementoImpuestosLocales.RetencionesLocales[I].ImpLocRetenido;
-        impuestoLocal.Tasa := 0;
-        impuestoLocal.Importe := 0;
+        impuestoLocal.Tasa := StrToFloat(complementoImpuestosLocales.RetencionesLocales[I].TasadeRetencion);
+        impuestoLocal.Importe := StrToFloat(complementoImpuestosLocales.RetencionesLocales[I].Importe);
         impuestoLocal.Tipo := tiRetenido;
         inherited AgregarImpuestoLocal(impuestoLocal);
-     end;    }
+     end;
 
-     for I := 0 to complementoImpuestosLocales.ChildNodes.Count - 1 do
+     for I := 0 to complementoImpuestosLocales.TrasladosLocales.Count - 1 do
      begin
-        if complementoImpuestosLocales.ChildNodes[I].HasAttribute('ImpLocTrasladado') then
-        begin
-          impuestoLocal.Nombre := complementoImpuestosLocales.ChildNodes[I].Attributes['ImpLocTrasladado'];
-          impuestoLocal.Tasa := complementoImpuestosLocales.ChildNodes[I].Attributes['TasadeTraslado'];
-          impuestoLocal.Importe :=  complementoImpuestosLocales.ChildNodes[I].Attributes['Importe'];
-          impuestoLocal.Tipo := tiTrasladado;
-        end;
-
-//        if complementoImpuestosLocales.ChildNodes[I].HasAttribute('ImpLocRetenido') then
-//        begin
-//          impuestoLocal.Nombre := complementoImpuestosLocales.TrasladosLocales[I].ImpLocTrasladado;
-//          impuestoLocal.Tasa := 0;
-//          impuestoLocal.Importe := 0;
-//          impuestoLocal.Tipo := tiRetenido;
-//        end;
-
+        impuestoLocal.Nombre := complementoImpuestosLocales.TrasladosLocales[I].ImpLocTrasladado;
+        impuestoLocal.Tasa := StrToFloat(complementoImpuestosLocales.TrasladosLocales[I].TasadeTraslado);
+        impuestoLocal.Importe := StrToFloat(complementoImpuestosLocales.TrasladosLocales[I].Importe);
+        impuestoLocal.Tipo := tiTrasladado;
         inherited AgregarImpuestoLocal(impuestoLocal);
      end;
 

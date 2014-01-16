@@ -190,10 +190,17 @@ function NuevoNodoImpuestosLocales(Doc: IXMLDocument): IFEXMLImpuestosLocales;
 function LoadImpuestosLocales(const FileName: string): IFEXMLImpuestosLocales;
 function NewImpuestosLocales: IFEXMLImpuestosLocales;
 
+type
+  TDOMStringDynArray = array of DOMString;
+  TStringSplitOption = (ssNone, ssRemoveEmptyEntries);
+  TStringSplitOptions = set of TStringSplitOption;
+
 const
   TargetNamespace = 'http://www.sat.gob.mx/implocal';
 
 implementation
+
+uses SysUtils;
 
 { Global Functions }
 
@@ -216,16 +223,21 @@ end;
 
 procedure TFEXMLImpuestosLocales.AfterConstruction;
 begin
-  RegisterChildNode('RetencionesLocales', TFEXMLImpuestosLocales_RetencionesLocales);
-  RegisterChildNode('TrasladosLocales', TFEXMLImpuestosLocales_TrasladosLocales);
-  FRetencionesLocales := CreateCollection(TFEXMLImpuestosLocales_RetencionesLocalesList, IFEXMLImpuestosLocales_RetencionesLocales, 'implocal:RetencionesLocales') as IFEXMLImpuestosLocales_RetencionesLocalesList;
-  FTrasladosLocales := CreateCollection(TFEXMLImpuestosLocales_TrasladosLocalesList, IFEXMLImpuestosLocales_TrasladosLocales, 'implocal:TrasladosLocales') as IFEXMLImpuestosLocales_TrasladosLocalesList;
+  inherited;
+  DeclareNamespace('implocal', TargetNamespace);
 
-  // Declaramos el NameSpace de CFDI para que agregue el prefijo "cfdi:" a los nodos del complemento
-  // Ref: https://forums.embarcadero.com/thread.jspa?threadID=64760
-  //DeclareNamespace('implocal', 'http://www.sat.gob.mx/implocal');
-  //RegisterChildNode('ImpuestosLocales', TFEXMLImpuestosLocales, 'http://www.sat.gob.mx/implocal');
+  RegisterChildNode('RetencionesLocales', TFEXMLImpuestosLocales_RetencionesLocales, TargetNamespace);
+  RegisterChildNode('TrasladosLocales', TFEXMLImpuestosLocales_TrasladosLocales, TargetNamespace);
 
+  fRetencionesLocales := CreateCollection(TFEXMLImpuestosLocales_RetencionesLocalesList,
+                                          IFEXMLImpuestosLocales_RetencionesLocales,
+                                          'implocal:RetencionesLocales;RetencionesLocales',
+                                          TargetNamespace) as IFEXMLImpuestosLocales_RetencionesLocalesList;
+
+  fTrasladosLocales := CreateCollection(TFEXMLImpuestosLocales_TrasladosLocalesList,
+                                        IFEXMLImpuestosLocales_TrasladosLocales,
+                                        'implocal:TrasladosLocales;TrasladosLocales',
+                                        TargetNamespace) as IFEXMLImpuestosLocales_TrasladosLocalesList;
 end;
 
 function TFEXMLImpuestosLocales.Get_Version: UnicodeString;
@@ -304,12 +316,15 @@ end;
 
 function TFEXMLImpuestosLocales_RetencionesLocalesList.Add: IFEXMLImpuestosLocales_RetencionesLocales;
 begin
-  Result := AddItem(-1) as IFEXMLImpuestosLocales_RetencionesLocales;
+  Result := Insert(-1);
 end;
 
 function TFEXMLImpuestosLocales_RetencionesLocalesList.Insert(const Index: Integer): IFEXMLImpuestosLocales_RetencionesLocales;
 begin
-  Result := AddItem(Index) as IFEXMLImpuestosLocales_RetencionesLocales;
+  Result := AddChild('implocal:RetencionesLocales',
+                     TargetNamespace,
+                     False,
+                     Index) as IFEXMLImpuestosLocales_RetencionesLocales;
 end;
 
 function TFEXMLImpuestosLocales_RetencionesLocalesList.Get_Item(Index: Integer): IFEXMLImpuestosLocales_RetencionesLocales;
@@ -353,12 +368,15 @@ end;
 
 function TFEXMLImpuestosLocales_TrasladosLocalesList.Add: IFEXMLImpuestosLocales_TrasladosLocales;
 begin
-  Result := AddItem(-1) as IFEXMLImpuestosLocales_TrasladosLocales;
+  Result := Insert(-1);
 end;
 
 function TFEXMLImpuestosLocales_TrasladosLocalesList.Insert(const Index: Integer): IFEXMLImpuestosLocales_TrasladosLocales;
 begin
-  Result := AddItem(Index) as IFEXMLImpuestosLocales_TrasladosLocales;
+  Result := AddChild('implocal:TrasladosLocales',
+                     TargetNamespace,
+                     False,
+                     Index) as IFEXMLImpuestosLocales_TrasladosLocales;
 end;
 
 function TFEXMLImpuestosLocales_TrasladosLocalesList.Get_Item(Index: Integer): IFEXMLImpuestosLocales_TrasladosLocales;

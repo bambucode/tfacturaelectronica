@@ -445,19 +445,18 @@ begin
     AgregarACadenaOriginal(impuestosLocales.TotaldeRetenciones);
     AgregarACadenaOriginal(impuestosLocales.TotaldeTraslados);
 
-    // Agregamos todos los impuestos trasladados/retenidos
-    {for I := 0 to impuestosLocales.RetencionesLocales.ChildNodes.Count - 1 do
+    for I := 0 to impuestosLocales.RetencionesLocales.Count - 1 do
     begin
-      AgregarAtributo(impuestosLocales.RetencionesLocales.ChildNodes[I], 'ImpRetTrasladado');
-      AgregarAtributo(impuestosLocales.RetencionesLocales.ChildNodes[I], 'TasadeRetencion');
-      AgregarAtributo(impuestosLocales.RetencionesLocales.ChildNodes[I], 'Importe');
-    end;  }
+      AgregarACadenaOriginal(impuestosLocales.RetencionesLocales[I].ImpLocRetenido);
+      AgregarACadenaOriginal(impuestosLocales.RetencionesLocales[I].TasadeRetencion);
+      AgregarACadenaOriginal(impuestosLocales.RetencionesLocales[I].Importe);
+    end;
 
-    for I := 0 to impuestosLocales.TrasladosLocales.ChildNodes.Count - 1 do
+    for I := 0 to impuestosLocales.TrasladosLocales.Count - 1 do
     begin
-      AgregarAtributo(impuestosLocales.TrasladosLocales.ChildNodes[I], 'ImpLocTrasladado');
-      AgregarAtributo(impuestosLocales.TrasladosLocales.ChildNodes[I], 'TasadeTraslado');
-      AgregarAtributo(impuestosLocales.TrasladosLocales.ChildNodes[I], 'Importe');
+      AgregarACadenaOriginal(impuestosLocales.TrasladosLocales[I].ImpLocTrasladado);
+      AgregarACadenaOriginal(impuestosLocales.TrasladosLocales[I].TasadeTraslado);
+      AgregarACadenaOriginal(impuestosLocales.TrasladosLocales[I].Importe);
     end;
   end;
 end;
