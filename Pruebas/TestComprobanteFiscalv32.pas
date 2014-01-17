@@ -37,6 +37,7 @@ type
     procedure setXML_DeComprobanteConImpuestosLocales_EstablezcaImpuestosCorrectamente;
     procedure AgregarImpuestoLocal_Retenido_LoGuardeEnXML;
     procedure AgregarImpuestoLocal_Trasladado_LoGuardeEnXML;
+    procedure SelloDigital_ConConfiguracionDecimalIncorrecta_NoFalle;
   end;
 
 implementation
@@ -140,7 +141,9 @@ begin
   fComprobanteFiscalv32.AgregarImpuestoLocal(nuevoImpuestoLocal);
   fComprobanteFiscalv32.AsignarImpuestosLocales;
 
+  {$IFDEF CODESITE}
   Codesite.Send('XML', fComprobanteFiscalv32.fXmlComprobante.XML);
+  {$ENDIF}
 
   CheckEquals(xmlFixture,
               fComprobanteFiscalv32.fXmlComprobante.XML,
@@ -171,7 +174,9 @@ begin
   fComprobanteFiscalv32.AgregarImpuestoLocal(nuevoImpuestoLocal);
   fComprobanteFiscalv32.AsignarImpuestosLocales;
 
+  {$IFDEF CODESITE}
   Codesite.Send('XML', fComprobanteFiscalv32.fXmlComprobante.XML);
+  {$ENDIF}
 
   CheckEquals(xmlFixture,
               fComprobanteFiscalv32.fXmlComprobante.XML,
@@ -223,6 +228,49 @@ begin
 
   CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscalv32.SelloDigital,
               'El sello digital no fue calculado correctamente');
+end;
+
+procedure TestTFEComprobanteFiscalV32.SelloDigital_ConConfiguracionDecimalIncorrecta_NoFalle;
+var
+  sSelloDigitalCorrecto: String;
+  Certificado: TFECertificado;
+  huboFalla: Boolean;
+  separadorDecimalAnterior: Char;
+  xmlFacturaGenerada: WideString;
+  comprobanteNuevo: TFEComprobanteFiscal;
+begin
+  ConfigurarCertificadoDePrueba(Certificado);
+
+  // Intentamos generar el sello
+  try
+    // Llenamos el comprobante fiscal con datos usados para generar la factura
+    LeerXMLDePruebaEnComprobante(fRutaFixtures +
+                                'comprobante_fiscal/v32/comprobante_con_impuestos_locales.xml',
+                                Certificado, fComprobanteFiscalv32);
+
+    // Creamos un comprobante para leer el XML generado con el decimal incorrecto
+    comprobanteNuevo := TFEComprobanteFiscal.Create();
+    try
+      // Leemos el XML generado con la configuracion de "DecimalSeparator" incorrecta
+      // Configuramos el decimal para que sea incorrecto forzosamente
+      separadorDecimalAnterior := DecimalSeparator;
+      DecimalSeparator := ',';
+      xmlFacturaGenerada := fComprobanteFiscalv32.XML;
+      DecimalSeparator := '.';
+      // Lo intemos leer en un nuevo comprobante
+      comprobanteNuevo.XML := xmlFacturaGenerada;
+      // Si llegamos aqui es porque no hubo falla
+      huboFalla := False;
+    except
+      huboFalla := True;
+    end;
+  finally
+    DecimalSeparator := separadorDecimalAnterior;
+    comprobanteNuevo.Free;
+  end;
+
+  CheckFalse(huboFalla,
+             'No debio haber fallado al usar una configuracion decimal incorrecta');
 end;
 
 procedure TestTFEComprobanteFiscalV32.SelloDigital_DespuesDeVariosSegundos_SeaElMismo;
@@ -439,10 +487,6 @@ begin
 
   FreeAndNil(NuevoComprobante);
 end;
-
-
-
-
 
 initialization
 

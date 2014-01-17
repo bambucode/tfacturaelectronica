@@ -1029,8 +1029,8 @@ begin
      for I := 0 to complementoImpuestosLocales.RetencionesLocales.Count - 1 do
      begin
         impuestoLocal.Nombre := complementoImpuestosLocales.RetencionesLocales[I].ImpLocRetenido;
-        impuestoLocal.Tasa := StrToFloat(complementoImpuestosLocales.RetencionesLocales[I].TasadeRetencion);
-        impuestoLocal.Importe := StrToFloat(complementoImpuestosLocales.RetencionesLocales[I].Importe);
+        impuestoLocal.Tasa := TFEReglamentacion.DeTasaImpuesto(complementoImpuestosLocales.RetencionesLocales[I].TasadeRetencion);
+        impuestoLocal.Importe := TFEReglamentacion.DeMoneda(complementoImpuestosLocales.RetencionesLocales[I].Importe);
         impuestoLocal.Tipo := tiRetenido;
         inherited AgregarImpuestoLocal(impuestoLocal);
      end;
@@ -1038,8 +1038,8 @@ begin
      for I := 0 to complementoImpuestosLocales.TrasladosLocales.Count - 1 do
      begin
         impuestoLocal.Nombre := complementoImpuestosLocales.TrasladosLocales[I].ImpLocTrasladado;
-        impuestoLocal.Tasa := StrToFloat(complementoImpuestosLocales.TrasladosLocales[I].TasadeTraslado);
-        impuestoLocal.Importe := StrToFloat(complementoImpuestosLocales.TrasladosLocales[I].Importe);
+        impuestoLocal.Tasa := TFEReglamentacion.DeTasaImpuesto(complementoImpuestosLocales.TrasladosLocales[I].TasadeTraslado);
+        impuestoLocal.Importe := TFEReglamentacion.DeMoneda(complementoImpuestosLocales.TrasladosLocales[I].Importe);
         impuestoLocal.Tipo := tiTrasladado;
         inherited AgregarImpuestoLocal(impuestoLocal);
      end;
@@ -1625,11 +1625,11 @@ begin
 
             for I := 0 to Conceptos.Count - 1 do
             begin
-                feConcepto.Cantidad:=StrToFloat(Conceptos[I].Cantidad);
+                feConcepto.Cantidad:=TFEReglamentacion.DeCantidad(Conceptos[I].Cantidad);
                 if TieneAtributo(Conceptos[I], 'unidad') then
                   feConcepto.Unidad:=Conceptos[I].Unidad;
                 feConcepto.Descripcion:=Conceptos[I].Descripcion;
-                feConcepto.ValorUnitario:=StrToFloat(Conceptos[I].ValorUnitario);
+                feConcepto.ValorUnitario:=TFEReglamentacion.DeMoneda(Conceptos[I].ValorUnitario);
                 if TieneAtributo(Conceptos[I], 'noIdentificacion') then
                   feConcepto.NoIdentificacion:=Conceptos[I].NoIdentificacion;
 
@@ -1642,7 +1642,7 @@ begin
                 for I := 0 to fXmlComprobante.Impuestos.Retenciones.Count - 1 do
                 begin
                     ImpuestoRetenido.Nombre := fXmlComprobante.Impuestos.Retenciones.Retencion[I].Impuesto;
-                    ImpuestoRetenido.Importe := StrToFloat(fXmlComprobante.Impuestos.Retenciones.Retencion[I].Importe);
+                    ImpuestoRetenido.Importe := TFEReglamentacion.DeMoneda(fXmlComprobante.Impuestos.Retenciones.Retencion[I].Importe);
                     inherited AgregarImpuestoRetenido(ImpuestoRetenido);
                 end;
 
@@ -1655,8 +1655,8 @@ begin
                   with Impuestos.Traslados do
                   begin
                     ImpuestoTrasladado.Nombre := Traslado[I].Impuesto;
-                    ImpuestoTrasladado.Tasa:= StrToFloat(Traslado[I].Tasa);
-                    ImpuestoTrasladado.Importe := StrToFloat(Traslado[I].Importe);
+                    ImpuestoTrasladado.Tasa:= TFEReglamentacion.DeTasaImpuesto(Traslado[I].Tasa);
+                    ImpuestoTrasladado.Importe := TFEReglamentacion.DeMoneda(Traslado[I].Importe);
                     inherited AgregarImpuestoTrasladado(ImpuestoTrasladado);
                   end;
                 end;
@@ -1693,11 +1693,11 @@ begin
               else
                 sMotivoDescuento:='';
 
-              Self.AsignarDescuento(StrToFloat(Descuento), sMotivoDescuento);
+              Self.AsignarDescuento(TFEReglamentacion.DeMoneda(Descuento), sMotivoDescuento);
             end;
 
             // Asignamos el subtotal de la factura
-            inherited SubTotal := StrToFloat(Subtotal);
+            inherited SubTotal := TFEReglamentacion.DeMoneda(Subtotal);
 
             // Leemos los complementos
             if TieneHijo(fXmlComprobante, 'Complemento') then
@@ -1728,9 +1728,7 @@ begin
     except
         On E:Exception do
         begin
-          {$IFDEF DEBUG}
-              ShowMessage(E.Message);
-          {$ENDIF}
+
           Raise Exception.Create(E.Message);
         end;
     end;
