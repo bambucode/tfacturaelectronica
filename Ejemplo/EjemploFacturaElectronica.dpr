@@ -168,7 +168,7 @@ begin
       // Definimos todos los conceptos que incluyo la factura
       Concepto1.Cantidad:=10.25;
       Concepto1.Unidad:='Kilo';
-      Concepto1.Descripcion:='Arroz blanco precocido';
+      Concepto1.Descripcion:='Arroz blanco precocido (con caractéres inválidos: |&<>''")';
       Concepto1.ValorUnitario:=12.23;
       Factura.AgregarConcepto(Concepto1);
 
