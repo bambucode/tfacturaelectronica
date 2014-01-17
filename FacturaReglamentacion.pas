@@ -187,6 +187,9 @@ begin
     // En el caso del > se deberá usar la secuencia &gt;
     // En el caso del ‘ se deberá usar la secuencia &apos;
 
+    // No es permitido el caracter de | en las cadenas (entra en conflicto con la generación de la Cadena Original)
+    sCadenaEscapada := StringReplace(sCadenaEscapada, '|', '', [rfReplaceAll]);
+
     // Si se presentan nuevas reglas para los Strings en el XML, incluirlas aqui
 
     Result:=sCadenaEscapada;

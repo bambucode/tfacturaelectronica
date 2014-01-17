@@ -190,6 +190,7 @@
 			<DCCReference Include="..\PACs\Ecodex\EcodexWsClientes.pas"/>
 			<DCCReference Include="..\PACs\Ecodex\EcodexWsComun.pas"/>
 			<DCCReference Include="..\PACs\ManejadorDeErroresComunes.pas"/>
+			<DCCReference Include="..\CFD\FEImpuestosLocales.pas"/>
 			<RcCompile Include="..\CadenaOriginalTimbre.rc">
 				<Form>CadenaOriginalTimbre.res</Form>
 			</RcCompile>
@@ -207,7 +208,7 @@
 		</ItemGroup>
 		<ItemGroup/>
 		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
-		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+		<Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
 	</Project>
 
 <!-- EurekaLog First Line
