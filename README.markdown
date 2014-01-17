@@ -1,8 +1,6 @@
-﻿TFACTURACIONELECTRONICA v1.1 (Beta) 
-===================================
-Con soporte para CFD 2.2 y CFDI 3.2     
+﻿TFACTURACIONELECTRONICA v1.2 (Beta) 
 --------------------------------------
-Esta es una librería que sirve para generar una factura electrónica de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
+Esta es una librería que sirve para generar una factura electrónica (CFDI) de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
 El propósito es servir como una libreria gratuita, de código abierto, de fácil uso en la cual con el esfuerzo de la comunidad siempre esté actualizada y funcional.
 
@@ -38,6 +36,7 @@ Proveedores Autorizados de Certificación (PAC) Soportados
 
 Completado
 -------------
+- Implementar soporte para impuestos locales/estatales. <Enero 2014>
 - Implementar la version 3.2 de los CFD (o comprobantes digitales en linea) con colaboración de Ing. Pablo Torres - <Completado a finales de Noviembre 2013>
 - Implementar soporte para la versión 2.2 de CFD - Completado Junio 2012.
 - Implementar la lectura de un CFD y que al mismo tiempo verifique si es válido o no. <- Completado 12 Dic 2010>
@@ -70,4 +69,4 @@ Colaboradores actuales.
 -------------
 * Ing. Luis Carrasco - Bambú Code SA de CV - <http://github.com/lcarrasco>
 * Ing. Eduardo  Padilla - Bambú Code SA de CV - <https://github.com/epadillac>
-*  Ing. Pablo Torres - <http://www.tecsisnet.net>
+* Ing. Pablo Torres - <http://www.tecsisnet.net>

@@ -28,6 +28,7 @@ type
       fResultado: TStringCadenaOriginal;
       fVersionCFD: TFEVersionComprobante;
       const _PIPE = '|';
+      procedure AgregarACadenaOriginal(const aValor: String);
       function RemoverExcesoEspacios(const s: string): String;
       function LimpiaCampo(sTexto: String): String;
 
@@ -47,6 +48,7 @@ type
       procedure AgregarRegimenesFiscales(const aRegimenesFiscales: IXMLComprobante_Emisor_RegimenFiscalList);
       procedure AgregarUbicacion(Ubicacion: IFEXmlT_Ubicacion);
       procedure AgregarUbicacionFiscal(Ubicacion: IFEXmlT_UbicacionFiscal);
+      procedure ProcesarImpuestosLocales;
   public
       constructor Create(Comprobante: IFEXMLComprobante; aVersionCFD:
           TFEVersionComprobante); overload;
@@ -58,6 +60,8 @@ implementation
 
 uses SysUtils,
      StrUtils,
+     RegularExpressions,
+     FEImpuestosLocales,
      {$IFDEF CODESITE}
      FacturacionHashes,
      CodeSiteLogging,
@@ -72,6 +76,17 @@ begin
     inherited Create;
     fXMLComprobante:=Comprobante;
     fVersionCFD:=aVersionCFD;
+end;
+
+procedure TCadenaOriginal.AgregarACadenaOriginal(const aValor: String);
+var
+  valorValidado: String;
+begin
+  valorValidado:=LimpiaCampo(aValor);
+  // Checamos que no sea vacio el valor...
+  if Trim(valorValidado) <> '' then
+    // Lo agregamos a la variable interna de la clase
+    fResultado := fResultado + valorValidado + _PIPE;
 end;
 
 // Funcion usada para remover los espacios internos
@@ -129,8 +144,6 @@ begin
 end;
 
 procedure TCadenaOriginal.AgregarAtributo(NodoPadre: IXMLNode; sNombreAtributo: String);
-var
-  sValor: String;
 begin
   // 5. Los datos opcionales no expresados, no aparecerán en la cadena original y no tendrán delimitador alguno.
   // Si se nos fue especificado un nodo "padre" checamos si tiene al atributo hijo
@@ -138,11 +151,7 @@ begin
   if Assigned(NodoPadre) then
     if NodoPadre.HasAttribute(sNombreAtributo) then
     begin
-      sValor:=LimpiaCampo(NodoPadre.AttributeNodes[sNombreAtributo].Text);
-      // Checamos que no sea vacio el valor...
-      if Trim(sValor) <> '' then
-        // Lo agregamos a la variable interna de la clase
-        fResultado := fResultado + sValor + _PIPE;
+      AgregarACadenaOriginal(NodoPadre.AttributeNodes[sNombreAtributo].Text);
     end;
 end;
 
@@ -376,7 +385,15 @@ begin
               end;
 
 
-     AgregarAtributo(fXmlComprobante.Impuestos, 'totalImpuestosTrasladados');
+      AgregarAtributo(fXmlComprobante.Impuestos, 'totalImpuestosTrasladados');
+
+      // Generamos la cadena original de los complementos
+      if Assigned(fXmlComprobante.ChildNodes.FindNode('Complemento')) then
+      begin
+        ProcesarImpuestosLocales;
+
+         // TODO: Procesar otros complementos que se tengan que incluir en la cadena original
+      end;
 
       // 6. El final de la cadena original será expresado mediante una cadena de caracteres || (doble “pipe”).
       // 7. Toda la cadena de original se encuentra expresada en el formato de codificación UTF-8.
@@ -390,6 +407,58 @@ begin
       CodeSite.Send('SHA1 Cadena Original',
                     UpperCase(TFacturacionHashing.CalcularHash(Result, haSHA1)));
       {$ENDIF}
+end;
+
+procedure TCadenaOriginal.ProcesarImpuestosLocales;
+var
+  I: Integer;
+  nodoImpuestosLocales : IXMLNode;
+  xmlImpuestosLocales: String;
+  IXMLDoc: IXMLDocument;
+  impuestosLocales: IFEXMLImpuestosLocales;
+  nodoComplemento: IFEXmlComplemento;
+  trasladoLocal: IFEXMLImpuestosLocales_TrasladosLocales;
+const
+  _CADENA_XML_INICIO_IMPUESTOS_LOCALES = '<implocal:ImpuestosLocales';
+  _CADENA_XML_FIN_IMPUESTOS_LOCALES    = '</implocal:ImpuestosLocales>';
+begin
+  nodoComplemento := fXmlComprobante.Complemento;
+
+  // NOTA: Por algun motivo se origina un AV al tratar de obtener el nodo con el siguiente código
+//  if nodoComplemento <> nil then
+//    nodoImpuestosLocales := nodoComplemento.ChildNodes.FindNode('ImpuestosLocales');
+
+  // Extraemos el XML del nodo de impuestos locales
+  xmlImpuestosLocales := Trim(TRegEx.Match(nodoComplemento.XML,
+                                           '<implocal:ImpuestosLocales.*</implocal:ImpuestosLocales>').Value);
+
+  // Solo procesamos los impuestos si existio dicho nodo
+  if (xmlImpuestosLocales <> '') then
+  begin
+    // Convertimos el XML leido a su instancia de TXMLDocument
+    IXMLDoc := LoadXMLData(xmlImpuestosLocales);
+    impuestosLocales := NuevoNodoImpuestosLocales(IXMLDoc);
+
+    // De acuerdo a http://www.sat.gob.mx/cfd/implocal/implocal.xslt el orden en que deberán aparecer es el
+    // siguiente:
+    AgregarACadenaOriginal(impuestosLocales.Version);
+    AgregarACadenaOriginal(impuestosLocales.TotaldeRetenciones);
+    AgregarACadenaOriginal(impuestosLocales.TotaldeTraslados);
+
+    for I := 0 to impuestosLocales.RetencionesLocales.Count - 1 do
+    begin
+      AgregarACadenaOriginal(impuestosLocales.RetencionesLocales[I].ImpLocRetenido);
+      AgregarACadenaOriginal(impuestosLocales.RetencionesLocales[I].TasadeRetencion);
+      AgregarACadenaOriginal(impuestosLocales.RetencionesLocales[I].Importe);
+    end;
+
+    for I := 0 to impuestosLocales.TrasladosLocales.Count - 1 do
+    begin
+      AgregarACadenaOriginal(impuestosLocales.TrasladosLocales[I].ImpLocTrasladado);
+      AgregarACadenaOriginal(impuestosLocales.TrasladosLocales[I].TasadeTraslado);
+      AgregarACadenaOriginal(impuestosLocales.TrasladosLocales[I].Importe);
+    end;
+  end;
 end;
 
 

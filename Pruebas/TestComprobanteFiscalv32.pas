@@ -34,6 +34,10 @@ type
     procedure GuardarEnArchivo_DeComprobanteTimbrado_GenereXMLIgualAlLeido;
     procedure setXML_DeComprobanteTimbrado_AsignePropiedadesDelTimbre;
     procedure setXML_DeComprobanteV32_EstablezcaLasPropiedadesCorrectamente;
+    procedure setXML_DeComprobanteConImpuestosLocales_EstablezcaImpuestosCorrectamente;
+    procedure AgregarImpuestoLocal_Retenido_LoGuardeEnXML;
+    procedure AgregarImpuestoLocal_Trasladado_LoGuardeEnXML;
+    procedure SelloDigital_ConConfiguracionDecimalIncorrecta_NoFalle;
   end;
 
 implementation
@@ -42,6 +46,9 @@ uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
   DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
   FacturacionHashes,
+  {$IFDEF CODESITE}
+  CodeSiteLogging,
+  {$ENDIF}
   FacturaReglamentacion,
   UtileriasPruebas;
 
@@ -115,6 +122,70 @@ begin
               'La cadena original no fue generada correctamente');
 end;
 
+procedure TestTFEComprobanteFiscalV32.AgregarImpuestoLocal_Retenido_LoGuardeEnXML;
+var
+  xmlFixture: WideString;
+  totalImpuestosLocalesRetenidosAnterior: Currency;
+  nuevoImpuestoLocal: TFEImpuestoLocal;
+begin
+  xmlFixture := leerContenidoDeFixture('comprobante_fiscal/v32/agregarimpuestolocal_retenido.xml');
+
+  totalImpuestosLocalesRetenidosAnterior := fComprobanteFiscalv32.TotalImpuestosLocalesRetenidos;
+
+  nuevoImpuestoLocal.Nombre := 'ISH';
+  nuevoImpuestoLocal.Tasa := 3;
+  nuevoImpuestoLocal.Importe := 100;
+  nuevoImpuestoLocal.Tipo := tiRetenido;
+
+  //**********************************************
+  fComprobanteFiscalv32.AgregarImpuestoLocal(nuevoImpuestoLocal);
+  fComprobanteFiscalv32.AsignarImpuestosLocales;
+
+  {$IFDEF CODESITE}
+  Codesite.Send('XML', fComprobanteFiscalv32.fXmlComprobante.XML);
+  {$ENDIF}
+
+  CheckEquals(xmlFixture,
+              fComprobanteFiscalv32.fXmlComprobante.XML,
+              'El contenido XML del comprobante no incluyo los impuestos retenidos locales correctamente');
+
+  CheckEquals(totalImpuestosLocalesRetenidosAnterior + nuevoImpuestoLocal.Importe,
+              fComprobanteFiscalv32.TotalImpuestosLocalesRetenidos,
+              'El total de los impuestos locales retenidos no se le sumo el total del nuevo impuesto local');
+end;
+
+procedure
+    TestTFEComprobanteFiscalV32.AgregarImpuestoLocal_Trasladado_LoGuardeEnXML;
+var
+  xmlFixture: WideString;
+  totalImpuestosLocalesTrasladadosAnterior: Currency;
+  nuevoImpuestoLocal: TFEImpuestoLocal;
+begin
+  xmlFixture := leerContenidoDeFixture('comprobante_fiscal/v32/agregarimpuestolocal_trasladado.xml');
+
+  totalImpuestosLocalesTrasladadosAnterior := fComprobanteFiscalv32.TotalImpuestosLocalesTrasladados;
+
+  nuevoImpuestoLocal.Nombre := 'IVA';
+  nuevoImpuestoLocal.Tasa := 16;
+  nuevoImpuestoLocal.Importe := 100;
+  nuevoImpuestoLocal.Tipo := tiTrasladado;
+
+  //**********************************************
+  fComprobanteFiscalv32.AgregarImpuestoLocal(nuevoImpuestoLocal);
+  fComprobanteFiscalv32.AsignarImpuestosLocales;
+
+  {$IFDEF CODESITE}
+  Codesite.Send('XML', fComprobanteFiscalv32.fXmlComprobante.XML);
+  {$ENDIF}
+
+  CheckEquals(xmlFixture,
+              fComprobanteFiscalv32.fXmlComprobante.XML,
+              'El contenido XML del comprobante no incluyo los impuestos trasladados locales correctamente');
+
+  CheckEquals(totalImpuestosLocalesTrasladadosAnterior + nuevoImpuestoLocal.Importe,
+              fComprobanteFiscalv32.TotalImpuestosLocalesTrasladados,
+              'El total de los impuestos locales trasladados no se le sumo el total del nuevo impuesto local');
+end;
 
 procedure TestTFEComprobanteFiscalV32.SelloDigital_DeMilConceptos_SeaCorrecto;
 var
@@ -157,6 +228,49 @@ begin
 
   CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscalv32.SelloDigital,
               'El sello digital no fue calculado correctamente');
+end;
+
+procedure TestTFEComprobanteFiscalV32.SelloDigital_ConConfiguracionDecimalIncorrecta_NoFalle;
+var
+  sSelloDigitalCorrecto: String;
+  Certificado: TFECertificado;
+  huboFalla: Boolean;
+  separadorDecimalAnterior: Char;
+  xmlFacturaGenerada: WideString;
+  comprobanteNuevo: TFEComprobanteFiscal;
+begin
+  ConfigurarCertificadoDePrueba(Certificado);
+
+  // Intentamos generar el sello
+  try
+    // Llenamos el comprobante fiscal con datos usados para generar la factura
+    LeerXMLDePruebaEnComprobante(fRutaFixtures +
+                                'comprobante_fiscal/v32/comprobante_con_impuestos_locales.xml',
+                                Certificado, fComprobanteFiscalv32);
+
+    // Creamos un comprobante para leer el XML generado con el decimal incorrecto
+    comprobanteNuevo := TFEComprobanteFiscal.Create();
+    try
+      // Leemos el XML generado con la configuracion de "DecimalSeparator" incorrecta
+      // Configuramos el decimal para que sea incorrecto forzosamente
+      separadorDecimalAnterior := DecimalSeparator;
+      DecimalSeparator := ',';
+      xmlFacturaGenerada := fComprobanteFiscalv32.XML;
+      DecimalSeparator := '.';
+      // Lo intemos leer en un nuevo comprobante
+      comprobanteNuevo.XML := xmlFacturaGenerada;
+      // Si llegamos aqui es porque no hubo falla
+      huboFalla := False;
+    except
+      huboFalla := True;
+    end;
+  finally
+    DecimalSeparator := separadorDecimalAnterior;
+    comprobanteNuevo.Free;
+  end;
+
+  CheckFalse(huboFalla,
+             'No debio haber fallado al usar una configuracion decimal incorrecta');
 end;
 
 procedure TestTFEComprobanteFiscalV32.SelloDigital_DespuesDeVariosSegundos_SeaElMismo;
@@ -231,6 +345,25 @@ begin
      CheckNotEquals('',
                   fComprobanteFiscalv32.Timbre.XML,
                   'El XML del timbre fue vacio!');
+end;
+
+procedure TestTFEComprobanteFiscalV32.setXML_DeComprobanteConImpuestosLocales_EstablezcaImpuestosCorrectamente;
+var
+  contenidoXML: WideString;
+  Certificado: TFECertificado;
+  fComprobanteComparacion:  TFEComprobanteFiscal;
+begin
+  ConfigurarCertificadoDePrueba(Certificado);
+
+  // Leemos el XML de nuestro Fixture en memoria
+  contenidoXML := leerContenidoDeFixture('comprobante_fiscal/v32/comprobante_con_impuestos_locales.xml');
+
+  // Leemos el XML en nuestro comprobante
+  fComprobanteFiscalv32.XML:=UTF8ToString(contenidoXML);
+
+  // Corroboramos tener los impuestos configurados correctamente
+  CheckTrue(Length(fComprobanteFiscalv32.ImpuestosLocales) > 0,
+            'Se debio de haber tenido al menos 1 impuesto local');
 end;
 
 procedure
@@ -354,8 +487,6 @@ begin
 
   FreeAndNil(NuevoComprobante);
 end;
-
-
 
 initialization
 

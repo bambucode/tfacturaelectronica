@@ -900,12 +900,14 @@ end;
 
 function TFEXmlConceptos.Add: IFEXmlConcepto;
 begin
-  Result := AddItem(-1) as IFEXmlConcepto;
+  //Result := AddItem(-1) as IFEXmlConcepto;
+  Result := AddChild(ItemTag, ItemNS, True, -1) as IFEXMLConcepto; //Nueva forma para versiones de delphi XE?
 end;
 
 function TFEXmlConceptos.Insert(const Index: Integer): IFEXmlConcepto;
 begin
-  Result := AddItem(Index) as IFEXmlConcepto;
+  //Result := AddItem(Index) as IFEXmlConcepto;
+  Result := AddChild(ItemTag, ItemNS, True, Index) as IFEXMLConcepto;
 end;
 
 { TFEXmlConcepto }

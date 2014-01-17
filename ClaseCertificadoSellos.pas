@@ -47,8 +47,10 @@ type
 implementation
 
 uses SysUtils,
-     ClaseOpenSSL,
-     CodeSiteLogging;
+     {$IFDEF CODESITE}
+     CodeSiteLogging,
+     {$ENDIF}
+     ClaseOpenSSL;
 
 constructor TCertificadoSellos.Create(const aRutaCertificado: String);
 const
@@ -130,6 +132,12 @@ begin
 
     moduloLlavePrivada := openSSL.ObtenerModulusDeLlavePrivada(aLlavePrivada.Ruta, aLlavePrivada.Clave);
     moduloCertificado := openSSL.ObtenerModulusDeCertificado(fCertificadoFacturas.Ruta);
+
+    {$IFDEF CODESITE}
+    CodeSite.Send('Modulus Llave Privada', moduloLlavePrivada);
+    CodeSite.Send('Modulus Certificado', moduloCertificado);
+    CodeSite.Send('¿Son Pareja?', moduloCertificado = moduloLlavePrivada);
+    {$ENDIF}
 
     Result := (moduloLlavePrivada = moduloCertificado);
   finally

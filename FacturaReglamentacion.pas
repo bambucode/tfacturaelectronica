@@ -18,6 +18,10 @@ interface
 type
 
   TFEReglamentacion = class
+  private
+      class procedure CorregirConfiguracionRegionalLocal;
+      class procedure RegresarConfiguracionRegionalLocal;
+  public
       /// <summary>Convierte el valor de moneda al formato de dinero requerido por el SAT
       /// </summary>
       /// <param name="Monto">Monto a convertir al formato aceptado por el SAT</param>
@@ -27,14 +31,42 @@ type
       class function ComoFechaHora(dtFecha: TDateTime) : String;
       class function DeFechaHoraISO8601(const aFechaISO8601: String) : TDateTime;
       class function ComoFechaAduanera(dtFecha: TDateTime) : String;
-      class function ComoTasaImpuesto(dTasa: Double) : String;
+      class function ComoTasaImpuesto(dTasa: Double; const aDecimalesDefault: Integer
+          = 6): String;
       class function ComoDateTime(sFechaISO8601: String): TDateTime;
       class function ComoFechaHoraInforme(dtFecha: TDateTime) : String;
+      class function DeTasaImpuesto(const aCadenaTasa: String) : Double;
+      class function DeCantidad(const aCadenaCatidad: String) : Double;
+      class function DeMoneda(const aMoneda : String) : Currency;
   end;
+
+var
+  separadorDecimalAnterior: Char;
 
 implementation
 
-uses SysUtils, DateUtils {$IF Compilerversion >= 20} ,Soap.XSBuiltIns {$ELSE} , XSBuiltIns {$IFEND};
+uses DateUtils,
+     {$IF Compilerversion >= 20}
+     Soap.XSBuiltIns,
+     {$ELSE}
+     XSBuiltIns,
+     {$IFEND}
+     SysUtils;
+
+
+class procedure TFEReglamentacion.CorregirConfiguracionRegionalLocal;
+begin
+  // Debido a que si el usuario en la PC tiene una configuración regional incorrecta
+  // los XMLs se generan con montos y cantidades inválidas
+  separadorDecimalAnterior := DecimalSeparator;
+  // Indicamos que el separador Decimal será el punto
+  DecimalSeparator := '.';
+end;
+
+class procedure TFEReglamentacion.RegresarConfiguracionRegionalLocal;
+begin
+  DecimalSeparator := separadorDecimalAnterior;
+end;
 
 // Segun las reglas del SAT:
 // "Se expresa en la forma aaaa-mm-ddThh:mm:ss, de acuerdo con la especificación ISO 8601"
@@ -93,17 +125,51 @@ begin
    // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
    // http://www.sat.gob.mx/cfd/3/cfdv32.xsd
    // http://www.sat.gob.mx/cfd/2/cfdv22.xsd
-   Result:=CurrToStrF(dMonto, ffFixed, aDecimalesDefault);
+   try
+      CorregirConfiguracionRegionalLocal;
+      Result:=CurrToStrF(dMonto, ffFixed, aDecimalesDefault);
+   finally
+      RegresarConfiguracionRegionalLocal;
+   end;
 end;
 
-class function TFEReglamentacion.ComoTasaImpuesto(dTasa: Double) : String;
-const
-  _NUMERO_DECIMALES_TASA = 6;
+class function TFEReglamentacion.ComoTasaImpuesto(dTasa: Double; const
+    aDecimalesDefault: Integer = 6): String;
 begin
    // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
    // http://www.sat.gob.mx/cfd/3/cfdv32.xsd
    // http://www.sat.gob.mx/cfd/2/cfdv22.xsd
-   Result:=FloatToStrF(dTasa,ffFixed, 10, _NUMERO_DECIMALES_TASA);
+   try
+     CorregirConfiguracionRegionalLocal;
+     Result:=FloatToStrF(dTasa,ffFixed, 10, aDecimalesDefault);
+   finally
+     RegresarConfiguracionRegionalLocal;
+   end;
+end;
+
+class function TFEReglamentacion.DeTasaImpuesto(const aCadenaTasa: String) : Double;
+begin
+  Result := TFEReglamentacion.DeCantidad(aCadenaTasa);
+end;
+
+class function TFEReglamentacion.DeCantidad(const aCadenaCatidad: String) : Double;
+begin
+  try
+     CorregirConfiguracionRegionalLocal;
+     Result:=StrToFloat(aCadenaCatidad);
+  finally
+     RegresarConfiguracionRegionalLocal;
+  end;
+end;
+
+class function TFEReglamentacion.DeMoneda(const aMoneda : String) : Currency;
+begin
+  try
+     CorregirConfiguracionRegionalLocal;
+     Result:=StrToCurr(aMoneda);
+  finally
+     RegresarConfiguracionRegionalLocal;
+  end;
 end;
 
 // Las cadenas usadas en el XML deben de escapar caracteres incorrectos
@@ -130,10 +196,15 @@ class function TFEReglamentacion.ComoCantidad(dCantidad: Double) : String;
 begin
    // Las cantidades cerradas las regresamos sin decimales
    // las que tienen fracciones con 2 digitos decimales...
-   if Frac(dCantidad) > 0 then
-      Result:=FloatToStrF(dCantidad,ffFixed,10,2)
-   else
-      Result:=IntToStr(Round(dCantidad));
+   try
+     CorregirConfiguracionRegionalLocal;
+     if Frac(dCantidad) > 0 then
+        Result:=FloatToStrF(dCantidad,ffFixed,10,2)
+     else
+        Result:=IntToStr(Round(dCantidad));
+   finally
+     RegresarConfiguracionRegionalLocal;
+   end;
 end;
 
 end.
