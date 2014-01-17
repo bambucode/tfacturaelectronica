@@ -1,4 +1,4 @@
-﻿TFACTURACIONELECTRONICA v1.1 (Beta) 
+﻿TFACTURACIONELECTRONICA v1.2 (Beta) 
 --------------------------------------
 Esta es una librería que sirve para generar una factura electrónica (CFDI) de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
