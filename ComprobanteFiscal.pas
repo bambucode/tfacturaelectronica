@@ -125,6 +125,7 @@ type
     function GetTimbre: TFETimbre;
     procedure LeerImpuestosLocales;
     procedure LeerVersionDeComprobanteLeido(const aDocumentoXML: WideString);
+    function ObtenerFechaHoraDeGeneracionActual: TDateTime;
     procedure ValidarCamposEmisor;
     procedure ValidarCamposReceptor;
   protected
@@ -913,11 +914,11 @@ begin
       // defina la fecha/hora en que se "genero" el comprobante
       // para que sea el mismo que se uso al haber sido generado con el MicroE
       if (_USAR_HORA_REAL = True) then
-         FechaGeneracion:=Now;
+         FechaGeneracion:=ObtenerFechaHoraDeGeneracionActual;
     {$ELSE}
         // Si ya fue generada la factura (por ejemplo cuando se lee)
         if (fAutoAsignarFechaGeneracion = True) then
-          FechaGeneracion := Now;
+          FechaGeneracion := ObtenerFechaHoraDeGeneracionActual;
     {$ENDIF}
 
     // Verificamos que la fecha sea valida
@@ -1774,6 +1775,17 @@ begin
   if fXmlComprobante = nil then
     raise EFEVersionComprobanteNoSoportadaException.Create('No es posible leer un CFD/I con version "' + cadenaVersion +
                                                            '" ya que esta versión del programa no es capaz de leerla');
+end;
+
+function TFEComprobanteFiscal.ObtenerFechaHoraDeGeneracionActual: TDateTime;
+const
+  _SEGUNDOS_A_RESTAR = -30;
+begin
+  // Debido a que la fecha de generación NO puede ser mayor que la hora de la Cd. de México,
+  // en ocasiones aunque la hora "este correcta" al mandarla al PAC se genera un error 401
+  // en que la fecha/hora están fuera de rango. Para evitar este tipo de fallas, restamos 30 segundos
+  // a la fecha de generación para evitar esta falla cuando la diferencia entre la PC y el PAC es mínima
+  Result := DateUtils.IncSecond(Now, _SEGUNDOS_A_RESTAR);
 end;
 
 procedure TFEComprobanteFiscal.ValidarCamposEmisor;
