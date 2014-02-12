@@ -811,7 +811,8 @@ begin
       fCertificadoTexto:=certificadoSellos.ComoBase64;
 
   finally
-    certificadoSellos.Free;
+    if Assigned(certificadoSellos) then
+      FreeAndNil(certificadoSellos);
   end;
 end;
 
