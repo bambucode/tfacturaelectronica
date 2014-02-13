@@ -57,7 +57,9 @@ uses
   EcodexWsClientes in '..\PACs\Ecodex\EcodexWsClientes.pas',
   EcodexWsComun in '..\PACs\Ecodex\EcodexWsComun.pas',
   ManejadorDeErroresComunes in '..\PACs\ManejadorDeErroresComunes.pas',
-  FEImpuestosLocales in '..\CFD\FEImpuestosLocales.pas';
+  FEImpuestosLocales in '..\CFD\FEImpuestosLocales.pas',
+  ClaseCertificadoSellos in '..\ClaseCertificadoSellos.pas',
+  uWSHelper in '..\uWSHelper.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
