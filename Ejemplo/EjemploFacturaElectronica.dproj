@@ -193,6 +193,7 @@
         <DCCReference Include="..\CFD\FEImpuestosLocales.pas"/>
         <DCCReference Include="..\ClaseCertificadoSellos.pas"/>
         <DCCReference Include="..\uWSHelper.pas"/>
+        <DCCReference Include="..\PACs\ComercioDigital\PACComercioDigital.pas"/>
         <RcCompile Include="..\CadenaOriginalTimbre.rc">
             <Form>CadenaOriginalTimbre.res</Form>
         </RcCompile>

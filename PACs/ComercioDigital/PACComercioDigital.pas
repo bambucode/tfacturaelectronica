@@ -69,6 +69,7 @@ type
   function RealizarCancelacionREST(const URL : string; const aDocumentoXML: TTipoComprobanteXML): TTipoComprobanteXML;
   function ValidarXML(const xmlFile : TFileName) : String; //unicamente valida la estructura del xml solo se usaria para desarrollo
 public
+  constructor Create();
   destructor Destroy(); override;
   procedure AfterConstruction; override;
   procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); override;
@@ -131,6 +132,8 @@ end;
 //unicamente valida la estructura del xml solo se usaria para desarrollo
 
 procedure TPACComercioDigital.ProcesarCodigoDeError(aRespuestaDePAC: String);
+var
+  mensajeExcepcion: string;
 Const
 _ERROR_CD_PETICION_VACIA                           = '001';
 _ERROR_CD_TAMANO_PETICION_GRANDE                   = '002';
@@ -156,52 +159,53 @@ _ERROR_CD_FOLIO_NO_APLICA_CANCELACION              = '204';
 _ERROR_CD_FOLIO_NO_EXISTE                          = '205';
 
 begin
-  if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, mensajeExcepcion) > _NO_ECONTRADO then
-    raise EPACServicioNoDisponibleException.Create(mensajeExcepcion, 0, True);
 
-  if AnsiPos(_ERROR_SAT_XML_INVALIDO, mensajeExcepcion) > _NO_ECONTRADO then
-    raise  ETimbradoXMLInvalidoException.Create(mensajeExcepcion, 301, False);
-
-  if AnsiPos(_ERROR_SAT_SELLO_EMISOR_INVALIDO, mensajeExcepcion) > _NO_ECONTRADO then
-    raise ETimbradoSelloEmisorInvalidoException.Create(mensajeExcepcion, 302, False);
-
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
-    raise ETimbradoCertificadoNoCorrespondeException.Create(mensajeExcepcion, 303, False);
-
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_REVOCADO, mensajeExcepcion) > _NO_ECONTRADO then
-    raise ETimbradoCertificadoRevocadoException.Create(mensajeExcepcion, 304, False);
-
-  if AnsiPos(_ERROR_SAT_FECHA_EMISION_SIN_VIGENCIA, mensajeExcepcion) > _NO_ECONTRADO then
-    raise ETimbradoFechaEmisionSinVigenciaException.Create(mensajeExcepcion, 305, False);
-
-  if AnsiPos(_ERROR_SAT_LLAVE_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
-    raise ETimbradoLlaveInvalidaException.Create(mensajeExcepcion, 306, False);
-
-  if AnsiPos(_ERROR_SAT_PREVIAMENTE_TIMBRADO, mensajeExcepcion) > _NO_ECONTRADO then
-    raise ETimbradoPreviamenteException.Create(mensajeExcepcion, 307, False);
-
-  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_FIRMADO_POR_SAT, mensajeExcepcion) > _NO_ECONTRADO then
-    raise ETimbradoCertificadoApocrifoException.Create(mensajeExcepcion, 308, False);
-
-  if AnsiPos(_ERROR_SAT_FECHA_FUERA_DE_RANGO, mensajeExcepcion) > _NO_ECONTRADO then
-    raise ETimbradoFechaGeneracionMasDe72HorasException.Create(mensajeExcepcion, 401, False);
-
-  if AnsiPos(_ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO, mensajeExcepcion) > _NO_ECONTRADO then
-    raise ETimbradoRegimenEmisorNoValidoException.Create(mensajeExcepcion, 402, False);
-
-  if AnsiPos(_ERROR_SAT_FECHA_EMISION_EN_EL_PASADO, mensajeExcepcion) > _NO_ECONTRADO then
-    raise ETimbradoFechaEnElPasadoException.Create(mensajeExcepcion, 403, False);
-
-  if AnsiPos(_ECODEX_RFC_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
-    raise EPACTimbradoRFCNoCorrespondeException.Create('El RFC del documento y el del emisor no corresponden', 0, False);
-
-  if AnsiPos(_ECODEX_VERSION_NO_SOPORTADA, mensajeExcepcion) > _NO_ECONTRADO then
-    raise EPACTimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
-                                                              mensajeExcepcion, 0, False);
+//  if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise EPACServicioNoDisponibleException.Create(mensajeExcepcion, 0, True);
+//
+//  if AnsiPos(_ERROR_SAT_XML_INVALIDO, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise  ETimbradoXMLInvalidoException.Create(mensajeExcepcion, 301, False);
+//
+//  if AnsiPos(_ERROR_SAT_SELLO_EMISOR_INVALIDO, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise ETimbradoSelloEmisorInvalidoException.Create(mensajeExcepcion, 302, False);
+//
+//  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise ETimbradoCertificadoNoCorrespondeException.Create(mensajeExcepcion, 303, False);
+//
+//  if AnsiPos(_ERROR_SAT_CERTIFICADO_REVOCADO, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise ETimbradoCertificadoRevocadoException.Create(mensajeExcepcion, 304, False);
+//
+//  if AnsiPos(_ERROR_SAT_FECHA_EMISION_SIN_VIGENCIA, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise ETimbradoFechaEmisionSinVigenciaException.Create(mensajeExcepcion, 305, False);
+//
+//  if AnsiPos(_ERROR_SAT_LLAVE_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise ETimbradoLlaveInvalidaException.Create(mensajeExcepcion, 306, False);
+//
+//  if AnsiPos(_ERROR_SAT_PREVIAMENTE_TIMBRADO, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise ETimbradoPreviamenteException.Create(mensajeExcepcion, 307, False);
+//
+//  if AnsiPos(_ERROR_SAT_CERTIFICADO_NO_FIRMADO_POR_SAT, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise ETimbradoCertificadoApocrifoException.Create(mensajeExcepcion, 308, False);
+//
+//  if AnsiPos(_ERROR_SAT_FECHA_FUERA_DE_RANGO, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise ETimbradoFechaGeneracionMasDe72HorasException.Create(mensajeExcepcion, 401, False);
+//
+//  if AnsiPos(_ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise ETimbradoRegimenEmisorNoValidoException.Create(mensajeExcepcion, 402, False);
+//
+//  if AnsiPos(_ERROR_SAT_FECHA_EMISION_EN_EL_PASADO, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise ETimbradoFechaEnElPasadoException.Create(mensajeExcepcion, 403, False);
+//
+//  if AnsiPos(_ECODEX_RFC_NO_CORRESPONDE, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise EPACTimbradoRFCNoCorrespondeException.Create('El RFC del documento y el del emisor no corresponden', 0, False);
+//
+//  if AnsiPos(_ECODEX_VERSION_NO_SOPORTADA, mensajeExcepcion) > _NO_ECONTRADO then
+//    raise EPACTimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
+//                                                              mensajeExcepcion, 0, False);
 
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
   // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
-  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, True);
+//  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, True);
 
 /// errores generados de este pac
   if AnsiPos(_ERROR_CD_PETICION_VACIA, aRespuestaDePAC) > -1 then
@@ -271,7 +275,8 @@ begin
     raise ECDErrorFolioNoExiste.Create(aRespuestaDePAC+' Folio Fiscal no existe');
 
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
-  raise ETimbradoErrorGenericoException.Create(aRespuestaDePAC);
+  // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
+  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
 end;
 
 function TPACComercioDigital.ValidarXML(const xmlFile : TFileName) : String;
@@ -386,9 +391,9 @@ begin
    res.Add('UUID='+ExtraerUUID(aDocumentoXML));
    res.Add('USER='+EncodeURL(fCredenciales.RFC));
    res.Add('PWDW='+EncodeURL(fCredenciales.Clave));
-//   res.Add('CERT='+EncodeF(fCredenciales.Certificado.Ruta));
-//   res.Add('KEYF='+EncodeF(fCredenciales.Certificado.LlavePrivada.Ruta));
-//   res.Add('PWDK='+EncodeURL(fCredenciales.Certificado.LlavePrivada.Clave));
+   res.Add('CERT='+EncodeF(fCredenciales.Certificado.Ruta));
+   res.Add('KEYF='+EncodeF(fCredenciales.Certificado.LlavePrivada.Ruta));
+   res.Add('PWDK='+EncodeURL(fCredenciales.Certificado.LlavePrivada.Clave));
    res.Add('ACUS=SI');
   {$IF Compilerversion >= 20}
    resultadoAPI := TStringStream.Create;
@@ -472,7 +477,9 @@ begin
      nodoCancelacion := GetAcuse(fDocumentoXMLCancelado);
     // Paso 3. Validamos haber recibido la cancelación correctamente
     if nodoCancelacion.Folios.EstatusUUID<>201 then
-     ProcesarCodigoDeError(IntToStr(nodoCancelacion.Folios.EstatusUUID));
+     ProcesarCodigoDeError(IntToStr(nodoCancelacion.Folios.EstatusUUID))
+    else
+      Result:= True;
   except
     On E:Exception do
     begin
@@ -482,5 +489,10 @@ begin
   end;
 end;
 
+
+constructor TPACComercioDigital.Create;
+begin
+  inherited;
+end;
 
 end.
