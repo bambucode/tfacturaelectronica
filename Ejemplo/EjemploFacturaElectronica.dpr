@@ -57,7 +57,10 @@ uses
   EcodexWsClientes in '..\PACs\Ecodex\EcodexWsClientes.pas',
   EcodexWsComun in '..\PACs\Ecodex\EcodexWsComun.pas',
   ManejadorDeErroresComunes in '..\PACs\ManejadorDeErroresComunes.pas',
-  FEImpuestosLocales in '..\CFD\FEImpuestosLocales.pas';
+  FEImpuestosLocales in '..\CFD\FEImpuestosLocales.pas',
+  ClaseCertificadoSellos in '..\ClaseCertificadoSellos.pas',
+  uWSHelper in '..\uWSHelper.pas',
+  PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
@@ -224,11 +227,13 @@ begin
       try
         CredencialesPAC.RFC   := Emisor.RFC;
         CredencialesPAC.Clave := 'PWD';
+        //CredencialesPac.Certificado:= Certificado;  // Si queremos usar a Comercio Digital solo des-comentamos aqui
 
         // Este es el "ID de Integrador" de pruebas de Ecodex
         CredencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
         // Asignamos nuestras credenciales de acceso con el PAC (en caso de Ecodex asignamos la credencial como usuario e integrador)
         ProveedorTimbrado.AsignarCredenciales(CredencialesPAC, CredencialesPAC);
+        //ProveedorTimbrado.AsignarCredenciales(CredencialesPAC);  // Si queremos usar a Comercio Digital solo des-comentamos aqui
         // Mandamos timbrar el documento al PAC
         TimbreDeFactura := ProveedorTimbrado.TimbrarDocumento(Factura.XML);
 
