@@ -128,6 +128,7 @@ type
     function ObtenerFechaHoraDeGeneracionActual: TDateTime;
     procedure ValidarCamposEmisor;
     procedure ValidarCamposReceptor;
+    procedure ValidarCertificado;
   protected
     fFueTimbrado: Boolean;
     procedure GenerarComprobante;
@@ -774,46 +775,8 @@ begin
 end;
 
 procedure TFEComprobanteFiscal.setCertificado(Certificado: TFECertificado);
-var
-  certificadoSellos: TCertificadoSellos;
 begin
-  // Ya que tenemos los datos del certificado, lo procesamos para obtener los datos
-  // necesarios
-  try
-    certificadoSellos := TCertificadoSellos.Create(Certificado.Ruta);
-
-    // Checamos que el certificado este dentro de la vigencia
-    if Not certificadoSellos.Vigente then
-      raise EFECertificadoNoVigente.Create('El certificado no tiene vigencia actual');
-
-    // Solo realizamos las validaciones del certificado y llave privada si así se especificó
-    if fValidarCertificadoYLlavePrivada then
-    begin
-      // Checamos que el certificado no sea el de la FIEL
-      if Not (certificadoSellos.Tipo = tcSellos) then
-        raise EFECertificadoNoEsDeSellosException.Create('El certificado leido no es de sellos' );
-
-      // Checamos que la Llave Privada sea pareja del Certificado
-      if Not certificadoSellos.esParejaDe(Certificado.LlavePrivada) then
-        raise EFELlavePrivadaNoCorrespondeACertificadoException.Create('La llave privada no corresponde al certificado');
-    end;
-
-    // Almacenamos la propiedad interna del certificado
-    fCertificado := certificadoSellos.paraFacturar;
-    fCertificado.LlavePrivada := Certificado.LlavePrivada;
-
-    // Ya procesado llenamos su propiedad en el XML
-    Assert(Assigned(fXmlComprobante), 'El Nodo comprobante no est asignado!');
-    fXmlComprobante.NoCertificado := fCertificado.NumeroSerie;
-
-    // Incluir el certificado en el XML?
-    if bIncluirCertificadoEnXML = True then
-      fCertificadoTexto:=certificadoSellos.ComoBase64;
-
-  finally
-    if Assigned(certificadoSellos) then
-      FreeAndNil(certificadoSellos);
-  end;
+  fCertificado := Certificado;
 end;
 
 // Asignamos la serie, el no y año de aprobacion al XML...
@@ -1200,6 +1163,8 @@ begin
   else
   begin
       fSelloDigitalCalculado:='';
+
+      ValidarCertificado;
 
       // Si tiene activada la opcion de "VerificarRFCDelCertificado" checamos que el
       // RFC del emisor del CFD corresponda al RFC para el que fue generado el Emisor
@@ -1817,6 +1782,52 @@ begin
        if Trim((inherited Receptor).Direccion.Pais) = '' then
         raise EFEAtributoRequeridoNoPresenteException.Create('Se debe especificar el pais del Receptor');
     end;
+  end;
+end;
+
+procedure TFEComprobanteFiscal.ValidarCertificado;
+var
+  certificadoSellos: TCertificadoSellos;
+  llavePrivadaOriginal: TFELlavePrivada;
+begin
+  // Ya que tenemos los datos del certificado, lo procesamos para obtener los datos
+  // necesarios
+  try
+    llavePrivadaOriginal := fCertificado.LlavePrivada;
+    certificadoSellos := TCertificadoSellos.Create(fCertificado.Ruta);
+
+    // Checamos que el certificado este dentro de la vigencia
+    if Not certificadoSellos.Vigente then
+      raise EFECertificadoNoVigente.Create('El certificado no tiene vigencia actual');
+
+    // Solo realizamos las validaciones del certificado y llave privada si así se especificó
+    if fValidarCertificadoYLlavePrivada then
+    begin
+      // Checamos que el certificado no sea el de la FIEL
+      if Not (certificadoSellos.Tipo = tcSellos) then
+        raise EFECertificadoNoEsDeSellosException.Create('El certificado leido no es de sellos' );
+
+      // Checamos que la Llave Privada sea pareja del Certificado
+      if Not certificadoSellos.esParejaDe(Certificado.LlavePrivada) then
+        raise EFELlavePrivadaNoCorrespondeACertificadoException.Create('La llave privada no corresponde al certificado');
+    end;
+
+    // Sobre escribimos el certificado interno con las propiedades obtenidas con la clase
+    // TCertificadoSellos...
+    fCertificado := certificadoSellos.paraFacturar;
+    fCertificado.LlavePrivada := llavePrivadaOriginal;
+
+    // Ya procesado llenamos su propiedad en el XML
+    Assert(Assigned(fXmlComprobante), 'El Nodo comprobante no est asignado!');
+    fXmlComprobante.NoCertificado := fCertificado.NumeroSerie;
+
+    // Incluir el certificado en el XML?
+    if bIncluirCertificadoEnXML = True then
+      fCertificadoTexto:=certificadoSellos.ComoBase64;
+
+  finally
+    if Assigned(certificadoSellos) then
+      FreeAndNil(certificadoSellos);
   end;
 end;
 
