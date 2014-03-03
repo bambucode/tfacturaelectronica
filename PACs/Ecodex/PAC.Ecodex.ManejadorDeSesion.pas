@@ -48,7 +48,7 @@ procedure TEcodexManejadorDeSesion.AfterConstruction;
 begin
   inherited;
   // Obtenemos la instancia del WebService de Sesion usando el dominio especificado por el usuario
-  wsSeguridad := GetWsEcodexSeguridad(False, 'http://10.0.1.103:12046' + '/ServicioSeguridad.svc');
+  wsSeguridad := GetWsEcodexSeguridad(False, fDominioWebService + '/ServicioSeguridad.svc');
 end;
 
 procedure TEcodexManejadorDeSesion.AsignarCredenciales(const aCredenciales: TFEPACCredenciales);

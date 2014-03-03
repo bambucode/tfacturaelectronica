@@ -56,6 +56,7 @@ type
  TPACEcodex = class(TProveedorAutorizadoCertificacion)
  private
   fDominioWebService : string;
+  fDominioWebServiceSeguridad : string;
   fIdTransaccionInicial: Integer;
   fCredenciales : TFEPACCredenciales;
   fCredencialesIntegrador : TFEPACCredenciales;
@@ -85,8 +86,11 @@ public
   property UltimoXMLEnviado: string read GetUltimoXMLEnviado;
   property UltimoXMLRecibido: string read GetUltimoXMLRecibido;
   property Nombre : String read getNombre;
-  constructor Create(const aDominioWebService : String); overload;
-  constructor Create(const aDominioWebService : String; const aIdTransaccionInicial: Integer); overload;
+  constructor Create(const aDominioWebService: String; const
+      aDominioWebServiceSeguridad: String = ''); overload;
+  constructor Create(const aDominioWebService: String; const
+      aIdTransaccionInicial: Integer; aDominioWebServiceSeguridad: String = '');
+      overload;
   function AgregarTimbres(const aRFC: String; const aTimbresAAsignar: Integer):
       Integer;
 end;
@@ -103,17 +107,25 @@ uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
      {$ENDIF}
      FacturaReglamentacion;
 
-constructor TPACEcodex.Create(const aDominioWebService : String);
+constructor TPACEcodex.Create(const aDominioWebService: String; const
+    aDominioWebServiceSeguridad: String = '');
 begin
   inherited;
 
   // Obtenemos el dominio del WS que usaremos
   fDominioWebService := aDominioWebService;
+
+  // Si el segundo parametro, el de seguridad no fue definido usamos el mismo que el de timbrado
+  if aDominioWebServiceSeguridad = '' then
+    fDominioWebServiceSeguridad := aDominioWebService
+  else
+    fDominioWebServiceSeguridad := aDominioWebServiceSeguridad;
 end;
 
-constructor TPACEcodex.Create(const aDominioWebService : String; const aIdTransaccionInicial: Integer);
+constructor TPACEcodex.Create(const aDominioWebService: String; const
+    aIdTransaccionInicial: Integer; aDominioWebServiceSeguridad: String = '');
 begin
-  Create(aDominioWebService);
+  Create(aDominioWebService, aDominioWebServiceSeguridad);
   // Establecemos el id de transaccion inicial para todas las operaciones
   fIdTransaccionInicial := aIdTransaccionInicial;
 end;
@@ -123,7 +135,7 @@ begin
   // Obtenemos una instancia del WebService de Timbrado de Ecodex
   wsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
   wsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService + '/ServicioClientes.svc');
-  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService, fIdTransaccionInicial);
+  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebServiceSeguridad, fIdTransaccionInicial);
 end;
 
 function TPACEcodex.getNombre() : string;
