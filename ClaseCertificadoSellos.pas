@@ -25,6 +25,8 @@ type
     fx509Certificado : TX509Certificate;
     fTipoCertificado : TFETipoCertificado;
     fCertificadoFacturas: TFECertificado;
+    FFueLeido: Boolean;
+    FRazonNoLeido: String;
     FVigenteDesde: TDateTime;
     FVigenteHasta: TDateTime;
     function GetComoBase64: String;
@@ -42,14 +44,16 @@ type
     property Vigente: Boolean read GetVigente;
     property VigenteDesde: TDateTime read FVigenteDesde;
     property VigenteHasta: TDateTime read FVigenteHasta;
+    property FueLeido: Boolean read FFueLeido;
+    property RazonNoLeido: String read FRazonNoLeido;
   end;
 
 implementation
 
 uses SysUtils,
-     {$IFDEF CODESITE}
+     {.$IFDEF CODESITE}
      CodeSiteLogging,
-     {$ENDIF}
+     {.$ENDIF}
      ClaseOpenSSL;
 
 constructor TCertificadoSellos.Create(const aRutaCertificado: String);
@@ -60,12 +64,25 @@ const
 var
   rfcDelCertificado: String;
 begin
+  fRazonNoLeido := '';
+  AppStartup;
   fx509Certificado := TX509Certificate.Create;
   try
     if Not FileExists(aRutaCertificado) then
-      raise EFECertificadoNoExisteException.Create('No existe el archivo del certificado: ' + aRutaCertificado)
-    else
-      fx509Certificado.LoadFromFile(aRutaCertificado);
+      raise EFECertificadoNoExisteException.Create('No existe el archivo del certificado: ' + aRutaCertificado);
+
+    try
+       fx509Certificado.LoadFromFile(aRutaCertificado);
+    except
+       On E:Exception do
+       begin
+          fRazonNoLeido := E.Message;
+          CodeSite.SendException(E);
+          raise;
+       end;
+    end;
+
+    FFueLeido := True;
 
     fCertificadoFacturas.Ruta := aRutaCertificado;
 
@@ -98,12 +115,10 @@ begin
      // Pasamos la excepcion tal y como esta
      On E: Exception do
      begin
+        FFueLeido := False;
         FreeAndNil(fx509Certificado);
         // Checamos los posibles errores
-        if AnsiPos(_ERROR_LECTURA_CERTIFICADO, E.Message) > 0 then
-            raise EFECertificadoNoFueLeidoException.Create('No fue posible leer el certificado: ' + E.Message)
-        else
-            raise;
+        fRazonNoLeido := E.Message + ' (' + GetErrorMessage() + ')';
      end;
   end;
 end;

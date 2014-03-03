@@ -1793,8 +1793,11 @@ begin
   // Ya que tenemos los datos del certificado, lo procesamos para obtener los datos
   // necesarios
   try
-    llavePrivadaOriginal := fCertificado.LlavePrivada;
     certificadoSellos := TCertificadoSellos.Create(fCertificado.Ruta);
+    llavePrivadaOriginal := fCertificado.LlavePrivada;
+
+    if Not certificadoSellos.FueLeido then
+      raise  EFECertificadoNoFueLeidoException.Create('No fue posible leer el certificado: ' + certificadoSellos.RazonNoLeido);
 
     // Checamos que el certificado este dentro de la vigencia
     if Not certificadoSellos.Vigente then
