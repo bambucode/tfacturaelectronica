@@ -51,21 +51,26 @@ uses DateUtils,
      {$ELSE}
      XSBuiltIns,
      {$IFEND}
-     SysUtils;
+     SysUtils, Windows;
 
 
 class procedure TFEReglamentacion.CorregirConfiguracionRegionalLocal;
+var
+  fs: TFormatSettings;
 begin
   // Debido a que si el usuario en la PC tiene una configuración regional incorrecta
   // los XMLs se generan con montos y cantidades inválidas
-  separadorDecimalAnterior := DecimalSeparator;
+  GetLocaleFormatSettings(LOCALE_SYSTEM_DEFAULT, fs);
+  separadorDecimalAnterior := fs.DecimalSeparator;
   // Indicamos que el separador Decimal será el punto
-  DecimalSeparator := '.';
+  fs.DecimalSeparator := '.';
 end;
 
 class procedure TFEReglamentacion.RegresarConfiguracionRegionalLocal;
+var
+  fs: TFormatSettings;
 begin
-  DecimalSeparator := separadorDecimalAnterior;
+  fs.DecimalSeparator := separadorDecimalAnterior;
 end;
 
 // Segun las reglas del SAT:

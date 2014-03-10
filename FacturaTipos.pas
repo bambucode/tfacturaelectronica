@@ -174,6 +174,7 @@ TFEPACCredenciales = record
   RFC: string;
   Clave: String;
   DistribuidorID: string; // Usado por algunos PAC para la comunicacion (Ej: Ecodex)
+  Certificado: TFECertificado;
 end;
 
 EFECertificadoNoExisteException = class(Exception);

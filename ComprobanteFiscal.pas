@@ -590,22 +590,11 @@ begin
   begin
     RFC := Trim((inherited Receptor).RFC);
 
-    // Si es un CFD de venta al publico en general o extranjeros no incluimos nombre ni direccion
-    if ((Rfc <> _RFC_VENTA_PUBLICO_EN_GENERAL) And (Rfc <> _RFC_VENTA_EXTRANJEROS)) then
-    begin
-        Nombre := TFEReglamentacion.ComoCadena((inherited Receptor).Nombre);
+    Nombre := TFEReglamentacion.ComoCadena((inherited Receptor).Nombre);
 
-        // Agregamos el domicilio fiscal del Receptor
-        if (inherited Receptor).Direccion.Calle <> '' then
-          AgregarDireccionFiscalv32(Domicilio, (inherited Receptor).Direccion);
-    end else
-        // Si es Publico en General solo agregamos el pais al nodo Direccion
-        // cualquier otra cosa generara un CFD invalido.
-        if (Rfc = _RFC_VENTA_PUBLICO_EN_GENERAL) then
-          Domicilio.Pais:='México'
-        else // Si es el RFC de extranjero ahi si obtenemos el pais del que se nos haya asignado...
-          fXmlComprobante.Receptor.Domicilio.Pais := TFEReglamentacion.ComoCadena((inherited Receptor).Direccion.Pais);
-
+    // Agregamos el domicilio fiscal del Receptor
+    if (inherited Receptor).Direccion.Calle <> '' then
+      AgregarDireccionFiscalv32(Domicilio, (inherited Receptor).Direccion);
   end;
 end;
 

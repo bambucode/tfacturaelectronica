@@ -28,7 +28,7 @@ type
 implementation
 
 uses
-  CodeSiteLogging, System.SysUtils;
+  {$IFDEF CODESITE}CodeSiteLogging, {$ENDIF}System.SysUtils;
 
 procedure TWSHelper.BeforeExecute(const MethodName: string; SOAPRequest: TStream);
 var
