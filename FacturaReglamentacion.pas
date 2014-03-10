@@ -27,8 +27,8 @@ type
       /// <summary>Convierte el valor de moneda al formato de dinero requerido por el SAT
       /// </summary>
       /// <param name="Monto">Monto a convertir al formato aceptado por el SAT</param>
-      class function ComoMoneda(var dMonto: Currency; const aDecimalesDefault:
-          Integer = 6): String;
+      class function ComoMoneda(dMonto: Currency; const aDecimalesDefault: Integer =
+          6): String;
       class function ComoCadena(sCadena: String) : String;
       class function ComoCantidad(dCantidad: Double) : String;
       class function ComoFechaHora(dtFecha: TDateTime) : String;
@@ -131,7 +131,7 @@ begin
    Result := FormatDateTime('yyyy-mm-dd', dtFecha);
 end;
 
-class function TFEReglamentacion.ComoMoneda(var dMonto: Currency; const
+class function TFEReglamentacion.ComoMoneda(dMonto: Currency; const
     aDecimalesDefault: Integer = 6): String;
 begin
    // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
