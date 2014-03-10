@@ -20,12 +20,15 @@ type
   TFEReglamentacion = class
   private
       class procedure CorregirConfiguracionRegionalLocal;
+      class procedure ReemplazarComaSiActuaComoPuntoDecimal(var aCadenaCatidad:
+          String);
       class procedure RegresarConfiguracionRegionalLocal;
   public
       /// <summary>Convierte el valor de moneda al formato de dinero requerido por el SAT
       /// </summary>
       /// <param name="Monto">Monto a convertir al formato aceptado por el SAT</param>
-      class function ComoMoneda(dMonto: Currency; const aDecimalesDefault: Integer = 6): String;
+      class function ComoMoneda(var dMonto: Currency; const aDecimalesDefault:
+          Integer = 6): String;
       class function ComoCadena(sCadena: String) : String;
       class function ComoCantidad(dCantidad: Double) : String;
       class function ComoFechaHora(dtFecha: TDateTime) : String;
@@ -36,12 +39,16 @@ type
       class function ComoDateTime(sFechaISO8601: String): TDateTime;
       class function ComoFechaHoraInforme(dtFecha: TDateTime) : String;
       class function DeTasaImpuesto(const aCadenaTasa: String) : Double;
-      class function DeCantidad(const aCadenaCatidad: String) : Double;
-      class function DeMoneda(const aMoneda : String) : Currency;
+      class function DeCantidad(aCadenaCatidad: String): Double;
+      class function DeMoneda(aMoneda: String): Currency;
   end;
 
 var
   separadorDecimalAnterior: Char;
+
+const
+  _PUNTO_DECIMAL = '.';
+  _COMA_DECIMAL  = ',';
 
 implementation
 
@@ -63,7 +70,7 @@ begin
   GetLocaleFormatSettings(LOCALE_SYSTEM_DEFAULT, fs);
   separadorDecimalAnterior := fs.DecimalSeparator;
   // Indicamos que el separador Decimal será el punto
-  fs.DecimalSeparator := '.';
+  fs.DecimalSeparator := _PUNTO_DECIMAL;
 end;
 
 class procedure TFEReglamentacion.RegresarConfiguracionRegionalLocal;
@@ -124,7 +131,7 @@ begin
    Result := FormatDateTime('yyyy-mm-dd', dtFecha);
 end;
 
-class function TFEReglamentacion.ComoMoneda(dMonto: Currency; const
+class function TFEReglamentacion.ComoMoneda(var dMonto: Currency; const
     aDecimalesDefault: Integer = 6): String;
 begin
    // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
@@ -157,20 +164,22 @@ begin
   Result := TFEReglamentacion.DeCantidad(aCadenaTasa);
 end;
 
-class function TFEReglamentacion.DeCantidad(const aCadenaCatidad: String) : Double;
+class function TFEReglamentacion.DeCantidad(aCadenaCatidad: String): Double;
 begin
   try
      CorregirConfiguracionRegionalLocal;
+     ReemplazarComaSiActuaComoPuntoDecimal(aCadenaCatidad);
      Result:=StrToFloat(aCadenaCatidad);
   finally
      RegresarConfiguracionRegionalLocal;
   end;
 end;
 
-class function TFEReglamentacion.DeMoneda(const aMoneda : String) : Currency;
+class function TFEReglamentacion.DeMoneda(aMoneda: String): Currency;
 begin
   try
      CorregirConfiguracionRegionalLocal;
+     ReemplazarComaSiActuaComoPuntoDecimal(aMoneda);
      Result:=StrToCurr(aMoneda);
   finally
      RegresarConfiguracionRegionalLocal;
@@ -213,6 +222,16 @@ begin
    finally
      RegresarConfiguracionRegionalLocal;
    end;
+end;
+
+class procedure TFEReglamentacion.ReemplazarComaSiActuaComoPuntoDecimal(var
+    aCadenaCatidad: String);
+begin
+  // Reemplazamos cualquier coma por el simbolo de punto
+  aCadenaCatidad := StringReplace(aCadenaCatidad,
+                                  _COMA_DECIMAL,
+                                  _PUNTO_DECIMAL,
+                                  [rfReplaceAll]);
 end;
 
 end.
