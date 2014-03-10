@@ -600,6 +600,7 @@ end;
 
 procedure TFEComprobanteFiscal.AsignarContenidoCertificado;
 begin
+    ValidarCertificado;
     if Trim(fCertificadoTexto) <> '' then
        fXmlComprobante.Certificado := TFEReglamentacion.ComoCadena(fCertificadoTexto);
 end;
