@@ -234,7 +234,7 @@ procedure TestTFEComprobanteFiscalV32.SelloDigital_ConConfiguracionDecimalIncorr
 var
   sSelloDigitalCorrecto: String;
   Certificado: TFECertificado;
-  huboFalla: Boolean;
+  textoFalla: String;
   separadorDecimalAnterior: Char;
   xmlFacturaGenerada: WideString;
   comprobanteNuevo: TFEComprobanteFiscal;
@@ -248,6 +248,7 @@ begin
                                 'comprobante_fiscal/v32/comprobante_con_impuestos_locales.xml',
                                 Certificado, fComprobanteFiscalv32);
 
+    textoFalla := '';
     // Creamos un comprobante para leer el XML generado con el decimal incorrecto
     comprobanteNuevo := TFEComprobanteFiscal.Create();
     try
@@ -257,19 +258,20 @@ begin
       DecimalSeparator := ',';
       xmlFacturaGenerada := fComprobanteFiscalv32.XML;
       DecimalSeparator := '.';
+      xmlFacturaGenerada := fComprobanteFiscalv32.XML;
       // Lo intemos leer en un nuevo comprobante
       comprobanteNuevo.XML := xmlFacturaGenerada;
-      // Si llegamos aqui es porque no hubo falla
-      huboFalla := False;
     except
-      huboFalla := True;
+      on E:Exception do
+        textoFalla := E.Message;
     end;
   finally
     DecimalSeparator := separadorDecimalAnterior;
     comprobanteNuevo.Free;
   end;
 
-  CheckFalse(huboFalla,
+  CheckEquals('',
+              textoFalla,
              'No debio haber fallado al usar una configuracion decimal incorrecta');
 end;
 
