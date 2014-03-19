@@ -27,7 +27,7 @@ type
       /// <summary>Convierte el valor de moneda al formato de dinero requerido por el SAT
       /// </summary>
       /// <param name="Monto">Monto a convertir al formato aceptado por el SAT</param>
-      class function ComoMoneda(dMonto: Currency; const aDecimalesDefault: Integer =
+      class function ComoMoneda(aMonto: Currency; const aDecimalesDefault: Integer =
           6): String;
       class function ComoCadena(sCadena: String) : String;
       class function ComoCantidad(dCantidad: Double) : String;
@@ -131,7 +131,7 @@ begin
    Result := FormatDateTime('yyyy-mm-dd', dtFecha);
 end;
 
-class function TFEReglamentacion.ComoMoneda(dMonto: Currency; const
+class function TFEReglamentacion.ComoMoneda(aMonto: Currency; const
     aDecimalesDefault: Integer = 6): String;
 begin
    // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
@@ -139,7 +139,7 @@ begin
    // http://www.sat.gob.mx/cfd/2/cfdv22.xsd
    try
       CorregirConfiguracionRegionalLocal;
-      Result:=CurrToStrF(dMonto, ffFixed, aDecimalesDefault);
+      Result:=CurrToStrF(aMonto, ffFixed, aDecimalesDefault);
    finally
       RegresarConfiguracionRegionalLocal;
    end;
