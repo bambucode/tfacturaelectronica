@@ -56,12 +56,14 @@ type
  TPACEcodex = class(TProveedorAutorizadoCertificacion)
  private
   fDominioWebService : string;
-  fDominioWebServiceSeguridad : string;
+  fDominioWebServiceSeguridad: string;
+  fDominioWebServiceRespaldo: string;
   fIdTransaccionInicial: Integer;
   fCredenciales : TFEPACCredenciales;
   fCredencialesIntegrador : TFEPACCredenciales;
   wsClientesEcodex : IEcodexServicioClientes;
   wsTimbradoEcodex: IEcodexServicioTimbrado;
+  wsTimbradoEcodexRespaldo: IEcodexServicioTimbrado;
   fManejadorDeSesion : TEcodexManejadorDeSesion;
   FUltimoXMLEnviado: string;
   fUltimoXMLRecibido: string;
@@ -86,11 +88,12 @@ public
   property UltimoXMLEnviado: string read GetUltimoXMLEnviado;
   property UltimoXMLRecibido: string read GetUltimoXMLRecibido;
   property Nombre : String read getNombre;
-  constructor Create(const aDominioWebService: String; const
-      aDominioWebServiceSeguridad: String = ''); overload;
-  constructor Create(const aDominioWebService: String; const
-      aIdTransaccionInicial: Integer; aDominioWebServiceSeguridad: String = '');
+  constructor Create(const aDominioWebService: string;
+      const aDominioWebServiceSeguridad: string = ''; const aDominioWebServiceRespaldo: String = '');
       overload;
+  constructor Create(const aDominioWebService: String; const
+      aIdTransaccionInicial: Integer; const aDominioWebServiceSeguridad: string =
+      ''; const aDominioWebServiceRespaldo: string = ''); overload;
   function AgregarTimbres(const aRFC: String; const aTimbresAAsignar: Integer):
       Integer;
 end;
@@ -107,25 +110,27 @@ uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
      {$ENDIF}
      FacturaReglamentacion;
 
-constructor TPACEcodex.Create(const aDominioWebService: String; const
-    aDominioWebServiceSeguridad: String = '');
+constructor TPACEcodex.Create(const aDominioWebService: string;
+      const aDominioWebServiceSeguridad: string = ''; const aDominioWebServiceRespaldo: String = '');
 begin
   inherited;
 
   // Obtenemos el dominio del WS que usaremos
   fDominioWebService := aDominioWebService;
 
-  // Si el segundo parametro, el de seguridad no fue definido usamos el mismo que el de timbrado
-  if aDominioWebServiceSeguridad = '' then
-    fDominioWebServiceSeguridad := aDominioWebService
+  if aDominioWebServiceSeguridad <> '' then
+    fDominioWebServiceSeguridad := aDominioWebServiceSeguridad
   else
-    fDominioWebServiceSeguridad := aDominioWebServiceSeguridad;
+    fDominioWebServiceSeguridad := aDominioWebService;
+
+  fDominioWebServiceRespaldo := aDominioWebServiceRespaldo;
 end;
 
 constructor TPACEcodex.Create(const aDominioWebService: String; const
-    aIdTransaccionInicial: Integer; aDominioWebServiceSeguridad: String = '');
+    aIdTransaccionInicial: Integer; const aDominioWebServiceSeguridad: string =
+    ''; const aDominioWebServiceRespaldo: string = '');
 begin
-  Create(aDominioWebService, aDominioWebServiceSeguridad);
+  Create(aDominioWebService, aDominioWebServiceSeguridad, aDominioWebServiceRespaldo);
   // Establecemos el id de transaccion inicial para todas las operaciones
   fIdTransaccionInicial := aIdTransaccionInicial;
 end;
@@ -136,6 +141,9 @@ begin
   wsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
   wsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService + '/ServicioClientes.svc');
   fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebServiceSeguridad, fIdTransaccionInicial);
+
+  if fDominioWebServiceRespaldo <> '' then
+    wsTimbradoEcodexRespaldo := GetWsEcodexTimbrado(False, fDominioWebServiceRespaldo + '/ServicioTimbrado.svc');
 end;
 
 function TPACEcodex.getNombre() : string;
@@ -370,7 +378,18 @@ begin
     except
       On E:Exception do
       begin
-        ProcesarExcepcionDePAC(E);
+        // Verificamos si tenemos configurado un ws de respaldo para cancelacion
+        if (fDominioWebServiceRespaldo <> '') and (AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, E.Message) > 0) and (Assigned(wsTimbradoEcodexRespaldo)) then 
+          try
+            respuestaCancelacion := wsTimbradoEcodexRespaldo.CancelaTimbrado(solicitudCancelacion);
+          except
+            on E2:Exception do 
+            begin
+              ProcesarExcepcionDePAC(E2);
+            end;
+          end          
+        else        
+          ProcesarExcepcionDePAC(E);
       end;
     end;
   finally
