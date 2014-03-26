@@ -904,12 +904,12 @@ end;
 
 function TXMLComprobante_Emisor_RegimenFiscalList.Add: IXMLComprobante_Emisor_RegimenFiscal;
 begin
-  Result := AddItem(-1) as IXMLComprobante_Emisor_RegimenFiscal;
+  Result := AddChild(ItemTag, ItemNS, True, -1) as IXMLComprobante_Emisor_RegimenFiscal;
 end;
 
 function TXMLComprobante_Emisor_RegimenFiscalList.Insert(const Index: Integer): IXMLComprobante_Emisor_RegimenFiscal;
 begin
-  Result := AddItem(Index) as IXMLComprobante_Emisor_RegimenFiscal;
+  Result :=AddChild(ItemTag, ItemNS, True, Index) as IXMLComprobante_Emisor_RegimenFiscal;
 end;
 
 function TXMLComprobante_Emisor_RegimenFiscalList.GetItem(Index: Integer): IXMLComprobante_Emisor_RegimenFiscal;

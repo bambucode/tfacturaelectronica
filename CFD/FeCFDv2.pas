@@ -1269,12 +1269,12 @@ end;
 
 function TFEXmlTraslados.Add: IFEXmlTraslado;
 begin
-  Result := AddItem(-1) as IFEXmlTraslado;
+  Result := AddChild(ItemTag, ItemNS, True, -1) as IFEXmlTraslado;
 end;
 
 function TFEXmlTraslados.Insert(const Index: Integer): IFEXmlTraslado;
 begin
-  Result := AddItem(Index) as IFEXmlTraslado;
+  Result := AddChild(ItemTag, ItemNS, True, Index) as IFEXmlTraslado;
 end;
 
 { TFEXmlTraslado }
