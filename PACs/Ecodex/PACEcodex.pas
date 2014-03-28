@@ -89,11 +89,12 @@ public
   property UltimoXMLRecibido: string read GetUltimoXMLRecibido;
   property Nombre : String read getNombre;
   constructor Create(const aDominioWebService: string;
-      const aDominioWebServiceSeguridad: string = ''; const aDominioWebServiceRespaldo: String = '');
-      overload;
-  constructor Create(const aDominioWebService: String; const
-      aIdTransaccionInicial: Integer; const aDominioWebServiceSeguridad: string =
-      ''; const aDominioWebServiceRespaldo: string = ''); overload;
+                     const aDominioWebServiceSeguridad: string = '';
+                     const aDominioWebServiceRespaldo: String = ''); overload;
+  constructor Create(const aDominioWebService: String;
+                     const aIdTransaccionInicial: Integer;
+                     const aDominioWebServiceSeguridad: string = '';
+                     const aDominioWebServiceRespaldo: string = ''); overload;
   function AgregarTimbres(const aRFC: String; const aTimbresAAsignar: Integer):
       Integer;
 end;
@@ -126,9 +127,10 @@ begin
   fDominioWebServiceRespaldo := aDominioWebServiceRespaldo;
 end;
 
-constructor TPACEcodex.Create(const aDominioWebService: String; const
-    aIdTransaccionInicial: Integer; const aDominioWebServiceSeguridad: string =
-    ''; const aDominioWebServiceRespaldo: string = '');
+constructor TPACEcodex.Create(const aDominioWebService: String;
+                              const aIdTransaccionInicial: Integer;
+                              const aDominioWebServiceSeguridad: string = '';
+                              const aDominioWebServiceRespaldo: string = '');
 begin
   Create(aDominioWebService, aDominioWebServiceSeguridad, aDominioWebServiceRespaldo);
   // Establecemos el id de transaccion inicial para todas las operaciones
