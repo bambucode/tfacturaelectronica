@@ -343,6 +343,9 @@ var
   mensajeFalla, tokenDeUsuario: String;
   solicitudCancelacion : TEcodexSolicitudCancelacion;
   respuestaCancelacion : TEcodexRespuestaCancelacion;
+  solicitudCancelacionRespaldo: TEcodexSolicitudCancelacion;
+  tokenDeUsuarioRespaldo: String;
+  manejadorDeSesionRespaldo: TEcodexManejadorDeSesion;
 
   function ExtraerUUID(const aDocumentoTimbrado: TTipoComprobanteXML) : String;
   const
@@ -381,7 +384,26 @@ begin
         // Verificamos si tenemos configurado un ws de respaldo para cancelacion
         if (fDominioWebServiceRespaldo <> '') and (AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, E.Message) > 0) and (Assigned(wsTimbradoEcodexRespaldo)) then 
           try
-            respuestaCancelacion := wsTimbradoEcodexRespaldo.CancelaTimbrado(solicitudCancelacion);
+            // 1. Creamos la solicitud de cancelacion
+            solicitudCancelacionRespaldo := TEcodexSolicitudCancelacion.Create;
+
+            // 2. Creamos una sesion en el servidor de respaldo
+            manejadorDeSesionRespaldo := TEcodexManejadorDeSesion.Create(fDominioWebServiceRespaldo, fIdTransaccionInicial);
+
+            // 3. Iniciamos una nueva sesion solicitando un nuevo token
+            manejadorDeSesionRespaldo.AsignarCredenciales(fCredenciales);
+            tokenDeUsuarioRespaldo := manejadorDeSesionRespaldo.ObtenerNuevoTokenDeUsuario;
+
+            // 4. Llenamos la nueva solicitud de cancelacion
+            solicitudCancelacionRespaldo.RFC := fCredenciales.RFC;
+            solicitudCancelacionRespaldo.Token := tokenDeUsuarioRespaldo;
+            solicitudCancelacionRespaldo.TransaccionID := manejadorDeSesionRespaldo.NumeroDeTransaccion;
+
+            // Ecodex solo requiere que le enviemos el UUID del timbre anterior, lo extraemos para enviarlo
+            solicitudCancelacionRespaldo.UUID := ExtraerUUID(aDocumento);
+
+            // 5. Mandamos cancelar en el WS de respaldo
+            respuestaCancelacion := wsTimbradoEcodexRespaldo.CancelaTimbrado(solicitudCancelacionRespaldo);
           except
             on E2:Exception do 
             begin
