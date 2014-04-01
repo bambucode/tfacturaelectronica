@@ -605,7 +605,7 @@ begin
 
       // 5. Mandamos cancelar en el WS de respaldo
       wsTimbradoEcodexRespaldo := GetWsEcodexTimbrado(False, fDominioWebServiceRespaldo + '/ServicioTimbrado.svc');
-      respuestaCancelacion := wsTimbradoEcodex.CancelaTimbrado(solicitudCancelacionRespaldo);
+      respuestaCancelacion := wsTimbradoEcodexRespaldo.CancelaTimbrado(solicitudCancelacionRespaldo);
 
       if Assigned(respuestaCancelacion) then
         Result := respuestaCancelacion.Cancelada;
