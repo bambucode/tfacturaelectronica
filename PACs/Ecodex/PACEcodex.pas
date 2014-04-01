@@ -387,15 +387,6 @@ begin
         if (fDominioWebServiceRespaldo <> '') and (AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, E.Message) > 0) and (Assigned(wsTimbradoEcodexRespaldo)) then
         begin
           Result := IntentarCancelarEnServidorDeRespaldo(ExtraerUUID(aDocumento))
-//          wsTimbradoEcodexRespaldo.CancelaTimbrado(solicitudCancelacion);
-//          try
-//            respuestaCancelacion := wsTimbradoEcodexRespaldo.CancelaTimbrado(solicitudCancelacion);
-//            Result := respuestaCancelacion.Cancelada;
-//            respuestaCancelacion.Free;
-//          except
-//            on E2:Exception do
-//              ProcesarExcepcionDePAC(E2);
-//          end
         end
         else
           ProcesarExcepcionDePAC(E);
@@ -590,7 +581,11 @@ begin
   try
     try
       Result := False;
+
+      {$IFDEF CODESITE}
       CodeSite.SendWarning('Intentando cancelar con servidor de respaldo = ' + fDominioWebServiceRespaldo);
+      {$ENDIF}
+
       // 1. Creamos la solicitud de cancelacion
       solicitudCancelacionRespaldo := TEcodexSolicitudCancelacion.Create;
 
