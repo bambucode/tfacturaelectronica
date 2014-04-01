@@ -240,6 +240,8 @@ const
   _ECODEX_ALTA_EMISOR_CORREO_INVALIDO = '(891)';
   _ECODEX_SERVICIO_NO_DISPONIBLE = 'Servicio no disponible';
   _ECODEX_VERSION_NO_SOPORTADA = 'El driver no soporta esta version de cfdi';
+  _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
+  _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
   _NO_ENCONTRADO = 0;
 begin
   mensajeExcepcion := aExcepcion.Message;

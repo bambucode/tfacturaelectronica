@@ -147,18 +147,12 @@ var
   mensajeFalla: string;
 const
   _NO_ECONTRADO = 0;
-  _ERROR_ECODEX_EMISOR_NO_INSCRITO = 'Emisor no encontrado';
-  _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
-  _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
+  _ERROR_ECODEX_EMISOR_NO_INSCRITO           = 'Emisor no encontrado';
 begin
   mensajeFalla := aExcepcion.Message;
 
   if AnsiPos(_ERROR_ECODEX_EMISOR_NO_INSCRITO, mensajeFalla) > _NO_ECONTRADO then
     raise EPACEmisorNoInscritoException.Create(mensajeFalla, 0, 0, False);
-
-  if (AnsiPos(_CADENA_ERROR_DNS_ESPANOL, mensajeFalla) > _NO_ECONTRADO) or
-     (AnsiPos(_CADENA_ERROR_DNS_INGLES, mensajeFalla) > _NO_ECONTRADO) then
-    raise EPACProblemaConInternetException.Create(mensajeFalla, 0, 0, False);
 
   TManejadorErroresComunes.LanzarExcepcionSiDetectaFallaInternet(aExcepcion);
 
