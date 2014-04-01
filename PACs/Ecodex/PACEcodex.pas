@@ -143,9 +143,6 @@ begin
   wsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
   wsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService + '/ServicioClientes.svc');
   fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebServiceSeguridad, fIdTransaccionInicial);
-
-  if fDominioWebServiceRespaldo <> '' then
-    wsTimbradoEcodexRespaldo := GetWsEcodexTimbrado(False, fDominioWebServiceRespaldo + '/ServicioTimbrado.svc');
 end;
 
 function TPACEcodex.getNombre() : string;
@@ -339,7 +336,7 @@ begin
 
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
   // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
-  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
+  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, False);
 end;
 
 function TPACEcodex.CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean;
@@ -370,23 +367,25 @@ begin
   tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
 
   try
-    solicitudCancelacion.RFC := fCredenciales.RFC;
-    solicitudCancelacion.Token := tokenDeUsuario;
-    solicitudCancelacion.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
-
-    // Ecodex solo requiere que le enviemos el UUID del timbre anterior, lo extraemos para enviarlo
-    solicitudCancelacion.UUID := ExtraerUUID(aDocumento);
-
     try
+      solicitudCancelacion.RFC := fCredenciales.RFC;
+      solicitudCancelacion.Token := tokenDeUsuario;
+      solicitudCancelacion.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+
+      // Ecodex solo requiere que le enviemos el UUID del timbre anterior, lo extraemos para enviarlo
+      solicitudCancelacion.UUID := ExtraerUUID(aDocumento);
       mensajeFalla := '';
       respuestaCancelacion := wsTimbradoEcodex.CancelaTimbrado(solicitudCancelacion);
       Result := respuestaCancelacion.Cancelada;
       respuestaCancelacion.Free;
+
+      fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+      fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
     except
       On E:Exception do
       begin
         // Verificamos si tenemos configurado un ws de respaldo para cancelacion
-        if (fDominioWebServiceRespaldo <> '') and (AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, E.Message) > 0) and (Assigned(wsTimbradoEcodexRespaldo)) then
+        if (fDominioWebServiceRespaldo <> '') and (AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, E.Message) > 0) then
         begin
           Result := IntentarCancelarEnServidorDeRespaldo(ExtraerUUID(aDocumento))
         end
@@ -395,10 +394,8 @@ begin
       end;
     end;
   finally
-    fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
-    fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
-    if Assigned(solicitudCancelacion) then
-      solicitudCancelacion.Free;
+//    if Assigned(solicitudCancelacion) then
+//      solicitudCancelacion.Free;
   end;
 end;
 
@@ -607,24 +604,29 @@ begin
       solicitudCancelacionRespaldo.UUID := aUUIDDocumento;
 
       // 5. Mandamos cancelar en el WS de respaldo
-      respuestaCancelacion := wsTimbradoEcodexRespaldo.CancelaTimbrado(solicitudCancelacionRespaldo);
-
-      Result := respuestaCancelacion.Cancelada;
-    finally
-      if Assigned(solicitudCancelacionRespaldo) then
-        solicitudCancelacionRespaldo.Free;
-
-      if Assigned(manejadorDeSesionRespaldo) then
-        manejadorDeSesionRespaldo.Free;
+      wsTimbradoEcodexRespaldo := GetWsEcodexTimbrado(False, fDominioWebServiceRespaldo + '/ServicioTimbrado.svc');
+      respuestaCancelacion := wsTimbradoEcodex.CancelaTimbrado(solicitudCancelacionRespaldo);
 
       if Assigned(respuestaCancelacion) then
-        respuestaCancelacion.Free;
+        Result := respuestaCancelacion.Cancelada;
+
+      fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+      fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
+    except
+      on E:Exception do
+      begin
+        ProcesarExcepcionDePAC(E);
+      end;
     end;
-  except
-    on E:Exception do
-    begin
-      ProcesarExcepcionDePAC(E);
-    end;
+  finally
+//    if Assigned(solicitudCancelacionRespaldo) then
+//      solicitudCancelacionRespaldo.Free;
+//
+//    if Assigned(manejadorDeSesionRespaldo) then
+//      manejadorDeSesionRespaldo.Free;
+//
+//    if Assigned(respuestaCancelacion) then
+//      respuestaCancelacion.Free;
   end;
 end;
 
