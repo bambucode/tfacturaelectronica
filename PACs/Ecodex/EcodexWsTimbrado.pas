@@ -512,12 +512,18 @@ end;
 
 function GetUltimoXMLEnviadoEcodexWsTimbrado: string;
 begin
-  Result := wsHelper.UltimoXMLEnviado;
+  Result := '';
+
+  if wsHelper <> nil then
+    Result := wsHelper.UltimoXMLEnviado;
 end;
 
 function GetUltimoXMLRecibidoEcodexWsTimbrado: string;
 begin
-  Result := wsHelper.UltimoXMLRecibido;
+  Result := '';
+
+  if wsHelper <> nil then
+    Result := wsHelper.UltimoXMLRecibido;
 end;
 
 procedure TEcodexComprobanteXML.SetDatosXML(Index: Integer; const Astring:

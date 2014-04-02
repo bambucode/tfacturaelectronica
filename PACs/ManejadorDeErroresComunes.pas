@@ -36,6 +36,10 @@ class procedure TManejadorErroresComunes.LanzarExcepcionSiDetectaFallaInternet(c
 const
   _SIN_INTERNET = 'No se pudo establecer una conexi';
   _SIN_INTERNET_INGLES = 'A connection with the server could not be established ';
+  _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
+  _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
+  _CADENA_TIMEOUT_GENERICO_ESPANOL           = 'el tiempo de espera para la operaci';
+  _CADENA_TIMEOUT_GENERICO_INGLES            = 'timed out';
 begin
   if aExcepcion <> nil then
   begin
@@ -59,6 +63,16 @@ begin
       then
         raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' +
                                                       aExcepcion.Message, 0, 0, True);
+
+      if (AnsiPos(_CADENA_ERROR_DNS_ESPANOL, aExcepcion.Message) > 0) or
+         (AnsiPos(_CADENA_ERROR_DNS_INGLES, aExcepcion.Message) > 0) then
+        raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' +
+                                                      aExcepcion.Message, 0, 0, False);
+
+      if (AnsiPos(AnsiUpperCase(_CADENA_TIMEOUT_GENERICO_ESPANOL), AnsiUpperCase(aExcepcion.Message)) > 0) Or
+         (AnsiPos(AnsiUpperCase(_CADENA_TIMEOUT_GENERICO_INGLES), AnsiUpperCase(aExcepcion.Message)) > 0) then
+        raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' +
+                                                      aExcepcion.Message, 0, 0, False);
     end;
   end;
 end;

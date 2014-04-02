@@ -70,6 +70,8 @@ type
   function AsignarTimbreDeRespuestaDeEcodex(const aComprobanteTimbrado: TEcodexComprobanteXML): TFETimbre;
   function GetUltimoXMLEnviado: string;
   function GetUltimoXMLRecibido: string;
+  function IntentarCancelarEnServidorDeRespaldo(const aUUIDDocumento: String):
+      Boolean;
   procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
   function TimbrarPorPrimeraVez(const aDocumento: TTipoComprobanteXML; const
       aIdTransaccionAUsar: Integer): TFETimbre;
@@ -143,9 +145,6 @@ begin
   wsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
   wsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService + '/ServicioClientes.svc');
   fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebServiceSeguridad, fIdTransaccionInicial);
-
-  if fDominioWebServiceRespaldo <> '' then
-    wsTimbradoEcodexRespaldo := GetWsEcodexTimbrado(False, fDominioWebServiceRespaldo + '/ServicioTimbrado.svc');
 end;
 
 function TPACEcodex.getNombre() : string;
@@ -240,6 +239,8 @@ const
   _ECODEX_ALTA_EMISOR_CORREO_INVALIDO = '(891)';
   _ECODEX_SERVICIO_NO_DISPONIBLE = 'Servicio no disponible';
   _ECODEX_VERSION_NO_SOPORTADA = 'El driver no soporta esta version de cfdi';
+  _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
+  _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
   _NO_ENCONTRADO = 0;
 begin
   mensajeExcepcion := aExcepcion.Message;
@@ -337,7 +338,7 @@ begin
 
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
   // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
-  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
+  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, False);
 end;
 
 function TPACEcodex.CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean;
@@ -345,6 +346,9 @@ var
   mensajeFalla, tokenDeUsuario: String;
   solicitudCancelacion : TEcodexSolicitudCancelacion;
   respuestaCancelacion : TEcodexRespuestaCancelacion;
+  solicitudCancelacionRespaldo: TEcodexSolicitudCancelacion;
+  tokenDeUsuarioRespaldo: String;
+  manejadorDeSesionRespaldo: TEcodexManejadorDeSesion;
 
   function ExtraerUUID(const aDocumentoTimbrado: TTipoComprobanteXML) : String;
   const
@@ -365,40 +369,35 @@ begin
   tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
 
   try
-    solicitudCancelacion.RFC := fCredenciales.RFC;
-    solicitudCancelacion.Token := tokenDeUsuario;
-    solicitudCancelacion.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
-
-    // Ecodex solo requiere que le enviemos el UUID del timbre anterior, lo extraemos para enviarlo
-    solicitudCancelacion.UUID := ExtraerUUID(aDocumento);
-
     try
+      solicitudCancelacion.RFC := fCredenciales.RFC;
+      solicitudCancelacion.Token := tokenDeUsuario;
+      solicitudCancelacion.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+
+      // Ecodex solo requiere que le enviemos el UUID del timbre anterior, lo extraemos para enviarlo
+      solicitudCancelacion.UUID := ExtraerUUID(aDocumento);
       mensajeFalla := '';
       respuestaCancelacion := wsTimbradoEcodex.CancelaTimbrado(solicitudCancelacion);
       Result := respuestaCancelacion.Cancelada;
       respuestaCancelacion.Free;
+
+      fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+      fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
     except
       On E:Exception do
       begin
         // Verificamos si tenemos configurado un ws de respaldo para cancelacion
-        if (fDominioWebServiceRespaldo <> '') and (AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, E.Message) > 0) and (Assigned(wsTimbradoEcodexRespaldo)) then 
-          try
-            respuestaCancelacion := wsTimbradoEcodexRespaldo.CancelaTimbrado(solicitudCancelacion);
-          except
-            on E2:Exception do 
-            begin
-              ProcesarExcepcionDePAC(E2);
-            end;
-          end          
-        else        
+        if (fDominioWebServiceRespaldo <> '') and (AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, E.Message) > 0) then
+        begin
+          Result := IntentarCancelarEnServidorDeRespaldo(ExtraerUUID(aDocumento))
+        end
+        else
           ProcesarExcepcionDePAC(E);
       end;
     end;
   finally
-    fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
-    fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
-    if Assigned(solicitudCancelacion) then
-      solicitudCancelacion.Free;
+//    if Assigned(solicitudCancelacion) then
+//      solicitudCancelacion.Free;
   end;
 end;
 
@@ -570,6 +569,67 @@ end;
 function TPACEcodex.GetUltimoXMLRecibido: string;
 begin
   Result := fUltimoXMLRecibido;
+end;
+
+function TPACEcodex.IntentarCancelarEnServidorDeRespaldo(const aUUIDDocumento:
+    String): Boolean;
+var
+  solicitudCancelacionRespaldo: TEcodexSolicitudCancelacion;
+  tokenDeUsuarioRespaldo: String;
+  manejadorDeSesionRespaldo: TEcodexManejadorDeSesion;
+  respuestaCancelacion: TEcodexRespuestaCancelacion;
+begin
+  try
+    try
+      Result := False;
+
+      {$IFDEF CODESITE}
+      CodeSite.SendWarning('Intentando cancelar con servidor de respaldo = ' + fDominioWebServiceRespaldo);
+      {$ENDIF}
+
+      // 1. Creamos la solicitud de cancelacion
+      solicitudCancelacionRespaldo := TEcodexSolicitudCancelacion.Create;
+
+      // 2. Creamos una sesion en el servidor de respaldo
+      manejadorDeSesionRespaldo := TEcodexManejadorDeSesion.Create(fDominioWebServiceRespaldo, fIdTransaccionInicial);
+
+      // 3. Iniciamos una nueva sesion solicitando un nuevo token
+      manejadorDeSesionRespaldo.AsignarCredenciales(fCredenciales);
+      tokenDeUsuarioRespaldo := manejadorDeSesionRespaldo.ObtenerNuevoTokenDeUsuario;
+
+      // 4. Llenamos la nueva solicitud de cancelacion
+      solicitudCancelacionRespaldo.RFC := fCredenciales.RFC;
+      solicitudCancelacionRespaldo.Token := tokenDeUsuarioRespaldo;
+      solicitudCancelacionRespaldo.TransaccionID := manejadorDeSesionRespaldo.NumeroDeTransaccion;
+
+      // Ecodex solo requiere que le enviemos el UUID del timbre anterior, lo extraemos para enviarlo
+      solicitudCancelacionRespaldo.UUID := aUUIDDocumento;
+
+      // 5. Mandamos cancelar en el WS de respaldo
+      wsTimbradoEcodexRespaldo := GetWsEcodexTimbrado(False, fDominioWebServiceRespaldo + '/ServicioTimbrado.svc');
+      respuestaCancelacion := wsTimbradoEcodexRespaldo.CancelaTimbrado(solicitudCancelacionRespaldo);
+
+      if Assigned(respuestaCancelacion) then
+        Result := respuestaCancelacion.Cancelada;
+
+      fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+      fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
+    except
+      on E:Exception do
+      begin
+        ProcesarExcepcionDePAC(E);
+      end;
+    end;
+  finally
+//    if Assigned(solicitudCancelacionRespaldo) then
+//      solicitudCancelacionRespaldo.Free;
+//
+//    if Assigned(manejadorDeSesionRespaldo) then
+//      manejadorDeSesionRespaldo.Free;
+//
+//    if Assigned(respuestaCancelacion) then
+//      respuestaCancelacion.Free;
+  end;
 end;
 
 function TPACEcodex.ObtenerTimbrePrevio(const aIdTransaccionOriginal: Integer):
