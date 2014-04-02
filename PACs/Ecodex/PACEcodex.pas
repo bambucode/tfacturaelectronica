@@ -396,8 +396,8 @@ begin
       end;
     end;
   finally
-//    if Assigned(solicitudCancelacion) then
-//      solicitudCancelacion.Free;
+    if Assigned(solicitudCancelacion) then
+      solicitudCancelacion.Free;
   end;
 end;
 
@@ -621,14 +621,14 @@ begin
       end;
     end;
   finally
-//    if Assigned(solicitudCancelacionRespaldo) then
-//      solicitudCancelacionRespaldo.Free;
-//
-//    if Assigned(manejadorDeSesionRespaldo) then
-//      manejadorDeSesionRespaldo.Free;
-//
-//    if Assigned(respuestaCancelacion) then
-//      respuestaCancelacion.Free;
+    if Assigned(solicitudCancelacionRespaldo) then
+      solicitudCancelacionRespaldo.Free;
+
+    if Assigned(manejadorDeSesionRespaldo) then
+      manejadorDeSesionRespaldo.Free;
+
+    if Assigned(respuestaCancelacion) then
+      respuestaCancelacion.Free;
   end;
 end;
 

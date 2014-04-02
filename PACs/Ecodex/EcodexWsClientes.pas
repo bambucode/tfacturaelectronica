@@ -1121,4 +1121,8 @@ initialization
   RemClassRegistry.RegisterXSClass(TEcodexSolicitudEstatusCuenta, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudEstatusCuenta');
   RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudEstatusCuenta, [xoLiteralParam]);
 
+  wsHelper.Create;
+finalization
+  if Assigned(wsHelper) then
+    wsHelper.Free;
 end.

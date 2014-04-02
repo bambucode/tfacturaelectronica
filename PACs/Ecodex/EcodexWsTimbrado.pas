@@ -1004,4 +1004,9 @@ initialization
   RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaCancelacion, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(TEcodexSolicitudCancelacion, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudCancelaTimbrado');
   RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudCancelacion, [xoLiteralParam]);
+
+  wsHelper.Create;
+finalization
+  if Assigned(wsHelper) then
+    wsHelper.Free;
 end.
