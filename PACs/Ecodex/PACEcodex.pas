@@ -241,6 +241,7 @@ const
   _ECODEX_VERSION_NO_SOPORTADA = 'El driver no soporta esta version de cfdi';
   _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
   _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
+  _ERROR_IMPUESTO_INVALIDO = 'impuesto had invalid value';
   _NO_ENCONTRADO = 0;
 begin
   mensajeExcepcion := aExcepcion.Message;
@@ -272,7 +273,13 @@ begin
     raise EPACServicioNoDisponibleException.Create(mensajeExcepcion, 0, 22, True);
 
   if AnsiPos(_ERROR_SAT_XML_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
+  begin
+    // Checamos los diferentes errores de validacion del XML
+    if AnsiPos(_ERROR_IMPUESTO_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
+      raise ETimbradoImpuestoInvalidoException.Create(mensajeExcepcion, 301, 0, False);
+
     raise  ETimbradoXMLInvalidoException.Create(mensajeExcepcion, 301, 0, False);
+  end;
 
   if AnsiPos(_ERROR_SAT_SELLO_EMISOR_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise ETimbradoSelloEmisorInvalidoException.Create(mensajeExcepcion, 302, 0, False);
