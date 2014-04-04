@@ -26,6 +26,8 @@ type
 
    TManejadorErroresComunes = class
       class procedure LanzarExcepcionSiDetectaFallaInternet(const aExcepcion: Exception);
+  private
+    class procedure DetectarErroresConocidos(const aExcepcion: Exception);
    end;
 
 implementation
@@ -33,13 +35,6 @@ implementation
 uses SOAPHTTPTrans;
 
 class procedure TManejadorErroresComunes.LanzarExcepcionSiDetectaFallaInternet(const aExcepcion: Exception);
-const
-  _SIN_INTERNET = 'No se pudo establecer una conexi';
-  _SIN_INTERNET_INGLES = 'A connection with the server could not be established ';
-  _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
-  _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
-  _CADENA_TIMEOUT_GENERICO_ESPANOL           = 'el tiempo de espera para la operaci';
-  _CADENA_TIMEOUT_GENERICO_INGLES            = 'timed out';
 begin
   if aExcepcion <> nil then
   begin
@@ -54,27 +49,31 @@ begin
       case ESOAPHttpException(aExcepcion).StatusCode of
         502, 503, 504, 522: raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' +
                                                            aExcepcion.Message, 0, 0, True);
+      else
+        DetectarErroresConocidos(aExcepcion)
       end;
-
     end else
-    begin
-      if (AnsiPos(_SIN_INTERNET, aExcepcion.Message) > 0) or
-         (AnsiPos(_SIN_INTERNET_INGLES, aExcepcion.Message) > 0)
-      then
-        raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' +
-                                                      aExcepcion.Message, 0, 0, True);
-
-      if (AnsiPos(_CADENA_ERROR_DNS_ESPANOL, aExcepcion.Message) > 0) or
-         (AnsiPos(_CADENA_ERROR_DNS_INGLES, aExcepcion.Message) > 0) then
-        raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' +
-                                                      aExcepcion.Message, 0, 0, False);
-
-      if (AnsiPos(AnsiUpperCase(_CADENA_TIMEOUT_GENERICO_ESPANOL), AnsiUpperCase(aExcepcion.Message)) > 0) Or
-         (AnsiPos(AnsiUpperCase(_CADENA_TIMEOUT_GENERICO_INGLES), AnsiUpperCase(aExcepcion.Message)) > 0) then
-        raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' +
-                                                      aExcepcion.Message, 0, 0, False);
-    end;
+      DetectarErroresConocidos(aExcepcion);
   end;
+end;
+
+class procedure TManejadorErroresComunes.DetectarErroresConocidos(const aExcepcion: Exception);
+const
+  _SIN_INTERNET = 'No se pudo establecer una conexi';
+  _SIN_INTERNET_INGLES = 'A connection with the server could not be established ';
+  _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
+  _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
+  _CADENA_TIMEOUT_GENERICO_ESPANOL           = 'el tiempo de espera para la operaci';
+  _CADENA_TIMEOUT_GENERICO_INGLES            = 'timed out';
+begin
+  if (AnsiPos(_SIN_INTERNET, aExcepcion.Message) > 0) or (AnsiPos(_SIN_INTERNET_INGLES, aExcepcion.Message) > 0) then
+    raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' + aExcepcion.Message, 0, 0, True)
+  else if (AnsiPos(_CADENA_ERROR_DNS_ESPANOL, aExcepcion.Message) > 0) or (AnsiPos(_CADENA_ERROR_DNS_INGLES, aExcepcion.Message) > 0) then
+    raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' + aExcepcion.Message, 0, 0, True)
+  else if (AnsiPos(AnsiUpperCase(_CADENA_TIMEOUT_GENERICO_ESPANOL), AnsiUpperCase(aExcepcion.Message)) > 0) or (AnsiPos(AnsiUpperCase(_CADENA_TIMEOUT_GENERICO_INGLES), AnsiUpperCase(aExcepcion.Message)) > 0) then
+    raise EPACProblemaTimeoutException.Create('No se pudo realizar una conexion con el PAC: ' + aExcepcion.Message, 0, 0, True)
+  else
+    raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' + aExcepcion.Message, 0, 0, True);
 end;
 
 end.

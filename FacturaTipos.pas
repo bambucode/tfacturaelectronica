@@ -296,6 +296,8 @@ EPACTimbradoSinFoliosDisponiblesException = class(EPACException);
 {$ENDREGION}
 EPACProblemaConInternetException = class(EPACException);
 
+EPACProblemaTimeoutException = class(EPACException);
+
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Excepcion general para errores no programados/manejados.

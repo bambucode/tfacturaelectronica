@@ -345,7 +345,7 @@ begin
 
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
   // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
-  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, False);
+  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
 end;
 
 function TPACEcodex.CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean;
