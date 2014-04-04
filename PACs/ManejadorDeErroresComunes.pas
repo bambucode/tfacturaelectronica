@@ -42,6 +42,8 @@ begin
       CodeSite.SendException(aExcepcion);
     {$ENDIF}
 
+    DetectarErroresConocidos(aExcepcion);
+
     if aExcepcion Is ESOAPHttpException then
     begin
       // Lista de codigos de error estandares:
@@ -49,11 +51,8 @@ begin
       case ESOAPHttpException(aExcepcion).StatusCode of
         502, 503, 504, 522: raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' +
                                                            aExcepcion.Message, 0, 0, True);
-      else
-        DetectarErroresConocidos(aExcepcion)
       end;
-    end else
-      DetectarErroresConocidos(aExcepcion);
+    end;
   end;
 end;
 
