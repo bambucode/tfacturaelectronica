@@ -1,4 +1,4 @@
-﻿TFACTURACIONELECTRONICA v1.2 (Beta) 
+﻿TFACTURACIONELECTRONICA v1.3 (Beta) 
 --------------------------------------
 Esta es una librería que sirve para generar una factura electrónica (CFDI) de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
@@ -36,6 +36,7 @@ Proveedores Autorizados de Certificación (PAC) Soportados
 
 Completado
 -------------
+- Se agrego soporte para servidor de respaldo de cancelación de Ecodex - Abril 2014
 - Implementar soporte para impuestos locales/estatales. <Enero 2014>
 - Implementar la version 3.2 de los CFD (o comprobantes digitales en linea) con colaboración de Ing. Pablo Torres - <Completado a finales de Noviembre 2013>
 - Implementar soporte para la versión 2.2 de CFD - Completado Junio 2012.
