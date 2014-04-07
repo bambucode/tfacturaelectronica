@@ -546,10 +546,13 @@ if ((Encoding = auto) and (fCertificate = nil)) or (encoding = PEM) then
 if ((Encoding = auto) and (fCertificate = nil)) or (encoding = PKCS12) then
   begin
   p12 := d2i_PKCS12_bio(certfile, nil);
-  PKCS12_parse(p12, nil, a, c, ca);
-  fCertificate := c;
-  PKCS12_free(p12);
-  p12 := nil;
+  if p12 <> nil then
+  begin
+    PKCS12_parse(p12, nil, a, c, ca);
+    fCertificate := c;
+    PKCS12_free(p12);
+    p12 := nil;
+  end;
   end;
 BIO_free(certfile);
 if fCertificate = nil then

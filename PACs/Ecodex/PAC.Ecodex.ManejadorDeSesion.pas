@@ -147,18 +147,17 @@ var
   mensajeFalla: string;
 const
   _NO_ECONTRADO = 0;
-  _ERROR_ECODEX_EMISOR_NO_INSCRITO = 'Emisor no encontrado';
+  _ERROR_ECODEX_EMISOR_NO_INSCRITO           = 'Emisor no encontrado';
 begin
   mensajeFalla := aExcepcion.Message;
 
-   if AnsiPos(_ERROR_ECODEX_EMISOR_NO_INSCRITO, mensajeFalla) > _NO_ECONTRADO then
+  if AnsiPos(_ERROR_ECODEX_EMISOR_NO_INSCRITO, mensajeFalla) > _NO_ECONTRADO then
     raise EPACEmisorNoInscritoException.Create(mensajeFalla, 0, 0, False);
 
+  TManejadorErroresComunes.LanzarExcepcionSiDetectaFallaInternet(aExcepcion);
 
-   TManejadorErroresComunes.LanzarExcepcionSiDetectaFallaInternet(aExcepcion);
-
-   // Si llegamos aqui y no se proceso ningun otro error generamos un error genérico de credenciales
-   raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + mensajeFalla, 0, 0, True);
+  // Si llegamos aqui y no se proceso ningun otro error generamos un error genérico de credenciales
+  raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + mensajeFalla, 0, 0, True);
 end;
 
 

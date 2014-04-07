@@ -39,7 +39,9 @@ TTipoComprobanteXML = String;
   function getNombre() : String; virtual; abstract;
  public
   property Nombre : String read getNombre;
-  constructor Create(const aDominioWebService : String); virtual; abstract;
+  constructor Create(const aDominioWebService: string;
+      const aDominioWebServiceSeguridad: String = ''; const aDominioWebServiceRespaldo:
+      String = ''); virtual; abstract;
   procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); overload; virtual; abstract;
   procedure AsignarCredenciales(const aCredenciales, aCredencialesIntegrador: TFEPACCredenciales); overload; virtual; abstract;
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; virtual; abstract;

@@ -253,6 +253,7 @@ end;
 ///	</summary>
 {$ENDREGION}
 ETimbradoXMLInvalidoException = class(EPACException);
+ETimbradoImpuestoInvalidoException = class(EPACException); // Error 301 cuando un impuesto tiene un nombre no admitido
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Error estándard del SAT (302) cuando el sello del comprobante no se
@@ -270,6 +271,7 @@ ETimbradoCertificadoApocrifoException = class(EPACException); // Error 308
 ETimbradoFechaGeneracionMasDe72HorasException = class(EPACException); // Error 401
 ETimbradoRegimenEmisorNoValidoException = class(EPACException); // Error 402
 ETimbradoFechaEnElPasadoException = class(EPACException); // Error 403
+
 
 // Excepciones comunes para todos los PAC
 {$REGION 'Documentation'}
@@ -293,6 +295,8 @@ EPACTimbradoSinFoliosDisponiblesException = class(EPACException);
 ///	</summary>
 {$ENDREGION}
 EPACProblemaConInternetException = class(EPACException);
+
+EPACProblemaTimeoutException = class(EPACException);
 
 {$REGION 'Documentation'}
 ///	<summary>

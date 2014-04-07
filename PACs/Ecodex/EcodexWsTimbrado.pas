@@ -512,12 +512,18 @@ end;
 
 function GetUltimoXMLEnviadoEcodexWsTimbrado: string;
 begin
-  Result := wsHelper.UltimoXMLEnviado;
+  Result := '';
+
+  if wsHelper <> nil then
+    Result := wsHelper.UltimoXMLEnviado;
 end;
 
 function GetUltimoXMLRecibidoEcodexWsTimbrado: string;
 begin
-  Result := wsHelper.UltimoXMLRecibido;
+  Result := '';
+
+  if wsHelper <> nil then
+    Result := wsHelper.UltimoXMLRecibido;
 end;
 
 procedure TEcodexComprobanteXML.SetDatosXML(Index: Integer; const Astring:
@@ -998,4 +1004,9 @@ initialization
   RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaCancelacion, [xoLiteralParam]);
   RemClassRegistry.RegisterXSClass(TEcodexSolicitudCancelacion, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudCancelaTimbrado');
   RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudCancelacion, [xoLiteralParam]);
+
+  wsHelper := TWSHelper.Create;
+finalization
+  if Assigned(wsHelper) then
+    wsHelper.Free;
 end.

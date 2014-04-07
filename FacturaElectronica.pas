@@ -33,8 +33,9 @@ TFacturaElectronica = class(TFEComprobanteFiscal)
 {$IFDEF VERSION_DE_PRUEBA}
   public
 {$ELSE}
-  private
+  strict private
 {$ENDIF}
+  fCertificadoUsado: TFECertificado;
   fComprobanteGenerado : Boolean;
   fOnComprobanteTimbrado : TOnComprobanteTimbrado;
   fOnComprobanteGenerado: TOnComprobanteGenerado;
@@ -66,6 +67,7 @@ public
                       tcTipo: TFETipoComprobante);  overload;
 
   destructor Destroy; override;
+  procedure AfterConstruction; override;
   /// <summary>Genera el archivo XML de la factura electrónica con el sello, certificado, etc</summary>
   /// <param name="Folio">Este es el numero de folio que tendrá esta factura. Si
   /// es la primer factura, deberá iniciar con el número 1 (Art. 29 Fraccion III)</param>
@@ -96,10 +98,20 @@ begin
   // Llenamos las variables internas con las de los parametros
   inherited Emisor:=cEmisor;
   inherited Receptor:=cCliente;
+  inherited Tipo:=tcTipo;
+
+  fCertificadoUsado := cerCertificado;
+end;
+
+procedure TFacturaElectronica.AfterConstruction;
+begin
+  inherited;
 
   // REWRITE: Validamos aqui que el certificado sea valido
-  inherited Certificado:=cerCertificado;
-  inherited Tipo:=tcTipo;
+  if fCertificadoUsado.Ruta <> '' then
+  begin
+    inherited Certificado:=fCertificadoUsado;
+  end;
 end;
 
 constructor TFacturaElectronica.Create(cEmisor, cCliente: TFEContribuyente;
@@ -122,6 +134,8 @@ destructor TFacturaElectronica.Destroy();
 begin
    inherited Destroy;
 end;
+
+
 
 // Obtenemos el certificado de la clase padre para obtener el record
 // con los datos de serie, no aprobacion, etc.
