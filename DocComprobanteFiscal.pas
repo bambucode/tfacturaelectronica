@@ -116,6 +116,8 @@ RAZON PARA CAMBIAR:
 
 implementation
 
+uses SysUtils;
+
 constructor TDocumentoComprobanteFiscal.Create;
 begin
     // TODO LO SIGUIENTE LO HACE DELPHI POR NOSOTROS:
@@ -161,6 +163,9 @@ end;
 
 function TDocumentoComprobanteFiscal.AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoRetenido) : Integer;
 begin
+    // Convertimos el nombre del impuesto a mayusculas ya que el SAT usa todos sus impuestos en mayusculas
+    NuevoImpuesto.Nombre := Uppercase(NuevoImpuesto.Nombre);
+
     SetLength(fArrImpuestosRetenidos, Length(fArrImpuestosRetenidos) + 1);
     fArrImpuestosRetenidos[Length(fArrImpuestosRetenidos) - 1] := NuevoImpuesto;
     fTotalImpuestosRetenidos:=fTotalImpuestosRetenidos + NuevoImpuesto.Importe;
@@ -169,6 +174,9 @@ end;
 
 function TDocumentoComprobanteFiscal.AgregarImpuestoTrasladado(NuevoImpuesto: TFEImpuestoTrasladado) : Integer;
 begin
+    // Convertimos el nombre del impuesto a mayusculas ya que el SAT usa todos sus impuestos en mayusculas
+    NuevoImpuesto.Nombre := Uppercase(NuevoImpuesto.Nombre);
+
     SetLength(fArrImpuestosTrasladados, Length(fArrImpuestosTrasladados) + 1);
     fArrImpuestosTrasladados[Length(fArrImpuestosTrasladados) - 1] := NuevoImpuesto;
     fTotalImpuestosTrasladados:=fTotalImpuestosTrasladados + NuevoImpuesto.Importe;
