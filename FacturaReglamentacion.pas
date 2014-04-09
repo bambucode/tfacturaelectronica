@@ -62,22 +62,17 @@ uses DateUtils,
 
 
 class procedure TFEReglamentacion.CorregirConfiguracionRegionalLocal;
-var
-  fs: TFormatSettings;
 begin
   // Debido a que si el usuario en la PC tiene una configuración regional incorrecta
   // los XMLs se generan con montos y cantidades inválidas
-  GetLocaleFormatSettings(LOCALE_SYSTEM_DEFAULT, fs);
-  separadorDecimalAnterior := fs.DecimalSeparator;
+  separadorDecimalAnterior := DecimalSeparator;
   // Indicamos que el separador Decimal será el punto
-  fs.DecimalSeparator := _PUNTO_DECIMAL;
+  DecimalSeparator := _PUNTO_DECIMAL;
 end;
 
 class procedure TFEReglamentacion.RegresarConfiguracionRegionalLocal;
-var
-  fs: TFormatSettings;
 begin
-  fs.DecimalSeparator := separadorDecimalAnterior;
+  DecimalSeparator := separadorDecimalAnterior;
 end;
 
 // Segun las reglas del SAT:
@@ -139,7 +134,7 @@ begin
    // http://www.sat.gob.mx/cfd/2/cfdv22.xsd
    try
       CorregirConfiguracionRegionalLocal;
-      Result:=CurrToStrF(aMonto, ffFixed, aDecimalesDefault);
+      Result:=FloatToStrF(aMonto, ffFixed, 10, aDecimalesDefault);
    finally
       RegresarConfiguracionRegionalLocal;
    end;

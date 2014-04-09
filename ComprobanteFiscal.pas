@@ -1787,7 +1787,8 @@ begin
     llavePrivadaOriginal := fCertificado.LlavePrivada;
 
     if Not certificadoSellos.FueLeido then
-      raise  EFECertificadoNoFueLeidoException.Create('No fue posible leer el certificado: ' + certificadoSellos.RazonNoLeido);
+      raise  EFECertificadoNoFueLeidoException.Create('No fue posible leer el certificado: ' + certificadoSellos.RazonNoLeido +
+                                                      ' (' + fCertificado.Ruta + ')');
 
     // Checamos que el certificado este dentro de la vigencia
     if Not certificadoSellos.Vigente then
