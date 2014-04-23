@@ -287,6 +287,7 @@ EPACErrorGenericoDeAccesoException = class(EPACException);
 EPACTimbradoRFCNoCorrespondeException = class(EPACException);
 EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
 EPACTimbradoSinFoliosDisponiblesException = class(EPACException);
+EPACCAnceladoSinCertificadosException = class(EPACException);
 
 {$REGION 'Documentation'}
 ///	<summary>
