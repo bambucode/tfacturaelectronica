@@ -233,6 +233,7 @@ const
   _ERROR_ECODEX_PREVIAMENTE_TIMBRADO = '(96)';
   _ECODEX_ALTA_EMISOR_CORREO_USADO = '(97)';
   _ECODEX_ALTA_EMISOR_REPETIDO = '(98)';
+  _ECODEX_SIN_CERTIFICADOS_PARA_CANCELAR = '(29)';
   // El rfc del Documento no corresponde al del encabezado.
   _ECODEX_RFC_NO_CORRESPONDE = '(500)';
   _ECODEX_ALTA_EMISOR_RFC_INVALIDO = '(890)';
@@ -324,6 +325,11 @@ begin
 
   if AnsiPos(_ECODEX_SIN_FOLIOS_DISPONIBLES, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EPACTimbradoSinFoliosDisponiblesException.Create(mensajeExcepcion, 0, 800, True);
+
+  if AnsiPos(_ECODEX_SIN_CERTIFICADOS_PARA_CANCELAR, mensajeExcepcion) > _NO_ENCONTRADO then
+  begin
+    raise EPACCAnceladoSinCertificadosException.Create(mensajeExcepcion, 0, EEcodexFallaValidacionException(aExcepcion).Numero, True);
+  end;
 
   {$REGION 'Excepciones de alta de emisores'}
 
