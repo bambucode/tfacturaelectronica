@@ -29,6 +29,7 @@ uses Classes,
      PAC.Ecodex.ManejadorDeSesion,
      EcodexWsTimbrado,
      EcodexWsClientes,
+     EcodexWsCancelacion,
      FeCFD;
 
 type
@@ -63,6 +64,7 @@ type
   fCredencialesIntegrador : TFEPACCredenciales;
   wsClientesEcodex : IEcodexServicioClientes;
   wsTimbradoEcodex: IEcodexServicioTimbrado;
+  wsCancelacionEcodex: IEcodexServicioCancelacion;
   wsTimbradoEcodexRespaldo: IEcodexServicioTimbrado;
   fManejadorDeSesion : TEcodexManejadorDeSesion;
   FUltimoXMLEnviado: string;
@@ -81,6 +83,7 @@ public
   destructor Destroy(); override;
   procedure AfterConstruction; override;
   procedure AsignarCredenciales(const aCredenciales, aCredencialesIntegrador: TFEPACCredenciales); override;
+  function ObtenerAcuseDeCancelacion(const aDocumento: TTipoComprobanteXML): string; override;
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; override;
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; overload; override;
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML; const aIdTransaccionAUsar: Integer): TFETimbre; overload;
@@ -145,6 +148,7 @@ begin
   wsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
   wsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService + '/ServicioClientes.svc');
   fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebServiceSeguridad, fIdTransaccionInicial);
+  wsCancelacionEcodex := GetEcodexWSCancelacion(False, fDominioWebService + '/ServicioCancelacion.svc');
 end;
 
 function TPACEcodex.getNombre() : string;
@@ -352,6 +356,62 @@ begin
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
   // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
   raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
+end;
+
+function TPACEcodex.ObtenerAcuseDeCancelacion(const aDocumento: TTipoComprobanteXML): string;
+var
+  mensajeFalla, tokenDeUsuario: String;
+  solicitudAcuse : TEcodexSolicitudAcuse;
+  respuestaAcuse : TEcodexRespuestaRecuperarAcuse;
+  solicitudCancelacionRespaldo: TEcodexSolicitudCancelacion;
+  tokenDeUsuarioRespaldo: String;
+  manejadorDeSesionRespaldo: TEcodexManejadorDeSesion;
+
+  function ExtraerUUID(const aDocumentoTimbrado: TTipoComprobanteXML) : String;
+  const
+    _LONGITUD_UUID = 36;
+  begin
+      Result:=Copy(aDocumentoTimbrado,
+                   AnsiPos('UUID="', aDocumentoTimbrado) + 6,
+                   _LONGITUD_UUID);
+  end;
+
+begin
+  Result := '';
+
+  // 1. Creamos la solicitud de cancelacion
+  solicitudAcuse := TEcodexSolicitudAcuse.Create;
+
+  // 2. Iniciamos una nueva sesion solicitando un nuevo token
+  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+
+  solicitudAcuse.UUID := ExtraerUUID(aDocumento);
+
+  Assert(solicitudAcuse.UUID <> '', 'No es posible solicitar un acuse de cancelacion de una factura sin UUID');
+
+  try
+    try
+      solicitudAcuse.RFC := fCredenciales.RFC;
+      solicitudAcuse.Token := tokenDeUsuario;
+      solicitudAcuse.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+
+      mensajeFalla := '';
+      respuestaAcuse := wsCancelacionEcodex.RecuperarAcuses(solicitudAcuse);
+      Result := respuestaAcuse.AcuseXML;
+      respuestaAcuse.Free;
+
+      fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsCancelacion;
+      fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsCancelacion;
+    except
+      On E:Exception do
+      begin
+        ProcesarExcepcionDePAC(E);
+      end;
+    end;
+  finally
+    if Assigned(solicitudAcuse) then
+      solicitudAcuse.Free;
+  end;
 end;
 
 function TPACEcodex.CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean;
