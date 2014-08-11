@@ -59,6 +59,7 @@ type
   fDominioWebService : string;
   fDominioWebServiceSeguridad: string;
   fDominioWebServiceRespaldo: string;
+  fDominioWebServiceCancelacion: string;
   fIdTransaccionInicial: Integer;
   fCredenciales : TFEPACCredenciales;
   fCredencialesIntegrador : TFEPACCredenciales;
@@ -93,13 +94,13 @@ public
   property UltimoXMLEnviado: string read GetUltimoXMLEnviado;
   property UltimoXMLRecibido: string read GetUltimoXMLRecibido;
   property Nombre : String read getNombre;
-  constructor Create(const aDominioWebService: string;
-                     const aDominioWebServiceSeguridad: string = '';
-                     const aDominioWebServiceRespaldo: String = ''); overload;
-  constructor Create(const aDominioWebService: String;
-                     const aIdTransaccionInicial: Integer;
-                     const aDominioWebServiceSeguridad: string = '';
-                     const aDominioWebServiceRespaldo: string = ''); overload;
+  constructor Create(const aDominioWebService: string; const
+      aDominioWebServiceSeguridad: string = ''; const aDominioWebServiceRespaldo:
+      String = ''; const aDominioWebServiceCancelacion: string = ''); overload;
+  constructor Create(const aDominioWebService: String; const
+      aIdTransaccionInicial: Integer; const aDominioWebServiceSeguridad: string =
+      ''; const aDominioWebServiceRespaldo: string = ''; const
+      aDominioWebServiceCancelacion: string = ''); overload;
   function AgregarTimbres(const aRFC: String; const aTimbresAAsignar: Integer):
       Integer;
 end;
@@ -116,8 +117,9 @@ uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
      {$ENDIF}
      FacturaReglamentacion;
 
-constructor TPACEcodex.Create(const aDominioWebService: string;
-      const aDominioWebServiceSeguridad: string = ''; const aDominioWebServiceRespaldo: String = '');
+constructor TPACEcodex.Create(const aDominioWebService: string; const
+    aDominioWebServiceSeguridad: string = ''; const aDominioWebServiceRespaldo:
+    String = ''; const aDominioWebServiceCancelacion: string = '');
 begin
   inherited;
 
@@ -129,15 +131,20 @@ begin
   else
     fDominioWebServiceSeguridad := aDominioWebService;
 
+  if aDominioWebServiceCancelacion <> '' then
+    fDominioWebServiceCancelacion := aDominioWebServiceCancelacion
+  else
+    fDominioWebServiceCancelacion := aDominioWebService;
+
   fDominioWebServiceRespaldo := aDominioWebServiceRespaldo;
 end;
 
-constructor TPACEcodex.Create(const aDominioWebService: String;
-                              const aIdTransaccionInicial: Integer;
-                              const aDominioWebServiceSeguridad: string = '';
-                              const aDominioWebServiceRespaldo: string = '');
+constructor TPACEcodex.Create(const aDominioWebService: String; const
+    aIdTransaccionInicial: Integer; const aDominioWebServiceSeguridad: string =
+    ''; const aDominioWebServiceRespaldo: string = ''; const
+    aDominioWebServiceCancelacion: string = '');
 begin
-  Create(aDominioWebService, aDominioWebServiceSeguridad, aDominioWebServiceRespaldo);
+  Create(aDominioWebService, aDominioWebServiceSeguridad, aDominioWebServiceRespaldo, aDominioWebServiceCancelacion);
   // Establecemos el id de transaccion inicial para todas las operaciones
   fIdTransaccionInicial := aIdTransaccionInicial;
 end;
@@ -148,7 +155,7 @@ begin
   wsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
   wsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService + '/ServicioClientes.svc');
   fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebServiceSeguridad, fIdTransaccionInicial);
-  wsCancelacionEcodex := GetEcodexWSCancelacion(False, fDominioWebService + '/ServicioCancelacion.svc');
+  wsCancelacionEcodex := GetEcodexWSCancelacion(False, fDominioWebServiceCancelacion + '/ServicioCancelacion.svc');
 end;
 
 function TPACEcodex.getNombre() : string;
