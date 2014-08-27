@@ -254,6 +254,7 @@ const
   _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
   _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
   _ERROR_IMPUESTO_INVALIDO = 'impuesto had invalid value';
+  _ECODEX_ERROR_OBTENIENDO_ACUSE = 33;
   _NO_ENCONTRADO = 0;
 begin
   mensajeExcepcion := aExcepcion.Message;
@@ -279,6 +280,12 @@ begin
         mensajeExcepcion := 'EEcodexFallaSesionException (' + IntToStr(EEcodexFallaSesionException(aExcepcion).Estatus) + ') ' +
                             EEcodexFallaSesionException(aExcepcion).Descripcion;
       end;
+  end;
+
+  // Verificamos si el error es al obtener el acuse
+  if (EEcodexFallaServicioException(aExcepcion).Numero = _ECODEX_ERROR_OBTENIENDO_ACUSE) then
+  begin
+    raise EPACNoSePudoObtenerAcuseException.Create('Error al obtener el acuseMessage', 0, 33, False);
   end;
 
   if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, mensajeExcepcion) > _NO_ENCONTRADO then
