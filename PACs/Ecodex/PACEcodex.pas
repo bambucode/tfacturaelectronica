@@ -285,7 +285,7 @@ begin
   // Verificamos si el error es al obtener el acuse
   if (EEcodexFallaServicioException(aExcepcion).Numero = _ECODEX_ERROR_OBTENIENDO_ACUSE) then
   begin
-    raise EPACNoSePudoObtenerAcuseException.Create('Error al obtener el acuseMessage', 0, 33, False);
+    raise EPACNoSePudoObtenerAcuseException.Create('Error al obtener el acuse ' + mensajeExcepcion, 0, 33, False);
   end;
 
   if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, mensajeExcepcion) > _NO_ENCONTRADO then
