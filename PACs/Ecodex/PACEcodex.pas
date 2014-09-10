@@ -254,6 +254,7 @@ const
   _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
   _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
   _ERROR_IMPUESTO_INVALIDO = 'impuesto had invalid value';
+  _ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA = 'El emisor ya se encuentra dado de alta con un integrador';
   _ECODEX_ERROR_OBTENIENDO_ACUSE = 33;
   _NO_ENCONTRADO = 0;
 begin
@@ -353,6 +354,9 @@ begin
 
   if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_USADO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EEcodexAltaEmisorCorreoUsadoException.Create('El correo asignado ya está en uso por otro emisor', 0, 97, False);
+
+  if AnsiPos(_ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA, mensajeExcepcion) > 0 then
+    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta', 0, 98, False);
 
   if AnsiPos(_ECODEX_ALTA_EMISOR_REPETIDO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta', 0, 98, False);
@@ -513,10 +517,10 @@ begin
       respuestaAsignacion.Free;
     except
       On E:Exception do
-         if Not (E Is EPACException) then
-          ProcesarExcepcionDePAC(E)
-        else
-          raise;
+      if Not (E Is EPACException) then
+        ProcesarExcepcionDePAC(E)
+      else
+        raise;
     end;
   finally
     solicitudAsignacion.Free;
