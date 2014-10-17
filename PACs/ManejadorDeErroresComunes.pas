@@ -49,6 +49,8 @@ begin
       case ESOAPHttpException(aExcepcion).StatusCode of
         502, 503, 504, 522: raise EPACProblemaConInternetException.Create('No se pudo realizar una conexion con el PAC: ' +
                                                            aExcepcion.Message, 0, 0, True);
+        505: raise EPACErrorGenericoException.Create('Hubo un error al procesar tu factura: ' +
+                                                     aExcepcion.Message, 0, ESOAPHttpException(aExcepcion).StatusCode, False);
       else
         DetectarErroresConocidos(aExcepcion);
       end;
