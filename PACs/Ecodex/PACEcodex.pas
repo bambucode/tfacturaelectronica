@@ -56,6 +56,7 @@ type
  {$ENDREGION}
  TPACEcodex = class(TProveedorAutorizadoCertificacion)
  private
+  fIntentosDeCancelacion : Integer;
   fDominioWebService : string;
   fDominioWebServiceSeguridad: string;
   fDominioWebServiceRespaldo: string;
@@ -107,6 +108,7 @@ end;
 
 implementation
 
+
 uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
      EcodexWsComun,
      ManejadorDeErroresComunes,
@@ -116,6 +118,11 @@ uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
      CodeSiteLogging,
      {$ENDIF}
      FacturaReglamentacion;
+
+const
+  // Despues de 2 intentos intentando cancelar en el servidor normal, nos pasamos al de respaldo
+  _MAXIMO_INTENTOS_DE_CANCELACION_SERVIDOR_NORMAL= 2;
+
 
 constructor TPACEcodex.Create(const aDominioWebService: string; const
     aDominioWebServiceSeguridad: string = ''; const aDominioWebServiceRespaldo:
@@ -137,6 +144,8 @@ begin
     fDominioWebServiceCancelacion := aDominioWebService;
 
   fDominioWebServiceRespaldo := aDominioWebServiceRespaldo;
+
+  fIntentosDeCancelacion := 0;
 end;
 
 constructor TPACEcodex.Create(const aDominioWebService: String; const
@@ -468,9 +477,15 @@ begin
       // Ecodex solo requiere que le enviemos el UUID del timbre anterior, lo extraemos para enviarlo
       solicitudCancelacion.UUID := ExtraerUUID(aDocumento);
       mensajeFalla := '';
+
+      Inc(fIntentosDeCancelacion);
       respuestaCancelacion := wsTimbradoEcodex.CancelaTimbrado(solicitudCancelacion);
+
       Result := respuestaCancelacion.Cancelada;
       respuestaCancelacion.Free;
+
+      // Como si tuvimos exito al cancelar, reiniciamos el contador
+      fIntentosDeCancelacion := 0;
 
       fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
       fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
@@ -478,7 +493,7 @@ begin
       On E:Exception do
       begin
         // Verificamos si tenemos configurado un ws de respaldo para cancelacion
-        if (fDominioWebServiceRespaldo <> '') and (AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, E.Message) > 0) then
+        if (fDominioWebServiceRespaldo <> '') And (fIntentosDeCancelacion >= _MAXIMO_INTENTOS_DE_CANCELACION_SERVIDOR_NORMAL) then
         begin
           Result := IntentarCancelarEnServidorDeRespaldo(ExtraerUUID(aDocumento))
         end
