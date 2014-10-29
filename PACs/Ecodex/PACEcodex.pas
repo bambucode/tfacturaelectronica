@@ -61,7 +61,7 @@ type
   fDominioWebServiceSeguridad: string;
   fDominioWebServiceRespaldo: string;
   fDominioWebServiceCancelacion: string;
-  fIdTransaccionInicial: Integer;
+  fIdTransaccionInicial: Int64;
   fCredenciales : TFEPACCredenciales;
   fCredencialesIntegrador : TFEPACCredenciales;
   wsClientesEcodex : IEcodexServicioClientes;
@@ -78,7 +78,7 @@ type
       Boolean;
   procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
   function TimbrarPorPrimeraVez(const aDocumento: TTipoComprobanteXML; const
-      aIdTransaccionAUsar: Integer): TFETimbre;
+      aIdTransaccionAUsar: Int64): TFETimbre;
 protected
   function getNombre() : string; override;
 public
@@ -88,8 +88,9 @@ public
   function ObtenerAcuseDeCancelacion(const aDocumento: TTipoComprobanteXML): string; override;
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; override;
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; overload; override;
-  function TimbrarDocumento(const aDocumento: TTipoComprobanteXML; const aIdTransaccionAUsar: Integer): TFETimbre; overload;
-  function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Integer): TFETimbre;
+  function TimbrarDocumento(const aDocumento: TTipoComprobanteXML; const
+      aIdTransaccionAUsar: Int64): TFETimbre; overload;
+  function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TFETimbre;
   function AgregaCliente(const aNuevoEmisor: TFEContribuyente): string; override;
   function SaldoCliente(const aRFC: String) : Integer; override;
   property UltimoXMLEnviado: string read GetUltimoXMLEnviado;
@@ -99,7 +100,7 @@ public
       aDominioWebServiceSeguridad: string = ''; const aDominioWebServiceRespaldo:
       String = ''; const aDominioWebServiceCancelacion: string = ''); overload;
   constructor Create(const aDominioWebService: String; const
-      aIdTransaccionInicial: Integer; const aDominioWebServiceSeguridad: string =
+      aIdTransaccionInicial: Int64; const aDominioWebServiceSeguridad: string =
       ''; const aDominioWebServiceRespaldo: string = ''; const
       aDominioWebServiceCancelacion: string = ''); overload;
   function AgregarTimbres(const aRFC: String; const aTimbresAAsignar: Integer):
@@ -149,7 +150,7 @@ begin
 end;
 
 constructor TPACEcodex.Create(const aDominioWebService: String; const
-    aIdTransaccionInicial: Integer; const aDominioWebServiceSeguridad: string =
+    aIdTransaccionInicial: Int64; const aDominioWebServiceSeguridad: string =
     ''; const aDominioWebServiceRespaldo: string = ''; const
     aDominioWebServiceCancelacion: string = '');
 begin
@@ -738,7 +739,7 @@ begin
   end;
 end;
 
-function TPACEcodex.ObtenerTimbrePrevio(const aIdTransaccionOriginal: Integer):
+function TPACEcodex.ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64):
     TFETimbre;
 var
   solicitudObtenerTimbre: TEcodexSolicitudObtenerTimbrado;
@@ -785,7 +786,8 @@ begin
   Result := TimbrarDocumento(aDocumento, fManejadorDeSesion.NumeroDeTransaccion);
 end;
 
-function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML; const aIdTransaccionAUsar: Integer): TFETimbre;
+function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML;
+    const aIdTransaccionAUsar: Int64): TFETimbre;
 var
   documentoTimbradoPreviamente : Boolean;
 const
@@ -833,7 +835,7 @@ begin
 end;
 
 function TPACEcodex.TimbrarPorPrimeraVez(const aDocumento: TTipoComprobanteXML;
-    const aIdTransaccionAUsar: Integer): TFETimbre;
+    const aIdTransaccionAUsar: Int64): TFETimbre;
 var
   solicitudTimbrado: TSolicitudTimbradoEcodex;
   respuestaTimbrado: TEcodexRespuestaTimbrado;
