@@ -188,6 +188,7 @@ type
     ///	</summary>
     {$ENDREGION}
     procedure AsignarTimbreFiscal(const aTimbre: TFETimbre); virtual;
+    procedure BorrarConceptos; override;
     /// <summary>Guarda una copia del XML en el archivo indicado</summary>
     /// <param name="ArchivoFacturaXML">Ruta completa con nombre de archivo en el que se
     /// almacenara el XML del comprobante</param>
@@ -921,6 +922,18 @@ begin
             IFEXMLComprobanteV32(fXmlComprobante).NumCtaPago:=inherited NumeroDeCuenta;
     end;
   end;
+end;
+
+procedure TFEComprobanteFiscal.BorrarConceptos;
+begin
+  inherited;
+
+  // Borramos los conceptos previos del XML
+  if Assigned(fXmlComprobante) then
+    fXmlComprobante.Conceptos.Clear;
+
+  // Indicamos que es necesario de nuevo llenar el XML
+  fComprobanteLleno := False;
 end;
 
 procedure TFEComprobanteFiscal.LeerPropiedadesDeTimbre;

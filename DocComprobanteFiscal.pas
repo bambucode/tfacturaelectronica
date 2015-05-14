@@ -21,7 +21,7 @@ RAZON PARA CAMBIAR:
     {$ELSE}
      private
     {$ENDIF}
-        bFacturaGenerada : Boolean;
+        fFacturaGenerada : Boolean;
         fEmisor: TFEContribuyente;
         fReceptor: TFEContribuyente;
         fFolio: TFEFolio;
@@ -61,7 +61,7 @@ RAZON PARA CAMBIAR:
     public
         constructor Create;
         // Propiedades del comprobante normal
-        property FacturaGenerada: Boolean read bFacturaGenerada write bFacturaGenerada;
+        property FacturaGenerada: Boolean read fFacturaGenerada write fFacturaGenerada;
         property Serie: TFESerie read fSerie write fSerie;
         property Folio: TFEFolio read fFolio write fFolio;
         property Emisor: TFEContribuyente read fEmisor write fEmisor;
@@ -112,6 +112,7 @@ RAZON PARA CAMBIAR:
         /// <param name="ImporteDescuento">El monto total de descuentos realizados al comprobante</param>
         /// <param name="Motivo">Atributo opcional para indicar el motivo del descuento</param>
         procedure AsignarDescuento(ImporteDescuento: Currency; Motivo: String);
+        procedure BorrarConceptos; virtual;
     end;
 
 implementation
@@ -187,6 +188,12 @@ procedure TDocumentoComprobanteFiscal.AsignarDescuento(ImporteDescuento: Currenc
 begin
   fDescuento := ImporteDescuento;
   fMotivoDescuento := Motivo;
+end;
+
+procedure TDocumentoComprobanteFiscal.BorrarConceptos;
+begin
+   SetLength(fArrConceptos, 0);
+   fFacturaGenerada := False;
 end;
 
 function TDocumentoComprobanteFiscal.getTotal() : Currency;
