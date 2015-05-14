@@ -29,6 +29,7 @@ uses Classes,
      PAC.Ecodex.ManejadorDeSesion,
      EcodexWsTimbrado,
      EcodexWsClientes,
+     EcodexWsCancelacion,
      FeCFD;
 
 type
@@ -55,14 +56,17 @@ type
  {$ENDREGION}
  TPACEcodex = class(TProveedorAutorizadoCertificacion)
  private
+  fIntentosDeCancelacion : Integer;
   fDominioWebService : string;
   fDominioWebServiceSeguridad: string;
   fDominioWebServiceRespaldo: string;
-  fIdTransaccionInicial: Integer;
+  fDominioWebServiceCancelacion: string;
+  fIdTransaccionInicial: Int64;
   fCredenciales : TFEPACCredenciales;
   fCredencialesIntegrador : TFEPACCredenciales;
   wsClientesEcodex : IEcodexServicioClientes;
   wsTimbradoEcodex: IEcodexServicioTimbrado;
+  wsCancelacionEcodex: IEcodexServicioCancelacion;
   wsTimbradoEcodexRespaldo: IEcodexServicioTimbrado;
   fManejadorDeSesion : TEcodexManejadorDeSesion;
   FUltimoXMLEnviado: string;
@@ -74,34 +78,37 @@ type
       Boolean;
   procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
   function TimbrarPorPrimeraVez(const aDocumento: TTipoComprobanteXML; const
-      aIdTransaccionAUsar: Integer): TFETimbre;
+      aIdTransaccionAUsar: Int64): TFETimbre;
 protected
   function getNombre() : string; override;
 public
   destructor Destroy(); override;
   procedure AfterConstruction; override;
   procedure AsignarCredenciales(const aCredenciales, aCredencialesIntegrador: TFEPACCredenciales); override;
+  function ObtenerAcuseDeCancelacion(const aDocumento: TTipoComprobanteXML): string; override;
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; override;
   function TimbrarDocumento(const aDocumento: TTipoComprobanteXML): TFETimbre; overload; override;
-  function TimbrarDocumento(const aDocumento: TTipoComprobanteXML; const aIdTransaccionAUsar: Integer): TFETimbre; overload;
-  function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Integer): TFETimbre;
+  function TimbrarDocumento(const aDocumento: TTipoComprobanteXML; const
+      aIdTransaccionAUsar: Int64): TFETimbre; overload;
+  function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TFETimbre;
   function AgregaCliente(const aNuevoEmisor: TFEContribuyente): string; override;
   function SaldoCliente(const aRFC: String) : Integer; override;
   property UltimoXMLEnviado: string read GetUltimoXMLEnviado;
   property UltimoXMLRecibido: string read GetUltimoXMLRecibido;
   property Nombre : String read getNombre;
-  constructor Create(const aDominioWebService: string;
-                     const aDominioWebServiceSeguridad: string = '';
-                     const aDominioWebServiceRespaldo: String = ''); overload;
-  constructor Create(const aDominioWebService: String;
-                     const aIdTransaccionInicial: Integer;
-                     const aDominioWebServiceSeguridad: string = '';
-                     const aDominioWebServiceRespaldo: string = ''); overload;
+  constructor Create(const aDominioWebService: string; const
+      aDominioWebServiceSeguridad: string = ''; const aDominioWebServiceRespaldo:
+      String = ''; const aDominioWebServiceCancelacion: string = ''); overload;
+  constructor Create(const aDominioWebService: String; const
+      aIdTransaccionInicial: Int64; const aDominioWebServiceSeguridad: string =
+      ''; const aDominioWebServiceRespaldo: string = ''; const
+      aDominioWebServiceCancelacion: string = ''); overload;
   function AgregarTimbres(const aRFC: String; const aTimbresAAsignar: Integer):
       Integer;
 end;
 
 implementation
+
 
 uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
      EcodexWsComun,
@@ -113,8 +120,14 @@ uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
      {$ENDIF}
      FacturaReglamentacion;
 
-constructor TPACEcodex.Create(const aDominioWebService: string;
-      const aDominioWebServiceSeguridad: string = ''; const aDominioWebServiceRespaldo: String = '');
+const
+  // Despues de 2 intentos intentando cancelar en el servidor normal, nos pasamos al de respaldo
+  _MAXIMO_INTENTOS_DE_CANCELACION_SERVIDOR_NORMAL= 2;
+
+
+constructor TPACEcodex.Create(const aDominioWebService: string; const
+    aDominioWebServiceSeguridad: string = ''; const aDominioWebServiceRespaldo:
+    String = ''; const aDominioWebServiceCancelacion: string = '');
 begin
   inherited;
 
@@ -126,15 +139,22 @@ begin
   else
     fDominioWebServiceSeguridad := aDominioWebService;
 
+  if aDominioWebServiceCancelacion <> '' then
+    fDominioWebServiceCancelacion := aDominioWebServiceCancelacion
+  else
+    fDominioWebServiceCancelacion := aDominioWebService;
+
   fDominioWebServiceRespaldo := aDominioWebServiceRespaldo;
+
+  fIntentosDeCancelacion := 0;
 end;
 
-constructor TPACEcodex.Create(const aDominioWebService: String;
-                              const aIdTransaccionInicial: Integer;
-                              const aDominioWebServiceSeguridad: string = '';
-                              const aDominioWebServiceRespaldo: string = '');
+constructor TPACEcodex.Create(const aDominioWebService: String; const
+    aIdTransaccionInicial: Int64; const aDominioWebServiceSeguridad: string =
+    ''; const aDominioWebServiceRespaldo: string = ''; const
+    aDominioWebServiceCancelacion: string = '');
 begin
-  Create(aDominioWebService, aDominioWebServiceSeguridad, aDominioWebServiceRespaldo);
+  Create(aDominioWebService, aDominioWebServiceSeguridad, aDominioWebServiceRespaldo, aDominioWebServiceCancelacion);
   // Establecemos el id de transaccion inicial para todas las operaciones
   fIdTransaccionInicial := aIdTransaccionInicial;
 end;
@@ -145,6 +165,7 @@ begin
   wsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
   wsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService + '/ServicioClientes.svc');
   fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebServiceSeguridad, fIdTransaccionInicial);
+  wsCancelacionEcodex := GetEcodexWSCancelacion(False, fDominioWebServiceCancelacion + '/ServicioCancelacion.svc');
 end;
 
 function TPACEcodex.getNombre() : string;
@@ -243,6 +264,8 @@ const
   _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
   _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
   _ERROR_IMPUESTO_INVALIDO = 'impuesto had invalid value';
+  _ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA = 'El emisor ya se encuentra dado de alta con un integrador';
+  _ECODEX_ERROR_OBTENIENDO_ACUSE = 33;
   _NO_ENCONTRADO = 0;
 begin
   mensajeExcepcion := aExcepcion.Message;
@@ -268,6 +291,12 @@ begin
         mensajeExcepcion := 'EEcodexFallaSesionException (' + IntToStr(EEcodexFallaSesionException(aExcepcion).Estatus) + ') ' +
                             EEcodexFallaSesionException(aExcepcion).Descripcion;
       end;
+  end;
+
+  // Verificamos si el error es al obtener el acuse
+  if (EEcodexFallaServicioException(aExcepcion).Numero = _ECODEX_ERROR_OBTENIENDO_ACUSE) then
+  begin
+    raise EPACNoSePudoObtenerAcuseException.Create('Error al obtener el acuse ' + mensajeExcepcion, 0, 33, False);
   end;
 
   if AnsiPos(_ECODEX_FUERA_DE_SERVICIO, mensajeExcepcion) > _NO_ENCONTRADO then
@@ -334,16 +363,19 @@ begin
   {$REGION 'Excepciones de alta de emisores'}
 
   if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_USADO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorCorreoUsadoException.Create('El correo asignado ya está en uso por otro emisor', 0, 97, False);
+    raise EEcodexAltaEmisorCorreoUsadoException.Create('El correo asignado ya está en uso por otro emisor.', 0, 97, False);
+
+  if AnsiPos(_ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA, mensajeExcepcion) > 0 then
+    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta con un integrador.', 0, 98, False);
 
   if AnsiPos(_ECODEX_ALTA_EMISOR_REPETIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta', 0, 98, False);
+    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta.', 0, 98, False);
 
   if AnsiPos(_ECODEX_ALTA_EMISOR_RFC_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorRFCInvalidoException.Create('El RFC del emisor no es válido', 0, 890, False);
+    raise EEcodexAltaEmisorRFCInvalidoException.Create('El RFC del emisor no es válido.', 0, 890, False);
 
   if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorCorreoInvalidoException.Create('El correo del emisor no es válido', 0, 891, False);
+    raise EEcodexAltaEmisorCorreoInvalidoException.Create('El correo del emisor no es válido.', 0, 891, False);
 
   {$ENDREGION}
 
@@ -352,6 +384,62 @@ begin
   // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
   // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
   raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
+end;
+
+function TPACEcodex.ObtenerAcuseDeCancelacion(const aDocumento: TTipoComprobanteXML): string;
+var
+  mensajeFalla, tokenDeUsuario: String;
+  solicitudAcuse : TEcodexSolicitudAcuse;
+  respuestaAcuse : TEcodexRespuestaRecuperarAcuse;
+  solicitudCancelacionRespaldo: TEcodexSolicitudCancelacion;
+  tokenDeUsuarioRespaldo: String;
+  manejadorDeSesionRespaldo: TEcodexManejadorDeSesion;
+
+  function ExtraerUUID(const aDocumentoTimbrado: TTipoComprobanteXML) : String;
+  const
+    _LONGITUD_UUID = 36;
+  begin
+      Result:=Copy(aDocumentoTimbrado,
+                   AnsiPos('UUID="', aDocumentoTimbrado) + 6,
+                   _LONGITUD_UUID);
+  end;
+
+begin
+  Result := '';
+
+  // 1. Creamos la solicitud de cancelacion
+  solicitudAcuse := TEcodexSolicitudAcuse.Create;
+
+  // 2. Iniciamos una nueva sesion solicitando un nuevo token
+  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+
+  solicitudAcuse.UUID := ExtraerUUID(aDocumento);
+
+  Assert(solicitudAcuse.UUID <> '', 'No es posible solicitar un acuse de cancelacion de una factura sin UUID');
+
+  try
+    try
+      solicitudAcuse.RFC := fCredenciales.RFC;
+      solicitudAcuse.Token := tokenDeUsuario;
+      solicitudAcuse.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+
+      mensajeFalla := '';
+      respuestaAcuse := wsCancelacionEcodex.RecuperarAcuses(solicitudAcuse);
+      Result := respuestaAcuse.AcuseXML;
+      respuestaAcuse.Free;
+
+      fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsCancelacion;
+      fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsCancelacion;
+    except
+      On E:Exception do
+      begin
+        ProcesarExcepcionDePAC(E);
+      end;
+    end;
+  finally
+    if Assigned(solicitudAcuse) then
+      solicitudAcuse.Free;
+  end;
 end;
 
 function TPACEcodex.CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean;
@@ -390,9 +478,15 @@ begin
       // Ecodex solo requiere que le enviemos el UUID del timbre anterior, lo extraemos para enviarlo
       solicitudCancelacion.UUID := ExtraerUUID(aDocumento);
       mensajeFalla := '';
+
+      Inc(fIntentosDeCancelacion);
       respuestaCancelacion := wsTimbradoEcodex.CancelaTimbrado(solicitudCancelacion);
+
       Result := respuestaCancelacion.Cancelada;
       respuestaCancelacion.Free;
+
+      // Como si tuvimos exito al cancelar, reiniciamos el contador
+      fIntentosDeCancelacion := 0;
 
       fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
       fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
@@ -400,7 +494,7 @@ begin
       On E:Exception do
       begin
         // Verificamos si tenemos configurado un ws de respaldo para cancelacion
-        if (fDominioWebServiceRespaldo <> '') and (AnsiPos(_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE, E.Message) > 0) then
+        if (fDominioWebServiceRespaldo <> '') And (fIntentosDeCancelacion >= _MAXIMO_INTENTOS_DE_CANCELACION_SERVIDOR_NORMAL) then
         begin
           Result := IntentarCancelarEnServidorDeRespaldo(ExtraerUUID(aDocumento))
         end
@@ -439,10 +533,10 @@ begin
       respuestaAsignacion.Free;
     except
       On E:Exception do
-         if Not (E Is EPACException) then
-          ProcesarExcepcionDePAC(E)
-        else
-          raise;
+      if Not (E Is EPACException) then
+        ProcesarExcepcionDePAC(E)
+      else
+        raise;
     end;
   finally
     solicitudAsignacion.Free;
@@ -645,7 +739,7 @@ begin
   end;
 end;
 
-function TPACEcodex.ObtenerTimbrePrevio(const aIdTransaccionOriginal: Integer):
+function TPACEcodex.ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64):
     TFETimbre;
 var
   solicitudObtenerTimbre: TEcodexSolicitudObtenerTimbrado;
@@ -692,7 +786,8 @@ begin
   Result := TimbrarDocumento(aDocumento, fManejadorDeSesion.NumeroDeTransaccion);
 end;
 
-function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML; const aIdTransaccionAUsar: Integer): TFETimbre;
+function TPACEcodex.TimbrarDocumento(const aDocumento: TTipoComprobanteXML;
+    const aIdTransaccionAUsar: Int64): TFETimbre;
 var
   documentoTimbradoPreviamente : Boolean;
 const
@@ -740,7 +835,7 @@ begin
 end;
 
 function TPACEcodex.TimbrarPorPrimeraVez(const aDocumento: TTipoComprobanteXML;
-    const aIdTransaccionAUsar: Integer): TFETimbre;
+    const aIdTransaccionAUsar: Int64): TFETimbre;
 var
   solicitudTimbrado: TSolicitudTimbradoEcodex;
   respuestaTimbrado: TEcodexRespuestaTimbrado;

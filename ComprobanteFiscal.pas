@@ -27,7 +27,14 @@ type
 
   // Excepciones que pueden ser generadas
   EFEFolioFueraDeRango = class(Exception);
-  EXMLVacio = class(Exception);
+  EFEXMLVacio = class(Exception);
+
+  {$REGION 'Documentation'}
+  ///	<summary>
+  ///	  Excepcion lanzada cuando se intenta generar una factura sin ningun concepto
+  ///	</summary>
+  {$ENDREGION}
+  EFESinConceptosException = class(Exception);
 
   /// <summary>Representa la estructura de comprobante fiscal digital (ver2.2) y sus elementos
   /// definidos de acuerdo al XSD del SAT. Esta pensado para ser extendido en las versiones
@@ -181,6 +188,7 @@ type
     ///	</summary>
     {$ENDREGION}
     procedure AsignarTimbreFiscal(const aTimbre: TFETimbre); virtual;
+    procedure BorrarConceptos; override;
     /// <summary>Guarda una copia del XML en el archivo indicado</summary>
     /// <param name="ArchivoFacturaXML">Ruta completa con nombre de archivo en el que se
     /// almacenara el XML del comprobante</param>
@@ -610,39 +618,42 @@ var
   I: Integer;
   Concepto: TFEConcepto;
 begin
-     // Obtenemos los conceptos agregados al documento previamente
-     for I := 0 to Length(inherited Conceptos) - 1 do
-     begin
-          Concepto:=(inherited Conceptos)[I];
+  if Length(inherited Conceptos) = 0 then
+    raise EFESinConceptosException.Create('No es posible generar una factura ya que no tuvo ningun concepto.');
 
-          // Agregamos el concepto al XML
-          with fXmlComprobante.Conceptos.Add do
+  // Obtenemos los conceptos agregados al documento previamente
+  for I := 0 to Length(inherited Conceptos) - 1 do
+  begin
+      Concepto:=(inherited Conceptos)[I];
+
+      // Agregamos el concepto al XML
+      with fXmlComprobante.Conceptos.Add do
+      begin
+        Cantidad := TFEReglamentacion.ComoCantidad(Concepto.Cantidad);
+
+        if Trim(Concepto.Unidad) <> '' then
+          Unidad := Concepto.Unidad; // Requerido a partir de la v2.2
+
+        if Trim(Concepto.NoIdentificacion) <> '' then
+          NoIdentificacion := TFEReglamentacion.ComoCadena(Concepto.NoIdentificacion); // Opcional
+
+        Descripcion := TFEReglamentacion.ComoCadena(Concepto.Descripcion);
+        ValorUnitario := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario);
+        Importe := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario * Concepto.Cantidad);
+
+        // Le fue asignada informacion aduanera??
+        if (Concepto.DatosAduana.NumeroDocumento <> '') then
+          with InformacionAduanera.Add do
           begin
-            Cantidad := TFEReglamentacion.ComoCantidad(Concepto.Cantidad);
-
-            if Trim(Concepto.Unidad) <> '' then
-              Unidad := Concepto.Unidad; // Requerido a partir de la v2.2
-
-            if Trim(Concepto.NoIdentificacion) <> '' then
-              NoIdentificacion := TFEReglamentacion.ComoCadena(Concepto.NoIdentificacion); // Opcional
-
-            Descripcion := TFEReglamentacion.ComoCadena(Concepto.Descripcion);
-            ValorUnitario := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario);
-            Importe := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario * Concepto.Cantidad);
-
-            // Le fue asignada informacion aduanera??
-            if (Concepto.DatosAduana.NumeroDocumento <> '') then
-              with InformacionAduanera.Add do
-              begin
-                Numero := Concepto.DatosAduana.NumeroDocumento;
-                Fecha := TFEReglamentacion.ComoFechaAduanera(Concepto.DatosAduana.FechaExpedicion);
-                Aduana := TFEReglamentacion.ComoCadena(Concepto.DatosAduana.Aduana);
-              end;
-
-            if Trim(Concepto.CuentaPredial) <> '' then
-              CuentaPredial.Numero := TFEReglamentacion.ComoCadena(Concepto.CuentaPredial); // Opcional
+            Numero := Concepto.DatosAduana.NumeroDocumento;
+            Fecha := TFEReglamentacion.ComoFechaAduanera(Concepto.DatosAduana.FechaExpedicion);
+            Aduana := TFEReglamentacion.ComoCadena(Concepto.DatosAduana.Aduana);
           end;
-     end;
+
+        if Trim(Concepto.CuentaPredial) <> '' then
+          CuentaPredial.Numero := TFEReglamentacion.ComoCadena(Concepto.CuentaPredial); // Opcional
+      end;
+  end;
 end;
 
 procedure TFEComprobanteFiscal.AsignarImpuestosRetenidos;
@@ -911,6 +922,18 @@ begin
             IFEXMLComprobanteV32(fXmlComprobante).NumCtaPago:=inherited NumeroDeCuenta;
     end;
   end;
+end;
+
+procedure TFEComprobanteFiscal.BorrarConceptos;
+begin
+  inherited;
+
+  // Borramos los conceptos previos del XML
+  if Assigned(fXmlComprobante) then
+    fXmlComprobante.Conceptos.Clear;
+
+  // Indicamos que es necesario de nuevo llenar el XML
+  fComprobanteLleno := False;
 end;
 
 procedure TFEComprobanteFiscal.LeerPropiedadesDeTimbre;
@@ -1253,7 +1276,7 @@ var
 begin
     if (Trim(Valor) = '') then
     begin
-        Raise EXMLVacio.Create('El valor proveido al XML esta vacio. Imposible crear comprobante.');
+        Raise EFEXMLVacio.Create('El valor proveido al XML esta vacio. Imposible crear comprobante.');
         Exit;
     end;
 

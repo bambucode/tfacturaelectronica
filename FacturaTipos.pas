@@ -288,6 +288,7 @@ EPACTimbradoRFCNoCorrespondeException = class(EPACException);
 EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
 EPACTimbradoSinFoliosDisponiblesException = class(EPACException);
 EPACCAnceladoSinCertificadosException = class(EPACException);
+EPACNoSePudoObtenerAcuseException = class(EPACException);
 
 {$REGION 'Documentation'}
 ///	<summary>
@@ -320,6 +321,7 @@ _URL_PRUEBAS_ECODEX           = 'https://pruebas.ecodex.com.mx:2045';
 // Errores ecodex
 _ERROR_ECODEX_CERTIFICADO_NUEVO = 'Error en Certificado:402';
 _ERROR_ECODEX_CERTIFICADO_306   = '306 Certificado utilizado no es de sello';
+_ERROR_ECODEX_CORREO_REPETIDO   = 'El correo asignado ya est'; // Mensaje completo: El correo asignado ya está en uso por otro emisor
 
 // Códigos de error regresados por los PAC
 _ERROR_SAT_XML_INVALIDO                             = '301';

@@ -13,8 +13,8 @@ type
     fDominioWebService: String;
     fCredenciales: TFEPACCredenciales;
     wsSeguridad : IEcodexServicioSeguridad;
-    fNumeroTransaccion: Integer;
-    function GetNumeroDeTransaccion: Integer;
+    fNumeroTransaccion: Int64;
+    function GetNumeroDeTransaccion: Int64;
     function ObtenerNuevoTokenDeServicio(const aRFC: String): String;
     procedure ProcesarFallaEcodex(const aExcepcion: Exception);
   public
@@ -25,7 +25,7 @@ type
     function ObtenerNuevoTokenAltaEmisores(const aRFC, aIdIntegrador,
         aIdAltaEmisores: String): String;
     function ObtenerNuevoTokenDeUsuario: String;
-    property NumeroDeTransaccion: Integer read GetNumeroDeTransaccion;
+    property NumeroDeTransaccion: Int64 read GetNumeroDeTransaccion;
   end;
 
 implementation
@@ -59,7 +59,7 @@ begin
   fCredenciales := aCredenciales;
 end;
 
-function TEcodexManejadorDeSesion.GetNumeroDeTransaccion: Integer;
+function TEcodexManejadorDeSesion.GetNumeroDeTransaccion: Int64;
 begin
   Result := fNumeroTransaccion;
 end;

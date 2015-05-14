@@ -37,6 +37,7 @@ type
     procedure setXML_DeComprobanteConImpuestosLocales_EstablezcaImpuestosCorrectamente;
     procedure AgregarImpuestoLocal_Retenido_LoGuardeEnXML;
     procedure AgregarImpuestoLocal_Trasladado_LoGuardeEnXML;
+    procedure Importe_DeCantidadesConMuchosDecimales_SeaElCorrecto;
     procedure SelloDigital_ConConfiguracionDecimalIncorrecta_NoFalle;
   end;
 
@@ -488,6 +489,67 @@ begin
     'El encabezado del XML basico para un comprobante no fue el correcto');
 
   FreeAndNil(NuevoComprobante);
+end;
+
+procedure TestTFEComprobanteFiscalV32.Importe_DeCantidadesConMuchosDecimales_SeaElCorrecto;
+var
+  xmlDeComprobante: WideString;
+  comprobanteNuevo, comprobanteGuardado: TFEComprobanteFiscal;
+  importeEsperado, importeCalculado : Currency;
+  archivoComprobanteGuardado: String;
+  conceptoConCantidadesConMuchosDecimales : TFEConcepto;
+  Certificado: TFECertificado;
+begin
+  xmlDeComprobante := leerContenidoDeFixture('comprobante_fiscal/v32/comprobante_timbrado.xml');
+
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+  comprobanteNuevo.XML:=UTF8ToString(xmlDeComprobante);
+
+  // Configuramos el certificado de prueba
+  Certificado.Ruta := fRutaFixtures + _RUTA_CERTIFICADO;
+  Certificado.LlavePrivada.Ruta := fRutaFixtures + _LLAVE_PRIVADA_PRUEBAS_SAT;
+  Certificado.LlavePrivada.Clave := _CLAVE_LLAVE_PRIVADA_PRUEBAS_SAT;
+  comprobanteNuevo.Certificado := Certificado;
+  comprobanteNuevo.ValidarCertificadoYLlavePrivada := False;
+
+  // Eliminamos los conceptos del comprobante leido
+  comprobanteNuevo.BorrarConceptos;
+
+  try
+    // Agregamos un concepto con cantidad y precio a granel para forzar que se calcule un importe con mas de 6 decimales de exactitud
+    conceptoConCantidadesConMuchosDecimales.Cantidad := 0.1234;
+    conceptoConCantidadesConMuchosDecimales.Unidad := 'PZA';
+    conceptoConCantidadesConMuchosDecimales.Descripcion := 'Articulo de Prueba';
+    conceptoConCantidadesConMuchosDecimales.ValorUnitario := 129.9876;
+    conceptoConCantidadesConMuchosDecimales.NoIdentificacion := '1';
+
+    importeEsperado := conceptoConCantidadesConMuchosDecimales.Cantidad * conceptoConCantidadesConMuchosDecimales.ValorUnitario;
+
+    comprobanteNuevo.AgregarConcepto(conceptoConCantidadesConMuchosDecimales);
+
+    // Generamos el archivo
+    Randomize;
+    archivoComprobanteGuardado := fDirTemporal + 'comprobante_cantidad_v32_' + IntToStr(Random(9999999999)) + '.xml';
+    comprobanteNuevo.GuardarEnArchivo(archivoComprobanteGuardado);
+
+    // Leemos el XML recien generado para leer la cantidad y precio directo de los conceptos XML
+    xmlDeComprobante := leerContenidoDeArchivo(archivoComprobanteGuardado);
+    comprobanteGuardado := TFEComprobanteFiscal.Create(fev32);
+    comprobanteGuardado.XML:=UTF8ToString(xmlDeComprobante);
+
+    // Calculamos el importe segun la cantidad y valor unitario leidos del nodo concepto del XML
+    importeCalculado := comprobanteGuardado.Conceptos[0].Cantidad * comprobanteGuardado.Conceptos[0].ValorUnitario;
+
+    CheckTrue(Length(comprobanteGuardado.Conceptos) > 0,
+              'El comprobante recien guardado debio haber tenido conceptos');
+
+    // Checamos que el importe esperado sea el correcto
+    CheckEquals(importeEsperado,
+                importeCalculado,
+                'El importe del concepto no fue calculado correctamente. Verificar que CANTIDAD y PRECIO se guardaran correctamente en XML');
+  finally
+     FreeAndNil(comprobanteNuevo);
+  end;
 end;
 
 initialization

@@ -5,8 +5,8 @@ interface
 uses Types, Classes;
 
 var
-  fUltimoXMLEnviado: string;
-  fUltimoXMLRecibido: string;
+  _WSHELPER_ULTIMO_XML_ENVIADO: string;
+  _WSHELPER_ULTIMO_XML_RECIBIDO: string;
 
 type
   TWSHelper = class
@@ -18,11 +18,8 @@ type
   public
     procedure BeforeExecute(const MethodName: string; SOAPRequest: TStream);
     procedure AfterExecute (const MethodName: string; SOAPResponse: TStream);
-    property UltimoXMLEnviado: string read GetUltimoXMLEnviado write
-        SetUltimoXMLEnviado;
-    property UltimoXMLRecibido: string read GetUltimoXMLRecibido write
-        SetUltimoXMLRecibido;
-
+    property UltimoXMLEnviado: string read GetUltimoXMLEnviado;
+    property UltimoXMLRecibido: string read GetUltimoXMLRecibido;
   end;
 
 implementation
@@ -44,7 +41,7 @@ begin
   ss.CopyFrom(SOAPRequest, SOAPRequest.Size);
 //    Xml.text := ss.DataString;
 //    Xml.SaveToFile( 'c:send.xml' );
-  fUltimoXMLEnviado := ss.DataString;
+  _WSHELPER_ULTIMO_XML_ENVIADO := ss.DataString;
 
   {$IFDEF WEBSERVICEDEBUG}
   //CodeSite.Send('XML enviado:', ss.DataString);
@@ -67,7 +64,7 @@ begin
   ss.CopyFrom(SOAPResponse, SOAPResponse.Size);
 //    Xml.text := ss.DataString;
 //    Xml.SaveToFile( 'c:fact.xml' );
-  fUltimoXMLRecibido := ss.DataString;
+  _WSHELPER_ULTIMO_XML_RECIBIDO := ss.DataString;
   {$IFDEF WEBSERVICEDEBUG}
   //CodeSite.Send('XML recibido:', ss.DataString);
   {$ENDIF}
@@ -79,22 +76,22 @@ end;
 
 function TWSHelper.GetUltimoXMLEnviado: string;
 begin
-  Result := fUltimoXMLEnviado;
+  Result := _WSHELPER_ULTIMO_XML_ENVIADO;
 end;
 
 function TWSHelper.GetUltimoXMLRecibido: string;
 begin
-  Result := fUltimoXMLRecibido;
+  Result := _WSHELPER_ULTIMO_XML_RECIBIDO;
 end;
 
 procedure TWSHelper.SetUltimoXMLEnviado(const Value: string);
 begin
-  fUltimoXMLEnviado := Value;
+  _WSHELPER_ULTIMO_XML_ENVIADO := Value;
 end;
 
 procedure TWSHelper.SetUltimoXMLRecibido(const Value: string);
 begin
-  fUltimoXMLRecibido := Value;
+  _WSHELPER_ULTIMO_XML_RECIBIDO := Value;
 end;
 
 end.

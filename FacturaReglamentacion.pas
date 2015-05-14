@@ -30,7 +30,8 @@ type
       class function ComoMoneda(aMonto: Currency; const aDecimalesDefault: Integer =
           6): String;
       class function ComoCadena(sCadena: String) : String;
-      class function ComoCantidad(dCantidad: Double) : String;
+      class function ComoCantidad(dCantidad: Double; const aNumeroDecimales: Integer
+          = 6): String;
       class function ComoFechaHora(dtFecha: TDateTime) : String;
       class function DeFechaHoraISO8601(const aFechaISO8601: String) : TDateTime;
       class function ComoFechaAduanera(dtFecha: TDateTime) : String;
@@ -204,14 +205,16 @@ begin
     Result:=sCadenaEscapada;
 end;
 
-class function TFEReglamentacion.ComoCantidad(dCantidad: Double) : String;
+class function TFEReglamentacion.ComoCantidad(dCantidad: Double; const
+    aNumeroDecimales: Integer = 6): String;
 begin
    // Las cantidades cerradas las regresamos sin decimales
-   // las que tienen fracciones con 2 digitos decimales...
+   // las que tienen fracciones con 6 digitos decimales para respetar la especificacion
+   // del Anexo 20 respecto al tipo xs:decimal
    try
      CorregirConfiguracionRegionalLocal;
      if Frac(dCantidad) > 0 then
-        Result:=FloatToStrF(dCantidad,ffFixed,10,2)
+        Result:=FloatToStrF(dCantidad,ffFixed, 10, aNumeroDecimales)
      else
         Result:=IntToStr(Round(dCantidad));
    finally
