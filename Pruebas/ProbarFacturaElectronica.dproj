@@ -3,7 +3,7 @@
 			<ProjectGuid>{665A03AB-92A6-4A8E-AEE0-D3F492F186EA}</ProjectGuid>
 			<MainSource>ProbarFacturaElectronica.dpr</MainSource>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<TargetedPlatforms>1</TargetedPlatforms>
 			<AppType>Application</AppType>
 			<FrameworkType>VCL</FrameworkType>
@@ -67,6 +67,7 @@
 			<DCC_Define>RELEASE;XMLOUTPUT;ISCONSOLE;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+			<DCC_Define>CONSOLE_TESTRUNNER;$(DCC_Define)</DCC_Define>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<VerInfo_Locale>1033</VerInfo_Locale>
@@ -85,6 +86,8 @@
 			<DelphiCompile Include="$(MainSource)">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
+			<DCCReference Include="..\..\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas"/>
+			<DCCReference Include="..\..\DUnit-XML\VSoft.MSXML6.pas"/>
 			<DCCReference Include="TestSelloDigital.pas"/>
 			<DCCReference Include="TestCadenaOriginalDeTimbre.pas"/>
 			<DCCReference Include="..\FacturaTipos.pas"/>
@@ -174,8 +177,7 @@
 						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
 						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40WSDT_D2012.bpl">IB Objects Web Snap Extensions</Excluded_Packages>
-						<Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\TMS Aurelius\library\bpl\Win32\dclaureliusxe2.bpl">TMS Aurelius - Design-Time Core Package</Excluded_Packages>
-						<Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\IBObjects\lib\d2012\Win32\Release\ibo5wsdt_d2012.bpl">IB Objects 5.3.1 Web Snap Extensions</Excluded_Packages>
+						<Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\IBObjects\lib\d2012\Win32\Release\ibo5wsdt_d2012.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\IBObjects\lib\d2012\Win32\Release\ibo5wsdt_d2012.bpl not found</Excluded_Packages>
 					</Excluded_Packages>
 				</Delphi.Personality>
 				<Platforms>
@@ -185,8 +187,8 @@
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
 		</ProjectExtensions>
-		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
-		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+		<Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
 	</Project>
 
 <!-- EurekaLog First Line
