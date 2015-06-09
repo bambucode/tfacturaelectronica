@@ -77,13 +77,13 @@ type
   function IntentarCancelarEnServidorDeRespaldo(const aUUIDDocumento: String):
       Boolean;
   procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
-  function TimbrarPorPrimeraVez(const aDocumento: TTipoComprobanteXML; const
-      aIdTransaccionAUsar: Int64): TFETimbre;
+
 protected
   function getNombre() : string; override;
 public
   destructor Destroy(); override;
   procedure AfterConstruction; override;
+  function TimbrarPorPrimeraVez(const aDocumento: TTipoComprobanteXML; const aIdTransaccionAUsar: Int64): TFETimbre;
   procedure AsignarCredenciales(const aCredenciales, aCredencialesIntegrador: TFEPACCredenciales); override;
   function ObtenerAcuseDeCancelacion(const aDocumento: TTipoComprobanteXML): string; override;
   function CancelarDocumento(const aDocumento: TTipoComprobanteXML): Boolean; override;
