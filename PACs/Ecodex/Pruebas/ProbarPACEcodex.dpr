@@ -74,7 +74,6 @@ uses
   ManejadorDeErroresComunes in '..\..\ManejadorDeErroresComunes.pas',
   EcodexWsCancelacion in '..\EcodexWsCancelacion.pas';
 
-{$R *.RES}
 
 {$IfDef XMLOUTPUT}
 var
