@@ -34,6 +34,13 @@ program ProbarPACEcodex;
 
 uses
   Forms,
+  {$IFDEF XMLOUTPUT}
+  // Soporte para Vsoft.DUnit.Xml el cual permite que las pruebas generen un archivo XML para los reportes
+  // Ref: https://github.com/VSoftTechnologies/DUnit-XML
+  // Solo se debe agregar la carpeta de dicho proyecto al "Library Path"
+  VSoft.DUnit.XMLTestRunner in '..\..\..\externos\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas',
+  VSoft.MSXML6 in '..\..\..\externos\DUnit-XML\VSoft.MSXML6.pas',
+  {$ENDIF}
   TestFramework,
   GUITestRunner,
   TextTestRunner,
@@ -64,15 +71,57 @@ uses
   ComprobanteFiscal in '..\..\..\ComprobanteFiscal.pas',
   EcodexWsClientes in '..\EcodexWsClientes.pas',
   EcodexWsComun in '..\EcodexWsComun.pas',
-  ManejadorDeErroresComunes in '..\..\ManejadorDeErroresComunes.pas';
+  ManejadorDeErroresComunes in '..\..\ManejadorDeErroresComunes.pas',
+  EcodexWsCancelacion in '..\EcodexWsCancelacion.pas';
 
 {$R *.RES}
 
+{$IfDef XMLOUTPUT}
+var
+  OutputFile : string = DEFAULT_FILENAME;
+
+var
+  ConfigFile : string;
+{$EndIf}
+
+{$IFDEF ISCONSOLE}
+var
+  ExitBehavior: TRunnerExitBehavior;
+{$EndIf}
+
 begin
-  Application.Initialize;
-  if IsConsole then
-    with TextTestRunner.RunRegisteredTests do
-      Free
-  else
-    GUITestRunner.RunRegisteredTests;
+
+  {$IfDef ISCONSOLE}
+    {$IfDef XMLOUTPUT}
+      {$Message Hint 'Compilando version generadora de XML'}
+      if ConfigFile <> '' then
+      begin
+        RegisteredTests.LoadConfiguration(ConfigFile, False, True);
+        WriteLn('Loaded config file ' + ConfigFile);
+      end;
+      if ParamCount > 0 then
+        OutputFile := ParamStr(1);
+      WriteLn('Writing output to ' + OutputFile);
+      WriteLn('Running ' + IntToStr(RegisteredTests.CountEnabledTestCases) + ' of ' + IntToStr(RegisteredTests.CountTestCases) + ' test cases');
+      TXMLTestListener.RunRegisteredTests(OutputFile);
+    {$else}
+      WriteLn('To run with rxbPause, use -p switch');
+      WriteLn('To run with rxbHaltOnFailures, use -h switch');
+      WriteLn('No switch runs as rxbContinue');
+
+      if FindCmdLineSwitch('p', ['-', '/'], true) then
+        ExitBehavior := rxbPause
+      else if FindCmdLineSwitch('h', ['-', '/'], true) then
+        ExitBehavior := rxbHaltOnFailures
+      else
+        ExitBehavior := rxbContinue;
+
+      TextTestRunner.RunRegisteredTests(ExitBehavior);
+    {$endif}
+  {$Else}
+    {$Message Hint 'Generando version GUI de pruebas'}
+    Application.Initialize;
+    TGUITestRunner.RunRegisteredTests;
+  {$EndIf}
 end.
+

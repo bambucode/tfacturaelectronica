@@ -44,7 +44,7 @@ type
     procedure TimbrarDocumento_ConXMLMalformado_CauseExcepcion;
     procedure TimbrarDocumento_DePrueba_RegreseDatosDeTimbre;
     procedure TimbrarDocumento_GeneradoHaceMasDe72Horas_CauseExcepcion;
-    procedure TimbrarDocumento_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
+    procedure TimbrarPorPrimeraVez_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
     procedure TimbrarDocumento_PreviamenteTimbrado_ObtenegaYRegreseTimbrePrevioAutomaticamente;
 
   end;
@@ -64,7 +64,7 @@ begin
   cutPACEcodex := TPACEcodex.Create('https://pruebas.ecodex.com.mx:2045');
 
   // Definimos el directorio donde estan los archivos de prueba
-  fDirectorioFixtures := ExtractFilePath(Application.ExeName) + '..\..\Fixtures\';
+  fDirectorioFixtures := ExtractFilePath(Application.ExeName) + 'Fixtures\';
 
   // Asignamos las credenciales de prueba
   // tomadas del documento "Guia de integracion ECODEX_v2.0.1.pdf" Página 28
@@ -354,17 +354,21 @@ begin
 end;
 
 procedure
-    TestTPACEcodex.TimbrarDocumento_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
+    TestTPACEcodex.TimbrarPorPrimeraVez_PreviamenteTimbrado_CauseExcepcionDeTimbrePrevio;
 var
   excepcionLanzada: Boolean;
+  nuevoDocumentoATimbrar : WideString;
+  resultadoTimbre: TFETimbre;
 begin
   excepcionLanzada := False;
-  // Leemos el XML de un documento previamente timbrado
-  fDocumentoDePrueba := Self.leerContenidoDeArchivo(fDirectorioFixtures + '\comprobante_previamente_timbrado.xml');
+
+   // Creamos un comprobante nuevo para mandarlo timbrar
+  nuevoDocumentoATimbrar := ObtenerNuevaFacturaATimbrar();
+  resultadoTimbre := cutPACEcodex.TimbrarDocumento(nuevoDocumentoATimbrar);
 
   try
-    // Mandamos timbrar
-    cutPACEcodex.TimbrarDocumento(fDocumentoDePrueba);
+    // Lo mandamos timbrar de nuevo
+    cutPACEcodex.TimbrarPorPrimeraVez(nuevoDocumentoATimbrar, 1);
   except
     On E:ETimbradoPreviamenteException do
     begin
