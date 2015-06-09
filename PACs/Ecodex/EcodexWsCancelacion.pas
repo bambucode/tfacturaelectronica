@@ -51,9 +51,6 @@ type
 
   TEcodexListaResultadoCancelacion2 = class;           { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
   TEcodexListaResultadoCancelacion = class;            { "http://Ecodex.WS.Model/2011/CFDI"[GblElm] }
-  TEcodexFallaValidacion      = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[Flt][GblElm] }
-  TEcodexFallaSesion          = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[Flt][GblElm] }
-  TEcodexFallaServicio        = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[Flt][GblElm] }
   TEcodexRespuestaCancelaMultiple = class;             { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
   TEcodexListaCancelar2       = class;                 { "http://Ecodex.WS.Model/2011/CFDI"[GblCplx] }
   TEcodexSolicitudCancelaOtros = class;                { "http://Ecodex.WS.Model/2011/CFDI"[Lit][GblElm] }
@@ -104,120 +101,6 @@ type
   private
   published
   end;
-
-
-
-  // ************************************************************************ //
-  // XML       : TEcodexFallaValidacion, global, <element>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // Info      : Fault
-  // Base Types: TEcodexFallaValidacion
-  // ************************************************************************ //
-  TEcodexFallaValidacion = class(ERemotableException)
-  private
-    FRFC: string;
-    FNumero: Integer;
-    FDescripcion: TXSString;
-    FDescripcion_Specified: boolean;
-    FNodo: TXSString;
-    FNodo_Specified: boolean;
-    FAntecedente: TXSString;
-    FAntecedente_Specified: boolean;
-    FSugerencia: TXSString;
-    FSugerencia_Specified: boolean;
-    FEvento: TXSString;
-    FEvento_Specified: boolean;
-    function GetRFC(Index: Integer): string;
-    procedure SetRFC(Index: Integer; const ATXSString: string);
-    function  GetNumero: Integer;
-    procedure SetNumero(const AInteger: Integer);
-    function  GetDescripcion(Index: Integer): TXSString;
-    procedure SetDescripcion(Index: Integer; const ATXSString: TXSString);
-    function  Descripcion_Specified(Index: Integer): boolean;
-    function  GetNodo(Index: Integer): TXSString;
-    procedure SetNodo(Index: Integer; const ATXSString: TXSString);
-    function  Nodo_Specified(Index: Integer): boolean;
-    function  GetAntecedente(Index: Integer): TXSString;
-    procedure SetAntecedente(Index: Integer; const ATXSString: TXSString);
-    function  Antecedente_Specified(Index: Integer): boolean;
-    function  GetSugerencia(Index: Integer): TXSString;
-    procedure SetSugerencia(Index: Integer; const ATXSString: TXSString);
-    function  Sugerencia_Specified(Index: Integer): boolean;
-    function  GetEvento(Index: Integer): TXSString;
-    procedure SetEvento(Index: Integer; const ATXSString: TXSString);
-    function  Evento_Specified(Index: Integer): boolean;
-  published
-    property RFC: string index (IS_NLBL) read GetRFC write SetRFC;
-    property Numero:      Integer    read GetNumero write SetNumero;
-    property Descripcion: TXSString  Index (IS_OPTN or IS_NLBL) read GetDescripcion write SetDescripcion stored Descripcion_Specified;
-    property Nodo:        TXSString  Index (IS_OPTN or IS_NLBL) read GetNodo write SetNodo stored Nodo_Specified;
-    property Antecedente: TXSString  Index (IS_OPTN or IS_NLBL) read GetAntecedente write SetAntecedente stored Antecedente_Specified;
-    property Sugerencia:  TXSString  Index (IS_OPTN or IS_NLBL) read GetSugerencia write SetSugerencia stored Sugerencia_Specified;
-    property Evento:      TXSString  Index (IS_OPTN or IS_NLBL) read GetEvento write SetEvento stored Evento_Specified;
-  end;
-
-
-
-  // ************************************************************************ //
-  // XML       : TEcodexFallaSesion, global, <element>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // Info      : Fault
-  // Base Types: TEcodexFallaSesion
-  // ************************************************************************ //
-  TEcodexFallaSesion = class(ERemotableException)
-  private
-    FRFC: TXSString;
-    FEstatus: Integer;
-    FEstatus_Specified: boolean;
-    FDescripcion: TXSString;
-    FDescripcion_Specified: boolean;
-    function  GetRFC(Index: Integer): TXSString;
-    procedure SetRFC(Index: Integer; const ATXSString: TXSString);
-    function  GetEstatus(Index: Integer): Integer;
-    procedure SetEstatus(Index: Integer; const AInteger: Integer);
-    function  Estatus_Specified(Index: Integer): boolean;
-    function  GetDescripcion(Index: Integer): TXSString;
-    procedure SetDescripcion(Index: Integer; const ATXSString: TXSString);
-    function  Descripcion_Specified(Index: Integer): boolean;
-  published
-    property RFC:         TXSString  Index (IS_NLBL) read GetRFC write SetRFC;
-    property Estatus:     Integer    Index (IS_OPTN) read GetEstatus write SetEstatus stored Estatus_Specified;
-    property Descripcion: TXSString  Index (IS_OPTN or IS_NLBL) read GetDescripcion write SetDescripcion stored Descripcion_Specified;
-  end;
-
-
-
-  // ************************************************************************ //
-  // XML       : TEcodexFallaServicio, global, <element>
-  // Namespace : http://Ecodex.WS.Model/2011/CFDI
-  // Info      : Fault
-  // Base Types: TEcodexFallaServicio
-  // ************************************************************************ //
-  TEcodexFallaServicio = class(ERemotableException)
-  private
-    FRFC: TXSString;
-    FNumero: Integer;
-    FDescripcion: TXSString;
-    FDescripcion_Specified: boolean;
-    FEvento: TXSString;
-    FEvento_Specified: boolean;
-    function  GetRFC(Index: Integer): TXSString;
-    procedure SetRFC(Index: Integer; const ATXSString: TXSString);
-    function  GetNumero: Integer;
-    procedure SetNumero(const AInteger: Integer);
-    function  GetDescripcion(Index: Integer): TXSString;
-    procedure SetDescripcion(Index: Integer; const ATXSString: TXSString);
-    function  Descripcion_Specified(Index: Integer): boolean;
-    function  GetEvento(Index: Integer): TXSString;
-    procedure SetEvento(Index: Integer; const ATXSString: TXSString);
-    function  Evento_Specified(Index: Integer): boolean;
-  published
-    property RFC:         TXSString  Index (IS_NLBL) read GetRFC write SetRFC;
-    property Numero:      Integer    read GetNumero write SetNumero;
-    property Descripcion: TXSString  Index (IS_OPTN or IS_NLBL) read GetDescripcion write SetDescripcion stored Descripcion_Specified;
-    property Evento:      TXSString  Index (IS_OPTN or IS_NLBL) read GetEvento write SetEvento stored Evento_Specified;
-  end;
-
 
 
   // ************************************************************************ //
@@ -646,7 +529,7 @@ type
 
 implementation
 
-uses SysUtils, uWSHelper;
+uses SysUtils, uWSHelper, EcodexWsComun;
 
 var
   wsHelper: TWSHelper;
@@ -741,201 +624,6 @@ end;
 function TEcodexListaResultadoCancelacion2.ResultadoCancelacion_Specified(Index: Integer): boolean;
 begin
   Result := FResultadoCancelacion_Specified;
-end;
-
-function TEcodexFallaValidacion.GetRFC(Index: Integer): string;
-begin
-  Result := FRFC;
-end;
-
-procedure TEcodexFallaValidacion.SetRFC(Index: Integer; const ATXSString:
-    string);
-begin
-  FRFC := ATXSString;
-end;
-
-function TEcodexFallaValidacion.GetNumero: Integer;
-begin
-  Result := FNumero;
-end;
-
-procedure TEcodexFallaValidacion.SetNumero(const AInteger: Integer);
-begin
-  FNumero := AInteger;
-end;
-
-function TEcodexFallaValidacion.GetDescripcion(Index: Integer): TXSString;
-begin
-  Result := FDescripcion;
-end;
-
-procedure TEcodexFallaValidacion.SetDescripcion(Index: Integer; const ATXSString: TXSString);
-begin
-  FDescripcion := ATXSString;
-  FDescripcion_Specified := True;
-end;
-
-function TEcodexFallaValidacion.Descripcion_Specified(Index: Integer): boolean;
-begin
-  Result := FDescripcion_Specified;
-end;
-
-function TEcodexFallaValidacion.GetNodo(Index: Integer): TXSString;
-begin
-  Result := FNodo;
-end;
-
-procedure TEcodexFallaValidacion.SetNodo(Index: Integer; const ATXSString: TXSString);
-begin
-  FNodo := ATXSString;
-  FNodo_Specified := True;
-end;
-
-function TEcodexFallaValidacion.Nodo_Specified(Index: Integer): boolean;
-begin
-  Result := FNodo_Specified;
-end;
-
-function TEcodexFallaValidacion.GetAntecedente(Index: Integer): TXSString;
-begin
-  Result := FAntecedente;
-end;
-
-procedure TEcodexFallaValidacion.SetAntecedente(Index: Integer; const ATXSString: TXSString);
-begin
-  FAntecedente := ATXSString;
-  FAntecedente_Specified := True;
-end;
-
-function TEcodexFallaValidacion.Antecedente_Specified(Index: Integer): boolean;
-begin
-  Result := FAntecedente_Specified;
-end;
-
-function TEcodexFallaValidacion.GetSugerencia(Index: Integer): TXSString;
-begin
-  Result := FSugerencia;
-end;
-
-procedure TEcodexFallaValidacion.SetSugerencia(Index: Integer; const ATXSString: TXSString);
-begin
-  FSugerencia := ATXSString;
-  FSugerencia_Specified := True;
-end;
-
-function TEcodexFallaValidacion.Sugerencia_Specified(Index: Integer): boolean;
-begin
-  Result := FSugerencia_Specified;
-end;
-
-function TEcodexFallaValidacion.GetEvento(Index: Integer): TXSString;
-begin
-  Result := FEvento;
-end;
-
-procedure TEcodexFallaValidacion.SetEvento(Index: Integer; const ATXSString: TXSString);
-begin
-  FEvento := ATXSString;
-  FEvento_Specified := True;
-end;
-
-function TEcodexFallaValidacion.Evento_Specified(Index: Integer): boolean;
-begin
-  Result := FEvento_Specified;
-end;
-
-function TEcodexFallaSesion.GetRFC(Index: Integer): TXSString;
-begin
-  Result := FRFC;
-end;
-
-procedure TEcodexFallaSesion.SetRFC(Index: Integer; const ATXSString: TXSString);
-begin
-  FRFC := ATXSString;
-end;
-
-function TEcodexFallaSesion.GetEstatus(Index: Integer): Integer;
-begin
-  Result := FEstatus;
-end;
-
-procedure TEcodexFallaSesion.SetEstatus(Index: Integer; const AInteger: Integer);
-begin
-  FEstatus := AInteger;
-  FEstatus_Specified := True;
-end;
-
-function TEcodexFallaSesion.Estatus_Specified(Index: Integer): boolean;
-begin
-  Result := FEstatus_Specified;
-end;
-
-function TEcodexFallaSesion.GetDescripcion(Index: Integer): TXSString;
-begin
-  Result := FDescripcion;
-end;
-
-procedure TEcodexFallaSesion.SetDescripcion(Index: Integer; const ATXSString: TXSString);
-begin
-  FDescripcion := ATXSString;
-  FDescripcion_Specified := True;
-end;
-
-function TEcodexFallaSesion.Descripcion_Specified(Index: Integer): boolean;
-begin
-  Result := FDescripcion_Specified;
-end;
-
-function TEcodexFallaServicio.GetRFC(Index: Integer): TXSString;
-begin
-  Result := FRFC;
-end;
-
-procedure TEcodexFallaServicio.SetRFC(Index: Integer; const ATXSString: TXSString);
-begin
-  FRFC := ATXSString;
-end;
-
-function TEcodexFallaServicio.GetNumero: Integer;
-begin
-  Result := FNumero;
-end;
-
-procedure TEcodexFallaServicio.SetNumero(const AInteger: Integer);
-begin
-  FNumero := AInteger;
-end;
-
-function TEcodexFallaServicio.GetDescripcion(Index: Integer): TXSString;
-begin
-  Result := FDescripcion;
-end;
-
-procedure TEcodexFallaServicio.SetDescripcion(Index: Integer; const ATXSString: TXSString);
-begin
-  FDescripcion := ATXSString;
-  FDescripcion_Specified := True;
-end;
-
-function TEcodexFallaServicio.Descripcion_Specified(Index: Integer): boolean;
-begin
-  Result := FDescripcion_Specified;
-end;
-
-function TEcodexFallaServicio.GetEvento(Index: Integer): TXSString;
-begin
-  Result := FEvento;
-end;
-
-procedure TEcodexFallaServicio.SetEvento(Index: Integer; const ATXSString: TXSString);
-begin
-  FEvento := ATXSString;
-  FEvento_Specified := True;
-end;
-
-function TEcodexFallaServicio.Evento_Specified(Index: Integer): boolean;
-begin
-  Result := FEvento_Specified;
 end;
 
 constructor TEcodexRespuestaCancelaMultiple.Create;
@@ -1570,17 +1258,14 @@ initialization
   InvRegistry.RegisterInvokeOptions(TypeInfo(IEcodexServicioCancelacion), ioDocument);
   InvRegistry.RegisterInvokeOptions(TypeInfo(IEcodexServicioCancelacion), ioLiteral);
 
-  InvRegistry.RegisterException(TypeInfo(IEcodexServicioCancelacion), TEcodexFallaSesion);
-  InvRegistry.RegisterException(TypeInfo(IEcodexServicioCancelacion), TEcodexFallaServicio);
-  InvRegistry.RegisterException(TypeInfo(IEcodexServicioCancelacion), TEcodexFallaValidacion);
-  InvRegistry.RegisterExceptionMethod(TypeInfo(IEcodexServicioCancelacion), TEcodexFallaValidacion, 'RecuperarAcuses');
-  InvRegistry.RegisterExceptionMethod(TypeInfo(IEcodexServicioCancelacion), TEcodexFallaValidacion, 'CancelaOtros');
+  InvRegistry.RegisterException(TypeInfo(IEcodexServicioCancelacion), EEcodexFallaSesionException);
+  InvRegistry.RegisterException(TypeInfo(IEcodexServicioCancelacion), EEcodexFallaServicioException);
+  InvRegistry.RegisterException(TypeInfo(IEcodexServicioCancelacion), EEcodexFallaValidacionException);
+  InvRegistry.RegisterExceptionMethod(TypeInfo(IEcodexServicioCancelacion), EEcodexFallaValidacionException, 'RecuperarAcuses');
+  InvRegistry.RegisterExceptionMethod(TypeInfo(IEcodexServicioCancelacion), EEcodexFallaValidacionException, 'CancelaOtros');
   RemClassRegistry.RegisterXSInfo(TypeInfo(Array_Of_TEcodexResultadoCancelacion), 'http://Ecodex.WS.Model/2011/CFDI', 'Array_Of_TEcodexResultadoCancelacion');
   RemClassRegistry.RegisterXSClass(TEcodexListaResultadoCancelacion2, 'http://Ecodex.WS.Model/2011/CFDI', 'ListaResultadoCancelacion2', 'ListaResultadoCancelacion');
   RemClassRegistry.RegisterXSClass(TEcodexListaResultadoCancelacion, 'http://Ecodex.WS.Model/2011/CFDI', 'ListaResultadoCancelacion');
-  RemClassRegistry.RegisterXSClass(TEcodexFallaValidacion, 'http://Ecodex.WS.Model/2011/CFDI', 'FallaValidacion');
-  RemClassRegistry.RegisterXSClass(TEcodexFallaSesion, 'http://Ecodex.WS.Model/2011/CFDI', 'FallaSesion');
-  RemClassRegistry.RegisterXSClass(TEcodexFallaServicio, 'http://Ecodex.WS.Model/2011/CFDI', 'FallaServicio');
   RemClassRegistry.RegisterXSClass(TEcodexRespuestaCancelaMultiple, 'http://Ecodex.WS.Model/2011/CFDI', 'RespuestaCancelaMultiple');
   RemClassRegistry.RegisterSerializeOptions(TEcodexRespuestaCancelaMultiple, [xoLiteralParam]);
   RemClassRegistry.RegisterXSInfo(TypeInfo(guid), 'http://schemas.microsoft.com/2003/10/Serialization/', 'guid');
