@@ -39,6 +39,7 @@ type
     procedure AgregarImpuestoLocal_Trasladado_LoGuardeEnXML;
     procedure Importe_DeCantidadesConMuchosDecimales_SeaElCorrecto;
     procedure SelloDigital_ConConfiguracionDecimalIncorrecta_NoFalle;
+    procedure setSerie_Serie_LaGuardeEnXML;
   end;
 
 implementation
@@ -550,6 +551,24 @@ begin
   finally
      FreeAndNil(comprobanteNuevo);
   end;
+end;
+
+procedure TestTFEComprobanteFiscalV32.setSerie_Serie_LaGuardeEnXML;
+var
+  sXMLFixture: WideString;
+  Serie: TFESerie;
+  comprobanteNuevo, comprobanteGuardado: TFEComprobanteFiscal;
+begin
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+  // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
+  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/v32/serie.xml');
+
+  Serie := 'ABC';
+  comprobanteNuevo.Serie := Serie;
+  comprobanteNuevo.AsignarDatosFolios;
+
+  CheckEquals(sXMLFixture, comprobanteNuevo.fXmlComprobante.XML,
+              'No se guardo la serie en la estructura del XML');
 end;
 
 initialization
