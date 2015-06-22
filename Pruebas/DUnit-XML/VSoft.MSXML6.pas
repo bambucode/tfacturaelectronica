@@ -65,7 +65,7 @@ unit VSoft.MSXML6;
 {$ALIGN 4}
 interface
 
-uses Windows, ActiveX, Classes, Graphics, OleServer, StdVCL, Variants;
+uses ActiveX;
   
 
 // *********************************************************************//

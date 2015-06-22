@@ -28,44 +28,11 @@
 //  so that it can be used with FinalBuilder and Continua CI.
 unit VSoft.DUnit.XMLTestRunner;
 
-{$IFDEF VER210} // RAD Studio 2010
-  {$DEFINE DELPHI_2010}
-  {$DEFINE DELPHI_2010_UP}
-{$ENDIF VER210}
-
-{$IFDEF VER220} // RAD Studio XE
-  {$DEFINE DELPHI_2010_UP}
-  {$DEFINE DELPHI_XE}
-  {$DEFINE DELPHI_XE_UP}
-  {$UNDEF UNSUPPORTED_COMPILER_VERSION}
-{$ENDIF VER220}
-
-{$IFDEF VER230} // RAD Studio XE2
-  {$DEFINE DELPHI_2010_UP}
-  {$DEFINE DELPHI_XE_UP}
-  {$DEFINE DELPHI_XE2}
-  {$DEFINE DELPHI_XE2_UP}
-  {$UNDEF UNSUPPORTED_COMPILER_VERSION}
-{$ENDIF VER230}
-
-{$IFDEF VER240} // RAD Studio XE3
-  {$DEFINE DELPHI_2010_UP}
-  {$DEFINE DELPHI_XE_UP}
-  {$DEFINE DELPHI_XE2}
-  {$DEFINE DELPHI_XE2_UP}
-  {$DEFINE DELPHI_XE3}
-  {$DEFINE DELPHI_XE3_UP}
-{$ENDIF VER230}
-
-{$IFDEF VER260} // RAD Studio XE3
-  {$DEFINE DELPHI_2010_UP}
-  {$DEFINE DELPHI_XE_UP}
-  {$DEFINE DELPHI_XE2}
-  {$DEFINE DELPHI_XE2_UP}
-  {$DEFINE DELPHI_XE3}
-  {$DEFINE DELPHI_XE3_UP}
-{$ENDIF VER260}
-
+{$IFDEF CONDITIONALEXPRESSIONS} // Delphi 6 or later
+  {$IF RtlVersion >= 23.0} // XE2
+    {$DEFINE FORMATSETTINGS}  // Change where Format accepts TFormatSettings as Param
+  {$IFEND}
+{$ENDIF}
 
 interface
 uses
@@ -102,23 +69,16 @@ type
     FErrorCount : integer;
     FFailureCount : integer;
 
-    {$IFDEF DELPHI_XE2_UP}
+    {$IFDEF FORMATSETTINGS}
     FFormatSettings : TFormatSettings;
     {$ENDIF}
 
     procedure PushSuite(const suiteElement, resultsElement : IXMLDOMElement; const name : string);
     procedure PopSuite(var suiteElement, resultsElement : IXMLDOMElement; var name : string );
     function CurrentSuiteElement : IXMLDOMElement;
-    function CurrentSuiteName : string;
 
     function CurrentResultsElement : IXMLDOMElement;
   protected
-
-
-
-
-
-
     function  PrintErrors(r: TTestResult): string; virtual;
     function  PrintFailures(r: TTestResult): string; virtual;
     function  PrintHeader(r: TTestResult): string; virtual;
@@ -168,7 +128,8 @@ var
 
 implementation
 
-uses Forms, Windows, ActiveX;
+uses 
+  ActiveX;
 
 const
    CRLF = #13#10;
@@ -241,9 +202,11 @@ end;
 constructor TXMLTestListener.Create(outputFile : String);
 var
   pi : IXMLDOMProcessingInstruction;
+  environmentElement : IXMLDOMElement;
+  cultureElement : IXMLDOMElement;
 begin
    inherited Create;
-   {$IFDEF DELPHI_XE2_UP}
+   {$IFDEF FORMATSETTINGS}
    FFormatSettings := TFormatSettings.Create('en-US');
    {$ENDIF}
 
@@ -259,7 +222,25 @@ begin
    FXMLDoc.appendChild(pi);
 
    FTestResultsElement := FXMLDoc.createElement('test-results');
+   FTestResultsElement.setAttribute('name',ExtractFileName(ParamStr(0)));
    FXMLDoc.appendChild(FTestResultsElement);
+
+   environmentElement := FXMLDoc.createElement('environment');
+   environmentElement.setAttribute('nunit-version','2.6.4');
+   environmentElement.setAttribute('clr-version','');
+   environmentElement.setAttribute('os-version','');
+   environmentElement.setAttribute('platform','');
+   environmentElement.setAttribute('cwd','');
+   environmentElement.setAttribute('machine-name','');
+   environmentElement.setAttribute('user','');
+   environmentElement.setAttribute('user-domain','');
+   FTestResultsElement.appendChild(environmentElement);
+
+   cultureElement := FXMLDoc.createElement('culture-info');
+   cultureElement.setAttribute('current-culture','');
+   cultureElement.setAttribute('current-uiculture','');
+   FTestResultsElement.appendChild(cultureElement);
+
    FSuiteDataStack := TList.Create;
 end;
 
@@ -277,11 +258,6 @@ begin
   result := TSuiteData(FSuiteDataStack.Items[0]).SuiteElement;
 end;
 
-function TXMLTestListener.CurrentSuiteName: string;
-begin
-  Assert(FSuiteDataStack.Count > 0);
-  result := TSuiteData(FSuiteDataStack.Items[0]).Name;
-end;
 
 const
   TrueFalse : array[Boolean] of string = ('False', 'True');
@@ -297,7 +273,7 @@ begin
   if FCurrentTestElement <> nil then
   begin
     FCurrentTestElement.setAttribute('success','True');
-    FCurrentTestElement.setAttribute('result','Success  ');
+    FCurrentTestElement.setAttribute('result','Success');
 
     FCurrentTestElement.setAttribute('time',FormatNUnitTime(test.ElapsedTestTime / 1000));
     if FMessageList.Count > 0 then
@@ -318,6 +294,7 @@ end;
 procedure TXMLTestListener.AddError(error: TTestFailure);
 var
   msgElement : IXMLDOMElement;
+  stacktraceElement : IXMLDOMElement;
   failureElement : IXMLDOMElement;
   cData : IXMLDOMCDATASection;
 begin
@@ -330,6 +307,11 @@ begin
     FCurrentTestElement.appendChild(failureElement);
     msgElement := FXMLDoc.createElement('message');
     failureElement.appendChild(msgElement);
+
+    stacktraceElement := FXMLDoc.createElement('stack-trace');
+    stacktraceElement.text := error.StackTrace;
+    failureElement.appendChild(stacktraceElement);
+
     cData := FXMLDoc.createCDATASection(EscapeForXML(error.ThrownExceptionMessage,false));
     msgElement.appendChild(cData);
   end;
@@ -339,6 +321,7 @@ end;
 procedure TXMLTestListener.AddFailure(failure: TTestFailure);
 var
   msgElement : IXMLDOMElement;
+  stacktraceElement : IXMLDOMElement;
   failureElement : IXMLDOMElement;
   cData : IXMLDOMCDATASection;
 begin
@@ -351,6 +334,11 @@ begin
     FCurrentTestElement.appendChild(failureElement);
     msgElement := FXMLDoc.createElement('message');
     failureElement.appendChild(msgElement);
+
+    stacktraceElement := FXMLDoc.createElement('stack-trace');
+    stacktraceElement.text := failure.StackTrace;
+    failureElement.appendChild(stacktraceElement);
+
     cData := FXMLDoc.createCDATASection(EscapeForXML(failure.ThrownExceptionMessage,false));
     msgElement.appendChild(cData);
   end;
@@ -364,10 +352,12 @@ begin
   if Supports(test,ITestSuite) then
     exit;
 
-
   FCurrentTestElement := FXMLDoc.createElement('test-case');
   FCurrentTestElement.setAttribute('name',test.Name);
   FCurrentTestElement.setAttribute('executed','True');
+  FCurrentTestElement.setAttribute('success','True');
+  FCurrentTestElement.setAttribute('result','Success');
+  FCurrentTestElement.setAttribute('time','0');
   CurrentResultsElement.appendChild(FCurrentTestElement);
 end;
 
@@ -377,16 +367,21 @@ begin
 end;
 
 function TXMLTestListener.FormatNUnitTime(const value: Extended): string;
+{$IFNDEF FORMATSETTINGS}
 var
   oldDecimalSeparator : Char;
+{$ENDIF}
 begin
-{$IFDEF DELPHI_XE2_UP}
+{$IFDEF FORMATSETTINGS}
   result := Format('%1.3f',[value],FFormatSettings);
 {$ELSE}
   oldDecimalSeparator := SysUtils.DecimalSeparator;
-  SysUtils.DecimalSeparator := '.';
-  result := Format('%1.3f',[value]);
-  SysUtils.DecimalSeparator := oldDecimalSeparator;
+  try
+    SysUtils.DecimalSeparator := '.';
+    result := Format('%1.3f',[value]);
+  finally
+    SysUtils.DecimalSeparator := oldDecimalSeparator;
+  end;
 {$ENDIF}
 end;
 
@@ -419,16 +414,17 @@ begin
       CurrentSuiteElement.setAttribute('result','Success');
       CurrentSuiteElement.setAttribute('success','True');
     end;
-
-
   end;
 
   FTestResultsElement.setAttribute('total',IntToStr(RegisteredTests.CountTestCases));
   FTestResultsElement.setAttribute('not-run',IntToStr(RegisteredTests.CountTestCases - RegisteredTests.CountEnabledTestCases));
   FTestResultsElement.setAttribute('errors',IntToStr(testResult.errorCount));
   FTestResultsElement.setAttribute('failures',IntToStr(testResult.FailureCount));
+  FTestResultsElement.setAttribute('inconclusive','0');
+  FTestResultsElement.setAttribute('skipped','0');
+  FTestResultsElement.setAttribute('invalid','0');
+  FTestResultsElement.setAttribute('ignored','0');
   FTestResultsElement.setAttribute('date',DateToStr(Now));
-
   FTestResultsElement.setAttribute('time',FormatNUnitTime(testResult.TotalTime / 1000));
 
   if ExtractFilePath(FFileName) = '' then
@@ -446,8 +442,6 @@ begin
     writeln(Report(testResult));
     writeln;
   end;
-
-
 end;
 
 class function TXMLTestListener.RunTest(suite: ITest; outputFile:String): TTestResult;
@@ -529,6 +523,7 @@ begin
     suiteElement := FXMLDoc.createElement('test-suite');
     suiteElement.setAttribute('type','Assembly');
     suiteElement.setAttribute('name',suite.Name);
+    suiteElement.setAttribute('executed','True');
 {    suiteElement.setAttribute('result','Success');
     suiteElement.setAttribute('success','True');
     suiteElement.setAttribute('time','0');}
@@ -554,6 +549,7 @@ begin
       suiteElement := FXMLDoc.createElement('test-suite');
       suiteElement.setAttribute('type','Namespace');
       suiteElement.setAttribute('name',sNameSpace);
+      suiteElement.setAttribute('executed','True');
       CurrentResultsElement.appendChild(suiteElement);
       resultsElement := FXMLDoc.createElement('results');
       suiteElement.appendChild(resultsElement);
@@ -564,6 +560,7 @@ begin
   suiteElement := FXMLDoc.createElement('test-suite');
   suiteElement.setAttribute('type',sType);
   suiteElement.setAttribute('name',suite.Name);
+  suiteElement.setAttribute('executed','True');
   CurrentResultsElement.appendChild(suiteElement);
   resultsElement := FXMLDoc.createElement('results');
   suiteElement.appendChild(resultsElement);
