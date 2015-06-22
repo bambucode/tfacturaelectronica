@@ -38,8 +38,8 @@ uses
   // Soporte para Vsoft.DUnit.Xml el cual permite que las pruebas generen un archivo XML para los reportes
   // Ref: https://github.com/VSoftTechnologies/DUnit-XML
   // Solo se debe agregar la carpeta de dicho proyecto al "Library Path"
-  VSoft.DUnit.XMLTestRunner in '..\..\..\externos\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas',
-  VSoft.MSXML6 in '..\..\..\externos\DUnit-XML\VSoft.MSXML6.pas',
+   VSoft.DUnit.XMLTestRunner in '..\..\..\Pruebas\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas',
+  VSoft.MSXML6 in '..\..\..\Pruebas\DUnit-XML\VSoft.MSXML6.pas',
   {$ENDIF}
   TestFramework,
   GUITestRunner,
