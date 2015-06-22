@@ -785,16 +785,29 @@ procedure TFEComprobanteFiscal.AsignarDatosFolios;
 var
   soportaFolios : IFESoportaBloqueFolios;
 begin
-   if Trim(fBloqueFolios.Serie) <> '' then
-      fXmlComprobante.Serie := fBloqueFolios.Serie;
+   case fVersion of
+      fev20, fev22:
+      begin
+         if Trim(fBloqueFolios.Serie) <> '' then
+          fXmlComprobante.Serie := fBloqueFolios.Serie;
+      end;
+      fev32:
+      begin
+         if Trim(inherited Serie) <> '' then
+          fXmlComprobante.Serie := inherited Serie;
+      end;
+   end;
 
    // Los folios asignados solo se soportan en CFD 2.0, 2.2
    if fVersion In [fev20, fev22] then
    begin
       if Supports(fXmlComprobante, IFESoportaBloqueFolios, soportaFolios) then
       begin
-        soportaFolios.NoAprobacion := fBloqueFolios.NumeroAprobacion;
-        soportaFolios.AnoAprobacion := fBloqueFolios.AnoAprobacion;
+        if fBloqueFolios.NumeroAprobacion > 0 then
+          soportaFolios.NoAprobacion := fBloqueFolios.NumeroAprobacion;
+
+        if fBloqueFolios.AnoAprobacion > 0 then
+          soportaFolios.AnoAprobacion := fBloqueFolios.AnoAprobacion;
       end;
    end;
 end;
@@ -923,6 +936,7 @@ begin
     end;
   end;
 end;
+
 
 procedure TFEComprobanteFiscal.BorrarConceptos;
 begin
