@@ -76,7 +76,8 @@
 			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-			<DCC_Define>XMLOUTPUT;$(DCC_Define)</DCC_Define>
+			<DCC_ConsoleTarget>true</DCC_ConsoleTarget>
+			<DCC_Define>XMLOUTPUT;CONSOLE_TESTRUNNER;ISCONSOLE;$(DCC_Define)</DCC_Define>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
 			<DCC_ExeOutput>C:\Delphi\eleventa\Output\UnitTests\Win32</DCC_ExeOutput>
@@ -213,7 +214,7 @@
 		</ItemGroup>
 		<ItemGroup/>
 		<Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
-		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+		<Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
 	</Project>
 
 <!-- EurekaLog First Line

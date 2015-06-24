@@ -44,6 +44,7 @@ uses
   TestFramework,
   GUITestRunner,
   TextTestRunner,
+  System.SysUtils,
   FacturaTipos in '..\..\..\FacturaTipos.pas',
   FacturaReglamentacion in '..\..\..\FacturaReglamentacion.pas',
   TestManejadorDeSesion in 'TestManejadorDeSesion.pas',
