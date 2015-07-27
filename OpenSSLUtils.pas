@@ -482,7 +482,7 @@ end;
 function TX509Certificate.AsBase64() : String;
 var
   bioOut: pBIO;
-  Buffer: array [0..2048] of Caracter;
+  Buffer: array [0..4096] of Caracter;
   Res: String;
 begin
   // This code was translated from x509.c from the OpenSSL source code
