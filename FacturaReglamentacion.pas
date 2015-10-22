@@ -61,19 +61,21 @@ uses DateUtils,
      {$IFEND}
      SysUtils, Windows;
 
+var
+  formatSettingsLocal : TFormatSettings;
 
 class procedure TFEReglamentacion.CorregirConfiguracionRegionalLocal;
 begin
   // Debido a que si el usuario en la PC tiene una configuración regional incorrecta
   // los XMLs se generan con montos y cantidades inválidas
-  separadorDecimalAnterior := DecimalSeparator;
+  separadorDecimalAnterior := formatSettingsLocal.DecimalSeparator;
   // Indicamos que el separador Decimal será el punto
-  DecimalSeparator := _PUNTO_DECIMAL;
+  formatSettingsLocal.DecimalSeparator := _PUNTO_DECIMAL;
 end;
 
 class procedure TFEReglamentacion.RegresarConfiguracionRegionalLocal;
 begin
-  DecimalSeparator := separadorDecimalAnterior;
+  formatSettingsLocal.DecimalSeparator := separadorDecimalAnterior;
 end;
 
 // Segun las reglas del SAT:
@@ -232,4 +234,6 @@ begin
                                   [rfReplaceAll]);
 end;
 
+initialization
+  formatSettingsLocal := TFormatSettings.Create;
 end.
