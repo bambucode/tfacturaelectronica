@@ -46,7 +46,12 @@ implementation
 
 uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
-  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
+  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc,
+  {$IFNDEF VER300}
+  // Si estamos en Delphi 10 Seattle, este archivo ya no es necesario
+  XSLProd,
+  {$ENDIF}
+  FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
   FacturacionHashes,
   {$IFDEF CODESITE}
   CodeSiteLogging,
@@ -240,37 +245,49 @@ var
   separadorDecimalAnterior: Char;
   xmlFacturaGenerada: WideString;
   comprobanteNuevo: TFEComprobanteFiscal;
+  {$IFDEF VER300}
+  // A partir de Delphi Seattle es necesario usar esta constante
+  formatSettings : TFormatSettings;
+  {$ENDIF}
 begin
   ConfigurarCertificadoDePrueba(Certificado);
 
   // Intentamos generar el sello
-  try
-    // Llenamos el comprobante fiscal con datos usados para generar la factura
-    LeerXMLDePruebaEnComprobante(fRutaFixtures +
-                                'comprobante_fiscal/v32/comprobante_con_impuestos_locales.xml',
-                                Certificado, fComprobanteFiscalv32);
-
-    textoFalla := '';
-    // Creamos un comprobante para leer el XML generado con el decimal incorrecto
-    comprobanteNuevo := TFEComprobanteFiscal.Create();
+  {$IFDEF VER300}
+  with formatSettings do
+  begin
+  {$ENDIF}
     try
-      // Leemos el XML generado con la configuracion de "DecimalSeparator" incorrecta
-      // Configuramos el decimal para que sea incorrecto forzosamente
-      separadorDecimalAnterior := DecimalSeparator;
-      DecimalSeparator := ',';
-      xmlFacturaGenerada := fComprobanteFiscalv32.XML;
-      DecimalSeparator := '.';
-      xmlFacturaGenerada := fComprobanteFiscalv32.XML;
-      // Lo intemos leer en un nuevo comprobante
-      comprobanteNuevo.XML := xmlFacturaGenerada;
-    except
-      on E:Exception do
-        textoFalla := E.Message;
+      // Llenamos el comprobante fiscal con datos usados para generar la factura
+      LeerXMLDePruebaEnComprobante(fRutaFixtures +
+                                  'comprobante_fiscal/v32/comprobante_con_impuestos_locales.xml',
+                                  Certificado, fComprobanteFiscalv32);
+
+      textoFalla := '';
+      // Creamos un comprobante para leer el XML generado con el decimal incorrecto
+      comprobanteNuevo := TFEComprobanteFiscal.Create();
+      try
+        // Leemos el XML generado con la configuracion de "DecimalSeparator" incorrecta
+        // Configuramos el decimal para que sea incorrecto forzosamente
+        separadorDecimalAnterior := DecimalSeparator;
+        DecimalSeparator := ',';
+        xmlFacturaGenerada := fComprobanteFiscalv32.XML;
+        DecimalSeparator := '.';
+        xmlFacturaGenerada := fComprobanteFiscalv32.XML;
+        // Lo intemos leer en un nuevo comprobante
+        comprobanteNuevo.XML := xmlFacturaGenerada;
+      except
+        on E:Exception do
+          textoFalla := E.Message;
+      end;
+    finally
+      DecimalSeparator := separadorDecimalAnterior;
+      comprobanteNuevo.Free;
     end;
-  finally
-    DecimalSeparator := separadorDecimalAnterior;
-    comprobanteNuevo.Free;
+
+  {$IFDEF VER300}
   end;
+  {$ENDIF}
 
   CheckEquals('',
               textoFalla,

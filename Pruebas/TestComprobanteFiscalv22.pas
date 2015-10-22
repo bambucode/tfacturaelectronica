@@ -54,7 +54,12 @@ implementation
 
 uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
-  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
+  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc,
+  {$IFNDEF VER300}
+  // Si estamos en Delphi 10 Seattle, este archivo ya no es necesario
+  XSLProd,
+  {$ENDIF}
+  FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
   FacturacionHashes,
   UtileriasPruebas;
 
