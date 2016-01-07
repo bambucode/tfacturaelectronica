@@ -20,7 +20,11 @@ interface
 uses Classes,
      xmldom,
      XMLIntf,
+     {$IF Compilerversion >= 20}
+     Xml.Win.Msxmldom,
+     {$ELSE}
      msxmldom,
+     {$IFEND}
      XMLDoc,
      SysUtils,
      ProveedorAutorizadoCertificacion,

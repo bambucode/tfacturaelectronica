@@ -46,7 +46,7 @@ implementation
 
 uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
-  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc,
+  DateUtils, XmlDom, XMLIntf, Xml.win.MsXmlDom, XMLDoc,
   {$IFNDEF VER300}
   // Si estamos en Delphi 10 Seattle, este archivo ya no es necesario
   XSLProd,

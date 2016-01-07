@@ -15,8 +15,16 @@ unit CadenaOriginal;
 
 interface
 
-uses FacturaTipos, FeCFD, FeCFDv32,FeCFDv22, FeCFDv2,
-     XmlDom, XMLIntf, MsXmlDom, XMLDoc;
+uses FacturaTipos, FeCFD, FeCFDv32,FeCFDv22,
+     {$IF Compilerversion >= 20}
+      Xml.xmldom,
+      Xml.XMLIntf,
+      Xml.Win.MsXmlDom,
+      Xml.XMLDoc,
+      {$ELSE}
+      XmlDom, XMLIntf, Xml.win.MsXmlDom, XMLDoc,
+      {$ENDIF}
+     FeCFDv2;
 
 type
 
