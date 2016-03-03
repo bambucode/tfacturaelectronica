@@ -95,6 +95,9 @@ TFEConcepto = record
   Unidad: String;
   Descripcion: String;
   ValorUnitario: Currency;
+  // Almacenamos los valores globales
+  ValorUnitarioFinal: Currency;
+  Importe           : Currency;
   // Datos opcionales
   NoIdentificacion: String;
   DatosAduana: TFEDatosAduana;
