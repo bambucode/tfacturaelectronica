@@ -20,8 +20,15 @@ interface
 
 uses FacturaTipos, SysUtils,
   // Unidades especificas de manejo de XML:
-  XmlDom, XMLIntf, MsXmlDom, XMLDoc, DocComprobanteFiscal,
-  FeCFDv22,FeCFDv32, FeCFDv2, feCFD;
+  {$IF Compilerversion >= 20}
+  Xml.xmldom,
+  Xml.XMLIntf,
+  Xml.Win.MsXmlDom,
+  Xml.XMLDoc,
+  {$ELSE}
+  XmlDom, XMLIntf, Xml.win.MsXmlDom, XMLDoc,
+  {$ENDIF}
+  DocComprobanteFiscal, FeCFDv22,FeCFDv32, FeCFDv2, feCFD;
 
 type
 
@@ -722,7 +729,7 @@ begin
          nodoImpuestosLocales.Version := '1.0';
          nodoImpuestosLocales.TotaldeRetenciones := TFEReglamentacion.ComoMoneda(inherited TotalImpuestosLocalesRetenidos,
                                                                                  _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
-         nodoImpuestosLocales.TotaldeTraslados := TFEReglamentacion.ComoMoneda(inherited TotalImpuestosLocalesTrasladados, 
+         nodoImpuestosLocales.TotaldeTraslados := TFEReglamentacion.ComoMoneda(inherited TotalImpuestosLocalesTrasladados,
                                                                                _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
 
          // Agregamos el detalle de los impuestos "hijo"
@@ -732,7 +739,7 @@ begin
 
             // Agregamos el nodo de impuesto segun el tipo de impuesto...
             case nuevoImpuesto.Tipo of
-              tiRetenido    : 
+              tiRetenido    :
               begin
                 with nodoImpuestosLocales.RetencionesLocales.Add do
                 begin
@@ -741,7 +748,7 @@ begin
                   Importe := TFEReglamentacion.ComoMoneda(nuevoImpuesto.Importe, _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
                 end;
               end;
-              tiTrasladado  : 
+              tiTrasladado  :
               begin
                 with nodoImpuestosLocales.TrasladosLocales.Add do
                 begin
@@ -752,7 +759,7 @@ begin
               end;
             end;
          end;
-         
+
       finally
          // No liberamos el TXMLDocument por que impleneta a un TInterfacedObject y Delphi lo libera solo
          //documentoImpuestosLocales.Free;
@@ -1307,7 +1314,7 @@ begin
         fDocumentoXML:=TXmlDocument.Create(nil);
         // Pasamos el XML para poder usarlo en la clase
         fDocumentoXML.XML:=iXmlDoc.XML;
-        
+
         // Leemos la interface XML adecuada segun la version del XML, si la version no está soportada
         // lanzaremos una excepcion
         LeerVersionDeComprobanteLeido(Valor);

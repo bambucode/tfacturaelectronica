@@ -19,7 +19,8 @@ unit FacturaElectronica;
 
 interface
 
-uses FacturaTipos, ComprobanteFiscal;
+uses FacturaTipos,
+     ComprobanteFiscal;
 
 type
 

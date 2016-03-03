@@ -24,7 +24,7 @@ uses FacturaTipos,
      Classes,
      XMLDoc,
      XMLIntf,
-     XSLProd,
+     //XSLProd,
      System.SysUtils;
 
 type
