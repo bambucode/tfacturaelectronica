@@ -55,7 +55,7 @@ RAZON PARA CAMBIAR:
         FNumeroDeCuenta: String;
 
         // Funcion usada para obtener el importe de un concepto 
-        function ObtenerImporte(Concepto: TFEConcepto) : Currency;
+        function ObtenerImporte(Concepto: TFEConcepto; aEsImporteAsignadoManualmente: Boolean = False) : Currency;
         function obtenerNumArticulos() : Integer;
         function getTotal() : Currency;
     public
@@ -205,9 +205,13 @@ begin
                                      (fTotalImpuestosLocalesTrasladados - fTotalImpuestosLocalesRetenidos);
 end;
 
-function TDocumentoComprobanteFiscal.ObtenerImporte(Concepto: TFEConcepto) : Currency;
+function TDocumentoComprobanteFiscal.ObtenerImporte(Concepto: TFEConcepto;
+      aEsImporteAsignadoManualmente: Boolean = False) : Currency;
 begin
-    Result:= Concepto.Importe;
+  if aImporteAsignadoManualmente then
+      Result := Concepto.Importe
+  else
+      Result := Concepto.ValorUnitario * Concepto.Cantidad;
 end;
 
 end.
