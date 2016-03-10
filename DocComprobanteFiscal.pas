@@ -207,7 +207,7 @@ end;
 
 function TDocumentoComprobanteFiscal.ObtenerImporte(Concepto: TFEConcepto) : Currency;
 begin
-    Result:=Concepto.ValorUnitario * Concepto.Cantidad;
+    Result:= Concepto.Importe;
 end;
 
 end.

@@ -27,16 +27,16 @@ type
       /// <summary>Convierte el valor de moneda al formato de dinero requerido por el SAT
       /// </summary>
       /// <param name="Monto">Monto a convertir al formato aceptado por el SAT</param>
-      class function ComoMoneda(aMonto: Currency; const aDecimalesDefault: Integer =
-          6): String;
+      class function ComoMoneda(aMonto: Currency; const aDecimalesDefault: Integer
+          = 2): String;
       class function ComoCadena(sCadena: String) : String;
       class function ComoCantidad(dCantidad: Double; const aNumeroDecimales: Integer
-          = 6): String;
+          = 2): String;
       class function ComoFechaHora(dtFecha: TDateTime) : String;
       class function DeFechaHoraISO8601(const aFechaISO8601: String) : TDateTime;
       class function ComoFechaAduanera(dtFecha: TDateTime) : String;
       class function ComoTasaImpuesto(dTasa: Double; const aDecimalesDefault: Integer
-          = 6): String;
+          = 2): String;
       class function ComoDateTime(sFechaISO8601: String): TDateTime;
       class function ComoFechaHoraInforme(dtFecha: TDateTime) : String;
       class function DeTasaImpuesto(const aCadenaTasa: String) : Double;
@@ -130,7 +130,7 @@ begin
 end;
 
 class function TFEReglamentacion.ComoMoneda(aMonto: Currency; const
-    aDecimalesDefault: Integer = 6): String;
+    aDecimalesDefault: Integer = 2): String;
 begin
    // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
    // http://www.sat.gob.mx/cfd/3/cfdv32.xsd
@@ -144,7 +144,7 @@ begin
 end;
 
 class function TFEReglamentacion.ComoTasaImpuesto(dTasa: Double; const
-    aDecimalesDefault: Integer = 6): String;
+    aDecimalesDefault: Integer = 2): String;
 begin
    // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
    // http://www.sat.gob.mx/cfd/3/cfdv32.xsd
@@ -208,7 +208,7 @@ begin
 end;
 
 class function TFEReglamentacion.ComoCantidad(dCantidad: Double; const
-    aNumeroDecimales: Integer = 6): String;
+    aNumeroDecimales: Integer = 2): String;
 begin
    // Las cantidades cerradas las regresamos sin decimales
    // las que tienen fracciones con 6 digitos decimales para respetar la especificacion
