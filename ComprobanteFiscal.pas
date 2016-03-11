@@ -167,7 +167,7 @@ type
     ///	  Version del comprobante a crear
     ///	</param>
     {$ENDREGION}
-    constructor Create(const aVersionComprobante: TFEVersionComprobante = fev32; RecalcularImporte: Boolean = True);
+    constructor Create(const aVersionComprobante: TFEVersionComprobante = fev32; aRecalcularImporte: Boolean = True);
     destructor Destroy(); override;
     procedure Cancelar();
 
@@ -222,9 +222,9 @@ uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
 
 // Al crear el objeto, comenzamos a "llenar" el XML interno
 constructor TFEComprobanteFiscal.Create(const aVersionComprobante:
-    TFEVersionComprobante = fev32; RecalcularImporte: Boolean = True);
+    TFEVersionComprobante = fev32; aRecalcularImporte: Boolean = True);
 begin
-  inherited Create(RecalcularImporte);
+  inherited Create(aRecalcularImporte);
   _CADENA_PAGO_UNA_EXHIBICION := 'Pago en una sola exhibición';
   _CADENA_PAGO_PARCIALIDADES := 'En parcialidades';
 
@@ -233,7 +233,7 @@ begin
   {$ENDIF}
 
   // Almacenamos si queremos recalcular el Importe
-  fRecalcularImporte := RecalcularImporte;
+  fRecalcularImporte := aRecalcularImporte;
 
    // Ahora La decisión de que tipo de comprobante y su versión deberá de ser del programa y no de la clase
   fVersion:=aVersionComprobante;

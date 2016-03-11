@@ -60,7 +60,7 @@ RAZON PARA CAMBIAR:
         function obtenerNumArticulos() : Integer;
         function getTotal() : Currency;
     public
-        constructor Create(RecalcularImporte : Boolean); overload;
+        constructor Create(aRecalcularImporte : Boolean = True); overload;
         // Propiedades del comprobante normal
         property FacturaGenerada: Boolean read fFacturaGenerada write fFacturaGenerada;
         property Serie: TFESerie read fSerie write fSerie;
@@ -120,7 +120,7 @@ implementation
 
 uses SysUtils;
 
-constructor TDocumentoComprobanteFiscal.Create(RecalcularImporte : Boolean = True);
+constructor TDocumentoComprobanteFiscal.Create(aRecalcularImporte : Boolean = True);
 begin
     // TODO LO SIGUIENTE LO HACE DELPHI POR NOSOTROS:
     // Rewrite:
@@ -132,7 +132,7 @@ begin
     bHuboRetenciones:=False;
     bHuboTraslados:=False; }
   inherited Create;
-  fRecalcularImporte := RecalcularImporte;
+  fRecalcularImporte := aRecalcularImporte;
 end;
 
 function TDocumentoComprobanteFiscal.obtenerNumArticulos() : Integer;
