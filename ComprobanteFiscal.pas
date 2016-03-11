@@ -78,6 +78,7 @@ type
     fAutoAsignarFechaGeneracion: Boolean;
     FValidarCertificadoYLlavePrivada: Boolean;
     FVerificarRFCDelCertificado: Boolean;
+    fRecalcularImporte  : Boolean;
 
 
     {$REGION 'Documentation'}
@@ -166,7 +167,7 @@ type
     ///	  Version del comprobante a crear
     ///	</param>
     {$ENDREGION}
-    constructor Create(const aVersionComprobante: TFEVersionComprobante = fev32);
+    constructor Create(const aVersionComprobante: TFEVersionComprobante = fev32; aRecalcularImporte: Boolean = True);
     destructor Destroy(); override;
     procedure Cancelar();
 
@@ -221,15 +222,18 @@ uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
 
 // Al crear el objeto, comenzamos a "llenar" el XML interno
 constructor TFEComprobanteFiscal.Create(const aVersionComprobante:
-    TFEVersionComprobante = fev32);
+    TFEVersionComprobante = fev32; aRecalcularImporte: Boolean = True);
 begin
-  inherited Create;
+  inherited Create(aRecalcularImporte);
   _CADENA_PAGO_UNA_EXHIBICION := 'Pago en una sola exhibición';
   _CADENA_PAGO_PARCIALIDADES := 'En parcialidades';
 
   {$IFDEF VERSION_DE_PRUEBA}
     _USAR_HORA_REAL := False;
   {$ENDIF}
+
+  // Almacenamos si queremos recalcular el Importe
+  fRecalcularImporte := aRecalcularImporte;
 
    // Ahora La decisión de que tipo de comprobante y su versión deberá de ser del programa y no de la clase
   fVersion:=aVersionComprobante;
@@ -646,7 +650,11 @@ begin
 
         Descripcion := TFEReglamentacion.ComoCadena(Concepto.Descripcion);
         ValorUnitario := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario);
-        Importe := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario * Concepto.Cantidad);
+
+        //  Si esta habilitada la bandera permite recalcular el importe u obtenerlo directamente de la variable
+        if fRecalcularImporte
+        then Importe := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario * Concepto.Cantidad)
+        else Importe := TFEReglamentacion.ComoMoneda(Concepto.Importe);
 
         // Le fue asignada informacion aduanera??
         if (Concepto.DatosAduana.NumeroDocumento <> '') then

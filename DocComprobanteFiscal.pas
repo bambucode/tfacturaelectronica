@@ -35,7 +35,8 @@ RAZON PARA CAMBIAR:
         fDescuento: Currency;
         fMotivoDescuento: String;
         fSerie: TFESerie;
-        
+
+        fRecalcularImporte : Boolean;
         fTotal: Currency;
         fSubTotal: Currency;
         fTotalImpuestosRetenidos: Currency;
@@ -59,7 +60,7 @@ RAZON PARA CAMBIAR:
         function obtenerNumArticulos() : Integer;
         function getTotal() : Currency;
     public
-        constructor Create;
+        constructor Create(aRecalcularImporte : Boolean = True); overload;
         // Propiedades del comprobante normal
         property FacturaGenerada: Boolean read fFacturaGenerada write fFacturaGenerada;
         property Serie: TFESerie read fSerie write fSerie;
@@ -119,7 +120,7 @@ implementation
 
 uses SysUtils;
 
-constructor TDocumentoComprobanteFiscal.Create;
+constructor TDocumentoComprobanteFiscal.Create(aRecalcularImporte : Boolean = True);
 begin
     // TODO LO SIGUIENTE LO HACE DELPHI POR NOSOTROS:
     // Rewrite:
@@ -130,6 +131,8 @@ begin
     bFacturaGenerada := False;
     bHuboRetenciones:=False;
     bHuboTraslados:=False; }
+  inherited Create;
+  fRecalcularImporte := aRecalcularImporte;
 end;
 
 function TDocumentoComprobanteFiscal.obtenerNumArticulos() : Integer;
@@ -138,13 +141,20 @@ begin
 end;
 
 function TDocumentoComprobanteFiscal.AgregarConcepto(NuevoConcepto: TFEConcepto) : Integer;
+var
+  importe : Currency;
 begin
     SetLength(fArrConceptos, Length(fArrConceptos) + 1);
     fArrConceptos[Length(fArrConceptos) - 1] := NuevoConcepto;
 
+    importe := NuevoConcepto.Importe;
+
+    if fRecalcularImporte then
+      importe := ObtenerImporte(NuevoConcepto);
+
     // Se Suma el total
-    fSubtotal := fSubtotal + ObtenerImporte(NuevoConcepto);
-    fTotal:=fTotal + ObtenerImporte(NuevoConcepto);
+    fSubtotal := fSubtotal + importe;
+    fTotal:=fTotal + importe;
 
     Result:=Length(fArrConceptos) - 1;
 end;
@@ -207,7 +217,7 @@ end;
 
 function TDocumentoComprobanteFiscal.ObtenerImporte(Concepto: TFEConcepto) : Currency;
 begin
-    Result:=Concepto.ValorUnitario * Concepto.Cantidad;
+  Result := Concepto.ValorUnitario * Concepto.Cantidad;
 end;
 
 end.
