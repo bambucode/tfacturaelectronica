@@ -649,7 +649,8 @@ begin
           NoIdentificacion := TFEReglamentacion.ComoCadena(Concepto.NoIdentificacion); // Opcional
 
         Descripcion := TFEReglamentacion.ComoCadena(Concepto.Descripcion);
-        ValorUnitario := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario);
+        // Se guardan 4 decimales para que pase la prueba del validador de ValidaCFD
+        ValorUnitario := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario, 4);
 
         //  Si esta habilitada la bandera permite recalcular el importe u obtenerlo directamente de la variable
         if fRecalcularImporte
