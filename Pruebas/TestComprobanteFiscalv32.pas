@@ -57,7 +57,8 @@ uses
   CodeSiteLogging,
   {$ENDIF}
   FacturaReglamentacion,
-  UtileriasPruebas;
+  UtileriasPruebas,
+  System.Math;
 
 procedure
     TestTFEComprobanteFiscalV32.CadenaOriginalDeTimbre_DeComprobanteV32_SeaCorrecta;
@@ -329,10 +330,10 @@ const
   // ToDo: Leer estas propiedades de forma alternativa desde el XML de prueba para no tenerlas fijas
   // y pode cambiar el XML de prueba facilmente
   _TIMBRE_VERSION = '1.0';
-  _TIMBRE_SELLO_SAT = 'XWJRk4IX97i2WEBJj1KJ4e3IYyGHOazTVtNusuGMLUT7YSt/nNWNK9dll3/p+mXOccLbfxRJcwIXzkIw0D+FetYPtpe8+Bw+utCF4/ZmDMy1xX5GzOWqXk2eu5KCz+HZQdkPFntD2/lyFtFP2+6xl+cR1aLB4BSQZ862JS2gj7M=';
-  _TIMBRE_NOCERTIFICADO_SAT = '20001000000100005761';
-  _TIMBRE_UUID = '2BDCA386-B562-45B0-8904-6099A33CA6B8';
-  _TIMBRE_FECHA = '2013-11-29T17:35:51';
+  _TIMBRE_SELLO_SAT = 'JFZQYjO+ta+R/gH+w7lqunZLzHNeqYWGQvcvJ+Dbvuk6KTCQgvkTP5tIKzqS7v4tXu1o1Rs6u+8p1Uo4jg4LZqvjZUbT14ZYzgE78wlVwz1aJFohHFRB9L4Fh1bcgqgYaJW+62npRq5Lt8EZanKnAdlxAdOHgTgyIzP/6jFtosM=';
+  _TIMBRE_NOCERTIFICADO_SAT = '20001000000100005868';
+  _TIMBRE_UUID = '64A89088-CFD7-42C1-8ABE-F0BDCFA85EB8';
+  _TIMBRE_FECHA = '2016-03-14T12:14:20';
 begin
     ConfigurarCertificadoDePrueba(Certificado);
 
@@ -442,8 +443,11 @@ begin
     CheckTrue(fComprobanteComparacion.Tipo = fComprobanteFiscalv32.Tipo, 'El tipo no fue el mismo');
     CheckTrue(fComprobanteComparacion.FormaDePago = fComprobanteFiscalv32.FormaDePago, 'La forma de pago no fue la misma');
     CheckEquals(fComprobanteComparacion.CondicionesDePago, fComprobanteFiscalv32.CondicionesDePago, 'Las condiciones de pago no fueron las mismas');
-    CheckEquals(fComprobanteComparacion.Subtotal, fComprobanteFiscalv32.Subtotal, 'El subtotal no fue el mismo');
-    CheckEquals(fComprobanteComparacion.Total, fComprobanteFiscalv32.Total, 'El total no fue el mismo');
+
+    CheckEquals( RoundTo(fComprobanteComparacion.Subtotal, -2),
+          fComprobanteFiscalv32.Subtotal, 'El subtotal no fue el mismo');
+    CheckEquals( RoundTo(fComprobanteComparacion.Total, -2),
+          fComprobanteFiscalv32.Total, 'El total no fue el mismo');
 
     CheckEquals(fComprobanteComparacion.Emisor.RFC, fComprobanteFiscalv32.Emisor.RFC, 'El RFC del Emisor no fue el mismo');
     CheckEquals(fComprobanteComparacion.Emisor.Nombre, fComprobanteFiscalv32.Emisor.Nombre, 'El Nombre del Emisor no fue el mismo');
@@ -535,7 +539,7 @@ begin
 
   try
     // Agregamos un concepto con cantidad y precio a granel para forzar que se calcule un importe con mas de 6 decimales de exactitud
-    conceptoConCantidadesConMuchosDecimales.Cantidad := 0.1234;
+    conceptoConCantidadesConMuchosDecimales.Cantidad := 0.12;
     conceptoConCantidadesConMuchosDecimales.Unidad := 'PZA';
     conceptoConCantidadesConMuchosDecimales.Descripcion := 'Articulo de Prueba';
     conceptoConCantidadesConMuchosDecimales.ValorUnitario := 129.9876;
