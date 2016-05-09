@@ -1643,6 +1643,9 @@ begin
                 if TieneAtributo(Conceptos[I], 'noIdentificacion') then
                   feConcepto.NoIdentificacion:=Conceptos[I].NoIdentificacion;
 
+                feConcepto.ValorUnitarioFinal := TFEReglamentacion.DeMoneda(Conceptos[I].ValorUnitario);
+                feConcepto.Importe := TFEReglamentacion.DeMoneda(Conceptos[I].Importe);
+
                 inherited AgregarConcepto(feConcepto);
             end;
 
