@@ -864,18 +864,18 @@ begin
      if TryStrToInt(cadenaMetodoDePago, numeroCatalogoMetodoPago) then
      begin
        {$IFDEF CODESITE}
-          CodeSiteLogging.Send('Usando código de método de pago definido por usuario', numeroCatalogoMetodoPago);
+          CodeSite.Send('Usando código de método de pago definido por usuario', numeroCatalogoMetodoPago);
        {$ENDIF}
        metodoDePagoFinal := IntToStr(numeroCatalogoMetodoPago)
      end else
      begin
        {$IFDEF CODESITE}
-         CodeSiteLogging.Send('Intentando obtener número de método de pago: ' + cadenaMetodoDePago);
+         CodeSite.Send('Intentando obtener número de método de pago: ' + cadenaMetodoDePago);
        {$ENDIF}
        // Si fue una cadena, tratamos de convertirla al catálogo oficial
        metodoDePagoFinal := TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(cadenaMetodoDePago);
        {$IFDEF CODESITE}
-         CodeSiteLogging.Send('Numero de método de pago', metodoDePagoFinal);
+         CodeSite.Send('Numero de método de pago', metodoDePagoFinal);
        {$ENDIF}
 
        // Si regreso cadena vacia es que no encontró una equivalencia de la cadena al numero de catalogo en el SAT
