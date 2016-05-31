@@ -318,27 +318,28 @@ EPACProblemaTimeoutException = class(EPACException);
 EPACErrorGenericoException = class(EPACException);
 
 const
-_RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';
-_RFC_VENTA_EXTRANJEROS        = 'XEXX010101000';
-_URL_PRUEBAS_ECODEX           = 'https://pruebas.ecodex.com.mx:2045';
+  _RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';
+  _RFC_VENTA_EXTRANJEROS        = 'XEXX010101000';
+  _URL_PRUEBAS_ECODEX           = 'https://pruebas.ecodex.com.mx:2045';
+  _NUMERO_CATALOGO_METODO_NA    = '98';
 
-// Errores ecodex
-_ERROR_ECODEX_CERTIFICADO_NUEVO = 'Error en Certificado:402';
-_ERROR_ECODEX_CERTIFICADO_306   = '306 Certificado utilizado no es de sello';
-_ERROR_ECODEX_CORREO_REPETIDO   = 'El correo asignado ya est'; // Mensaje completo: El correo asignado ya está en uso por otro emisor
+  // Errores ecodex
+  _ERROR_ECODEX_CERTIFICADO_NUEVO = 'Error en Certificado:402';
+  _ERROR_ECODEX_CERTIFICADO_306   = '306 Certificado utilizado no es de sello';
+  _ERROR_ECODEX_CORREO_REPETIDO   = 'El correo asignado ya est'; // Mensaje completo: El correo asignado ya está en uso por otro emisor
 
-// Códigos de error regresados por los PAC
-_ERROR_SAT_XML_INVALIDO                             = '301';
-_ERROR_SAT_SELLO_EMISOR_INVALIDO                    = '302';
-_ERROR_SAT_CERTIFICADO_NO_CORRESPONDE               = '303';
-_ERROR_SAT_CERTIFICADO_REVOCADO                     = '304';
-_ERROR_SAT_FECHA_EMISION_SIN_VIGENCIA               = '305';
-_ERROR_SAT_LLAVE_NO_CORRESPONDE                     = '306';
-_ERROR_SAT_PREVIAMENTE_TIMBRADO                     = '307';
-_ERROR_SAT_CERTIFICADO_NO_FIRMADO_POR_SAT           = '308';
-_ERROR_SAT_FECHA_FUERA_DE_RANGO                     = '401';
-_ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO                 = '402';
-_ERROR_SAT_FECHA_EMISION_EN_EL_PASADO               = '403';
+  // Códigos de error regresados por los PAC
+  _ERROR_SAT_XML_INVALIDO                             = '301';
+  _ERROR_SAT_SELLO_EMISOR_INVALIDO                    = '302';
+  _ERROR_SAT_CERTIFICADO_NO_CORRESPONDE               = '303';
+  _ERROR_SAT_CERTIFICADO_REVOCADO                     = '304';
+  _ERROR_SAT_FECHA_EMISION_SIN_VIGENCIA               = '305';
+  _ERROR_SAT_LLAVE_NO_CORRESPONDE                     = '306';
+  _ERROR_SAT_PREVIAMENTE_TIMBRADO                     = '307';
+  _ERROR_SAT_CERTIFICADO_NO_FIRMADO_POR_SAT           = '308';
+  _ERROR_SAT_FECHA_FUERA_DE_RANGO                     = '401';
+  _ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO                 = '402';
+  _ERROR_SAT_FECHA_EMISION_EN_EL_PASADO               = '403';
 
 implementation
 

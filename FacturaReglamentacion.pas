@@ -252,6 +252,12 @@ begin
   cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'Í', 'I', [rfReplaceAll]);
   cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'Ó', 'O', [rfReplaceAll]);
   cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'Ú', 'U', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'á', 'A', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'é', 'E', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'í', 'I', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'ó', 'O', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'ú', 'U', [rfReplaceAll]);
+
 
   if cadenaSinAcentos = 'EFECTIVO' then
     Result := '01';
@@ -259,10 +265,11 @@ begin
   if cadenaSinAcentos = 'CHEQUE' then
     Result := '02';
 
-  if cadenaSinAcentos = 'TRANSFERENCIA' then
+  if AnsiPos('TRANSFERENCIA', cadenaSinAcentos) > 0 then
     Result := '03';
 
-  if cadenaSinAcentos = 'TARJETAS DE CREDITO' then
+  if (cadenaSinAcentos = 'TARJETA DE CREDITO') or
+     (cadenaSinAcentos = 'TARJETAS DE CREDITO' ) then
     Result := '04';
 
   if AnsiPos('MONEDERO', cadenaSinAcentos) > 0 then
@@ -305,7 +312,8 @@ begin
     Result := '17';
 
   if ((cadenaSinAcentos = 'NA') or
-     (cadenaSinAcentos = 'NO APLICA')) then
+     (cadenaSinAcentos = 'NO APLICA') or
+     (cadenaSinAcentos = 'NO IDENTIFICADO')) then
     Result := '98';
 
   if cadenaSinAcentos = 'OTROS' then
