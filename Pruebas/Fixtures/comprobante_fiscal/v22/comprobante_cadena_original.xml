@@ -8,9 +8,9 @@
     <Domicilio calle="AV HIDALGO" noExterior="77" colonia="GUERRERO" estado="DISTRITO FEDERAL" pais="México" codigoPostal="06300"/>
   </Receptor>
   <Conceptos>
-    <Concepto cantidad="1.000000" unidad="PZ" noIdentificacion="1" descripcion="Mac Book Air" valorUnitario="10000.00" importe="10000.00"/>
-    <Concepto cantidad="3.000000" unidad="PZ" noIdentificacion="2" descripcion="Magic Mouse" valorUnitario="900.00" importe="2700.00"/>
-    <Concepto cantidad="5.500000" unidad="HRS" noIdentificacion="3" descripcion="Servicio de soporte técnico" valorUnitario="120.00" importe="660.00"/>
+    <Concepto cantidad="1.00" unidad="PZ" noIdentificacion="1" descripcion="Mac Book Air" valorUnitario="10000.0000" importe="10000.00"/>
+    <Concepto cantidad="3.00" unidad="PZ" noIdentificacion="2" descripcion="Magic Mouse" valorUnitario="900.0000" importe="2700.00"/>
+    <Concepto cantidad="5.50" unidad="HRS" noIdentificacion="3" descripcion="Servicio de soporte técnico" valorUnitario="120.0000" importe="660.00"/>
   </Conceptos>
   <Impuestos totalImpuestosTrasladados="2137.60">
     <Traslados>

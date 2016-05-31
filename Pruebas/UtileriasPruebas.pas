@@ -77,6 +77,10 @@ var
   comprobanteConBloqueFolios: IFESoportaBloqueFolios;
   complementoTimbre: IFEXMLtimbreFiscalDigital;
   timbreComprobante: TFETimbre;
+  {$IFDEF VER300}
+  // A partir de Delphi Seattle es necesario usar esta constante
+  formatSettings : TFormatSettings;
+  {$ENDIF}
 
   procedure leerComprobanteXML();
   begin
@@ -128,9 +132,14 @@ begin
   Assert(FileExists(DeArchivoXML), 'El XML ' + DeArchivoXML + ' no existe!');
 
   try
-    separadorDecimalAnterior := DecimalSeparator;
     // Indicamos que el separador Decimal será el punto
+    {$IFDEF VER300}
+    separadorDecimalAnterior := formatSettings.DecimalSeparator;
+    formatSettings.DecimalSeparator := '.';
+    {$ELSE}
+    separadorDecimalAnterior := DecimalSeparator;
     DecimalSeparator := '.';
+    {$ENDIF}
 
     // Leemos el fixture de comprobante XML para obtener sus propiedades y asignarlas al comprobante
     leerComprobanteXML();
@@ -465,7 +474,11 @@ begin
 
     Result:=sSello;
   finally
+    {$IFDEF VER300}
+    formatSettings.DecimalSeparator := separadorDecimalAnterior;
+    {$ELSE}
     DecimalSeparator := separadorDecimalAnterior;
+    {$ENDIF}
   end;
 end;
 

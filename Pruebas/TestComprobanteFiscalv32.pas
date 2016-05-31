@@ -38,6 +38,9 @@ type
     procedure AgregarImpuestoLocal_Retenido_LoGuardeEnXML;
     procedure AgregarImpuestoLocal_Trasladado_LoGuardeEnXML;
     procedure Importe_DeCantidadesConMuchosDecimales_SeaElCorrecto;
+    procedure MetodoDePago_CadenaEfectivo_ConviertaANumero;
+    procedure MetodoDePago_EspecificandoNumero_LoDejeIgual;
+    procedure MetodoDePago_Inexistente_GenereExcepcion;
     procedure SelloDigital_ConConfiguracionDecimalIncorrecta_NoFalle;
     procedure setSerie_Serie_LaGuardeEnXML;
   end;
@@ -46,13 +49,19 @@ implementation
 
 uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
-  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
+  DateUtils, XmlDom, XMLIntf, Xml.win.MsXmlDom, XMLDoc,
+  {$IFNDEF VER300}
+  // Si estamos en Delphi 10 Seattle, este archivo ya no es necesario
+  XSLProd,
+  {$ENDIF}
+  FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
   FacturacionHashes,
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
   FacturaReglamentacion,
-  UtileriasPruebas;
+  UtileriasPruebas,
+  System.Math;
 
 procedure
     TestTFEComprobanteFiscalV32.CadenaOriginalDeTimbre_DeComprobanteV32_SeaCorrecta;
@@ -240,37 +249,49 @@ var
   separadorDecimalAnterior: Char;
   xmlFacturaGenerada: WideString;
   comprobanteNuevo: TFEComprobanteFiscal;
+  {$IFDEF VER300}
+  // A partir de Delphi Seattle es necesario usar esta constante
+  formatSettings : TFormatSettings;
+  {$ENDIF}
 begin
   ConfigurarCertificadoDePrueba(Certificado);
 
   // Intentamos generar el sello
-  try
-    // Llenamos el comprobante fiscal con datos usados para generar la factura
-    LeerXMLDePruebaEnComprobante(fRutaFixtures +
-                                'comprobante_fiscal/v32/comprobante_con_impuestos_locales.xml',
-                                Certificado, fComprobanteFiscalv32);
-
-    textoFalla := '';
-    // Creamos un comprobante para leer el XML generado con el decimal incorrecto
-    comprobanteNuevo := TFEComprobanteFiscal.Create();
+  {$IFDEF VER300}
+  with formatSettings do
+  begin
+  {$ENDIF}
     try
-      // Leemos el XML generado con la configuracion de "DecimalSeparator" incorrecta
-      // Configuramos el decimal para que sea incorrecto forzosamente
-      separadorDecimalAnterior := DecimalSeparator;
-      DecimalSeparator := ',';
-      xmlFacturaGenerada := fComprobanteFiscalv32.XML;
-      DecimalSeparator := '.';
-      xmlFacturaGenerada := fComprobanteFiscalv32.XML;
-      // Lo intemos leer en un nuevo comprobante
-      comprobanteNuevo.XML := xmlFacturaGenerada;
-    except
-      on E:Exception do
-        textoFalla := E.Message;
+      // Llenamos el comprobante fiscal con datos usados para generar la factura
+      LeerXMLDePruebaEnComprobante(fRutaFixtures +
+                                  'comprobante_fiscal/v32/comprobante_con_impuestos_locales.xml',
+                                  Certificado, fComprobanteFiscalv32);
+
+      textoFalla := '';
+      // Creamos un comprobante para leer el XML generado con el decimal incorrecto
+      comprobanteNuevo := TFEComprobanteFiscal.Create();
+      try
+        // Leemos el XML generado con la configuracion de "DecimalSeparator" incorrecta
+        // Configuramos el decimal para que sea incorrecto forzosamente
+        separadorDecimalAnterior := DecimalSeparator;
+        DecimalSeparator := ',';
+        xmlFacturaGenerada := fComprobanteFiscalv32.XML;
+        DecimalSeparator := '.';
+        xmlFacturaGenerada := fComprobanteFiscalv32.XML;
+        // Lo intemos leer en un nuevo comprobante
+        comprobanteNuevo.XML := xmlFacturaGenerada;
+      except
+        on E:Exception do
+          textoFalla := E.Message;
+      end;
+    finally
+      DecimalSeparator := separadorDecimalAnterior;
+      comprobanteNuevo.Free;
     end;
-  finally
-    DecimalSeparator := separadorDecimalAnterior;
-    comprobanteNuevo.Free;
+
+  {$IFDEF VER300}
   end;
+  {$ENDIF}
 
   CheckEquals('',
               textoFalla,
@@ -312,10 +333,10 @@ const
   // ToDo: Leer estas propiedades de forma alternativa desde el XML de prueba para no tenerlas fijas
   // y pode cambiar el XML de prueba facilmente
   _TIMBRE_VERSION = '1.0';
-  _TIMBRE_SELLO_SAT = 'XWJRk4IX97i2WEBJj1KJ4e3IYyGHOazTVtNusuGMLUT7YSt/nNWNK9dll3/p+mXOccLbfxRJcwIXzkIw0D+FetYPtpe8+Bw+utCF4/ZmDMy1xX5GzOWqXk2eu5KCz+HZQdkPFntD2/lyFtFP2+6xl+cR1aLB4BSQZ862JS2gj7M=';
-  _TIMBRE_NOCERTIFICADO_SAT = '20001000000100005761';
-  _TIMBRE_UUID = '2BDCA386-B562-45B0-8904-6099A33CA6B8';
-  _TIMBRE_FECHA = '2013-11-29T17:35:51';
+  _TIMBRE_SELLO_SAT = 'JFZQYjO+ta+R/gH+w7lqunZLzHNeqYWGQvcvJ+Dbvuk6KTCQgvkTP5tIKzqS7v4tXu1o1Rs6u+8p1Uo4jg4LZqvjZUbT14ZYzgE78wlVwz1aJFohHFRB9L4Fh1bcgqgYaJW+62npRq5Lt8EZanKnAdlxAdOHgTgyIzP/6jFtosM=';
+  _TIMBRE_NOCERTIFICADO_SAT = '20001000000100005868';
+  _TIMBRE_UUID = '64A89088-CFD7-42C1-8ABE-F0BDCFA85EB8';
+  _TIMBRE_FECHA = '2016-03-14T12:14:20';
 begin
     ConfigurarCertificadoDePrueba(Certificado);
 
@@ -425,8 +446,11 @@ begin
     CheckTrue(fComprobanteComparacion.Tipo = fComprobanteFiscalv32.Tipo, 'El tipo no fue el mismo');
     CheckTrue(fComprobanteComparacion.FormaDePago = fComprobanteFiscalv32.FormaDePago, 'La forma de pago no fue la misma');
     CheckEquals(fComprobanteComparacion.CondicionesDePago, fComprobanteFiscalv32.CondicionesDePago, 'Las condiciones de pago no fueron las mismas');
-    CheckEquals(fComprobanteComparacion.Subtotal, fComprobanteFiscalv32.Subtotal, 'El subtotal no fue el mismo');
-    CheckEquals(fComprobanteComparacion.Total, fComprobanteFiscalv32.Total, 'El total no fue el mismo');
+
+    CheckEquals( RoundTo(fComprobanteComparacion.Subtotal, -2),
+          fComprobanteFiscalv32.Subtotal, 'El subtotal no fue el mismo');
+    CheckEquals( RoundTo(fComprobanteComparacion.Total, -2),
+          fComprobanteFiscalv32.Total, 'El total no fue el mismo');
 
     CheckEquals(fComprobanteComparacion.Emisor.RFC, fComprobanteFiscalv32.Emisor.RFC, 'El RFC del Emisor no fue el mismo');
     CheckEquals(fComprobanteComparacion.Emisor.Nombre, fComprobanteFiscalv32.Emisor.Nombre, 'El Nombre del Emisor no fue el mismo');
@@ -518,7 +542,7 @@ begin
 
   try
     // Agregamos un concepto con cantidad y precio a granel para forzar que se calcule un importe con mas de 6 decimales de exactitud
-    conceptoConCantidadesConMuchosDecimales.Cantidad := 0.1234;
+    conceptoConCantidadesConMuchosDecimales.Cantidad := 0.12;
     conceptoConCantidadesConMuchosDecimales.Unidad := 'PZA';
     conceptoConCantidadesConMuchosDecimales.Descripcion := 'Articulo de Prueba';
     conceptoConCantidadesConMuchosDecimales.ValorUnitario := 129.9876;
@@ -550,6 +574,68 @@ begin
                 'El importe del concepto no fue calculado correctamente. Verificar que CANTIDAD y PRECIO se guardaran correctamente en XML');
   finally
      FreeAndNil(comprobanteNuevo);
+  end;
+end;
+
+procedure
+    TestTFEComprobanteFiscalV32.MetodoDePago_CadenaEfectivo_ConviertaANumero;
+var
+  xmlGenerado, cadenaEsperada: WideString;
+  comprobanteNuevo: TFEComprobanteFiscal;
+const
+  _CADENA_EFECTIVO = 'EfeCtivO';
+  _NUMERO_METODO_EFECTIVO = '01';
+begin
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+
+  // Especificamos la cadena de efectivo
+  comprobanteNuevo.MetodoDePago := _CADENA_EFECTIVO;
+  comprobanteNuevo.AsignarMetodoDePago;
+
+  // Checamos que se haya incluido el numero de catalogo de "Efectivo" y no dicha cadena
+  xmlGenerado := comprobanteNuevo.fXmlComprobante.XML;
+
+  cadenaEsperada := 'metodoDePago="' + _NUMERO_METODO_EFECTIVO + '"';
+  CheckTrue(AnsiPos(cadenaEsperada, xmlGenerado) > 0,
+            'No se incluyo el número de método de pago para Efectivo:' + _NUMERO_METODO_EFECTIVO);
+end;
+
+procedure
+    TestTFEComprobanteFiscalV32.MetodoDePago_EspecificandoNumero_LoDejeIgual;
+var
+  xmlGenerado, cadenaEsperada: WideString;
+  comprobanteNuevo: TFEComprobanteFiscal;
+  numeroInventado: Integer;
+begin
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+
+  Randomize;
+  numeroInventado := Random(999);
+  comprobanteNuevo.MetodoDePago := IntToStr(numeroInventado);
+  comprobanteNuevo.AsignarMetodoDePago;
+
+  xmlGenerado := comprobanteNuevo.fXmlComprobante.XML;
+
+  cadenaEsperada := 'metodoDePago="' + IntToStr(numeroInventado) + '"';
+  CheckTrue(AnsiPos(cadenaEsperada, xmlGenerado) > 0,
+            'No se incluyo el número de método de pago que se asigno manualmente');
+end;
+
+procedure TestTFEComprobanteFiscalV32.MetodoDePago_Inexistente_GenereExcepcion;
+var
+  comprobanteNuevo: TFEComprobanteFiscal;
+const
+  _CADENA_INEXISTENTE = 'METODO INVALIDO';
+begin
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+  try
+    comprobanteNuevo.MetodoDePago := _CADENA_INEXISTENTE;
+
+    StartExpectingException(EFECadenaMetodoDePagoNoEnCatalogoException);
+    comprobanteNuevo.AsignarMetodoDePago;
+    StopExpectingException('No se lanzo la excepcion EFECadenaMetodoDePagoNoEnCatalogoException con un metodo de pago inválido');
+  finally
+    comprobanteNuevo.Free;
   end;
 end;
 
