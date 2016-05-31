@@ -60,7 +60,8 @@ uses
   FEImpuestosLocales in '..\CFD\FEImpuestosLocales.pas',
   ClaseCertificadoSellos in '..\ClaseCertificadoSellos.pas',
   uWSHelper in '..\uWSHelper.pas',
-  PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas';
+  PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas',
+  EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas';
 
 var
    ProveedorTimbrado : TProveedorAutorizadoCertificacion;
@@ -162,7 +163,7 @@ begin
       //Factura.FechaGeneracion := EncodeDateTime(2012, 05, 12, 19, 47, 22, 0);
       //Factura.OnComprobanteGenerado:=onComprobanteGenerado;
 
-      Factura.MetodoDePago:='Tarjeta de credito';
+      Factura.MetodoDePago:='Efectivo';
       //Factura.NumeroDeCuenta:='1234';
 
       // Asignamos el lugar de expedición (requerido en  CFD >= 2.2)

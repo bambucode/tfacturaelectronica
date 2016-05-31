@@ -27,18 +27,32 @@ type
       /// <summary>Convierte el valor de moneda al formato de dinero requerido por el SAT
       /// </summary>
       /// <param name="Monto">Monto a convertir al formato aceptado por el SAT</param>
-      class function ComoMoneda(aMonto: Currency; const aDecimalesDefault: Integer =
-          6): String;
+      class function ComoMoneda(aMonto: Currency; const aDecimalesDefault: Integer
+          = 2): String;
       class function ComoCadena(sCadena: String) : String;
       class function ComoCantidad(dCantidad: Double; const aNumeroDecimales: Integer
-          = 6): String;
+          = 2): String;
       class function ComoFechaHora(dtFecha: TDateTime) : String;
       class function DeFechaHoraISO8601(const aFechaISO8601: String) : TDateTime;
       class function ComoFechaAduanera(dtFecha: TDateTime) : String;
       class function ComoTasaImpuesto(dTasa: Double; const aDecimalesDefault: Integer
-          = 6): String;
+          = 2): String;
       class function ComoDateTime(sFechaISO8601: String): TDateTime;
       class function ComoFechaHoraInforme(dtFecha: TDateTime) : String;
+      /// <summary>
+      ///   Se encarga de convertir una cadena de método de pago al número del
+      ///   catálogo del SAT. Referencia:
+      ///   http://www.sat.gob.mx/fichas_tematicas/buzon_tributario/Documents/catalogo_metodos_pago.pdf
+      /// </summary>
+      /// <param name="aCadenaMetodoDePago">
+      ///   Cadena, Ejemplo: Efectivo, Vales de Despensa, etc.
+      /// </param>
+      /// <returns>
+      ///   Regresa el numero del catálogo del SAT oficial o cadena vacía si la
+      ///   cadena no fue encontrada dentro del catálogo oficial.
+      /// </returns>
+      class function ConvertirCadenaMetodoDePagoANumeroCatalogo(const
+          aCadenaMetodoDePago: string): String;
       class function DeTasaImpuesto(const aCadenaTasa: String) : Double;
       class function DeCantidad(aCadenaCatidad: String): Double;
       class function DeMoneda(aMoneda: String): Currency;
@@ -61,19 +75,21 @@ uses DateUtils,
      {$IFEND}
      SysUtils, Windows;
 
+var
+  formatSettingsLocal : TFormatSettings;
 
 class procedure TFEReglamentacion.CorregirConfiguracionRegionalLocal;
 begin
   // Debido a que si el usuario en la PC tiene una configuración regional incorrecta
   // los XMLs se generan con montos y cantidades inválidas
-  separadorDecimalAnterior := DecimalSeparator;
+  separadorDecimalAnterior := formatSettingsLocal.DecimalSeparator;
   // Indicamos que el separador Decimal será el punto
-  DecimalSeparator := _PUNTO_DECIMAL;
+  formatSettingsLocal.DecimalSeparator := _PUNTO_DECIMAL;
 end;
 
 class procedure TFEReglamentacion.RegresarConfiguracionRegionalLocal;
 begin
-  DecimalSeparator := separadorDecimalAnterior;
+  formatSettingsLocal.DecimalSeparator := separadorDecimalAnterior;
 end;
 
 // Segun las reglas del SAT:
@@ -128,7 +144,7 @@ begin
 end;
 
 class function TFEReglamentacion.ComoMoneda(aMonto: Currency; const
-    aDecimalesDefault: Integer = 6): String;
+    aDecimalesDefault: Integer = 2): String;
 begin
    // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
    // http://www.sat.gob.mx/cfd/3/cfdv32.xsd
@@ -142,7 +158,7 @@ begin
 end;
 
 class function TFEReglamentacion.ComoTasaImpuesto(dTasa: Double; const
-    aDecimalesDefault: Integer = 6): String;
+    aDecimalesDefault: Integer = 2): String;
 begin
    // Regresamos los montos de monedas con 6 decimales (maximo permitido en el XSD)
    // http://www.sat.gob.mx/cfd/3/cfdv32.xsd
@@ -206,7 +222,7 @@ begin
 end;
 
 class function TFEReglamentacion.ComoCantidad(dCantidad: Double; const
-    aNumeroDecimales: Integer = 6): String;
+    aNumeroDecimales: Integer = 2): String;
 begin
    // Las cantidades cerradas las regresamos sin decimales
    // las que tienen fracciones con 6 digitos decimales para respetar la especificacion
@@ -222,6 +238,80 @@ begin
    end;
 end;
 
+
+class function TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(
+    const aCadenaMetodoDePago: string): String;
+var
+  cadenaSinAcentos: string;
+begin
+  Result := '';
+
+  cadenaSinAcentos := UpperCase(aCadenaMetodoDePago);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'Á', 'A', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'É', 'E', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'Í', 'I', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'Ó', 'O', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'Ú', 'U', [rfReplaceAll]);
+
+  if cadenaSinAcentos = 'EFECTIVO' then
+    Result := '01';
+
+  if cadenaSinAcentos = 'CHEQUE' then
+    Result := '02';
+
+  if cadenaSinAcentos = 'TRANSFERENCIA' then
+    Result := '03';
+
+  if cadenaSinAcentos = 'TARJETAS DE CREDITO' then
+    Result := '04';
+
+  if AnsiPos('MONEDERO', cadenaSinAcentos) > 0 then
+    Result := '05';
+
+  if (cadenaSinAcentos = 'DINERO ELECTRONICO') then
+    Result := '06';
+
+  if cadenaSinAcentos = 'TARJETAS DIGITALES' then
+    Result := '07';
+
+  if AnsiPos('VALES', cadenaSinAcentos) > 0 then
+    Result := '08';
+
+  if cadenaSinAcentos = 'BIENES' then
+    Result := '09';
+
+  if cadenaSinAcentos = 'SERVICIO' then
+    Result := '10';
+
+  if cadenaSinAcentos = 'POR CUENTA DE TERCERO' then
+    Result := '11';
+
+  if cadenaSinAcentos = 'DACION EN PAGO' then
+    Result := '12';
+
+  if cadenaSinAcentos = 'PAGO POR SUBROGACION' then
+    Result := '13';
+
+  if cadenaSinAcentos = 'PAGO POR CONSIGNACION' then
+    Result := '14';
+
+  if cadenaSinAcentos = 'CONDONACION' then
+    Result := '15';
+
+  if cadenaSinAcentos = 'CANCELACION' then
+    Result := '16';
+
+  if cadenaSinAcentos = 'COMPENSACION' then
+    Result := '17';
+
+  if ((cadenaSinAcentos = 'NA') or
+     (cadenaSinAcentos = 'NO APLICA')) then
+    Result := '98';
+
+  if cadenaSinAcentos = 'OTROS' then
+    Result := '99';
+end;
+
 class procedure TFEReglamentacion.ReemplazarComaSiActuaComoPuntoDecimal(var
     aCadenaCatidad: String);
 begin
@@ -232,4 +322,6 @@ begin
                                   [rfReplaceAll]);
 end;
 
+initialization
+  formatSettingsLocal := TFormatSettings.Create;
 end.

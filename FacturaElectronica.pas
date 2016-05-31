@@ -19,7 +19,8 @@ unit FacturaElectronica;
 
 interface
 
-uses FacturaTipos, ComprobanteFiscal;
+uses FacturaTipos,
+     ComprobanteFiscal;
 
 type
 
@@ -39,6 +40,7 @@ TFacturaElectronica = class(TFEComprobanteFiscal)
   fComprobanteGenerado : Boolean;
   fOnComprobanteTimbrado : TOnComprobanteTimbrado;
   fOnComprobanteGenerado: TOnComprobanteGenerado;
+   fRecalcularImporte: Boolean;
   function GetonComprobanteTimbrado: TOnComprobanteTimbrado;
   function obtenerCertificado() : TFECertificado;
   procedure SetonComprobanteTimbrado(const Value: TOnComprobanteTimbrado);
@@ -64,7 +66,7 @@ public
   constructor Create(cEmisor, cCliente: TFEContribuyente; bfBloqueFolios: TFEBloqueFolios;
                      cerCertificado: TFECertificado; tcTipo: TFETipoComprobante);  overload; deprecated;
   constructor Create(cEmisor, cCliente: TFEContribuyente; cerCertificado: TFECertificado;
-                      tcTipo: TFETipoComprobante);  overload;
+                      tcTipo: TFETipoComprobante; aRecalcularImporte :Boolean = True);  overload;
 
   destructor Destroy; override;
   procedure AfterConstruction; override;
@@ -78,23 +80,23 @@ public
   procedure Guardar(const aArchivoDestino: String);
   procedure AsignarTimbreFiscal(const aTimbre: TFETimbre); override;
 published
-  constructor Create; overload;
+  constructor Create(aRecalcularImporte :Boolean = True); overload;
 end;
 
 implementation
 
 uses sysutils, Classes;
 
-constructor TFacturaElectronica.Create;
+constructor TFacturaElectronica.Create(aRecalcularImporte :Boolean = True);
 begin
-  inherited Create;
+  inherited Create(fev32, aRecalcularImporte);
 end;
 
 constructor TFacturaElectronica.Create(cEmisor, cCliente: TFEContribuyente; cerCertificado: TFECertificado;
-                      tcTipo: TFETipoComprobante);
+                      tcTipo: TFETipoComprobante; aRecalcularImporte :Boolean = True);
 begin
   // Si usamos este constructor que no usa bloque de folios creamos un CFDI 3.2 por default
-  inherited Create(fev32);
+  inherited Create(fev32, aRecalcularImporte);
   // Llenamos las variables internas con las de los parametros
   inherited Emisor:=cEmisor;
   inherited Receptor:=cCliente;

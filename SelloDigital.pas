@@ -25,12 +25,12 @@ type
 /// 'sellar' la factura electrónica.
 ///</summary>
 TSelloDigital = class
+private
     fCadenaOriginal: TStringCadenaOriginal;
     fDigestion: TTipoDigestionOpenSSL;
     fOpenSSL: TOpenSSL;
     fCertificado: TFECertificado;
     fLlavePrivada: String;
-private
     function calcularSello(): WideString;
 public
     constructor Create(sCadenaOriginal: TStringCadenaOriginal; Certificado: TFECertificado; TipoDigestion: TTipoDigestionOpenSSL);

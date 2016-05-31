@@ -20,8 +20,15 @@ interface
 
 uses FacturaTipos, SysUtils,
   // Unidades especificas de manejo de XML:
-  XmlDom, XMLIntf, MsXmlDom, XMLDoc, DocComprobanteFiscal,
-  FeCFDv22,FeCFDv32, FeCFDv2, feCFD;
+  {$IF Compilerversion >= 20}
+  Xml.xmldom,
+  Xml.XMLIntf,
+  Xml.Win.MsXmlDom,
+  Xml.XMLDoc,
+  {$ELSE}
+  XmlDom, XMLIntf, Xml.win.MsXmlDom, XMLDoc,
+  {$ENDIF}
+  DocComprobanteFiscal, FeCFDv22,FeCFDv32, FeCFDv2, feCFD;
 
 type
 
@@ -71,6 +78,7 @@ type
     fAutoAsignarFechaGeneracion: Boolean;
     FValidarCertificadoYLlavePrivada: Boolean;
     FVerificarRFCDelCertificado: Boolean;
+    fRecalcularImporte  : Boolean;
 
 
     {$REGION 'Documentation'}
@@ -159,7 +167,7 @@ type
     ///	  Version del comprobante a crear
     ///	</param>
     {$ENDREGION}
-    constructor Create(const aVersionComprobante: TFEVersionComprobante = fev32);
+    constructor Create(const aVersionComprobante: TFEVersionComprobante = fev32; aRecalcularImporte: Boolean = True);
     destructor Destroy(); override;
     procedure Cancelar();
 
@@ -196,7 +204,8 @@ type
   end;
 
 const
-   _CADENA_METODO_PAGO_NO_DISPONIBLE = 'No identificado';
+  // A partir del 6 de Mayo de 2016, usamos el numero de catalogo del SAT
+   _CADENA_METODO_PAGO_NO_DISPONIBLE = '98'; // Antes cadena "No identificado".
 
 implementation
 
@@ -214,15 +223,18 @@ uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
 
 // Al crear el objeto, comenzamos a "llenar" el XML interno
 constructor TFEComprobanteFiscal.Create(const aVersionComprobante:
-    TFEVersionComprobante = fev32);
+    TFEVersionComprobante = fev32; aRecalcularImporte: Boolean = True);
 begin
-  inherited Create;
+  inherited Create(aRecalcularImporte);
   _CADENA_PAGO_UNA_EXHIBICION := 'Pago en una sola exhibición';
   _CADENA_PAGO_PARCIALIDADES := 'En parcialidades';
 
   {$IFDEF VERSION_DE_PRUEBA}
     _USAR_HORA_REAL := False;
   {$ENDIF}
+
+  // Almacenamos si queremos recalcular el Importe
+  fRecalcularImporte := aRecalcularImporte;
 
    // Ahora La decisión de que tipo de comprobante y su versión deberá de ser del programa y no de la clase
   fVersion:=aVersionComprobante;
@@ -638,8 +650,13 @@ begin
           NoIdentificacion := TFEReglamentacion.ComoCadena(Concepto.NoIdentificacion); // Opcional
 
         Descripcion := TFEReglamentacion.ComoCadena(Concepto.Descripcion);
-        ValorUnitario := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario);
-        Importe := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario * Concepto.Cantidad);
+        // Se guardan 4 decimales para que pase la prueba del validador de ValidaCFD
+        ValorUnitario := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario, 4);
+
+        //  Si esta habilitada la bandera permite recalcular el importe u obtenerlo directamente de la variable
+        if fRecalcularImporte
+        then Importe := TFEReglamentacion.ComoMoneda(Concepto.ValorUnitario * Concepto.Cantidad)
+        else Importe := TFEReglamentacion.ComoMoneda(Concepto.Importe);
 
         // Le fue asignada informacion aduanera??
         if (Concepto.DatosAduana.NumeroDocumento <> '') then
@@ -722,7 +739,7 @@ begin
          nodoImpuestosLocales.Version := '1.0';
          nodoImpuestosLocales.TotaldeRetenciones := TFEReglamentacion.ComoMoneda(inherited TotalImpuestosLocalesRetenidos,
                                                                                  _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
-         nodoImpuestosLocales.TotaldeTraslados := TFEReglamentacion.ComoMoneda(inherited TotalImpuestosLocalesTrasladados, 
+         nodoImpuestosLocales.TotaldeTraslados := TFEReglamentacion.ComoMoneda(inherited TotalImpuestosLocalesTrasladados,
                                                                                _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
 
          // Agregamos el detalle de los impuestos "hijo"
@@ -732,7 +749,7 @@ begin
 
             // Agregamos el nodo de impuesto segun el tipo de impuesto...
             case nuevoImpuesto.Tipo of
-              tiRetenido    : 
+              tiRetenido    :
               begin
                 with nodoImpuestosLocales.RetencionesLocales.Add do
                 begin
@@ -741,7 +758,7 @@ begin
                   Importe := TFEReglamentacion.ComoMoneda(nuevoImpuesto.Importe, _DECIMALES_ACEPTADOS_EN_IMPUESTO_LOCAL);
                 end;
               end;
-              tiTrasladado  : 
+              tiTrasladado  :
               begin
                 with nodoImpuestosLocales.TrasladosLocales.Add do
                 begin
@@ -752,7 +769,7 @@ begin
               end;
             end;
          end;
-         
+
       finally
          // No liberamos el TXMLDocument por que impleneta a un TInterfacedObject y Delphi lo libera solo
          //documentoImpuestosLocales.Free;
@@ -843,12 +860,42 @@ begin
 end;
 
 procedure TFEComprobanteFiscal.AsignarMetodoDePago;
+var
+  cadenaMetodoDePago, metodoDePagoFinal: String;
+  numeroCatalogoMetodoPago: Integer;
 begin
   // Asignamos el metodo de pago
   if (Trim(inherited MetodoDePago) <> '') then
-     fXmlComprobante.MetodoDePago:=TFEReglamentacion.ComoCadena(inherited MetodoDePago)
-  else
-     fXmlComprobante.MetodoDePago:=_CADENA_METODO_PAGO_NO_DISPONIBLE;
+  begin
+     cadenaMetodoDePago := (inherited MetodoDePago);
+
+     // ¿El usuario especifico un numero de catalogo? Lo "pasamos" directo
+     if TryStrToInt(cadenaMetodoDePago, numeroCatalogoMetodoPago) then
+     begin
+       {$IFDEF CODESITE}
+          CodeSite.Send('Usando código de método de pago definido por usuario', numeroCatalogoMetodoPago);
+       {$ENDIF}
+       metodoDePagoFinal := IntToStr(numeroCatalogoMetodoPago)
+     end else
+     begin
+       {$IFDEF CODESITE}
+         CodeSite.Send('Intentando obtener número de método de pago: ' + cadenaMetodoDePago);
+       {$ENDIF}
+       // Si fue una cadena, tratamos de convertirla al catálogo oficial
+       metodoDePagoFinal := TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(cadenaMetodoDePago);
+       {$IFDEF CODESITE}
+         CodeSite.Send('Numero de método de pago', metodoDePagoFinal);
+       {$ENDIF}
+
+       // Si regreso cadena vacia es que no encontró una equivalencia de la cadena al numero de catalogo en el SAT
+       if (metodoDePagoFinal = '') then
+        raise EFECadenaMetodoDePagoNoEnCatalogoException.Create('La cadena "' + inherited MetodoDePago +
+                                                                '" no está en el catálogo de métodos de pago del SAT. Favor de verificar');
+     end;
+
+     fXmlComprobante.MetodoDePago := TFEReglamentacion.ComoCadena(metodoDePagoFinal)
+  end else
+     fXmlComprobante.MetodoDePago := _CADENA_METODO_PAGO_NO_DISPONIBLE;
 end;
 
 procedure TFEComprobanteFiscal.AsignarTipoComprobante;
@@ -1307,7 +1354,7 @@ begin
         fDocumentoXML:=TXmlDocument.Create(nil);
         // Pasamos el XML para poder usarlo en la clase
         fDocumentoXML.XML:=iXmlDoc.XML;
-        
+
         // Leemos la interface XML adecuada segun la version del XML, si la version no está soportada
         // lanzaremos una excepcion
         LeerVersionDeComprobanteLeido(Valor);
@@ -1626,6 +1673,9 @@ begin
                 feConcepto.ValorUnitario:=TFEReglamentacion.DeMoneda(Conceptos[I].ValorUnitario);
                 if TieneAtributo(Conceptos[I], 'noIdentificacion') then
                   feConcepto.NoIdentificacion:=Conceptos[I].NoIdentificacion;
+
+                feConcepto.ValorUnitarioFinal := TFEReglamentacion.DeMoneda(Conceptos[I].ValorUnitario);
+                feConcepto.Importe := TFEReglamentacion.DeMoneda(Conceptos[I].Importe);
 
                 inherited AgregarConcepto(feConcepto);
             end;

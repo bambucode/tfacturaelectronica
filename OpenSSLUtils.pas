@@ -40,6 +40,7 @@ uses libeay32, SysUtils;
 
 type
 EOpenSSL = class(Exception)
+public
   OpenSSLError: integer;
   OpenSSLErrorMessage: string;
   constructor Create(Msg: string);

@@ -95,6 +95,9 @@ TFEConcepto = record
   Unidad: String;
   Descripcion: String;
   ValorUnitario: Currency;
+  // Almacenamos los valores globales
+  ValorUnitarioFinal: Currency;
+  Importe           : Currency;
   // Datos opcionales
   NoIdentificacion: String;
   DatosAduana: TFEDatosAduana;
@@ -186,6 +189,7 @@ EFECertificadoNoFueLeidoException = class(Exception);
 
 {$REGION 'Errores durante generacion de CFD/I'}
 EFEAtributoRequeridoNoPresenteException = class(Exception);
+EFECadenaMetodoDePagoNoEnCatalogoException = class(Exception);
 
 {$REGION 'Documentation'}
 ///	<summary>
