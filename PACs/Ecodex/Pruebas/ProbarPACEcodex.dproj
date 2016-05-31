@@ -8,7 +8,7 @@
 			<FrameworkType>VCL</FrameworkType>
 			<ProjectVersion>13.4</ProjectVersion>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Config Condition="'$(Config)'==''">Release</Config>
 			<Platform Condition="'$(Platform)'==''">Win32</Platform>
 			<TargetedPlatforms>1</TargetedPlatforms>
 			<AppType>Application</AppType>
@@ -29,6 +29,12 @@
 		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
 			<Cfg_1>true</Cfg_1>
 			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+			<Cfg_1_Win32>true</Cfg_1_Win32>
+			<CfgParent>Cfg_1</CfgParent>
+			<Cfg_1>true</Cfg_1>
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
@@ -68,6 +74,14 @@
 			<DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
 			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
 			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+			<DCC_ConsoleTarget>true</DCC_ConsoleTarget>
+			<DCC_Define>XMLOUTPUT;CONSOLE_TESTRUNNER;ISCONSOLE;$(DCC_Define)</DCC_Define>
+			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
+			<DCC_ExeOutput>C:\Delphi\eleventa\Output\UnitTests\Win32</DCC_ExeOutput>
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
 			<Version>7.0</Version>
@@ -122,11 +136,20 @@
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
 					<Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40CDT_D2012.bpl">IB Objects Core Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40ADT_D2012.bpl">IB Objects Native Data Access Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40TDT_D2012.bpl">IB Objects Tools Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40VDT_D2012.bpl">IB Objects Visual Controls</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40FDT_D2012.bpl">IB Objects Forms and Dialogs</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40XDT_D2012.bpl">IB Objects TDataset</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40WDT_D2012.bpl">IB Objects Internet Extensions</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40WXDT_D2012.bpl">IB Objects TDataset Internet Extensions</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40EDT_D2012.bpl">IB Objects Editors</Excluded_Packages>
 						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\iOSComps.bpl">Components for iOS</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
 						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\9.0\Bpl\IBO40WSDT_D2012.bpl">IB Objects Web Snap Extensions</Excluded_Packages>
-						<Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\TMS Aurelius\library\bpl\Win32\dclaureliusxe2.bpl">TMS Aurelius - Design-Time Core Package</Excluded_Packages>
+						<Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\IBObjects\lib\d2012\Win32\Release\ibo5wsdt_d2012.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\IBObjects\lib\d2012\Win32\Release\ibo5wsdt_d2012.bpl not found</Excluded_Packages>
 					</Excluded_Packages>
 					<Source>
 						<Source Name="MainSource">ProbarPACEcodex.dpr</Source>
@@ -144,6 +167,10 @@
 			<DelphiCompile Include="$(MainSource)">
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
+			<DCCReference Include="..\..\..\Pruebas\DUnit-XML\VSoft.DUnit.XMLTestRunner.pas"/>
+			<DCCReference Include="..\..\..\Pruebas\DUnit-XML\VSoft.MSXML6.pas">
+				<Form>$ENDIF</Form>
+			</DCCReference>
 			<DCCReference Include="..\..\..\FacturaTipos.pas"/>
 			<DCCReference Include="..\..\..\FacturaReglamentacion.pas"/>
 			<DCCReference Include="TestManejadorDeSesion.pas"/>
@@ -172,6 +199,7 @@
 			<DCCReference Include="..\EcodexWsClientes.pas"/>
 			<DCCReference Include="..\EcodexWsComun.pas"/>
 			<DCCReference Include="..\..\ManejadorDeErroresComunes.pas"/>
+			<DCCReference Include="..\EcodexWsCancelacion.pas"/>
 			<BuildConfiguration Include="Debug">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>

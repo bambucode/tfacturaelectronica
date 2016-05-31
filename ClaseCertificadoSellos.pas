@@ -170,6 +170,9 @@ begin
   Assert(fx509Certificado <> nil, 'El certificado interno X509 fue nulo');
 
   sCertificadoBase64 := fx509Certificado.AsBase64;
+  Assert(Pos(_CADENA_INICIO_CERTIFICADO, sCertificadoBase64) > 0, 'No se tuvo cadena de inicio de certificado');
+  Assert(Pos(_CADENA_FIN_CERTIFICADO, sCertificadoBase64) > 0, 'No se tuvo cadena de fin de certificado');
+
   // Quita los encabezados, pie y retornos de carro del certificado
   sCertificadoBase64:=StringReplace(sCertificadoBase64, #13, '', [rfReplaceAll, rfIgnoreCase]);
   sCertificadoBase64:=StringReplace(sCertificadoBase64, #10, '', [rfReplaceAll, rfIgnoreCase]);

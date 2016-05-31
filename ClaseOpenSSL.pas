@@ -40,6 +40,7 @@ uses libeay32, SysUtils, Windows, OpenSSLUtils, libeay32plus;
     ///  lectura de la llave privada en su formato nativo binario (.key)
     ///</summary>
     TOpenSSL = class
+    private
         fArchivoLlavePrivada: String;
         fClaveLlavePrivada: String;
     private

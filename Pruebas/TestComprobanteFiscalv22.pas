@@ -46,6 +46,7 @@ type
     procedure getXML_DeComprobanteHecho_GenereXMLCorrectamente;
     procedure setXML_DeComprobanteExistente_EstablezcaLasPropiedadesCorrectamente;
     procedure GuardarEnArchivo_ComprobanteDeXML_LoGuarde;
+    procedure setSerie_Serie_LaGuardeEnXML;
     procedure setXML_DeComprobanteV2_EstablezcaLasPropiedadesCorrectamente;
   end;
 
@@ -53,7 +54,12 @@ implementation
 
 uses
   Windows, SysUtils, Classes, ConstantesFixtures, dialogs,
-  DateUtils, XmlDom, XMLIntf, MsXmlDom, XMLDoc, XSLProd, FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
+  DateUtils, XmlDom, XMLIntf, Xml.win.MsXmlDom, XMLDoc,
+  {$IFNDEF VER300}
+  // Si estamos en Delphi 10 Seattle, este archivo ya no es necesario
+  XSLProd,
+  {$ENDIF}
+  FeCFD, FeCFDv22, FeCFDv32, FeCFDv2,
   FacturacionHashes,
   UtileriasPruebas;
 
@@ -151,6 +157,26 @@ begin
 
   CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
     'No se guardo el Folio en la estructura del XML');
+end;
+
+procedure TestTFEComprobanteFiscalV22.setSerie_Serie_LaGuardeEnXML;
+var
+  sXMLFixture: WideString;
+  Serie: TFESerie;
+  bloqueFoliosPrueba: TFEBloqueFolios;
+begin
+  // Leemos el contenido de nuestro 'Fixture' para comparar que sean iguales...
+  sXMLFixture := leerContenidoDeFixture('comprobante_fiscal/v22/serie.xml');
+
+  bloqueFoliosPrueba.Serie := 'ABC';
+  bloqueFoliosPrueba.NumeroAprobacion := 0;
+  bloqueFoliosPrueba.AnoAprobacion := 0;
+
+  fComprobanteFiscal.BloqueFolios := bloqueFoliosPrueba;
+  fComprobanteFiscal.AsignarDatosFolios;
+
+  CheckEquals(sXMLFixture, fComprobanteFiscal.fXmlComprobante.XML,
+    'No se guardo la serie en la estructura del XML');
 end;
 
 {
@@ -682,6 +708,8 @@ begin
   CheckEquals(sXMLConReceptor, fComprobanteFiscal.fXmlComprobante.XML,
     'El Contenido XML del Comprobante no almaceno correctamente los datos del receptor (es diferente al fixture receptor.xml)');
 end;
+
+
 
 procedure
     TestTFEComprobanteFiscalV22.setXML_DeComprobanteV2_EstablezcaLasPropiedadesCorrectamente;
