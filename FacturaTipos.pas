@@ -186,6 +186,7 @@ EFECertificadoNoFueLeidoException = class(Exception);
 
 {$REGION 'Errores durante generacion de CFD/I'}
 EFEAtributoRequeridoNoPresenteException = class(Exception);
+EFECadenaMetodoDePagoNoEnCatalogoException = class(Exception);
 
 {$REGION 'Documentation'}
 ///	<summary>

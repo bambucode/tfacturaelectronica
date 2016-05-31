@@ -38,6 +38,9 @@ type
     procedure AgregarImpuestoLocal_Retenido_LoGuardeEnXML;
     procedure AgregarImpuestoLocal_Trasladado_LoGuardeEnXML;
     procedure Importe_DeCantidadesConMuchosDecimales_SeaElCorrecto;
+    procedure MetodoDePago_CadenaEfectivo_ConviertaANumero;
+    procedure MetodoDePago_EspecificandoNumero_LoDejeIgual;
+    procedure MetodoDePago_Inexistente_GenereExcepcion;
     procedure SelloDigital_ConConfiguracionDecimalIncorrecta_NoFalle;
     procedure setSerie_Serie_LaGuardeEnXML;
   end;
@@ -567,6 +570,68 @@ begin
                 'El importe del concepto no fue calculado correctamente. Verificar que CANTIDAD y PRECIO se guardaran correctamente en XML');
   finally
      FreeAndNil(comprobanteNuevo);
+  end;
+end;
+
+procedure
+    TestTFEComprobanteFiscalV32.MetodoDePago_CadenaEfectivo_ConviertaANumero;
+var
+  xmlGenerado, cadenaEsperada: WideString;
+  comprobanteNuevo: TFEComprobanteFiscal;
+const
+  _CADENA_EFECTIVO = 'EfeCtivO';
+  _NUMERO_METODO_EFECTIVO = '01';
+begin
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+
+  // Especificamos la cadena de efectivo
+  comprobanteNuevo.MetodoDePago := _CADENA_EFECTIVO;
+  comprobanteNuevo.AsignarMetodoDePago;
+
+  // Checamos que se haya incluido el numero de catalogo de "Efectivo" y no dicha cadena
+  xmlGenerado := comprobanteNuevo.fXmlComprobante.XML;
+
+  cadenaEsperada := 'metodoDePago="' + _NUMERO_METODO_EFECTIVO + '"';
+  CheckTrue(AnsiPos(cadenaEsperada, xmlGenerado) > 0,
+            'No se incluyo el número de método de pago para Efectivo:' + _NUMERO_METODO_EFECTIVO);
+end;
+
+procedure
+    TestTFEComprobanteFiscalV32.MetodoDePago_EspecificandoNumero_LoDejeIgual;
+var
+  xmlGenerado, cadenaEsperada: WideString;
+  comprobanteNuevo: TFEComprobanteFiscal;
+  numeroInventado: Integer;
+begin
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+
+  Randomize;
+  numeroInventado := Random(999);
+  comprobanteNuevo.MetodoDePago := IntToStr(numeroInventado);
+  comprobanteNuevo.AsignarMetodoDePago;
+
+  xmlGenerado := comprobanteNuevo.fXmlComprobante.XML;
+
+  cadenaEsperada := 'metodoDePago="' + IntToStr(numeroInventado) + '"';
+  CheckTrue(AnsiPos(cadenaEsperada, xmlGenerado) > 0,
+            'No se incluyo el número de método de pago que se asigno manualmente');
+end;
+
+procedure TestTFEComprobanteFiscalV32.MetodoDePago_Inexistente_GenereExcepcion;
+var
+  comprobanteNuevo: TFEComprobanteFiscal;
+const
+  _CADENA_INEXISTENTE = 'METODO INVALIDO';
+begin
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+  try
+    comprobanteNuevo.MetodoDePago := _CADENA_INEXISTENTE;
+
+    StartExpectingException(EFECadenaMetodoDePagoNoEnCatalogoException);
+    comprobanteNuevo.AsignarMetodoDePago;
+    StopExpectingException('No se lanzo la excepcion EFECadenaMetodoDePagoNoEnCatalogoException con un metodo de pago inválido');
+  finally
+    comprobanteNuevo.Free;
   end;
 end;
 

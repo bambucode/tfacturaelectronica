@@ -39,6 +39,20 @@ type
           = 6): String;
       class function ComoDateTime(sFechaISO8601: String): TDateTime;
       class function ComoFechaHoraInforme(dtFecha: TDateTime) : String;
+      /// <summary>
+      ///   Se encarga de convertir una cadena de método de pago al número del
+      ///   catálogo del SAT. Referencia:
+      ///   http://www.sat.gob.mx/fichas_tematicas/buzon_tributario/Documents/catalogo_metodos_pago.pdf
+      /// </summary>
+      /// <param name="aCadenaMetodoDePago">
+      ///   Cadena, Ejemplo: Efectivo, Vales de Despensa, etc.
+      /// </param>
+      /// <returns>
+      ///   Regresa el numero del catálogo del SAT oficial o cadena vacía si la
+      ///   cadena no fue encontrada dentro del catálogo oficial.
+      /// </returns>
+      class function ConvertirCadenaMetodoDePagoANumeroCatalogo(const
+          aCadenaMetodoDePago: string): String;
       class function DeTasaImpuesto(const aCadenaTasa: String) : Double;
       class function DeCantidad(aCadenaCatidad: String): Double;
       class function DeMoneda(aMoneda: String): Currency;
@@ -222,6 +236,80 @@ begin
    finally
      RegresarConfiguracionRegionalLocal;
    end;
+end;
+
+
+class function TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(
+    const aCadenaMetodoDePago: string): String;
+var
+  cadenaSinAcentos: string;
+begin
+  Result := '';
+
+  cadenaSinAcentos := UpperCase(aCadenaMetodoDePago);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'Á', 'A', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'É', 'E', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'Í', 'I', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'Ó', 'O', [rfReplaceAll]);
+  cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'Ú', 'U', [rfReplaceAll]);
+
+  if cadenaSinAcentos = 'EFECTIVO' then
+    Result := '01';
+
+  if cadenaSinAcentos = 'CHEQUE' then
+    Result := '02';
+
+  if cadenaSinAcentos = 'TRANSFERENCIA' then
+    Result := '03';
+
+  if cadenaSinAcentos = 'TARJETAS DE CREDITO' then
+    Result := '04';
+
+  if AnsiPos('MONEDERO', cadenaSinAcentos) > 0 then
+    Result := '05';
+
+  if (cadenaSinAcentos = 'DINERO ELECTRONICO') then
+    Result := '06';
+
+  if cadenaSinAcentos = 'TARJETAS DIGITALES' then
+    Result := '07';
+
+  if AnsiPos('VALES', cadenaSinAcentos) > 0 then
+    Result := '08';
+
+  if cadenaSinAcentos = 'BIENES' then
+    Result := '09';
+
+  if cadenaSinAcentos = 'SERVICIO' then
+    Result := '10';
+
+  if cadenaSinAcentos = 'POR CUENTA DE TERCERO' then
+    Result := '11';
+
+  if cadenaSinAcentos = 'DACION EN PAGO' then
+    Result := '12';
+
+  if cadenaSinAcentos = 'PAGO POR SUBROGACION' then
+    Result := '13';
+
+  if cadenaSinAcentos = 'PAGO POR CONSIGNACION' then
+    Result := '14';
+
+  if cadenaSinAcentos = 'CONDONACION' then
+    Result := '15';
+
+  if cadenaSinAcentos = 'CANCELACION' then
+    Result := '16';
+
+  if cadenaSinAcentos = 'COMPENSACION' then
+    Result := '17';
+
+  if ((cadenaSinAcentos = 'NA') or
+     (cadenaSinAcentos = 'NO APLICA')) then
+    Result := '98';
+
+  if cadenaSinAcentos = 'OTROS' then
+    Result := '99';
 end;
 
 class procedure TFEReglamentacion.ReemplazarComaSiActuaComoPuntoDecimal(var
