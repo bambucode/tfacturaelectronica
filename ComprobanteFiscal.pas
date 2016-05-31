@@ -203,7 +203,8 @@ type
   end;
 
 const
-   _CADENA_METODO_PAGO_NO_DISPONIBLE = 'No identificado';
+  // A partir del 6 de Mayo de 2016, usamos el numero de catalogo del SAT
+   _CADENA_METODO_PAGO_NO_DISPONIBLE = '98'; // Antes cadena "No identificado".
 
 implementation
 
@@ -850,12 +851,42 @@ begin
 end;
 
 procedure TFEComprobanteFiscal.AsignarMetodoDePago;
+var
+  cadenaMetodoDePago, metodoDePagoFinal: String;
+  numeroCatalogoMetodoPago: Integer;
 begin
   // Asignamos el metodo de pago
   if (Trim(inherited MetodoDePago) <> '') then
-     fXmlComprobante.MetodoDePago:=TFEReglamentacion.ComoCadena(inherited MetodoDePago)
-  else
-     fXmlComprobante.MetodoDePago:=_CADENA_METODO_PAGO_NO_DISPONIBLE;
+  begin
+     cadenaMetodoDePago := (inherited MetodoDePago);
+
+     // ¿El usuario especifico un numero de catalogo? Lo "pasamos" directo
+     if TryStrToInt(cadenaMetodoDePago, numeroCatalogoMetodoPago) then
+     begin
+       {$IFDEF CODESITE}
+          CodeSite.Send('Usando código de método de pago definido por usuario', numeroCatalogoMetodoPago);
+       {$ENDIF}
+       metodoDePagoFinal := IntToStr(numeroCatalogoMetodoPago)
+     end else
+     begin
+       {$IFDEF CODESITE}
+         CodeSite.Send('Intentando obtener número de método de pago: ' + cadenaMetodoDePago);
+       {$ENDIF}
+       // Si fue una cadena, tratamos de convertirla al catálogo oficial
+       metodoDePagoFinal := TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(cadenaMetodoDePago);
+       {$IFDEF CODESITE}
+         CodeSite.Send('Numero de método de pago', metodoDePagoFinal);
+       {$ENDIF}
+
+       // Si regreso cadena vacia es que no encontró una equivalencia de la cadena al numero de catalogo en el SAT
+       if (metodoDePagoFinal = '') then
+        raise EFECadenaMetodoDePagoNoEnCatalogoException.Create('La cadena "' + inherited MetodoDePago +
+                                                                '" no está en el catálogo de métodos de pago del SAT. Favor de verificar');
+     end;
+
+     fXmlComprobante.MetodoDePago := TFEReglamentacion.ComoCadena(metodoDePagoFinal)
+  end else
+     fXmlComprobante.MetodoDePago := _CADENA_METODO_PAGO_NO_DISPONIBLE;
 end;
 
 procedure TFEComprobanteFiscal.AsignarTipoComprobante;
