@@ -884,7 +884,8 @@ begin
                                                            _MES_CAMBIO_METODO_PAGO,
                                                            _DIA_CAMBIO_METODO_PAGO);
 
-     if CompareDate(fFechaGeneracion, fechaEntradaVigorConceptosMetodosDePago) In [_MISMA_FECHA, _FECHA_POSTERIOR] then
+     if CompareDate(inherited FechaGeneracion, fechaEntradaVigorConceptosMetodosDePago) In
+                    [_MISMA_FECHA, _FECHA_POSTERIOR] then
      begin
        // ¿El usuario especifico un numero de catalogo? Lo "pasamos" directo
        if TryStrToInt(cadenaMetodoDePago, numeroCatalogoMetodoPago) then
@@ -915,7 +916,14 @@ begin
                                                                   '" no está en el catálogo de métodos de pago del SAT. Favor de verificar');
        end;
      end else
+     begin
+        {$IFDEF CODESITE}
+            CodeSite.Send('La factura se generó previo a la entrada en vigor de ' +
+                          'numero de catálogo de métodos de pago, usando método de pago tal cual',
+                          cadenaMetodoDePago);
+         {$ENDIF}
         metodoDePagoFinal := cadenaMetodoDePago;
+     end;
 
      fXmlComprobante.MetodoDePago := TFEReglamentacion.ComoCadena(metodoDePagoFinal)
   end else

@@ -635,7 +635,7 @@ begin
     comprobanteNuevo.AsignarMetodoDePago;
 
     cadenaEsperada := 'metodoDePago="' + _CADENA_INVENTADA_METODO_PAGO + '"';
-    CheckTrue(AnsiPos(cadenaEsperada, comprobanteNuevo.XML) > 0,
+    CheckTrue(AnsiPos(cadenaEsperada, comprobanteNuevo.fXmlComprobante.XML) > 0,
               'No se respeto la cadena de metodo de pago previo a catalogo: ' + _CADENA_INVENTADA_METODO_PAGO);
   finally
     comprobanteNuevo.Free;
