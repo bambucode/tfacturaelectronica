@@ -19,6 +19,7 @@ type
   TestTFEComprobanteFiscalV32 = class(TTestPrueba)
   strict private
     fComprobanteFiscalv32: TFEComprobanteFiscal;
+    fFechaEntradaVigenciaCatalogo : TDate;
   private
     procedure ConfigurarCertificadoDePrueba(var Certificado: TFECertificado);
   public
@@ -39,8 +40,10 @@ type
     procedure AgregarImpuestoLocal_Trasladado_LoGuardeEnXML;
     procedure Importe_DeCantidadesConMuchosDecimales_SeaElCorrecto;
     procedure MetodoDePago_CadenaEfectivo_ConviertaANumero;
+    procedure MetodoDePago_CadenaEfectivo_FechaMenorACambioCatalogoLaDejeIgual;
     procedure MetodoDePago_EspecificandoNumero_LoDejeIgual;
     procedure MetodoDePago_Inexistente_GenereExcepcion;
+    procedure MetodoDePago_MenorADiez_AgregueCeroAlPrincipio;
     procedure SelloDigital_ConConfiguracionDecimalIncorrecta_NoFalle;
     procedure setSerie_Serie_LaGuardeEnXML;
   end;
@@ -89,9 +92,19 @@ begin
 end;
 
 procedure TestTFEComprobanteFiscalV32.SetUp;
+const
+  _ANO_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO = 2016;
+  _MES_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO = 6;
+  _DIA_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO = 6;
 begin
   inherited;
   fComprobanteFiscalv32 := TFEComprobanteFiscal.Create(fev32);
+
+    // Especificamos la cadena de efectivo
+  fFechaEntradaVigenciaCatalogo := EncodeDate(_ANO_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO,
+                                              _MES_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO,
+                                              _DIA_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO);
+
 end;
 
 procedure TestTFEComprobanteFiscalV32.TearDown;
@@ -582,13 +595,15 @@ procedure
 var
   xmlGenerado, cadenaEsperada: WideString;
   comprobanteNuevo: TFEComprobanteFiscal;
+  fechaGeneracionComprobante: TDate;
 const
   _CADENA_EFECTIVO = 'EfeCtivO';
   _NUMERO_METODO_EFECTIVO = '01';
 begin
   comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
 
-  // Especificamos la cadena de efectivo
+  comprobanteNuevo.FechaGeneracion := fFechaEntradaVigenciaCatalogo;
+  comprobanteNuevo.AutoAsignarFechaGeneracion := False;
   comprobanteNuevo.MetodoDePago := _CADENA_EFECTIVO;
   comprobanteNuevo.AsignarMetodoDePago;
 
@@ -601,6 +616,33 @@ begin
 end;
 
 procedure
+    TestTFEComprobanteFiscalV32.MetodoDePago_CadenaEfectivo_FechaMenorACambioCatalogoLaDejeIgual;
+var
+  comprobanteNuevo: TFEComprobanteFiscal;
+  fechaPreviaAEntradaCatalogo : TDate;
+  cadenaEsperada: String;
+const
+  _CADENA_INVENTADA_METODO_PAGO = 'Efectivo y Cheque';
+begin
+  fechaPreviaAEntradaCatalogo := EncodeDate(2016,1,1);
+
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+  comprobanteNuevo.FechaGeneracion := fechaPreviaAEntradaCatalogo;
+  comprobanteNuevo.AutoAsignarFechaGeneracion := False;
+  try
+    comprobanteNuevo.MetodoDePago := _CADENA_INVENTADA_METODO_PAGO;
+
+    comprobanteNuevo.AsignarMetodoDePago;
+
+    cadenaEsperada := 'metodoDePago="' + _CADENA_INVENTADA_METODO_PAGO + '"';
+    CheckTrue(AnsiPos(cadenaEsperada, comprobanteNuevo.XML) > 0,
+              'No se respeto la cadena de metodo de pago previo a catalogo: ' + _CADENA_INVENTADA_METODO_PAGO);
+  finally
+    comprobanteNuevo.Free;
+  end;
+end;
+
+procedure
     TestTFEComprobanteFiscalV32.MetodoDePago_EspecificandoNumero_LoDejeIgual;
 var
   xmlGenerado, cadenaEsperada: WideString;
@@ -608,9 +650,17 @@ var
   numeroInventado: Integer;
 begin
   comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+  comprobanteNuevo.FechaGeneracion := fFechaEntradaVigenciaCatalogo;
+  comprobanteNuevo.AutoAsignarFechaGeneracion := False;
 
   Randomize;
-  numeroInventado := Random(999);
+
+  // Generamos un numero aleatorio mayor a 10 ya que los menores a 10
+  // les agregamos un cero al principio y se prueban en otro método
+  numeroInventado := 0;
+  while numeroInventado < 10 do
+    numeroInventado := Random(999);
+
   comprobanteNuevo.MetodoDePago := IntToStr(numeroInventado);
   comprobanteNuevo.AsignarMetodoDePago;
 
@@ -628,6 +678,8 @@ const
   _CADENA_INEXISTENTE = 'METODO INVALIDO';
 begin
   comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+  comprobanteNuevo.FechaGeneracion := fFechaEntradaVigenciaCatalogo;
+  comprobanteNuevo.AutoAsignarFechaGeneracion := False;
   try
     comprobanteNuevo.MetodoDePago := _CADENA_INEXISTENTE;
 
@@ -637,6 +689,30 @@ begin
   finally
     comprobanteNuevo.Free;
   end;
+end;
+
+procedure
+    TestTFEComprobanteFiscalV32.MetodoDePago_MenorADiez_AgregueCeroAlPrincipio;
+var
+  xmlGenerado, cadenaEsperada: WideString;
+  comprobanteNuevo: TFEComprobanteFiscal;
+  numeroInventado: Integer;
+const
+  _NUMERO_METODO_PAGO_SIN_CERO = '3';
+  _NUMERO_METODO_PAGO_CON_CERO = '03'; // El SAT espera que tengan cero al principio los menores a 10
+begin
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+  comprobanteNuevo.FechaGeneracion := fFechaEntradaVigenciaCatalogo;
+  comprobanteNuevo.AutoAsignarFechaGeneracion := False;
+
+  comprobanteNuevo.MetodoDePago := _NUMERO_METODO_PAGO_SIN_CERO;
+  comprobanteNuevo.AsignarMetodoDePago;
+
+  xmlGenerado := comprobanteNuevo.fXmlComprobante.XML;
+
+  cadenaEsperada := 'metodoDePago="' + _NUMERO_METODO_PAGO_CON_CERO + '"';
+  CheckTrue(AnsiPos(cadenaEsperada, xmlGenerado) > 0,
+            'No se agrego el cero al principio del numero de pago menor a 10');
 end;
 
 procedure TestTFEComprobanteFiscalV32.setSerie_Serie_LaGuardeEnXML;
