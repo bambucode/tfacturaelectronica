@@ -863,34 +863,66 @@ procedure TFEComprobanteFiscal.AsignarMetodoDePago;
 var
   cadenaMetodoDePago, metodoDePagoFinal: String;
   numeroCatalogoMetodoPago: Integer;
+  fechaEntradaVigorConceptosMetodosDePago: TDate;
+const
+  _ANO_CAMBIO_METODO_PAGO = 2016;
+  _MES_CAMBIO_METODO_PAGO  = 6;
+  _DIA_CAMBIO_METODO_PAGO = 6;
+  _MISMA_FECHA = 0;
+  _FECHA_POSTERIOR = 1;
 begin
   // Asignamos el metodo de pago
   if (Trim(inherited MetodoDePago) <> '') then
   begin
      cadenaMetodoDePago := (inherited MetodoDePago);
 
-     // ¿El usuario especifico un numero de catalogo? Lo "pasamos" directo
-     if TryStrToInt(cadenaMetodoDePago, numeroCatalogoMetodoPago) then
+
+     // Checamos si tenemos que convertir el método de pago a número de catálogo
+     // solo lo hacemos si la factura fue generada posteriormente a la entrada en vigor
+     // del cambio a la regla (2.7.1.32) del 6 de Junio de 2016
+     fechaEntradaVigorConceptosMetodosDePago := EncodeDate(_ANO_CAMBIO_METODO_PAGO,
+                                                           _MES_CAMBIO_METODO_PAGO,
+                                                           _DIA_CAMBIO_METODO_PAGO);
+
+     if CompareDate(inherited FechaGeneracion, fechaEntradaVigorConceptosMetodosDePago) In
+                    [_MISMA_FECHA, _FECHA_POSTERIOR] then
      begin
-       {$IFDEF CODESITE}
-          CodeSite.Send('Usando código de método de pago definido por usuario', numeroCatalogoMetodoPago);
-       {$ENDIF}
-       metodoDePagoFinal := IntToStr(numeroCatalogoMetodoPago)
+       // ¿El usuario especifico un numero de catalogo? Lo "pasamos" directo
+       if TryStrToInt(cadenaMetodoDePago, numeroCatalogoMetodoPago) then
+       begin
+         {$IFDEF CODESITE}
+            CodeSite.Send('Usando código de método de pago definido por usuario', numeroCatalogoMetodoPago);
+         {$ENDIF}
+
+         metodoDePagoFinal := IntToStr(numeroCatalogoMetodoPago);
+
+         // Si el método de pago es menor a 10, asignamos un 0 al principio, ya que el SAT maneja "01", en lugar de solo "1"
+         if numeroCatalogoMetodoPago < 10 then
+           metodoDePagoFinal := '0' + metodoDePagoFinal;
+       end else
+       begin
+         {$IFDEF CODESITE}
+           CodeSite.Send('Intentando obtener número de método de pago: ' + cadenaMetodoDePago);
+         {$ENDIF}
+         // Si fue una cadena, tratamos de convertirla al catálogo oficial
+         metodoDePagoFinal := TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(cadenaMetodoDePago);
+         {$IFDEF CODESITE}
+           CodeSite.Send('Numero de método de pago', metodoDePagoFinal);
+         {$ENDIF}
+
+         // Si regreso cadena vacia es que no encontró una equivalencia de la cadena al numero de catalogo en el SAT
+         if (metodoDePagoFinal = '') then
+          raise EFECadenaMetodoDePagoNoEnCatalogoException.Create('La cadena "' + inherited MetodoDePago +
+                                                                  '" no está en el catálogo de métodos de pago del SAT. Favor de verificar');
+       end;
      end else
      begin
-       {$IFDEF CODESITE}
-         CodeSite.Send('Intentando obtener número de método de pago: ' + cadenaMetodoDePago);
-       {$ENDIF}
-       // Si fue una cadena, tratamos de convertirla al catálogo oficial
-       metodoDePagoFinal := TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(cadenaMetodoDePago);
-       {$IFDEF CODESITE}
-         CodeSite.Send('Numero de método de pago', metodoDePagoFinal);
-       {$ENDIF}
-
-       // Si regreso cadena vacia es que no encontró una equivalencia de la cadena al numero de catalogo en el SAT
-       if (metodoDePagoFinal = '') then
-        raise EFECadenaMetodoDePagoNoEnCatalogoException.Create('La cadena "' + inherited MetodoDePago +
-                                                                '" no está en el catálogo de métodos de pago del SAT. Favor de verificar');
+        {$IFDEF CODESITE}
+            CodeSite.Send('La factura se generó previo a la entrada en vigor de ' +
+                          'numero de catálogo de métodos de pago, usando método de pago tal cual',
+                          cadenaMetodoDePago);
+         {$ENDIF}
+        metodoDePagoFinal := cadenaMetodoDePago;
      end;
 
      fXmlComprobante.MetodoDePago := TFEReglamentacion.ComoCadena(metodoDePagoFinal)
