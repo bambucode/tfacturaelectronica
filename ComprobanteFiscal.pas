@@ -875,7 +875,12 @@ begin
        {$IFDEF CODESITE}
           CodeSite.Send('Usando código de método de pago definido por usuario', numeroCatalogoMetodoPago);
        {$ENDIF}
-       metodoDePagoFinal := IntToStr(numeroCatalogoMetodoPago)
+
+       metodoDePagoFinal := IntToStr(numeroCatalogoMetodoPago);
+
+       // Si el método de pago es menor a 10, asignamos un 0 al principio, ya que el SAT maneja "01", en lugar de solo "1"
+       if numeroCatalogoMetodoPago < 10 then
+         metodoDePagoFinal := '0' + metodoDePagoFinal;
      end else
      begin
        {$IFDEF CODESITE}
