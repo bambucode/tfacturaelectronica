@@ -866,12 +866,8 @@ var
   fechaEntradaVigorConceptosMetodosDePago: TDate;
 const
   _ANO_CAMBIO_METODO_PAGO = 2016;
-  _MES_CAMBIO_METODO_PAGO  = 6;
-  {$IFDEF ELEVENTA}
-  _DIA_CAMBIO_METODO_PAGO = 1;
-  {$ELSE}
-  _DIA_CAMBIO_METODO_PAGO = 6;
-  {$ENDIF}
+  _MES_CAMBIO_METODO_PAGO  = 7;
+  _DIA_CAMBIO_METODO_PAGO = 15;
   _MISMA_FECHA = 0;
   _FECHA_POSTERIOR = 1;
 begin
@@ -883,7 +879,7 @@ begin
 
      // Checamos si tenemos que convertir el método de pago a número de catálogo
      // solo lo hacemos si la factura fue generada posteriormente a la entrada en vigor
-     // del cambio a la regla (2.7.1.32) del 6 de Junio de 2016
+     // del cambio a la regla (2.7.1.32) del 15 de Julio de 2016
      fechaEntradaVigorConceptosMetodosDePago := EncodeDate(_ANO_CAMBIO_METODO_PAGO,
                                                            _MES_CAMBIO_METODO_PAGO,
                                                            _DIA_CAMBIO_METODO_PAGO);
