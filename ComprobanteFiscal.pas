@@ -865,9 +865,6 @@ var
   numeroCatalogoMetodoPago: Integer;
   fechaEntradaVigorConceptosMetodosDePago: TDate;
 const
-  _ANO_CAMBIO_METODO_PAGO = 2016;
-  _MES_CAMBIO_METODO_PAGO  = 7;
-  _DIA_CAMBIO_METODO_PAGO = 15;
   _MISMA_FECHA = 0;
   _FECHA_POSTERIOR = 1;
 begin
