@@ -258,7 +258,6 @@ begin
   cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'ó', 'O', [rfReplaceAll]);
   cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'ú', 'U', [rfReplaceAll]);
 
-
   if cadenaSinAcentos = 'EFECTIVO' then
     Result := '01';
 
@@ -278,46 +277,25 @@ begin
   if (cadenaSinAcentos = 'DINERO ELECTRONICO') then
     Result := '06';
 
-  if cadenaSinAcentos = 'TARJETAS DIGITALES' then
-    Result := '07';
+  // Se omite el 07
 
   if AnsiPos('VALES', cadenaSinAcentos) > 0 then
     Result := '08';
 
-  if cadenaSinAcentos = 'BIENES' then
-    Result := '09';
+  if (cadenaSinAcentos = 'TARJETA DE DEBITO') or
+     (cadenaSinAcentos = 'TARJETAS DE DEBITO' ) then
+    Result := '28';
 
-  if cadenaSinAcentos = 'SERVICIO' then
-    Result := '10';
-
-  if cadenaSinAcentos = 'POR CUENTA DE TERCERO' then
-    Result := '11';
-
-  if cadenaSinAcentos = 'DACION EN PAGO' then
-    Result := '12';
-
-  if cadenaSinAcentos = 'PAGO POR SUBROGACION' then
-    Result := '13';
-
-  if cadenaSinAcentos = 'PAGO POR CONSIGNACION' then
-    Result := '14';
-
-  if cadenaSinAcentos = 'CONDONACION' then
-    Result := '15';
-
-  if cadenaSinAcentos = 'CANCELACION' then
-    Result := '16';
-
-  if cadenaSinAcentos = 'COMPENSACION' then
-    Result := '17';
+  if (cadenaSinAcentos = 'TARJETA DE SERVICIO') or
+     (cadenaSinAcentos = 'TARJETAS DE SERVICIO' ) then
+    Result := '29';
 
   if ((cadenaSinAcentos = 'NA') or
      (cadenaSinAcentos = 'NO APLICA') or
-     (cadenaSinAcentos = 'NO IDENTIFICADO')) then
-    Result := '98';
-
-  if cadenaSinAcentos = 'OTROS' then
+     (cadenaSinAcentos = 'NO IDENTIFICADO') or
+     (cadenaSinAcentos = 'OTROS')) then
     Result := '99';
+
 end;
 
 class procedure TFEReglamentacion.ReemplazarComaSiActuaComoPuntoDecimal(var

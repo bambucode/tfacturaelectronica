@@ -341,6 +341,11 @@ const
   _ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO                 = '402';
   _ERROR_SAT_FECHA_EMISION_EN_EL_PASADO               = '403';
 
+  // Fecha de inicio de cambio a catalogo de método de pago
+  _ANO_CAMBIO_METODO_PAGO = 2016;
+  _MES_CAMBIO_METODO_PAGO = 7;
+  _DIA_CAMBIO_METODO_PAGO = 15;
+
 implementation
 
 constructor EPACException.Create(const aMensajeExcepcion: String; const
