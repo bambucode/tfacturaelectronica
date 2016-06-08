@@ -342,9 +342,17 @@ const
   _ERROR_SAT_FECHA_EMISION_EN_EL_PASADO               = '403';
 
   // Fecha de inicio de cambio a catalogo de método de pago
+  {$IFDEF QA}
+  // Si estamos en modo "QA" comenzamos desde ya a usar el cambio de metodo de pago
+  // para poder hacer las pruebas usando los servidores de prueba de los PAC
+  _ANO_CAMBIO_METODO_PAGO = 2016;
+  _MES_CAMBIO_METODO_PAGO = 5;
+  _DIA_CAMBIO_METODO_PAGO = 15;
+  {$ELSE}
   _ANO_CAMBIO_METODO_PAGO = 2016;
   _MES_CAMBIO_METODO_PAGO = 7;
   _DIA_CAMBIO_METODO_PAGO = 15;
+  {$ENDIF}
 
 implementation
 
