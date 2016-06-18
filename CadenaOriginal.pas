@@ -21,9 +21,10 @@ uses FacturaTipos, FeCFD, FeCFDv32,FeCFDv22,
       Xml.XMLIntf,
       Xml.Win.MsXmlDom,
       Xml.XMLDoc,
+      Xml.win.MsXmlDom,
       {$ELSE}
-      XmlDom, XMLIntf, Xml.win.MsXmlDom, XMLDoc,
-      {$ENDIF}
+      XmlDom, XMLIntf, MsXmlDom, XMLDoc,PerlRegEx,
+      {$IFEND}
      FeCFDv2;
 
 type
@@ -68,7 +69,10 @@ implementation
 
 uses SysUtils,
      StrUtils,
-     RegularExpressions,
+    {$IF Compilerversion >= 20}
+      RegularExpressions,
+    {$ELSE}
+    {$IFEND}
      FEImpuestosLocales,
      {$IFDEF CODESITE}
      FacturacionHashes,
@@ -424,6 +428,9 @@ var
 const
   _CADENA_XML_INICIO_IMPUESTOS_LOCALES = '<implocal:ImpuestosLocales';
   _CADENA_XML_FIN_IMPUESTOS_LOCALES    = '</implocal:ImpuestosLocales>';
+var
+  TRegex: TPerlRegex;
+
 begin
   nodoComplemento := fXmlComprobante.Complemento;
 
@@ -432,9 +439,21 @@ begin
 //    nodoImpuestosLocales := nodoComplemento.ChildNodes.FindNode('ImpuestosLocales');
 
   // Extraemos el XML del nodo de impuestos locales
+{$IF Compilerversion >= 20}
   xmlImpuestosLocales := Trim(TRegEx.Match(nodoComplemento.XML,
-                                           '<implocal:ImpuestosLocales.*</implocal:ImpuestosLocales>').Value);
-
+                                      '<implocal:ImpuestosLocales.*</implocal:ImpuestosLocales>').Value);
+{$ELSE}
+  TRegex := TPerlRegex.Create(nil);
+  Try
+   TRegex.Subject:=UTF8String(nodoComplemento.XML);
+   TRegex.RegEx:='<implocal:ImpuestosLocales.*</implocal:ImpuestosLocales>';
+   if TRegex.Match then
+    xmlImpuestosLocales :=Trim(nodoComplemento.XML);
+  Except
+     on E: Exception do
+      Writeln(E.ClassName, ': ', E.Message);
+  End;
+{$IFEND}
   // Solo procesamos los impuestos si existio dicho nodo
   if (xmlImpuestosLocales <> '') then
   begin

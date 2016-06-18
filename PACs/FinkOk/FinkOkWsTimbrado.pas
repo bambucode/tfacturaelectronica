@@ -272,7 +272,6 @@ type
     function  add(const reseller_username: WideString; const reseller_password: WideString; const taxpayer_id: WideString; const coupon: WideString; const added: WideString): IFinkOkRespuestaRegistro; stdcall;
     function  delete(const reseller_username: WideString; const reseller_password: WideString; const taxpayer_id: WideString): IFinkOkRespuestaRegistro; stdcall;
   end;
-
 function GetFinkOkTimbrado(UseWSDL: Boolean=System.False; Addr: string=''; HTTPRIO: THTTPRIO = nil): IFinkOkServicioTimbrado;
 function GetFinkOkCancelar(UseWSDL: Boolean=System.False; Addr: string=''; HTTPRIO: THTTPRIO = nil):   IFinkOkCancelaTimbrado;
 function GetFinkOkCliente(UseWSDL: Boolean=System.False; Addr: string=''; HTTPRIO: THTTPRIO = nil): IFinkOkAltaCliente;

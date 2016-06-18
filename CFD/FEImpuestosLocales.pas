@@ -13,7 +13,7 @@ unit FEImpuestosLocales;
 
 interface
 
-uses xmldom, XMLDoc, XMLIntf;
+uses xmldom, XMLDoc, XMLIntf,FacturaTipos;
 
 type
 
@@ -30,18 +30,18 @@ type
   IFEXMLImpuestosLocales = interface(IXMLNode)
   ['{EFA58A15-A8BC-466D-B6B7-B0003072659A}']
     { Property Accessors }
-    function Get_Version: UnicodeString;
-    function Get_TotaldeRetenciones: UnicodeString;
-    function Get_TotaldeTraslados: UnicodeString;
+    function Get_Version: TUnicodeString;
+    function Get_TotaldeRetenciones: TUnicodeString;
+    function Get_TotaldeTraslados: TUnicodeString;
     function Get_RetencionesLocales: IFEXMLImpuestosLocales_RetencionesLocalesList;
     function Get_TrasladosLocales: IFEXMLImpuestosLocales_TrasladosLocalesList;
-    procedure Set_Version(Value: UnicodeString);
-    procedure Set_TotaldeRetenciones(Value: UnicodeString);
-    procedure Set_TotaldeTraslados(Value: UnicodeString);
+    procedure Set_Version(Value: TUnicodeString);
+    procedure Set_TotaldeRetenciones(Value: TUnicodeString);
+    procedure Set_TotaldeTraslados(Value: TUnicodeString);
     { Methods & Properties }
-    property Version: UnicodeString read Get_Version write Set_Version;
-    property TotaldeRetenciones: UnicodeString read Get_TotaldeRetenciones write Set_TotaldeRetenciones;
-    property TotaldeTraslados: UnicodeString read Get_TotaldeTraslados write Set_TotaldeTraslados;
+    property Version: TUnicodeString read Get_Version write Set_Version;
+    property TotaldeRetenciones: TUnicodeString read Get_TotaldeRetenciones write Set_TotaldeRetenciones;
+    property TotaldeTraslados: TUnicodeString read Get_TotaldeTraslados write Set_TotaldeTraslados;
     property RetencionesLocales: IFEXMLImpuestosLocales_RetencionesLocalesList read Get_RetencionesLocales;
     property TrasladosLocales: IFEXMLImpuestosLocales_TrasladosLocalesList read Get_TrasladosLocales;
   end;
@@ -51,16 +51,16 @@ type
   IFEXMLImpuestosLocales_RetencionesLocales = interface(IXMLNode)
     ['{DF5ACEE7-B902-4DE7-BA92-287D3BF51CFB}']
     { Property Accessors }
-    function Get_ImpLocRetenido: UnicodeString;
-    function Get_TasadeRetencion: UnicodeString;
-    function Get_Importe: UnicodeString;
-    procedure Set_ImpLocRetenido(Value: UnicodeString);
-    procedure Set_TasadeRetencion(Value: UnicodeString);
-    procedure Set_Importe(Value: UnicodeString);
+    function Get_ImpLocRetenido: TUnicodeString;
+    function Get_TasadeRetencion: TUnicodeString;
+    function Get_Importe: TUnicodeString;
+    procedure Set_ImpLocRetenido(Value: TUnicodeString);
+    procedure Set_TasadeRetencion(Value: TUnicodeString);
+    procedure Set_Importe(Value: TUnicodeString);
     { Methods & Properties }
-    property ImpLocRetenido: UnicodeString read Get_ImpLocRetenido write Set_ImpLocRetenido;
-    property TasadeRetencion: UnicodeString read Get_TasadeRetencion write Set_TasadeRetencion;
-    property Importe: UnicodeString read Get_Importe write Set_Importe;
+    property ImpLocRetenido: TUnicodeString read Get_ImpLocRetenido write Set_ImpLocRetenido;
+    property TasadeRetencion: TUnicodeString read Get_TasadeRetencion write Set_TasadeRetencion;
+    property Importe: TUnicodeString read Get_Importe write Set_Importe;
   end;
 
 { IFEXMLImpuestosLocales_RetencionesLocalesList }
@@ -80,16 +80,16 @@ type
   IFEXMLImpuestosLocales_TrasladosLocales = interface(IXMLNode)
     ['{F2668E73-6083-4FBC-B1DD-66E2343962AA}']
     { Property Accessors }
-    function Get_ImpLocTrasladado: UnicodeString;
-    function Get_TasadeTraslado: UnicodeString;
-    function Get_Importe: UnicodeString;
-    procedure Set_ImpLocTrasladado(Value: UnicodeString);
-    procedure Set_TasadeTraslado(Value: UnicodeString);
-    procedure Set_Importe(Value: UnicodeString);
+    function Get_ImpLocTrasladado: TUnicodeString;
+    function Get_TasadeTraslado: TUnicodeString;
+    function Get_Importe: TUnicodeString;
+    procedure Set_ImpLocTrasladado(Value: TUnicodeString);
+    procedure Set_TasadeTraslado(Value: TUnicodeString);
+    procedure Set_Importe(Value: TUnicodeString);
     { Methods & Properties }
-    property ImpLocTrasladado: UnicodeString read Get_ImpLocTrasladado write Set_ImpLocTrasladado;
-    property TasadeTraslado: UnicodeString read Get_TasadeTraslado write Set_TasadeTraslado;
-    property Importe: UnicodeString read Get_Importe write Set_Importe;
+    property ImpLocTrasladado: TUnicodeString read Get_ImpLocTrasladado write Set_ImpLocTrasladado;
+    property TasadeTraslado: TUnicodeString read Get_TasadeTraslado write Set_TasadeTraslado;
+    property Importe: TUnicodeString read Get_Importe write Set_Importe;
   end;
 
 { IFEXMLImpuestosLocales_TrasladosLocalesList }
@@ -120,14 +120,14 @@ type
     FTrasladosLocales: IFEXMLImpuestosLocales_TrasladosLocalesList;
   protected
     { IFEXMLImpuestosLocales }
-    function Get_Version: UnicodeString;
-    function Get_TotaldeRetenciones: UnicodeString;
-    function Get_TotaldeTraslados: UnicodeString;
+    function Get_Version: TUnicodeString;
+    function Get_TotaldeRetenciones: TUnicodeString;
+    function Get_TotaldeTraslados: TUnicodeString;
     function Get_RetencionesLocales: IFEXMLImpuestosLocales_RetencionesLocalesList;
     function Get_TrasladosLocales: IFEXMLImpuestosLocales_TrasladosLocalesList;
-    procedure Set_Version(Value: UnicodeString);
-    procedure Set_TotaldeRetenciones(Value: UnicodeString);
-    procedure Set_TotaldeTraslados(Value: UnicodeString);
+    procedure Set_Version(Value: TUnicodeString);
+    procedure Set_TotaldeRetenciones(Value: TUnicodeString);
+    procedure Set_TotaldeTraslados(Value: TUnicodeString);
   public
     procedure AfterConstruction; override;
   end;
@@ -138,12 +138,12 @@ type
       IFEXMLImpuestosLocales_RetencionesLocales)
   protected
     { IFEXMLImpuestosLocales_RetencionesLocales }
-    function Get_ImpLocRetenido: UnicodeString;
-    function Get_TasadeRetencion: UnicodeString;
-    function Get_Importe: UnicodeString;
-    procedure Set_ImpLocRetenido(Value: UnicodeString);
-    procedure Set_TasadeRetencion(Value: UnicodeString);
-    procedure Set_Importe(Value: UnicodeString);
+    function Get_ImpLocRetenido: TUnicodeString;
+    function Get_TasadeRetencion: TUnicodeString;
+    function Get_Importe: TUnicodeString;
+    procedure Set_ImpLocRetenido(Value: TUnicodeString);
+    procedure Set_TasadeRetencion(Value: TUnicodeString);
+    procedure Set_Importe(Value: TUnicodeString);
   end;
 
 { TFEXMLImpuestosLocales_RetencionesLocalesList }
@@ -164,12 +164,12 @@ type
       IFEXMLImpuestosLocales_TrasladosLocales)
   protected
     { IFEXMLImpuestosLocales_TrasladosLocales }
-    function Get_ImpLocTrasladado: UnicodeString;
-    function Get_TasadeTraslado: UnicodeString;
-    function Get_Importe: UnicodeString;
-    procedure Set_ImpLocTrasladado(Value: UnicodeString);
-    procedure Set_TasadeTraslado(Value: UnicodeString);
-    procedure Set_Importe(Value: UnicodeString);
+    function Get_ImpLocTrasladado: TUnicodeString;
+    function Get_TasadeTraslado: TUnicodeString;
+    function Get_Importe: TUnicodeString;
+    procedure Set_ImpLocTrasladado(Value: TUnicodeString);
+    procedure Set_TasadeTraslado(Value: TUnicodeString);
+    procedure Set_Importe(Value: TUnicodeString);
   end;
 
 { TFEXMLImpuestosLocales_TrasladosLocalesList }
@@ -240,32 +240,32 @@ begin
                                         TargetNamespace) as IFEXMLImpuestosLocales_TrasladosLocalesList;
 end;
 
-function TFEXMLImpuestosLocales.Get_Version: UnicodeString;
+function TFEXMLImpuestosLocales.Get_Version: TUnicodeString;
 begin
   Result := AttributeNodes['version'].Text;
 end;
 
-procedure TFEXMLImpuestosLocales.Set_Version(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales.Set_Version(Value: TUnicodeString);
 begin
   SetAttribute('version', Value);
 end;
 
-function TFEXMLImpuestosLocales.Get_TotaldeRetenciones: UnicodeString;
+function TFEXMLImpuestosLocales.Get_TotaldeRetenciones: TUnicodeString;
 begin
   Result := AttributeNodes['TotaldeRetenciones'].Text;
 end;
 
-procedure TFEXMLImpuestosLocales.Set_TotaldeRetenciones(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales.Set_TotaldeRetenciones(Value: TUnicodeString);
 begin
   SetAttribute('TotaldeRetenciones', Value);
 end;
 
-function TFEXMLImpuestosLocales.Get_TotaldeTraslados: UnicodeString;
+function TFEXMLImpuestosLocales.Get_TotaldeTraslados: TUnicodeString;
 begin
   Result := AttributeNodes['TotaldeTraslados'].Text;
 end;
 
-procedure TFEXMLImpuestosLocales.Set_TotaldeTraslados(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales.Set_TotaldeTraslados(Value: TUnicodeString);
 begin
   SetAttribute('TotaldeTraslados', Value);
 end;
@@ -282,32 +282,32 @@ end;
 
 { TFEXMLImpuestosLocales_RetencionesLocales }
 
-function TFEXMLImpuestosLocales_RetencionesLocales.Get_ImpLocRetenido: UnicodeString;
+function TFEXMLImpuestosLocales_RetencionesLocales.Get_ImpLocRetenido: TUnicodeString;
 begin
   Result := AttributeNodes['ImpLocRetenido'].Text;
 end;
 
-procedure TFEXMLImpuestosLocales_RetencionesLocales.Set_ImpLocRetenido(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_RetencionesLocales.Set_ImpLocRetenido(Value: TUnicodeString);
 begin
   SetAttribute('ImpLocRetenido', Value);
 end;
 
-function TFEXMLImpuestosLocales_RetencionesLocales.Get_TasadeRetencion: UnicodeString;
+function TFEXMLImpuestosLocales_RetencionesLocales.Get_TasadeRetencion: TUnicodeString;
 begin
   Result := AttributeNodes['TasadeRetencion'].Text;
 end;
 
-procedure TFEXMLImpuestosLocales_RetencionesLocales.Set_TasadeRetencion(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_RetencionesLocales.Set_TasadeRetencion(Value: TUnicodeString);
 begin
   SetAttribute('TasadeRetencion', Value);
 end;
 
-function TFEXMLImpuestosLocales_RetencionesLocales.Get_Importe: UnicodeString;
+function TFEXMLImpuestosLocales_RetencionesLocales.Get_Importe: TUnicodeString;
 begin
   Result := AttributeNodes['Importe'].Text;
 end;
 
-procedure TFEXMLImpuestosLocales_RetencionesLocales.Set_Importe(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_RetencionesLocales.Set_Importe(Value: TUnicodeString);
 begin
   SetAttribute('Importe', Value);
 end;
@@ -334,32 +334,32 @@ end;
 
 { TFEXMLImpuestosLocales_TrasladosLocales }
 
-function TFEXMLImpuestosLocales_TrasladosLocales.Get_ImpLocTrasladado: UnicodeString;
+function TFEXMLImpuestosLocales_TrasladosLocales.Get_ImpLocTrasladado: TUnicodeString;
 begin
   Result := AttributeNodes['ImpLocTrasladado'].Text;
 end;
 
-procedure TFEXMLImpuestosLocales_TrasladosLocales.Set_ImpLocTrasladado(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_TrasladosLocales.Set_ImpLocTrasladado(Value: TUnicodeString);
 begin
   SetAttribute('ImpLocTrasladado', Value);
 end;
 
-function TFEXMLImpuestosLocales_TrasladosLocales.Get_TasadeTraslado: UnicodeString;
+function TFEXMLImpuestosLocales_TrasladosLocales.Get_TasadeTraslado: TUnicodeString;
 begin
   Result := AttributeNodes['TasadeTraslado'].Text;
 end;
 
-procedure TFEXMLImpuestosLocales_TrasladosLocales.Set_TasadeTraslado(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_TrasladosLocales.Set_TasadeTraslado(Value: TUnicodeString);
 begin
   SetAttribute('TasadeTraslado', Value);
 end;
 
-function TFEXMLImpuestosLocales_TrasladosLocales.Get_Importe: UnicodeString;
+function TFEXMLImpuestosLocales_TrasladosLocales.Get_Importe: TUnicodeString;
 begin
   Result := AttributeNodes['Importe'].Text;
 end;
 
-procedure TFEXMLImpuestosLocales_TrasladosLocales.Set_Importe(Value: UnicodeString);
+procedure TFEXMLImpuestosLocales_TrasladosLocales.Set_Importe(Value: TUnicodeString);
 begin
   SetAttribute('Importe', Value);
 end;

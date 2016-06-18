@@ -1,13 +1,10 @@
 ﻿(******************************************************************************
  PROYECTO FACTURACION ELECTRONICA
  Copyright (C) 2010-2014 - Bambu Code SA de CV - Ing. Luis Carrasco
-
  Metodos para validar los diferentes tipos de datos y como deben de estar
  especificados en el archivo XML.
-
  Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
  http://bambucode.com/codigoabierto
-
  La licencia de este codigo fuente se encuentra en:
  http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
  ******************************************************************************)
@@ -309,5 +306,9 @@ begin
 end;
 
 initialization
+ {$IF Compilerversion >= 20}
   formatSettingsLocal := TFormatSettings.Create;
+ {$ELSE}
+  GetLocaleFormatSettings(GetThreadLocale, formatSettingsLocal);
+ {$IFEND}
 end.

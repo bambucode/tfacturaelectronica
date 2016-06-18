@@ -492,9 +492,10 @@ begin
 
   // Configuramos uso de UTF8 (Probablemente solo para Delphi 2010 y menores)
   //RIO.HTTPWebNode.UseUTF8InHeader := True;
-  RIO.OnBeforeExecute := wsHelper.BeforeExecute;
-  RIO.OnAfterExecute := wsHelper.AfterExecute;
-
+  {$IF Compilerversion >= 20}
+    RIO.OnBeforeExecute := wsHelper.BeforeExecute;
+    RIO.OnAfterExecute := wsHelper.AfterExecute;
+  {$IFEND}
   try
     Result := (RIO as IEcodexServicioTimbrado);
     if UseWSDL then

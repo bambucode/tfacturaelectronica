@@ -539,9 +539,10 @@ begin
     RIO := THTTPRIO.Create(nil)
   else
     RIO := HTTPRIO;
-
-  RIO.OnBeforeExecute := wsHelper.BeforeExecute;
-  RIO.OnAfterExecute := wsHelper.AfterExecute;
+  {$IF Compilerversion >= 20}
+   RIO.OnBeforeExecute := wsHelper.BeforeExecute;
+   RIO.OnAfterExecute := wsHelper.AfterExecute;
+  {$IFEND}
   try
     Result := (RIO as IEcodexServicioClientes);
     if UseWSDL then
