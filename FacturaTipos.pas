@@ -17,7 +17,7 @@ unit FacturaTipos;
 
 interface
 
-uses SysUtils;
+uses SysUtils,IdExplicitTLSClientServerBase,IdSSLOpenSSL;
 
 type
 
@@ -26,10 +26,18 @@ type
 // y si es Delphi 2009 o superior necesita que sea RawByteString
 // Si NO se usan estos tipos de datos se pierden caracteres en memoria
 {$IF Compilerversion >= 20}
-TStringCadenaOriginal = RawByteString;
+ TStringCadenaOriginal = RawByteString;
+ TUnicodeString = UnicodeString;
 {$ELSE}
-TStringCadenaOriginal = UTF8String;
+ TStringCadenaOriginal = UTF8String;
+ TUnicodeString = UTF8String;
 {$IFEND}
+
+//// variables para correos
+TUsarTSL   = TIdUseTLS;
+TMetodo    = TIdSSLVersion;
+TManejador = TIdSSLIOHandlerSocketOpenSSL;
+TFormato = (tfPdf, tfBMP, tfXLS, tfHTML, tfTIF, tfJPG);
 
 TFEFolio = Integer;
 TFESerie = String[10];
@@ -340,19 +348,6 @@ const
   _ERROR_SAT_FECHA_FUERA_DE_RANGO                     = '401';
   _ERROR_SAT_REGIMEN_EMISOR_NO_VALIDO                 = '402';
   _ERROR_SAT_FECHA_EMISION_EN_EL_PASADO               = '403';
-
-  // Fecha de inicio de cambio a catalogo de método de pago
-  {$IFDEF QA}
-  // Si estamos en modo "QA" comenzamos desde ya a usar el cambio de metodo de pago
-  // para poder hacer las pruebas usando los servidores de prueba de los PAC
-  _ANO_CAMBIO_METODO_PAGO = 2016;
-  _MES_CAMBIO_METODO_PAGO = 5;
-  _DIA_CAMBIO_METODO_PAGO = 15;
-  {$ELSE}
-  _ANO_CAMBIO_METODO_PAGO = 2016;
-  _MES_CAMBIO_METODO_PAGO = 7;
-  _DIA_CAMBIO_METODO_PAGO = 15;
-  {$ENDIF}
 
 implementation
 

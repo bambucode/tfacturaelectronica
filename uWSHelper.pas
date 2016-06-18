@@ -25,8 +25,12 @@ type
 implementation
 
 uses
-  {$IFDEF CODESITE}CodeSiteLogging, {$ENDIF}System.SysUtils;
-
+  {$IFDEF CODESITE}CodeSiteLogging, {$ENDIF}
+ {$IF Compilerversion >= 20}
+   System.SysUtils;
+  {$ELSE}
+   SysUtils;
+  {$IFEND}
 procedure TWSHelper.BeforeExecute(const MethodName: string; SOAPRequest: TStream);
 var
 //  Xml:TStringList;

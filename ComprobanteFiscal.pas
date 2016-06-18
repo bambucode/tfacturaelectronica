@@ -1,16 +1,12 @@
 ﻿{* *****************************************************************************
   PROYECTO FACTURACION ELECTRONICA
   Copyright (C) 2010-2014 - Bambu Code SA de CV - Ing. Luis Carrasco
-
   Esta clase representa un Comprobante Fiscal Digital en su Version 2.0 asi como
   los metodos para generarla.
-
   Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
   http://bambucode.com/codigoabierto
-
   La licencia de este codigo fuente se encuentra en:
   http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
-
   Cambios para CFDI v3.2 Por Ing. Pablo Torres TecSisNet.net Cd. Juarez Chihuahua
   el 11-24-2013
   ***************************************************************************** *}
@@ -25,9 +21,10 @@ uses FacturaTipos, SysUtils,
   Xml.XMLIntf,
   Xml.Win.MsXmlDom,
   Xml.XMLDoc,
+  Xml.win.MsXmlDom,
   {$ELSE}
-  XmlDom, XMLIntf, Xml.win.MsXmlDom, XMLDoc,
-  {$ENDIF}
+  XmlDom, XMLIntf,  XMLDoc,MsXmlDom,
+  {$IFEND}
   DocComprobanteFiscal, FeCFDv22,FeCFDv32, FeCFDv2, feCFD;
 
 type
@@ -863,8 +860,11 @@ procedure TFEComprobanteFiscal.AsignarMetodoDePago;
 var
   cadenaMetodoDePago, metodoDePagoFinal: String;
   numeroCatalogoMetodoPago: Integer;
-  fechaEntradaVigorConceptosMetodosDePago: TDate;
+  fechaEntradaVigorConceptosMetodosDePago: TDateTime;
 const
+  _ANO_CAMBIO_METODO_PAGO = 2016;
+  _MES_CAMBIO_METODO_PAGO  = 6;
+  _DIA_CAMBIO_METODO_PAGO = 15;
   _MISMA_FECHA = 0;
   _FECHA_POSTERIOR = 1;
 begin
@@ -1174,9 +1174,7 @@ begin
     Variable1: Cancelas el mismo dia
     Variable2: Cancelas el mes
     Variable3: Cancelas otro mes
-
     en cualquiera de los casos el sistema tendrá que ser capaz de incorporarlo en el reporte como cancelado.
-
     Si además de la cancelación se realizó nota de crédito (por devolución o por descuento) el sistema deberá de
     generar el documento como un "egreso", recuerda que para el SAT solo existen: INGRESO, EGRESO, TRASLADO.
   }

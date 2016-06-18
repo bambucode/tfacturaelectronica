@@ -52,7 +52,7 @@ implementation
 
 uses SysUtils,
      {.$IFDEF CODESITE}
-     CodeSiteLogging,
+//     CodeSiteLogging,
      {.$ENDIF}
      ClaseOpenSSL;
 
@@ -77,7 +77,7 @@ begin
        On E:Exception do
        begin
           fRazonNoLeido := E.Message;
-          CodeSite.SendException(E);
+//          CodeSite.SendException(E);
           raise;
        end;
     end;

@@ -31,6 +31,8 @@ RAZON PARA CAMBIAR:
         fFechaGeneracion: TDateTime;
         fCondicionesDePago: String;
         fMetodoDePago: String;
+        fTipoCambio :Currency;
+        fMoneda :String;
         sForma: String;
         fDescuento: Currency;
         fMotivoDescuento: String;
@@ -73,6 +75,8 @@ RAZON PARA CAMBIAR:
         property Total: Currency read getTotal;
         property SubTotal: Currency read fSubTotal write fSubTotal;
         property CondicionesDePago: String read fCondicionesDePago write fCondicionesDePago;
+        property TipoCambio: Currency read fTipoCambio write fTipoCambio;
+        property Moneda: String read fMoneda write fMoneda;
         property MetodoDePago: String read fMetodoDePago write fMetodoDePago;
         property FechaGeneracion : TDateTime read fFechaGeneracion write fFechaGeneracion;
         property Conceptos: TFEConceptos read fArrConceptos;

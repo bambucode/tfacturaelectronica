@@ -114,11 +114,15 @@ end;
 implementation
 
 
-uses {$IF Compilerversion >= 20} Soap.InvokeRegistry, {$IFEND}
+uses {$IF Compilerversion >= 20}
+       Soap.InvokeRegistry,
+       System.RegularExpressions,
+     {$ELSE}
+       PerlRegEx,
+     {$IFEND}
      EcodexWsComun,
      ManejadorDeErroresComunes,
      feCFDv32,
-     System.RegularExpressions,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
@@ -200,6 +204,8 @@ var
   nodoXMLTimbre: IFEXMLtimbreFiscalDigital;
   documentoXMLTimbrado, documentoXMLTimbre: TXmlDocument;
   xmlComplemento, xmlTimbre: string;
+var
+  TRegex: TPerlRegex;
 begin
   Assert(aComprobanteTimbrado <> nil, 'La respuesta del servicio de timbrado fue nula');
 
@@ -226,7 +232,23 @@ begin
 
   xmlComplemento := IFEXMLComprobanteV32(comprobanteTimbrado).Complemento.XML;
   Assert(xmlComplemento <> '', 'El XML del documento estuvo vacio');
+{$IF Compilerversion >= 20}
   xmlTimbre := TRegEx.Match(xmlComplemento, '<tfd:TimbreFiscalDigital.*?/>').Value;
+{$ELSE}
+  TRegex := TPerlRegex.Create(nil);
+  Try
+   TRegex.Subject:=UTF8String(xmlComplemento);
+   TRegex.RegEx:='<tfd:TimbreFiscalDigital.*?/>';
+   if TRegex.Match then
+    xmlTimbre :=Trim(xmlComplemento);
+  Except
+     on E: Exception do
+      Writeln(E.ClassName, ': ', E.Message);
+  End;
+{$IFEND}
+
+
+
   Assert(xmlTimbre <> '', 'El XML del timbre estuvo vacio');
 
   // Creamos el documento XML solamente del timbre

@@ -24,9 +24,11 @@ uses FacturaTipos,
      Classes,
      XMLDoc,
      XMLIntf,
-     //XSLProd,
+    {$IF Compilerversion >= 20}
      System.SysUtils;
-
+    {$ELSE}
+     SysUtils;
+    {$IFEND}     
 type
 
   {$REGION 'Documentation'}

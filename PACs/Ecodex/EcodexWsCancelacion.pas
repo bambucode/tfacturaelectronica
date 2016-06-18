@@ -27,7 +27,13 @@ unit EcodexWSCancelacion;
 
 interface
 
-uses Soap.InvokeRegistry, Soap.SOAPHTTPClient, System.Types, Soap.XSBuiltIns, ProveedorAutorizadoCertificacion;
+uses
+{$IF Compilerversion >= 20}
+  Soap.InvokeRegistry, Soap.SOAPHTTPClient, System.Types, Soap.XSBuiltIns,
+{$ELSE}
+  InvokeRegistry, SOAPHTTPClient, Types, XSBuiltIns,
+{$IFEND}
+ ProveedorAutorizadoCertificacion;
 
 const
   IS_OPTN = $0001;
@@ -558,9 +564,10 @@ begin
 
   // Configuramos uso de UTF8 (Probablemente solo para Delphi 2010 y menores)
   //RIO.HTTPWebNode.UseUTF8InHeader := True;
-  RIO.OnBeforeExecute := wsHelper.BeforeExecute;
-  RIO.OnAfterExecute := wsHelper.AfterExecute;
-
+ {$IF Compilerversion >= 20}
+   RIO.OnBeforeExecute := wsHelper.BeforeExecute;
+   RIO.OnAfterExecute := wsHelper.AfterExecute;
+  {$IFEND}
   try
     Result := (RIO as IEcodexServicioCancelacion);
     if UseWSDL then

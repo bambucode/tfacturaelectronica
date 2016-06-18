@@ -58,6 +58,7 @@ type
  {$ENDREGION}
  TPACComercioDigital = class(TProveedorAutorizadoCertificacion)
  private
+  fDominioWebService : String;
   fCredenciales : TFEPACCredenciales;
   fDocumentoXMLTimbrado : TXMLDocument;
   fDocumentoXMLCancelado : TXMLDocument;
@@ -69,7 +70,7 @@ type
   function RealizarCancelacionREST(const URL : string; const aDocumentoXML: TTipoComprobanteXML): TTipoComprobanteXML;
   function ValidarXML(const xmlFile : TFileName) : String; //unicamente valida la estructura del xml solo se usaria para desarrollo
 public
-  constructor Create();
+  constructor Create(const aDominioWebService: string); overload;
   destructor Destroy(); override;
   procedure AfterConstruction; override;
   procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales); override;
@@ -79,9 +80,14 @@ public
  end;
 
 const
-  _URL_API_TIMBRADO = 'http://pruebas.comercio-digital.mx/timbre/timbrar.aspx?rfc=%s&pwd=%s';
-  _URL_API_CANCELAR = 'http://pruebas.comercio-digital.mx/cancela/uuid.aspx';
-  _URL_API_CANCELAR_PRM = '?rfc=%s&pwd=%s';  
+
+//  _URL_PRUEBAS_API_TIMBRADO = 'http://pruebas.comercio-digital.mx/timbre/timbrar.aspx?rfc=%s&pwd=%s';
+//  _URL_PRUEBAS_API_CANCELAR = 'http://pruebas.comercio-digital.mx/cancela/uuid.aspx';
+//  _URL_PRODUCCION_API_TIMBRADO = 'http://ws.comercio-digital.mx/timbre/timbrar.aspx?rfc=%s&pwd=%s';
+//  _URL_PRODUCCION_API_CANCELAR = 'http://ws.comercio-digital.mx/cancela/uuid.aspx';
+  _URL_API_CANCELAR_PRM = '?rfc=%s&pwd=%s';
+
+
 implementation
 
 uses FacturaReglamentacion;
@@ -117,7 +123,7 @@ end;
 function TPACComercioDigital.ObtenerURLTimbrado: String;
 begin
   // TODO: Pasar por URL encode estos parametros
-  Result := Format(_URL_API_TIMBRADO,
+  Result := Format(fDominioWebService+'/timbre/timbrar.aspx'+_URL_API_CANCELAR_PRM,
                    [fCredenciales.RFC,
                     fCredenciales.Clave]);
 end;
@@ -125,7 +131,7 @@ end;
 function TPACComercioDigital.ObtenerURLCancelacion: String;
 begin
   // TODO: Pasar por URL encode estos parametros
-  Result := Format(_URL_API_CANCELAR+_URL_API_CANCELAR_PRM,
+  Result := Format(fDominioWebService+'/cancela/uuid.aspx'+_URL_API_CANCELAR_PRM,
                    [fCredenciales.RFC,
                     fCredenciales.Clave]);
 end;
@@ -381,7 +387,7 @@ begin
   respuestaDeServidor := TStringList.Create;
   Res:= TStringList.Create;
   try
-   res.Add('POST '+_URL_API_CANCELAR+' HTTP/1.1');
+   res.Add('POST '+fDominioWebService+'/cancela/uuid.aspx'+' HTTP/1.1');
    res.Add('Content-Type: text/plain');
    res.Add('Host: pruebas.comercio-digital.mx');
    res.Add('Content-Length: 3285');
@@ -490,9 +496,10 @@ begin
 end;
 
 
-constructor TPACComercioDigital.Create;
+constructor TPACComercioDigital.Create(const aDominioWebService: string);
 begin
   inherited;
+  fDominioWebService := aDominioWebService;
 end;
 
 end.

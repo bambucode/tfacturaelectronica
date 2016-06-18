@@ -92,14 +92,18 @@ begin
 end;
 
 procedure TestTFEComprobanteFiscalV32.SetUp;
+const
+  _ANO_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO = 2016;
+  _MES_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO = 6;
+  _DIA_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO = 6;
 begin
   inherited;
   fComprobanteFiscalv32 := TFEComprobanteFiscal.Create(fev32);
 
     // Especificamos la cadena de efectivo
-  fFechaEntradaVigenciaCatalogo := EncodeDate(_ANO_CAMBIO_METODO_PAGO,
-                                              _MES_CAMBIO_METODO_PAGO,
-                                              _DIA_CAMBIO_METODO_PAGO);
+  fFechaEntradaVigenciaCatalogo := EncodeDate(_ANO_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO,
+                                              _MES_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO,
+                                              _DIA_ENTRADA_VIGENCIA_CATALOGO_METODO_PAGO);
 
 end;
 
@@ -620,9 +624,7 @@ var
 const
   _CADENA_INVENTADA_METODO_PAGO = 'Efectivo y Cheque';
 begin
-  fechaPreviaAEntradaCatalogo := EncodeDate(_ANO_CAMBIO_METODO_PAGO,
-                                            _MES_CAMBIO_METODO_PAGO,
-                                            _DIA_CAMBIO_METODO_PAGO - 1);
+  fechaPreviaAEntradaCatalogo := EncodeDate(2016,1,1);
 
   comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
   comprobanteNuevo.FechaGeneracion := fechaPreviaAEntradaCatalogo;
