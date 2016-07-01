@@ -242,13 +242,13 @@ begin
   // Establecemos como default que SI queremos incluir el certificado en el XML
   // ya que presenta la ventaja de poder validar el comprobante con solo el archivo
   // XML.
-  fAutoAsignarFechaGeneracion:=True;
-  bIncluirCertificadoEnXML := True;
-  fDesglosarTotalesImpuestos := True;
-  fCadenaOriginalCalculada:='';
-  fSelloDigitalCalculado:='';
-  fFueTimbrado := False;
-  FValidarCertificadoYLlavePrivada := True;
+  fAutoAsignarFechaGeneracion       := True;
+  bIncluirCertificadoEnXML          := True;
+  fDesglosarTotalesImpuestos        := True;
+  fCadenaOriginalCalculada          := '';
+  fSelloDigitalCalculado            := '';
+  fFueTimbrado                      := False;
+  FValidarCertificadoYLlavePrivada  := True;
 
   // Creamos el objeto XML
   fDocumentoXML := TXMLDocument.Create(nil);
@@ -1771,6 +1771,9 @@ begin
 
             // Asignamos el subtotal de la factura
             inherited SubTotal := TFEReglamentacion.DeMoneda(Subtotal);
+
+            // Asignamos el total de la factura
+            inherited Total := TFEReglamentacion.DeMoneda(Total);
 
             // Leemos los complementos
             if TieneHijo(fXmlComprobante, 'Complemento') then

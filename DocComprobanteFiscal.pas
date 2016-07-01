@@ -70,7 +70,7 @@ RAZON PARA CAMBIAR:
         property ExpedidoEn: TFeDireccion read fExpedidoEn write fExpedidoEn;
         property FormaDePago: TFEFormaDePago read fFormaDePago write fFormaDePago;
         property Tipo: TFeTipoComprobante read fTipoComprobante write fTipoComprobante;
-        property Total: Currency read getTotal;
+        property Total: Currency read getTotal write fTotal;
         property SubTotal: Currency read fSubTotal write fSubTotal;
         property CondicionesDePago: String read fCondicionesDePago write fCondicionesDePago;
         property MetodoDePago: String read fMetodoDePago write fMetodoDePago;
@@ -144,19 +144,18 @@ function TDocumentoComprobanteFiscal.AgregarConcepto(NuevoConcepto: TFEConcepto)
 var
   importe : Currency;
 begin
-    SetLength(fArrConceptos, Length(fArrConceptos) + 1);
-    fArrConceptos[Length(fArrConceptos) - 1] := NuevoConcepto;
+  SetLength(fArrConceptos, Length(fArrConceptos) + 1);
+  fArrConceptos[Length(fArrConceptos) - 1] := NuevoConcepto;
 
-    importe := NuevoConcepto.Importe;
+  importe := NuevoConcepto.Importe;
 
-    if fRecalcularImporte then
-      importe := ObtenerImporte(NuevoConcepto);
+  if fRecalcularImporte then
+    importe := ObtenerImporte(NuevoConcepto);
 
-    // Se Suma el total
-    fSubtotal := fSubtotal + importe;
-    fTotal:=fTotal + importe;
+  // Se Suma el total
+  fSubtotal := fSubtotal + importe;
 
-    Result:=Length(fArrConceptos) - 1;
+  Result:=Length(fArrConceptos) - 1;
 end;
 
 function TDocumentoComprobanteFiscal.AgregarImpuestoLocal(aNuevoImpuestoLocal:
@@ -174,24 +173,24 @@ end;
 
 function TDocumentoComprobanteFiscal.AgregarImpuestoRetenido(NuevoImpuesto: TFEImpuestoRetenido) : Integer;
 begin
-    // Convertimos el nombre del impuesto a mayusculas ya que el SAT usa todos sus impuestos en mayusculas
-    NuevoImpuesto.Nombre := Uppercase(NuevoImpuesto.Nombre);
+  // Convertimos el nombre del impuesto a mayusculas ya que el SAT usa todos sus impuestos en mayusculas
+  NuevoImpuesto.Nombre := Uppercase(NuevoImpuesto.Nombre);
 
-    SetLength(fArrImpuestosRetenidos, Length(fArrImpuestosRetenidos) + 1);
-    fArrImpuestosRetenidos[Length(fArrImpuestosRetenidos) - 1] := NuevoImpuesto;
-    fTotalImpuestosRetenidos:=fTotalImpuestosRetenidos + NuevoImpuesto.Importe;
-    Result:=Length(fArrImpuestosRetenidos) - 1;
+  SetLength(fArrImpuestosRetenidos, Length(fArrImpuestosRetenidos) + 1);
+  fArrImpuestosRetenidos[Length(fArrImpuestosRetenidos) - 1] := NuevoImpuesto;
+  fTotalImpuestosRetenidos:=fTotalImpuestosRetenidos + NuevoImpuesto.Importe;
+  Result:=Length(fArrImpuestosRetenidos) - 1;
 end;
 
 function TDocumentoComprobanteFiscal.AgregarImpuestoTrasladado(NuevoImpuesto: TFEImpuestoTrasladado) : Integer;
 begin
-    // Convertimos el nombre del impuesto a mayusculas ya que el SAT usa todos sus impuestos en mayusculas
-    NuevoImpuesto.Nombre := Uppercase(NuevoImpuesto.Nombre);
+  // Convertimos el nombre del impuesto a mayusculas ya que el SAT usa todos sus impuestos en mayusculas
+  NuevoImpuesto.Nombre := Uppercase(NuevoImpuesto.Nombre);
 
-    SetLength(fArrImpuestosTrasladados, Length(fArrImpuestosTrasladados) + 1);
-    fArrImpuestosTrasladados[Length(fArrImpuestosTrasladados) - 1] := NuevoImpuesto;
-    fTotalImpuestosTrasladados:=fTotalImpuestosTrasladados + NuevoImpuesto.Importe;
-    Result:=Length(fArrImpuestosTrasladados) - 1;
+  SetLength(fArrImpuestosTrasladados, Length(fArrImpuestosTrasladados) + 1);
+  fArrImpuestosTrasladados[Length(fArrImpuestosTrasladados) - 1] := NuevoImpuesto;
+  fTotalImpuestosTrasladados:=fTotalImpuestosTrasladados + NuevoImpuesto.Importe;
+  Result:=Length(fArrImpuestosTrasladados) - 1;
 end;
 
 procedure TDocumentoComprobanteFiscal.AsignarDescuento(ImporteDescuento: Currency; Motivo: String);
@@ -208,9 +207,13 @@ end;
 
 function TDocumentoComprobanteFiscal.getTotal() : Currency;
 begin
+  // Esto ocurre en caso de que se establezca un total definido por otra instancia
+  if fTotal > 0 then
+    Result := fTotal
+  else
     // Anexo 20:
     // Atributo requerido para representar la suma del subtotal, menos los descuentos aplicables,
-    // más los impuestos trasladados, menos los impuestos retenidos.
+    // más los impuestos trasladados, menos los impuestos retenidos.
     Result:=fSubTotal - fDescuento + (fTotalImpuestosTrasladados - fTotalImpuestosRetenidos) +
                                      (fTotalImpuestosLocalesTrasladados - fTotalImpuestosLocalesRetenidos);
 end;
