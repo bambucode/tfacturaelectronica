@@ -70,7 +70,7 @@ RAZON PARA CAMBIAR:
         property ExpedidoEn: TFeDireccion read fExpedidoEn write fExpedidoEn;
         property FormaDePago: TFEFormaDePago read fFormaDePago write fFormaDePago;
         property Tipo: TFeTipoComprobante read fTipoComprobante write fTipoComprobante;
-        property Total: Currency read getTotal;
+        property Total: Currency read getTotal write fTotal;
         property SubTotal: Currency read fSubTotal write fSubTotal;
         property CondicionesDePago: String read fCondicionesDePago write fCondicionesDePago;
         property MetodoDePago: String read fMetodoDePago write fMetodoDePago;
@@ -208,9 +208,12 @@ end;
 
 function TDocumentoComprobanteFiscal.getTotal() : Currency;
 begin
+  if fTotal > 0 then
+    Result := fTotal
+  else
     // Anexo 20:
     // Atributo requerido para representar la suma del subtotal, menos los descuentos aplicables,
-    // más los impuestos trasladados, menos los impuestos retenidos.
+    // más los impuestos trasladados, menos los impuestos retenidos.
     Result:=fSubTotal - fDescuento + (fTotalImpuestosTrasladados - fTotalImpuestosRetenidos) +
                                      (fTotalImpuestosLocalesTrasladados - fTotalImpuestosLocalesRetenidos);
 end;

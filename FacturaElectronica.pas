@@ -52,6 +52,7 @@ public
   property FacturaGenerada;
   property Folio;
   property SubTotal;
+  property Total;
   property Conceptos;
   property ImpuestosRetenidos;
   property ImpuestosTrasladados;
