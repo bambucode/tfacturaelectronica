@@ -279,7 +279,7 @@ begin
 
   // Se omite el 07
 
-  if AnsiPos('VALES', cadenaSinAcentos) > 0 then
+  if AnsiPos('VALE', cadenaSinAcentos) > 0 then
     Result := '08';
 
   if (cadenaSinAcentos = 'TARJETA DE DEBITO') or
