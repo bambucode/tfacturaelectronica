@@ -154,7 +154,7 @@ begin
 
     // Se Suma el total
     fSubtotal := fSubtotal + importe;
-    fTotal:=fTotal + importe;
+    // fTotal:=fTotal + importe;
 
     Result:=Length(fArrConceptos) - 1;
 end;
