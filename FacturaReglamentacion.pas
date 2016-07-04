@@ -290,12 +290,13 @@ begin
      (cadenaSinAcentos = 'TARJETAS DE SERVICIO' ) then
     Result := '29';
 
-  if ((cadenaSinAcentos = 'NA') or
-     (cadenaSinAcentos = 'NO APLICA') or
-     (cadenaSinAcentos = 'NO IDENTIFICADO') or
-     (cadenaSinAcentos = 'OTROS')) then
+   if AnsiPos('OTRO', cadenaSinAcentos) > 0 then
     Result := '99';
 
+  if ((cadenaSinAcentos = 'NA') or
+     (cadenaSinAcentos = 'NO APLICA') or
+     (cadenaSinAcentos = 'NO IDENTIFICADO')) then
+    Result := 'NA';
 end;
 
 class procedure TFEReglamentacion.ReemplazarComaSiActuaComoPuntoDecimal(var
