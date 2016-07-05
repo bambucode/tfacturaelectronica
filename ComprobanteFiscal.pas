@@ -128,6 +128,8 @@ type
     procedure AgregarDireccionFiscalv32(const aNodoContribuyente: IXMLNode; const
         aDireccionContribuyente: TFEDireccion);
     procedure AsignarImpuestosLocales;
+    function ConvertirCadenaMetodoPagoaNumero(const aCadenaMetodoPago: String):
+        String;
     {$REGION 'Documentation'}
     ///	<summary>
     ///	  Este metodo es llamado cuando leemos un XML (a través del metodo
@@ -169,7 +171,7 @@ type
     {$ENDREGION}
     constructor Create(const aVersionComprobante: TFEVersionComprobante = fev32; aRecalcularImporte: Boolean = True);
     destructor Destroy(); override;
-    procedure Cancelar();
+    procedure Cancelar(); deprecated;
 
     // Propiedades especificas al comprobante electronico
     property BloqueFolios: TFEBloqueFolios read fBloqueFolios write setBloqueFolios;
@@ -861,12 +863,15 @@ end;
 
 procedure TFEComprobanteFiscal.AsignarMetodoDePago;
 var
-  cadenaMetodoDePago, metodoDePagoFinal: String;
-  numeroCatalogoMetodoPago: Integer;
+  cadenaMetodoDePago, metodoDePagoFinal, metodoDePago: String;
+  numeroCatalogoMetodoPago, I: Integer;
   fechaEntradaVigorConceptosMetodosDePago: TDate;
+  listadoFormasPago: TStrings;
 const
-  _MISMA_FECHA = 0;
-  _FECHA_POSTERIOR = 1;
+  _MISMA_FECHA            = 0;
+  _FECHA_POSTERIOR        = 1;
+  _SEPARADOR_METODOS_PAGO = ',';
+  _NUEVA_LINEA            = #13#10;
 begin
   // Asignamos el metodo de pago
   if (Trim(inherited MetodoDePago) <> '') then
@@ -884,34 +889,27 @@ begin
      if CompareDate(inherited FechaGeneracion, fechaEntradaVigorConceptosMetodosDePago) In
                     [_MISMA_FECHA, _FECHA_POSTERIOR] then
      begin
-       // ¿El usuario especifico un numero de catalogo? Lo "pasamos" directo
-       if TryStrToInt(cadenaMetodoDePago, numeroCatalogoMetodoPago) then
-       begin
-         {$IFDEF CODESITE}
-            CodeSite.Send('Usando código de método de pago definido por usuario', numeroCatalogoMetodoPago);
-         {$ENDIF}
+      try
+        listadoFormasPago := TStringList.Create;
+        // Usamos la funcionalidad interna de TStrings que separa las cadenas automaticamente cuando encuentra un NewLine
+        listadoFormasPago.Text := StringReplace(cadenaMetodoDePago,
+                                                _SEPARADOR_METODOS_PAGO,
+                                                _NUEVA_LINEA, [rfReplaceAll]);
 
-         metodoDePagoFinal := IntToStr(numeroCatalogoMetodoPago);
+        metodoDePagoFinal := '';
+        for I := 0 to listadoFormasPago.Count - 1 do
+        begin
+          metodoDePago := listadoFormasPago[I];
+          metodoDePagoFinal := metodoDePagoFinal + ConvertirCadenaMetodoPagoaNumero(metodoDePago);
+          // Agregamos la coma separadora excepto en el ultimo ciclo
+          if I < listadoFormasPago.Count - 1 then
+            metodoDePagoFinal := metodoDePagoFinal + _SEPARADOR_METODOS_PAGO;
+        end;
 
-         // Si el método de pago es menor a 10, asignamos un 0 al principio, ya que el SAT maneja "01", en lugar de solo "1"
-         if numeroCatalogoMetodoPago < 10 then
-           metodoDePagoFinal := '0' + metodoDePagoFinal;
-       end else
-       begin
-         {$IFDEF CODESITE}
-           CodeSite.Send('Intentando obtener número de método de pago: ' + cadenaMetodoDePago);
-         {$ENDIF}
-         // Si fue una cadena, tratamos de convertirla al catálogo oficial
-         metodoDePagoFinal := TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(cadenaMetodoDePago);
-         {$IFDEF CODESITE}
-           CodeSite.Send('Numero de método de pago', metodoDePagoFinal);
-         {$ENDIF}
-
-         // Si regreso cadena vacia es que no encontró una equivalencia de la cadena al numero de catalogo en el SAT
-         if (metodoDePagoFinal = '') then
-          raise EFECadenaMetodoDePagoNoEnCatalogoException.Create('La cadena "' + inherited MetodoDePago +
-                                                                  '" no está en el catálogo de métodos de pago del SAT. Favor de verificar');
-       end;
+      finally
+        listadoFormasPago.Free;
+      end;
+        // Checamos si se esta especificando metodos de pago separados por coma
      end else
      begin
         {$IFDEF CODESITE}
@@ -1166,20 +1164,45 @@ end;
 
 procedure TFEComprobanteFiscal.Cancelar;
 begin
-  { http://www.validacfd.com/phpbb3/viewtopic.php?f=15&t=113&p=596&hilit=egreso#p596 - User: Carlos R
-    Algunos detalles tecnicos-practicos que generalmente se omiten.
-    * Al cancelar las facturas se deberá incorporar en los reportes mensuales con "|0|". pero no es tan simple.
-    Si es en el mismo dia, tendrás que insertar la serie y el folio primermente en |1| y posteriormente la declaras en |0|,
-    no de primera mano en |0|. (ojala me haya explicado)
-    Variable1: Cancelas el mismo dia
-    Variable2: Cancelas el mes
-    Variable3: Cancelas otro mes
+  raise Exception.Create('Funcion depreciada. Se dejará de usar en versiones futuras');
+end;
 
-    en cualquiera de los casos el sistema tendrá que ser capaz de incorporarlo en el reporte como cancelado.
+function TFEComprobanteFiscal.ConvertirCadenaMetodoPagoaNumero(const
+    aCadenaMetodoPago: String): String;
+var
+  cadenaMetodoDePago: String;
+  numeroCatalogoMetodoPago: Integer;
+begin
+  cadenaMetodoDePago := Trim(aCadenaMetodoPago);
 
-    Si además de la cancelación se realizó nota de crédito (por devolución o por descuento) el sistema deberá de
-    generar el documento como un "egreso", recuerda que para el SAT solo existen: INGRESO, EGRESO, TRASLADO.
-  }
+  // ¿El usuario especifico un numero de catalogo? Lo "pasamos" directo
+  if TryStrToInt(cadenaMetodoDePago, numeroCatalogoMetodoPago) then
+  begin
+   {$IFDEF CODESITE}
+      CodeSite.Send('Usando código de método de pago definido por usuario', numeroCatalogoMetodoPago);
+   {$ENDIF}
+
+   Result := IntToStr(numeroCatalogoMetodoPago);
+
+   // Si el método de pago es menor a 10, asignamos un 0 al principio, ya que el SAT maneja "01", en lugar de solo "1"
+   if numeroCatalogoMetodoPago < 10 then
+     Result := '0' + Result;
+  end else
+  begin
+   {$IFDEF CODESITE}
+     CodeSite.Send('Intentando obtener número de método de pago: ' + cadenaMetodoDePago);
+   {$ENDIF}
+   // Si fue una cadena, tratamos de convertirla al catálogo oficial
+   Result := TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(cadenaMetodoDePago);
+   {$IFDEF CODESITE}
+     CodeSite.Send('Numero de método de pago', Result);
+   {$ENDIF}
+
+   // Si regreso cadena vacia es que no encontró una equivalencia de la cadena al numero de catalogo en el SAT
+   if (Result = '') then
+    raise EFECadenaMetodoDePagoNoEnCatalogoException.Create('La cadena "' + inherited MetodoDePago +
+                                                            '" no está en el catálogo de métodos de pago del SAT. Favor de verificar');
+  end;
 end;
 
 procedure TFEComprobanteFiscal.EstablecerVersionDelComprobante;

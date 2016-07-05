@@ -44,6 +44,7 @@ type
     procedure MetodoDePago_EspecificandoNumero_LoDejeIgual;
     procedure MetodoDePago_Inexistente_GenereExcepcion;
     procedure MetodoDePago_MenorADiez_AgregueCeroAlPrincipio;
+    procedure MetodoDePago_VariosMetodos_ConviertaAlCatalogoCorrectamente;
     procedure SelloDigital_ConConfiguracionDecimalIncorrecta_NoFalle;
     procedure setSerie_Serie_LaGuardeEnXML;
   end;
@@ -611,6 +612,38 @@ begin
             'No se incluyo el número de método de pago para Efectivo:' + _NUMERO_METODO_EFECTIVO);
 end;
 
+
+procedure
+    TestTFEComprobanteFiscalV32.MetodoDePago_VariosMetodos_ConviertaAlCatalogoCorrectamente;
+var
+  xmlGenerado, cadenaEsperada, cadenaObtenida: WideString;
+  comprobanteNuevo: TFEComprobanteFiscal;
+  fechaGeneracionComprobante: TDate;
+const
+  _CADENA_XML_METODO_PAGO       = 'metodoDePago="';
+  _CADENA_VARIOS                = 'Efectivo,    Tarjeta de credito, Vales, Otros';
+  _NUMERO_METODO_PAGO_ESPERADOS = '01,04,08,99';
+begin
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+
+  comprobanteNuevo.FechaGeneracion            := fFechaEntradaVigenciaCatalogo;
+  comprobanteNuevo.AutoAsignarFechaGeneracion := False;
+  comprobanteNuevo.MetodoDePago               := _CADENA_VARIOS;
+  comprobanteNuevo.AsignarMetodoDePago;
+
+  // Checamos que se haya incluido el numero de catalogo de "Efectivo" y no dicha cadena
+  xmlGenerado := comprobanteNuevo.fXmlComprobante.XML;
+
+  cadenaEsperada := _CADENA_XML_METODO_PAGO + _NUMERO_METODO_PAGO_ESPERADOS + '"';
+  cadenaObtenida := _CADENA_XML_METODO_PAGO + Copy(xmlGenerado,
+                                                   AnsiPos(_CADENA_XML_METODO_PAGO, string(xmlGenerado)) + Length(_CADENA_XML_METODO_PAGO),
+                                                   Length(_NUMERO_METODO_PAGO_ESPERADOS) + 1);
+
+  CheckEquals(cadenaEsperada,
+              cadenaObtenida,
+              'No se convirtió la cadena de metodos de pago a sus equivalentes del catálogo:' + _NUMERO_METODO_PAGO_ESPERADOS);
+end;
+
 procedure
     TestTFEComprobanteFiscalV32.MetodoDePago_CadenaEfectivo_FechaMenorACambioCatalogoLaDejeIgual;
 var
@@ -712,6 +745,8 @@ begin
   CheckTrue(AnsiPos(cadenaEsperada, xmlGenerado) > 0,
             'No se agrego el cero al principio del numero de pago menor a 10');
 end;
+
+
 
 procedure TestTFEComprobanteFiscalV32.setSerie_Serie_LaGuardeEnXML;
 var
