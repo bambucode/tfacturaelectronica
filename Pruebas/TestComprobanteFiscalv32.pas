@@ -44,6 +44,7 @@ type
     procedure MetodoDePago_EspecificandoNumero_LoDejeIgual;
     procedure MetodoDePago_Inexistente_GenereExcepcion;
     procedure MetodoDePago_MenorADiez_AgregueCeroAlPrincipio;
+    procedure MetodoDePago_VariosMetodosNumericos_LosDejeIntactos;
     procedure MetodoDePago_VariosMetodos_ConviertaAlCatalogoCorrectamente;
     procedure SelloDigital_ConConfiguracionDecimalIncorrecta_NoFalle;
     procedure setSerie_Serie_LaGuardeEnXML;
@@ -744,6 +745,37 @@ begin
   cadenaEsperada := 'metodoDePago="' + _NUMERO_METODO_PAGO_CON_CERO + '"';
   CheckTrue(AnsiPos(cadenaEsperada, xmlGenerado) > 0,
             'No se agrego el cero al principio del numero de pago menor a 10');
+end;
+
+procedure
+    TestTFEComprobanteFiscalV32.MetodoDePago_VariosMetodosNumericos_LosDejeIntactos;
+var
+  xmlGenerado, cadenaEsperada, cadenaObtenida: WideString;
+  comprobanteNuevo: TFEComprobanteFiscal;
+  fechaGeneracionComprobante: TDate;
+const
+  _CADENA_XML_METODO_PAGO       = 'metodoDePago="';
+  _NUMERO_METODO_PAGO_INGRESADOS = '01,04,   8, 99';
+  _NUMERO_METODO_PAGO_ESPERADOS  = '01,04,08,99';
+begin
+  comprobanteNuevo := TFEComprobanteFiscal.Create(fev32);
+
+  comprobanteNuevo.FechaGeneracion            := fFechaEntradaVigenciaCatalogo;
+  comprobanteNuevo.AutoAsignarFechaGeneracion := False;
+  comprobanteNuevo.MetodoDePago               := _NUMERO_METODO_PAGO_INGRESADOS;
+  comprobanteNuevo.AsignarMetodoDePago;
+
+  // Checamos que se haya incluido el numero de catalogo de "Efectivo" y no dicha cadena
+  xmlGenerado := comprobanteNuevo.fXmlComprobante.XML;
+
+  cadenaEsperada := _CADENA_XML_METODO_PAGO + _NUMERO_METODO_PAGO_ESPERADOS + '"';
+  cadenaObtenida := _CADENA_XML_METODO_PAGO + Copy(xmlGenerado,
+                                                   AnsiPos(_CADENA_XML_METODO_PAGO, string(xmlGenerado)) + Length(_CADENA_XML_METODO_PAGO),
+                                                   Length(_NUMERO_METODO_PAGO_ESPERADOS) + 1);
+
+  CheckEquals(cadenaEsperada,
+              cadenaObtenida,
+              'No se dejó intacta la cadena de metodos de pago ya numéricos: ' + _NUMERO_METODO_PAGO_ESPERADOS);
 end;
 
 
