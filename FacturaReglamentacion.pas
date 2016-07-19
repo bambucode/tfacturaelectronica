@@ -15,6 +15,8 @@ unit FacturaReglamentacion;
 
 interface
 
+uses Classes;
+
 type
 
   TFEReglamentacion = class
@@ -23,6 +25,7 @@ type
       class procedure ReemplazarComaSiActuaComoPuntoDecimal(var aCadenaCatidad:
           String);
       class procedure RegresarConfiguracionRegionalLocal;
+      class function ObtenerCatalogoMetodosPago() : TStringList;
   public
       /// <summary>Convierte el valor de moneda al formato de dinero requerido por el SAT
       /// </summary>
@@ -56,6 +59,7 @@ type
       class function DeTasaImpuesto(const aCadenaTasa: String) : Double;
       class function DeCantidad(aCadenaCatidad: String): Double;
       class function DeMoneda(aMoneda: String): Currency;
+      class function ConvertirNumeroMetodoDePagoACadena(const aNumeroMetodoDePago: string): String;
   end;
 
 var
@@ -64,6 +68,7 @@ var
 const
   _PUNTO_DECIMAL = '.';
   _COMA_DECIMAL  = ',';
+  _CADENA_NO_IDENTIFICADO = 'NO IDENTIFICADO';
 
 implementation
 
@@ -238,11 +243,47 @@ begin
    end;
 end;
 
+class function TFEReglamentacion.ObtenerCatalogoMetodosPago() :TStringList;
+begin
+  Result := TStringList.Create;
+  Result.Values['EFECTIVO']             := '01';
+  Result.Values['CHEQUE']               := '02';
+  Result.Values['TRANSFERENCIA']        := '03';
+  Result.Values['TARJETA DE CREDITO']   := '04';
+  Result.Values['MONEDERO']             := '05';
+  Result.Values['DINERO ELECTRONICO']   := '06';
+  Result.Values['VALES']                := '08';
+  Result.Values['TARJETA DE DEBITO']    := '28';
+  Result.Values['TARJETA DE SERVICIO']  := '29';
+  Result.Values['OTROS']                := '99';
+end;
+
+
+class function TFEReglamentacion.ConvertirNumeroMetodoDePagoACadena(const aNumeroMetodoDePago: string): String;
+var
+   catalogoMetodosDePago: TStringList;
+   I : Integer;
+begin
+   try
+      catalogoMetodosDePago := TFEReglamentacion.ObtenerCatalogoMetodosPago();
+      for I := 0 to catalogoMetodosDePago.Count - 1 do
+      begin
+        if catalogoMetodosDePago.ValueFromIndex[I] = aNumeroMetodoDePago then
+          Result := catalogoMetodosDePago.Names[I];
+      end;
+
+      if Result = '' then
+        Result := _CADENA_NO_IDENTIFICADO;
+   finally
+      catalogoMetodosDePago.Free;
+   end;
+end;
 
 class function TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(
     const aCadenaMetodoDePago: string): String;
 var
   cadenaSinAcentos: string;
+  catalogoMetodosDePago: TStringList;
 begin
   Result := '';
 
@@ -258,45 +299,22 @@ begin
   cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'ó', 'O', [rfReplaceAll]);
   cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'ú', 'U', [rfReplaceAll]);
 
-  if cadenaSinAcentos = 'EFECTIVO' then
-    Result := '01';
+  try
+    catalogoMetodosDePago := TFEReglamentacion.ObtenerCatalogoMetodosPago();
 
-  if cadenaSinAcentos = 'CHEQUE' then
-    Result := '02';
+    // Reemplazamos nombres en plural/singular por singular
+    cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'TARJETAS', 'TARJETA', [rfReplaceAll, rfIgnoreCase]);
+    cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'VALE ', 'VALES', [rfReplaceAll, rfIgnoreCase]);
+    cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'OTRO ', 'OTROS', [rfReplaceAll, rfIgnoreCase]);
 
-  if AnsiPos('TRANSFERENCIA', cadenaSinAcentos) > 0 then
-    Result := '03';
-
-  if (cadenaSinAcentos = 'TARJETA DE CREDITO') or
-     (cadenaSinAcentos = 'TARJETAS DE CREDITO' ) then
-    Result := '04';
-
-  if AnsiPos('MONEDERO', cadenaSinAcentos) > 0 then
-    Result := '05';
-
-  if (cadenaSinAcentos = 'DINERO ELECTRONICO') then
-    Result := '06';
-
-  // Se omite el 07
-
-  if AnsiPos('VALE', cadenaSinAcentos) > 0 then
-    Result := '08';
-
-  if (cadenaSinAcentos = 'TARJETA DE DEBITO') or
-     (cadenaSinAcentos = 'TARJETAS DE DEBITO' ) then
-    Result := '28';
-
-  if (cadenaSinAcentos = 'TARJETA DE SERVICIO') or
-     (cadenaSinAcentos = 'TARJETAS DE SERVICIO' ) then
-    Result := '29';
-
-   if AnsiPos('OTRO', cadenaSinAcentos) > 0 then
-    Result := '99';
-
-  if ((cadenaSinAcentos = 'NA') or
-     (cadenaSinAcentos = 'NO APLICA') or
-     (cadenaSinAcentos = 'NO IDENTIFICADO')) then
-    Result := 'NA';
+    // Convertimos la cadena a numero de catalogo
+    if catalogoMetodosDePago.Values[cadenaSinAcentos] <> '' then
+      Result := catalogoMetodosDePago.Values[cadenaSinAcentos]
+    else
+      Result := _CADENA_NO_IDENTIFICADO;
+  finally
+    catalogoMetodosDePago.Free;
+  end;
 end;
 
 class procedure TFEReglamentacion.ReemplazarComaSiActuaComoPuntoDecimal(var
