@@ -256,6 +256,8 @@ begin
   Result.Values['TARJETA DE DEBITO']    := '28';
   Result.Values['TARJETA DE SERVICIO']  := '29';
   Result.Values['OTROS']                := '99';
+  Result.Values['NO IDENTIFICADO']      := 'NA';
+  Result.Values['NA']                   := 'NA';
 end;
 
 
@@ -311,7 +313,7 @@ begin
     if catalogoMetodosDePago.Values[cadenaSinAcentos] <> '' then
       Result := catalogoMetodosDePago.Values[cadenaSinAcentos]
     else
-      Result := _CADENA_NO_IDENTIFICADO;
+      Result := '';
   finally
     catalogoMetodosDePago.Free;
   end;
