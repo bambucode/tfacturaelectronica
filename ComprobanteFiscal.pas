@@ -1387,450 +1387,445 @@ var
   end;
 
 begin
-    if (Trim(Valor) = '') then
+  if (Trim(Valor) = '') then
+  begin
+    Raise EFEXMLVacio.Create('El valor proveido al XML esta vacio. Imposible crear comprobante.');
+    Exit;
+  end;
+
+  try
+    // Leemos el contenido XML en el Documento XML interno
+    {$IF Compilerversion >= 20}
+    // Usamos esta nueva funcion ya que UTF8Decode esta depreciada en Delphi XE2 y superiores
+    iXmlDoc:=LoadXMLData(Valor); //UTF8ToString
+    {$ELSE}
+    iXmlDoc:=LoadXMLData(UTF8Decode(Valor));
+    {$IFEND}
+
+    // Creamos el documento "dueño" del comprobante
+    fDocumentoXML:=TXmlDocument.Create(nil);
+    // Pasamos el XML para poder usarlo en la clase
+    fDocumentoXML.XML:=iXmlDoc.XML;
+
+    // Leemos la interface XML adecuada segun la version del XML, si la version no está soportada
+    // lanzaremos una excepcion
+    LeerVersionDeComprobanteLeido(Valor);
+
+    fDocumentoXML.Encoding := 'UTF-8';
+    Assert(fXmlComprobante <> nil, 'No se obtuvo una instancia del comprobante ya que fue nula');
+    Assert(fXmlComprobante.Version <> '', 'El comprobante no fue leido correctamente.');
+
+    // Checamos que versión es
+    if fXmlComprobante.Version = '2.0' then
+      fVersion:=fev20;
+
+    if fXmlComprobante.Version = '2.2' then
+      fVersion:=fev22;
+
+    if fXmlComprobante.Version = '3.2' then
+      fVersion:=fev32;
+
+    // Ahora, actualizamos todas las variables internas (de la clase) con los valores del XML
+    with fXmlComprobante do
     begin
-        Raise EFEXMLVacio.Create('El valor proveido al XML esta vacio. Imposible crear comprobante.');
-        Exit;
-    end;
+      inherited Folio:=StrToInt(Folio);
+      // Datos del certificado
+      fCertificado.NumeroSerie:=NoCertificado;
+      fCertificadoTexto := Certificado;
 
-    try
-        // Leemos el contenido XML en el Documento XML interno
-        {$IF Compilerversion >= 20}
-        // Usamos esta nueva funcion ya que UTF8Decode esta depreciada en Delphi XE2 y superiores
-        iXmlDoc:=LoadXMLData(Valor); //UTF8ToString
-        {$ELSE}
-        iXmlDoc:=LoadXMLData(UTF8Decode(Valor));
-        {$IFEND}
-
-        // Creamos el documento "dueño" del comprobante
-        fDocumentoXML:=TXmlDocument.Create(nil);
-        // Pasamos el XML para poder usarlo en la clase
-        fDocumentoXML.XML:=iXmlDoc.XML;
-
-        // Leemos la interface XML adecuada segun la version del XML, si la version no está soportada
-        // lanzaremos una excepcion
-        LeerVersionDeComprobanteLeido(Valor);
-
-        fDocumentoXML.Encoding := 'UTF-8';
-        Assert(fXmlComprobante <> nil, 'No se obtuvo una instancia del comprobante ya que fue nula');
-        Assert(fXmlComprobante.Version <> '', 'El comprobante no fue leido correctamente.');
-
-        // Checamos que versión es
-        if fXmlComprobante.Version = '2.0' then
-          fVersion:=fev20;
-
-        if fXmlComprobante.Version = '2.2' then
-          fVersion:=fev22;
-
-        if fXmlComprobante.Version = '3.2' then
-          fVersion:=fev32;
-
-        // Ahora, actualizamos todas las variables internas (de la clase) con los valores del XML
-        with fXmlComprobante do
+      if fVersion In [fev20, fev22] then
+      begin
+        if Supports(fXmlComprobante, IFESoportaBloqueFolios, comprobanteConBloqueFolios) then
         begin
-            inherited Folio:=StrToInt(Folio);
-            // Datos del certificado
-            fCertificado.NumeroSerie:=NoCertificado;
-            fCertificadoTexto := Certificado;
-
-            if fVersion In [fev20, fev22] then
-            begin
-              if Supports(fXmlComprobante, IFESoportaBloqueFolios, comprobanteConBloqueFolios) then
-              begin
-                fBloqueFolios.NumeroAprobacion:=comprobanteConBloqueFolios.NoAprobacion;
-                fBloqueFolios.AnoAprobacion:=comprobanteConBloqueFolios.AnoAprobacion;
-              end;
-            end;
-
-             if TieneAtributo(fXmlComprobante, 'serie') then
-            begin
-              fBloqueFolios.Serie:=Serie;
-              inherited Serie:=Serie;
-            end;
-
-            fBloqueFolios.FolioInicial:=inherited Folio;
-            fBloqueFolios.FolioFinal:=inherited Folio;
-
-            // CFD 2.2 /CFD 3.2
-            if (fVersion = fev22) then
-            begin
-                inherited LugarDeExpedicion:=IFEXMLComprobanteV22(fXmlComprobante).LugarExpedicion;
-
-                if TieneAtributo(fXmlComprobante, 'NumCtaPago') then
-                  inherited NumeroDeCuenta:=IFEXMLComprobanteV22(fXmlComprobante).NumCtaPago;
-            end
-           Else if (fVersion = fev32) then
-            begin
-                inherited LugarDeExpedicion:=IFEXMLComprobanteV32(fXmlComprobante).LugarExpedicion;
-
-                if TieneAtributo(fXmlComprobante, 'NumCtaPago') then
-                  inherited NumeroDeCuenta:=IFEXMLComprobanteV32(fXmlComprobante).NumCtaPago;
-            end;
-
-            FechaGeneracion:=TFEReglamentacion.ComoDateTime(fXmlComprobante.Fecha);
-
-            if TieneAtributo(fXmlComprobante, 'condicionesDePago') then
-              inherited CondicionesDePago:=CondicionesDePago;
-
-            if TieneAtributo(fXmlComprobante, 'metodoDePago') then
-              inherited MetodoDePago:=MetodoDePago;
-
-
-            // Leemos los datos del emisor
-            case fVersion of
-              fev20:
-              begin
-                  if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor, 'nombre') then
-                      ValorEmisor.Nombre:=IFEXmlComprobanteV2(fXmlComprobante).Emisor.Nombre;
-
-                  if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor, 'rfc') then
-                     ValorEmisor.RFC:=IFEXmlComprobanteV2(fXmlComprobante).Emisor.RFC;
-
-                  with IFEXmlComprobanteV2(fXmlComprobante).Emisor do
-                  begin
-                      if TieneAtributo(DomicilioFiscal, 'calle') then
-                        ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
-                      if TieneAtributo(DomicilioFiscal, 'noExterior') then
-                        ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
-                      if TieneAtributo(DomicilioFiscal, 'noInterior') then
-                        ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
-                      if TieneAtributo(DomicilioFiscal, 'codigoPostal') then
-                        ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
-                      if TieneAtributo(DomicilioFiscal, 'colonia') then
-                        ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
-                      if TieneAtributo(DomicilioFiscal, 'localidad') then
-                        ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
-                      if TieneAtributo(DomicilioFiscal, 'municipio') then
-                        ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
-                      if TieneAtributo(DomicilioFiscal, 'estado') then
-                        ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
-                      if TieneAtributo(DomicilioFiscal, 'pais') then
-                        ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
-                  end;
-              end;
-              fev22:
-              begin
-                  if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor, 'nombre') then
-                      ValorEmisor.Nombre:=IFEXmlComprobanteV22(fXmlComprobante).Emisor.Nombre;
-
-                  if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor, 'rfc') then
-                     ValorEmisor.RFC:=IFEXmlComprobanteV22(fXmlComprobante).Emisor.RFC;
-
-                  with IFEXmlComprobanteV22(fXmlComprobante).Emisor do
-                  begin
-                      if TieneAtributo(DomicilioFiscal, 'calle') then
-                        ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
-                      if TieneAtributo(DomicilioFiscal, 'noExterior') then
-                        ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
-                      if TieneAtributo(DomicilioFiscal, 'noInterior') then
-                        ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
-                      if TieneAtributo(DomicilioFiscal, 'codigoPostal') then
-                        ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
-                      if TieneAtributo(DomicilioFiscal, 'colonia') then
-                        ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
-                      if TieneAtributo(DomicilioFiscal, 'localidad') then
-                        ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
-                      if TieneAtributo(DomicilioFiscal, 'municipio') then
-                        ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
-                      if TieneAtributo(DomicilioFiscal, 'estado') then
-                        ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
-                      if TieneAtributo(DomicilioFiscal, 'pais') then
-                        ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
-                  end;
-              end;
-              fev32:
-              begin
-                  if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'nombre') then
-                      ValorEmisor.Nombre:=IFEXmlComprobanteV32(fXmlComprobante).Emisor.Nombre;
-
-                  if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'rfc') then
-                     ValorEmisor.RFC:=IFEXmlComprobanteV32(fXmlComprobante).Emisor.RFC;
-
-                  // Checamos si tuvo Domicilio Fiscal el Emisor
-                  if TieneHijo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'DomicilioFiscal')  then
-                  begin
-                    with IFEXmlComprobanteV32(fXmlComprobante).Emisor do
-                    begin
-                        if TieneAtributo(DomicilioFiscal, 'calle') then
-                          ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
-                        if TieneAtributo(DomicilioFiscal, 'noExterior') then
-                          ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
-                        if TieneAtributo(DomicilioFiscal, 'noInterior') then
-                          ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
-                        if TieneAtributo(DomicilioFiscal, 'codigoPostal') then
-                          ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
-                        if TieneAtributo(DomicilioFiscal, 'colonia') then
-                          ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
-                        if TieneAtributo(DomicilioFiscal, 'localidad') then
-                          ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
-                        if TieneAtributo(DomicilioFiscal, 'municipio') then
-                          ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
-                        if TieneAtributo(DomicilioFiscal, 'estado') then
-                          ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
-                        if TieneAtributo(DomicilioFiscal, 'pais') then
-                          ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
-                    end;
-                  end;
-              end;
-            end;
-
-            // Copiamos los régimenes fiscales del emisor
-            if (fVersion = fev22) then
-            begin
-                SetLength(ValorEmisor.Regimenes, IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal.Count);
-                for I := 0 to IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal.Count - 1 do
-                begin
-                     feRegimen := IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal[I].Regimen;
-                     ValorEmisor.Regimenes[I]:=feRegimen;
-                end;
-            end
-            else if (fVersion = fev32) then
-            begin
-                SetLength(ValorEmisor.Regimenes, IFEXMLComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal.Count);
-                for I := 0 to IFEXMLComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal.Count - 1 do
-                begin
-                     feRegimen := IFEXMLComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal[I].Regimen;
-                     ValorEmisor.Regimenes[I]:=feRegimen;
-                end;
-            end;
-
-            inherited Emisor:=ValorEmisor;
-
-            ValorReceptor.RFC:=Receptor.Rfc;
-
-            // Leemos los datos del receptor solo si no es publico en general o extranjero
-            if ((Uppercase(ValorReceptor.RFC) <> _RFC_VENTA_PUBLICO_EN_GENERAL) And
-                (Uppercase(ValorReceptor.RFC) <> _RFC_VENTA_EXTRANJEROS)) then
-            begin
-                  if TieneAtributo(Receptor, 'nombre') then
-                      ValorReceptor.Nombre:=Receptor.Nombre;
-
-                  tieneNodoDomicilio := (fVersion In [fev20, fev22]);
-                  if fVersion = fev32 then
-                    tieneNodoDomicilio := TieneHijo(IFEXmlComprobanteV32(fXmlComprobante).Receptor, 'Domicilio');
-
-                  if tieneNodoDomicilio then
-                  begin
-                    with Receptor do
-                    begin
-                        if TieneAtributo(Domicilio, 'calle') then
-                          ValorReceptor.Direccion.Calle := Domicilio.Calle;
-                        if TieneAtributo(Domicilio, 'noExterior') then
-                          ValorReceptor.Direccion.NoExterior := Domicilio.NoExterior;
-                        if TieneAtributo(Domicilio, 'noInterior') then
-                          ValorReceptor.Direccion.NoInterior := Domicilio.NoInterior;
-                        if TieneAtributo(Domicilio, 'codigoPostal') then
-                         ValorReceptor.Direccion.CodigoPostal := Domicilio.CodigoPostal;
-                        if TieneAtributo(Domicilio, 'colonia') then
-                          ValorReceptor.Direccion.Colonia := Domicilio.Colonia;
-                        if TieneAtributo(Domicilio, 'localidad') then
-                          ValorReceptor.Direccion.Localidad := Domicilio.Localidad;
-                        if TieneAtributo(Domicilio, 'municipio') then
-                          ValorReceptor.Direccion.Municipio := Domicilio.Municipio;
-                        if TieneAtributo(Domicilio, 'estado') then
-                          ValorReceptor.Direccion.Estado := Domicilio.Estado;
-                        if TieneAtributo(Domicilio, 'pais') then
-                          ValorReceptor.Direccion.Pais := Domicilio.Pais;
-                    end;
-                  end;
-            end;
-            inherited Receptor:=ValorReceptor;
-
-            // Tiene lugar de expedicion
-            case fVersion of
-              fev20:
-              begin
-                    if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor, 'ExpedidoEn') then
-                    begin
-                          with IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn do
-                          begin
-                              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'calle') then
-                                ValorExpedidoEn.Calle := Calle;
-                              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'NoExterior') then
-                                ValorExpedidoEn.NoExterior := NoExterior;
-                              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'codigoPostal') then
-                                ValorExpedidoEn.CodigoPostal := CodigoPostal;
-                              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'localidad') then
-                                ValorExpedidoEn.Localidad := Localidad;
-                              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'municipio') then
-                                ValorExpedidoEn.Municipio := Municipio;
-                              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'colonia') then
-                                ValorExpedidoEn.Colonia := Colonia;
-                              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'estado') then
-                                ValorExpedidoEn.Estado := Estado;
-                              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'pais') then
-                                ValorExpedidoEn.Pais := Pais;
-                          end;
-                    end;
-              end;
-              fev22:
-              begin
-                   if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor, 'ExpedidoEn') then
-                    begin
-                          with IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn do
-                          begin
-                              if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'calle') then
-                                ValorExpedidoEn.Calle := Calle;
-                              if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'NoExterior') then
-                                ValorExpedidoEn.NoExterior := NoExterior;
-                              if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'codigoPostal') then
-                                ValorExpedidoEn.CodigoPostal := CodigoPostal;
-                              if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'localidad') then
-                                ValorExpedidoEn.Localidad := Localidad;
-                              if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'municipio') then
-                                ValorExpedidoEn.Municipio := Municipio;
-                              if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'colonia') then
-                                ValorExpedidoEn.Colonia := Colonia;
-                              if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'estado') then
-                                ValorExpedidoEn.Estado := Estado;
-                              if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'pais') then
-                                ValorExpedidoEn.Pais := Pais;
-                          end;
-                    end;
-              end;
-              fev32:
-              begin
-                   if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'ExpedidoEn') then
-                    begin
-                          with IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn do
-                          begin
-                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'calle') then
-                                ValorExpedidoEn.Calle := Calle;
-                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'NoExterior') then
-                                ValorExpedidoEn.NoExterior := NoExterior;
-                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'codigoPostal') then
-                                ValorExpedidoEn.CodigoPostal := CodigoPostal;
-                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'localidad') then
-                                ValorExpedidoEn.Localidad := Localidad;
-                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'municipio') then
-                                ValorExpedidoEn.Municipio := Municipio;
-                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'colonia') then
-                                ValorExpedidoEn.Colonia := Colonia;
-                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'estado') then
-                                ValorExpedidoEn.Estado := Estado;
-                              if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'pais') then
-                                ValorExpedidoEn.Pais := Pais;
-                          end;
-                    end;
-              end;
-            end;
-            inherited ExpedidoEn:=ValorExpedidoEn;
-
-            for I := 0 to Conceptos.Count - 1 do
-            begin
-                feConcepto.Cantidad:=TFEReglamentacion.DeCantidad(Conceptos[I].Cantidad);
-                if TieneAtributo(Conceptos[I], 'unidad') then
-                  feConcepto.Unidad:=Conceptos[I].Unidad;
-                feConcepto.Descripcion:=Conceptos[I].Descripcion;
-                feConcepto.ValorUnitario:=TFEReglamentacion.DeMoneda(Conceptos[I].ValorUnitario);
-                if TieneAtributo(Conceptos[I], 'noIdentificacion') then
-                  feConcepto.NoIdentificacion:=Conceptos[I].NoIdentificacion;
-
-                feConcepto.ValorUnitarioFinal := TFEReglamentacion.DeMoneda(Conceptos[I].ValorUnitario);
-                feConcepto.Importe := TFEReglamentacion.DeMoneda(Conceptos[I].Importe);
-
-                inherited AgregarConcepto(feConcepto);
-            end;
-
-            // Agregamos las reteneciones
-            if Assigned(ChildNodes.FindNode('Impuestos')) then
-              if Assigned(ChildNodes.FindNode('Impuestos').ChildNodes.FindNode('Retenciones')) then
-                for I := 0 to fXmlComprobante.Impuestos.Retenciones.Count - 1 do
-                begin
-                    ImpuestoRetenido.Nombre := fXmlComprobante.Impuestos.Retenciones.Retencion[I].Impuesto;
-                    ImpuestoRetenido.Importe := TFEReglamentacion.DeMoneda(fXmlComprobante.Impuestos.Retenciones.Retencion[I].Importe);
-                    inherited AgregarImpuestoRetenido(ImpuestoRetenido);
-                end;
-
-            // Agregamos los traslados
-            if Assigned(ChildNodes.FindNode('Impuestos')) then
-            begin
-              if Assigned(ChildNodes.FindNode('Impuestos').ChildNodes.FindNode('Traslados')) then
-                for I := 0 to Impuestos.Traslados.Count - 1 do
-                begin
-                  with Impuestos.Traslados do
-                  begin
-                    ImpuestoTrasladado.Nombre := Traslado[I].Impuesto;
-                    ImpuestoTrasladado.Tasa:= TFEReglamentacion.DeTasaImpuesto(Traslado[I].Tasa);
-                    ImpuestoTrasladado.Importe := TFEReglamentacion.DeMoneda(Traslado[I].Importe);
-                    inherited AgregarImpuestoTrasladado(ImpuestoTrasladado);
-                  end;
-                end;
-                //AsignarImpuestosTrasladados;
-            end;
-
-
-            if TieneAtributo(Impuestos, 'totalImpuestosTraslados') then
-                Self.DesglosarTotalesImpuestos := True
-            else
-                Self.DesglosarTotalesImpuestos := False;
-
-            // Que forma de pago tuvo??
-            if AnsiPos('UNA', Uppercase(FormaDePago)) > 0 then
-                inherited FormaDePago := fpUnaSolaExhibicion
-            else
-                inherited FormaDePago := fpParcialidades;
-
-            // Tipo de comprobante
-            if TipoDeComprobante = 'ingreso' then
-              inherited Tipo := tcIngreso;
-
-            if TipoDeComprobante = 'egreso' then
-              inherited Tipo := tcEgreso;
-
-            if TipoDeComprobante = 'traslado' then
-              inherited Tipo := tcTraslado;
-
-            // Asignamos el descuento
-            if TieneAtributo(fXmlComprobante, 'descuento') then
-            begin
-              if TieneAtributo(fXmlComprobante, 'motivoDescuento') then
-                sMotivoDescuento:=MotivoDescuento
-              else
-                sMotivoDescuento:='';
-
-              Self.AsignarDescuento(TFEReglamentacion.DeMoneda(Descuento), sMotivoDescuento);
-            end;
-
-            // Asignamos el subtotal de la factura
-            inherited SubTotal := TFEReglamentacion.DeMoneda(Subtotal);
-
-            // Asignamos el total de la factura
-            inherited Total := TFEReglamentacion.DeMoneda(Total);
-
-            // Leemos los complementos
-            if TieneHijo(fXmlComprobante, 'Complemento') then
-            begin
-              LeerImpuestosLocales;
-
-              // Leemos el timbre del CFDI
-              if fVersion In [fev32] then
-              begin
-                LeerPropiedadesDeTimbre;
-              end;
-            end;
-
-            // Indicamos que el comprobante XML ya fue "llenado"
-            fComprobanteLleno:=True;
-
-            // Asignamos el sello que trae el XML
-            fSelloDigitalCalculado:=Sello;
-
-            // Ahora hacemos que se calcule la cadena original de nuevo
-            fCadenaOriginalCalculada:=getCadenaOriginal;
-
-            // Indicamos que la factura ya fue generada
-            FacturaGenerada:=True;
-
-            //Assert(CurrToStr(Self.Total) = Total, 'El total del comprobante no fue igual que el total del XML');
+          fBloqueFolios.NumeroAprobacion := comprobanteConBloqueFolios.NoAprobacion;
+          fBloqueFolios.AnoAprobacion := comprobanteConBloqueFolios.AnoAprobacion;
         end;
-    except
-        On E:Exception do
+      end;
+
+      if TieneAtributo(fXmlComprobante, 'serie') then
+      begin
+        fBloqueFolios.Serie := Serie;
+       inherited Serie := Serie;
+      end;
+
+      fBloqueFolios.FolioInicial := inherited Folio;
+      fBloqueFolios.FolioFinal := inherited Folio;
+
+      // CFD 2.2 /CFD 3.2
+      if (fVersion = fev22) then
+      begin
+        inherited LugarDeExpedicion:=IFEXMLComprobanteV22(fXmlComprobante).LugarExpedicion;
+
+        if TieneAtributo(fXmlComprobante, 'NumCtaPago') then
+          inherited NumeroDeCuenta:=IFEXMLComprobanteV22(fXmlComprobante).NumCtaPago;
+      end
+      Else if (fVersion = fev32) then
+      begin
+        inherited LugarDeExpedicion:=IFEXMLComprobanteV32(fXmlComprobante).LugarExpedicion;
+
+        if TieneAtributo(fXmlComprobante, 'NumCtaPago') then
+          inherited NumeroDeCuenta:=IFEXMLComprobanteV32(fXmlComprobante).NumCtaPago;
+      end;
+
+      FechaGeneracion:=TFEReglamentacion.ComoDateTime(fXmlComprobante.Fecha);
+
+      if TieneAtributo(fXmlComprobante, 'condicionesDePago') then
+        inherited CondicionesDePago:=CondicionesDePago;
+
+      if TieneAtributo(fXmlComprobante, 'metodoDePago') then
+        inherited MetodoDePago:=MetodoDePago;
+
+
+      // Leemos los datos del emisor
+      case fVersion of
+        fev20:
         begin
+          if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor, 'nombre') then
+              ValorEmisor.Nombre:=IFEXmlComprobanteV2(fXmlComprobante).Emisor.Nombre;
 
-          Raise Exception.Create(E.Message);
+          if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor, 'rfc') then
+             ValorEmisor.RFC:=IFEXmlComprobanteV2(fXmlComprobante).Emisor.RFC;
+
+          with IFEXmlComprobanteV2(fXmlComprobante).Emisor do
+          begin
+            if TieneAtributo(DomicilioFiscal, 'calle') then
+              ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
+            if TieneAtributo(DomicilioFiscal, 'noExterior') then
+              ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
+            if TieneAtributo(DomicilioFiscal, 'noInterior') then
+              ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
+            if TieneAtributo(DomicilioFiscal, 'codigoPostal') then
+              ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
+            if TieneAtributo(DomicilioFiscal, 'colonia') then
+              ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
+            if TieneAtributo(DomicilioFiscal, 'localidad') then
+              ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
+            if TieneAtributo(DomicilioFiscal, 'municipio') then
+              ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
+            if TieneAtributo(DomicilioFiscal, 'estado') then
+              ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
+            if TieneAtributo(DomicilioFiscal, 'pais') then
+              ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
+          end;
         end;
-    end;
+        fev22:
+        begin
+          if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor, 'nombre') then
+              ValorEmisor.Nombre:=IFEXmlComprobanteV22(fXmlComprobante).Emisor.Nombre;
+
+          if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor, 'rfc') then
+             ValorEmisor.RFC:=IFEXmlComprobanteV22(fXmlComprobante).Emisor.RFC;
+
+          with IFEXmlComprobanteV22(fXmlComprobante).Emisor do
+          begin
+            if TieneAtributo(DomicilioFiscal, 'calle') then
+              ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
+            if TieneAtributo(DomicilioFiscal, 'noExterior') then
+              ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
+            if TieneAtributo(DomicilioFiscal, 'noInterior') then
+              ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
+            if TieneAtributo(DomicilioFiscal, 'codigoPostal') then
+              ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
+            if TieneAtributo(DomicilioFiscal, 'colonia') then
+              ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
+            if TieneAtributo(DomicilioFiscal, 'localidad') then
+              ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
+            if TieneAtributo(DomicilioFiscal, 'municipio') then
+              ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
+            if TieneAtributo(DomicilioFiscal, 'estado') then
+              ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
+            if TieneAtributo(DomicilioFiscal, 'pais') then
+              ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
+          end;
+        end;
+        fev32:
+        begin
+          if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'nombre') then
+            ValorEmisor.Nombre:=IFEXmlComprobanteV32(fXmlComprobante).Emisor.Nombre;
+
+          if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'rfc') then
+             ValorEmisor.RFC:=IFEXmlComprobanteV32(fXmlComprobante).Emisor.RFC;
+
+          // Checamos si tuvo Domicilio Fiscal el Emisor
+          if TieneHijo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'DomicilioFiscal')  then
+          begin
+            with IFEXmlComprobanteV32(fXmlComprobante).Emisor do
+            begin
+              if TieneAtributo(DomicilioFiscal, 'calle') then
+                ValorEmisor.Direccion.Calle := DomicilioFiscal.Calle;
+              if TieneAtributo(DomicilioFiscal, 'noExterior') then
+                ValorEmisor.Direccion.NoExterior := DomicilioFiscal.NoExterior;
+              if TieneAtributo(DomicilioFiscal, 'noInterior') then
+                ValorEmisor.Direccion.NoInterior := DomicilioFiscal.NoInterior;
+              if TieneAtributo(DomicilioFiscal, 'codigoPostal') then
+                ValorEmisor.Direccion.CodigoPostal := DomicilioFiscal.CodigoPostal;
+              if TieneAtributo(DomicilioFiscal, 'colonia') then
+                ValorEmisor.Direccion.Colonia := DomicilioFiscal.Colonia;
+              if TieneAtributo(DomicilioFiscal, 'localidad') then
+                ValorEmisor.Direccion.Localidad := DomicilioFiscal.Localidad;
+              if TieneAtributo(DomicilioFiscal, 'municipio') then
+                ValorEmisor.Direccion.Municipio := DomicilioFiscal.Municipio;
+              if TieneAtributo(DomicilioFiscal, 'estado') then
+                ValorEmisor.Direccion.Estado := DomicilioFiscal.Estado;
+              if TieneAtributo(DomicilioFiscal, 'pais') then
+                ValorEmisor.Direccion.Pais := DomicilioFiscal.Pais;
+            end;
+          end;
+        end;
+      end;
+
+      // Copiamos los régimenes fiscales del emisor
+      if (fVersion = fev22) then
+      begin
+        SetLength(ValorEmisor.Regimenes, IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal.Count);
+        for I := 0 to IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal.Count - 1 do
+        begin
+          feRegimen := IFEXMLComprobanteV22(fXmlComprobante).Emisor.RegimenFiscal[I].Regimen;
+          ValorEmisor.Regimenes[I] := feRegimen;
+        end;
+      end
+      else if (fVersion = fev32) then
+      begin
+        SetLength(ValorEmisor.Regimenes, IFEXMLComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal.Count);
+        for I := 0 to IFEXMLComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal.Count - 1 do
+        begin
+          feRegimen := IFEXMLComprobanteV32(fXmlComprobante).Emisor.RegimenFiscal[I].Regimen;
+          ValorEmisor.Regimenes[I] := feRegimen;
+        end;
+      end;
+
+      inherited Emisor:=ValorEmisor;
+
+      ValorReceptor.RFC:=Receptor.Rfc;
+
+      // Leemos los datos del receptor solo si no es publico en general o extranjero
+      if ((Uppercase(ValorReceptor.RFC) <> _RFC_VENTA_PUBLICO_EN_GENERAL) And
+          (Uppercase(ValorReceptor.RFC) <> _RFC_VENTA_EXTRANJEROS)) then
+      begin
+        if TieneAtributo(Receptor, 'nombre') then
+            ValorReceptor.Nombre:=Receptor.Nombre;
+
+        tieneNodoDomicilio := (fVersion In [fev20, fev22]);
+        if fVersion = fev32 then
+          tieneNodoDomicilio := TieneHijo(IFEXmlComprobanteV32(fXmlComprobante).Receptor, 'Domicilio');
+
+        if tieneNodoDomicilio then
+        begin
+          with Receptor do
+          begin
+              if TieneAtributo(Domicilio, 'calle') then
+                ValorReceptor.Direccion.Calle := Domicilio.Calle;
+              if TieneAtributo(Domicilio, 'noExterior') then
+                ValorReceptor.Direccion.NoExterior := Domicilio.NoExterior;
+              if TieneAtributo(Domicilio, 'noInterior') then
+                ValorReceptor.Direccion.NoInterior := Domicilio.NoInterior;
+              if TieneAtributo(Domicilio, 'codigoPostal') then
+               ValorReceptor.Direccion.CodigoPostal := Domicilio.CodigoPostal;
+              if TieneAtributo(Domicilio, 'colonia') then
+                ValorReceptor.Direccion.Colonia := Domicilio.Colonia;
+              if TieneAtributo(Domicilio, 'localidad') then
+                ValorReceptor.Direccion.Localidad := Domicilio.Localidad;
+              if TieneAtributo(Domicilio, 'municipio') then
+                ValorReceptor.Direccion.Municipio := Domicilio.Municipio;
+              if TieneAtributo(Domicilio, 'estado') then
+                ValorReceptor.Direccion.Estado := Domicilio.Estado;
+              if TieneAtributo(Domicilio, 'pais') then
+                ValorReceptor.Direccion.Pais := Domicilio.Pais;
+          end;
+        end;
+      end;
+
+      inherited Receptor:=ValorReceptor;
+
+      // Tiene lugar de expedicion
+      case fVersion of
+        fev20:
+        begin
+          if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor, 'ExpedidoEn') then
+          begin
+            with IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn do
+            begin
+              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'calle') then
+                ValorExpedidoEn.Calle := Calle;
+              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'NoExterior') then
+                ValorExpedidoEn.NoExterior := NoExterior;
+              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'codigoPostal') then
+                ValorExpedidoEn.CodigoPostal := CodigoPostal;
+              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'localidad') then
+                ValorExpedidoEn.Localidad := Localidad;
+              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'municipio') then
+                ValorExpedidoEn.Municipio := Municipio;
+              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'colonia') then
+                ValorExpedidoEn.Colonia := Colonia;
+              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'estado') then
+                ValorExpedidoEn.Estado := Estado;
+              if TieneAtributo(IFEXmlComprobanteV2(fXmlComprobante).Emisor.ExpedidoEn, 'pais') then
+                ValorExpedidoEn.Pais := Pais;
+            end;
+          end;
+        end;
+        fev22:
+        begin
+          if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor, 'ExpedidoEn') then
+          begin
+            with IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn do
+            begin
+                if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'calle') then
+                  ValorExpedidoEn.Calle := Calle;
+                if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'NoExterior') then
+                  ValorExpedidoEn.NoExterior := NoExterior;
+                if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'codigoPostal') then
+                  ValorExpedidoEn.CodigoPostal := CodigoPostal;
+                if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'localidad') then
+                  ValorExpedidoEn.Localidad := Localidad;
+                if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'municipio') then
+                  ValorExpedidoEn.Municipio := Municipio;
+                if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'colonia') then
+                  ValorExpedidoEn.Colonia := Colonia;
+                if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'estado') then
+                  ValorExpedidoEn.Estado := Estado;
+                if TieneAtributo(IFEXmlComprobanteV22(fXmlComprobante).Emisor.ExpedidoEn, 'pais') then
+                  ValorExpedidoEn.Pais := Pais;
+            end;
+          end;
+        end;
+        fev32:
+        begin
+          if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor, 'ExpedidoEn') then
+          begin
+            with IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn do
+            begin
+                if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'calle') then
+                  ValorExpedidoEn.Calle := Calle;
+                if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'NoExterior') then
+                  ValorExpedidoEn.NoExterior := NoExterior;
+                if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'codigoPostal') then
+                  ValorExpedidoEn.CodigoPostal := CodigoPostal;
+                if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'localidad') then
+                  ValorExpedidoEn.Localidad := Localidad;
+                if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'municipio') then
+                  ValorExpedidoEn.Municipio := Municipio;
+                if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'colonia') then
+                  ValorExpedidoEn.Colonia := Colonia;
+                if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'estado') then
+                  ValorExpedidoEn.Estado := Estado;
+                if TieneAtributo(IFEXmlComprobanteV32(fXmlComprobante).Emisor.ExpedidoEn, 'pais') then
+                  ValorExpedidoEn.Pais := Pais;
+            end;
+          end;
+        end;
+      end;
+      inherited ExpedidoEn:=ValorExpedidoEn;
+
+      for I := 0 to Conceptos.Count - 1 do
+      begin
+        feConcepto.Cantidad:=TFEReglamentacion.DeCantidad(Conceptos[I].Cantidad);
+        if TieneAtributo(Conceptos[I], 'unidad') then
+          feConcepto.Unidad:=Conceptos[I].Unidad;
+        feConcepto.Descripcion:=Conceptos[I].Descripcion;
+        feConcepto.ValorUnitario:=TFEReglamentacion.DeMoneda(Conceptos[I].ValorUnitario);
+        if TieneAtributo(Conceptos[I], 'noIdentificacion') then
+          feConcepto.NoIdentificacion:=Conceptos[I].NoIdentificacion;
+
+        feConcepto.ValorUnitarioFinal := TFEReglamentacion.DeMoneda(Conceptos[I].ValorUnitario);
+        feConcepto.Importe := TFEReglamentacion.DeMoneda(Conceptos[I].Importe);
+
+        inherited AgregarConcepto(feConcepto);
+      end;
+
+      // Agregamos las reteneciones
+      if Assigned(ChildNodes.FindNode('Impuestos')) then
+        if Assigned(ChildNodes.FindNode('Impuestos').ChildNodes.FindNode('Retenciones')) then
+          for I := 0 to fXmlComprobante.Impuestos.Retenciones.Count - 1 do
+          begin
+            ImpuestoRetenido.Nombre := fXmlComprobante.Impuestos.Retenciones.Retencion[I].Impuesto;
+            ImpuestoRetenido.Importe := TFEReglamentacion.DeMoneda(fXmlComprobante.Impuestos.Retenciones.Retencion[I].Importe);
+            inherited AgregarImpuestoRetenido(ImpuestoRetenido);
+          end;
+
+      // Agregamos los traslados
+      if Assigned(ChildNodes.FindNode('Impuestos')) then
+      begin
+        if Assigned(ChildNodes.FindNode('Impuestos').ChildNodes.FindNode('Traslados')) then
+          for I := 0 to Impuestos.Traslados.Count - 1 do
+          begin
+            with Impuestos.Traslados do
+            begin
+              ImpuestoTrasladado.Nombre := Traslado[I].Impuesto;
+              ImpuestoTrasladado.Tasa:= TFEReglamentacion.DeTasaImpuesto(Traslado[I].Tasa);
+              ImpuestoTrasladado.Importe := TFEReglamentacion.DeMoneda(Traslado[I].Importe);
+              inherited AgregarImpuestoTrasladado(ImpuestoTrasladado);
+            end;
+          end;
+          //AsignarImpuestosTrasladados;
+      end;
+
+      if TieneAtributo(Impuestos, 'totalImpuestosTraslados') then
+          Self.DesglosarTotalesImpuestos := True
+      else
+          Self.DesglosarTotalesImpuestos := False;
+
+      // Que forma de pago tuvo??
+      if AnsiPos('UNA', Uppercase(FormaDePago)) > 0 then
+          inherited FormaDePago := fpUnaSolaExhibicion
+      else
+          inherited FormaDePago := fpParcialidades;
+
+      // Tipo de comprobante
+      if TipoDeComprobante = 'ingreso' then
+        inherited Tipo := tcIngreso;
+
+      if TipoDeComprobante = 'egreso' then
+        inherited Tipo := tcEgreso;
+
+      if TipoDeComprobante = 'traslado' then
+        inherited Tipo := tcTraslado;
+
+      // Asignamos el descuento
+      if TieneAtributo(fXmlComprobante, 'descuento') then
+      begin
+        if TieneAtributo(fXmlComprobante, 'motivoDescuento') then
+          sMotivoDescuento:=MotivoDescuento
+        else
+          sMotivoDescuento:='';
+
+        Self.AsignarDescuento(TFEReglamentacion.DeMoneda(Descuento), sMotivoDescuento);
+      end;
+
+      // Asignamos el subtotal de la factura
+      inherited SubTotal := TFEReglamentacion.DeMoneda(Subtotal);
+
+      // Asignamos el total de la factura
+      inherited Total := TFEReglamentacion.DeMoneda(Total);
+
+      // Leemos los complementos
+      if TieneHijo(fXmlComprobante, 'Complemento') then
+      begin
+        LeerImpuestosLocales;
+
+        // Leemos el timbre del CFDI
+        if fVersion In [fev32] then
+        begin
+          LeerPropiedadesDeTimbre;
+        end;
+      end;
+
+      // Indicamos que el comprobante XML ya fue "llenado"
+      fComprobanteLleno := True;
+
+      // Asignamos el sello que trae el XML
+      fSelloDigitalCalculado := Sello;
+
+      // Ahora hacemos que se calcule la cadena original de nuevo
+      fCadenaOriginalCalculada := getCadenaOriginal;
+
+      // Indicamos que la factura ya fue generada
+      FacturaGenerada := True;
+        end;
+  except
+    On E:Exception do
+      Raise Exception.Create(E.Message);
+  end;
 end;
 
 // Regresa el XML final del comprobante ya lleno
