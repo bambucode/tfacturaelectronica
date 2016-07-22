@@ -246,18 +246,20 @@ end;
 class function TFEReglamentacion.ObtenerCatalogoMetodosPago() :TStringList;
 begin
   Result := TStringList.Create;
-  Result.Values['EFECTIVO']             := '01';
-  Result.Values['CHEQUE']               := '02';
-  Result.Values['TRANSFERENCIA']        := '03';
-  Result.Values['TARJETA DE CREDITO']   := '04';
-  Result.Values['MONEDERO']             := '05';
-  Result.Values['DINERO ELECTRONICO']   := '06';
-  Result.Values['VALES']                := '08';
-  Result.Values['TARJETA DE DEBITO']    := '28';
-  Result.Values['TARJETA DE SERVICIO']  := '29';
-  Result.Values['OTROS']                := '99';
-  Result.Values['NO IDENTIFICADO']      := 'NA';
-  Result.Values['NA']                   := 'NA';
+  Result.Values['EFECTIVO']                   := '01';
+  Result.Values['CHEQUE']                     := '02';
+  Result.Values['TRANSFERENCIA']              := '03';
+  Result.Values['TRANSFERENCIA ELECTRONICA']  := '03';
+  Result.Values['TARJETA DE CREDITO']         := '04';
+  Result.Values['MONEDERO']                   := '05';
+  Result.Values['DINERO ELECTRONICO']         := '06';
+  Result.Values['VALES']                      := '08';
+  Result.Values['TARJETA DE DEBITO']          := '28';
+  Result.Values['TARJETA DE SERVICIO']        := '29';
+  Result.Values['OTROS']                      := '99';
+  Result.Values['NO IDENTIFICADO']            := 'NA';
+  Result.Values['NA']                         := 'NA';
+  Result.Values['NO APLICA']                  := 'NA';
 end;
 
 
