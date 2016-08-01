@@ -108,7 +108,6 @@
         <DCCReference Include="..\CadenaOriginal.pas"/>
         <DCCReference Include="..\CFD\FeCFDv22.pas"/>
         <DCCReference Include="..\CFD\FeCFDv32.pas"/>
-        <DCCReference Include="TestInformeMensual.pas"/>
         <DCCReference Include="TestClaseOpenSSL.pas"/>
         <DCCReference Include="TestComprobanteFiscalv22.pas"/>
         <DCCReference Include="..\ComprobanteFiscal.pas"/>
@@ -117,7 +116,6 @@
         <DCCReference Include="..\FacturacionHashes.pas"/>
         <DCCReference Include="..\CFD\FeTimbreFiscalDigital.pas"/>
         <DCCReference Include="..\CadenaOriginalTimbre.pas"/>
-        <DCCReference Include="..\InformeMensual.pas"/>
         <DCCReference Include="..\ClaseCertificadoSellos.pas"/>
         <DCCReference Include="TestCertificadoSellos.pas"/>
         <BuildConfiguration Include="Debug">
