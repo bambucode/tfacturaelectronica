@@ -156,15 +156,18 @@ begin
       Certificado.LlavePrivada.Clave:='12345678a';
 
       // 5. Creamos la clase Factura con los parametros minimos.
-      WriteLn('Generando factura CFD ...');
+      WriteLn('Generando factura CFDI ...');
       Factura:=TFacturaElectronica.Create(Emisor, Receptor, Certificado, tcIngreso);
 
       //Factura.AutoAsignarFechaGeneracion := False;
       //Factura.FechaGeneracion := EncodeDateTime(2012, 05, 12, 19, 47, 22, 0);
       //Factura.OnComprobanteGenerado:=onComprobanteGenerado;
 
-      Factura.MetodoDePago:='Efectivo';
-      //Factura.NumeroDeCuenta:='1234';
+      // Asignamos el método de pago, de momento funciona con la cadena "Efectivo"
+      // o el numero de catálogo.
+      //Factura.MetodoDePago:='Efectivo';
+      Factura.MetodoDePago := '04';
+      Factura.NumeroDeCuenta:='1234';
 
       // Asignamos el lugar de expedición (requerido en  CFD >= 2.2)
       Factura.LugarDeExpedicion:='Queretaro, Qro';
