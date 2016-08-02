@@ -58,7 +58,6 @@ uses
   CadenaOriginal in '..\CadenaOriginal.pas',
   FeCFDv22 in '..\CFD\FeCFDv22.pas',
   FeCFDv32 in '..\CFD\FeCFDv32.pas',
-  TestInformeMensual in 'TestInformeMensual.pas',
   TestClaseOpenSSL in 'TestClaseOpenSSL.pas',
   TestComprobanteFiscalv22 in 'TestComprobanteFiscalv22.pas',
   ComprobanteFiscal in '..\ComprobanteFiscal.pas',
@@ -67,7 +66,6 @@ uses
   FacturacionHashes in '..\FacturacionHashes.pas',
   FeTimbreFiscalDigital in '..\CFD\FeTimbreFiscalDigital.pas',
   CadenaOriginalTimbre in '..\CadenaOriginalTimbre.pas',
-  InformeMensual in '..\InformeMensual.pas',
   ClaseCertificadoSellos in '..\ClaseCertificadoSellos.pas',
   TestCertificadoSellos in 'TestCertificadoSellos.pas';
 
