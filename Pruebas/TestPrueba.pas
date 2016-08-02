@@ -46,12 +46,18 @@ implementation
 
 uses
   Windows, SysUtils, Classes, Forms,
+  Math,
   ShellApi;
 
 procedure TTestPrueba.SetUp;
 begin
    inherited;
-   fDirTemporal:=GetEnvironmentVariable('TEMP') + '\';
+   Randomize;
+
+   fDirTemporal:=GetEnvironmentVariable('TEMP') + '\' + IntToStr(RandomRange(1111,9999)) + '\';
+   if Not DirectoryExists(fDirTemporal) then
+    CreateDir(fDirTemporal);
+
    fRutaEXE := ExtractFilePath(Application.ExeName);
    fOpenSSL := ExtractFilePath(Application.ExeName) + 'openssl.exe';
 
