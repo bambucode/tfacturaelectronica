@@ -245,6 +245,7 @@ end;
 
 class function TFEReglamentacion.ObtenerCatalogoMetodosPago() :TStringList;
 begin
+  // Ref: http://www.sat.gob.mx/fichas_tematicas/buzon_tributario/Documents/catalogo_metodos_pago.pdf
   Result := TStringList.Create;
   Result.Values['EFECTIVO']                   := '01';
   Result.Values['CHEQUE']                     := '02';
@@ -256,10 +257,9 @@ begin
   Result.Values['VALES']                      := '08';
   Result.Values['TARJETA DE DEBITO']          := '28';
   Result.Values['TARJETA DE SERVICIO']        := '29';
+  Result.Values['NA']                         := '98';
   Result.Values['OTROS']                      := '99';
   Result.Values['NO IDENTIFICADO']            := 'NA';
-  Result.Values['NA']                         := 'NA';
-  Result.Values['NO APLICA']                  := 'NA';
 end;
 
 
