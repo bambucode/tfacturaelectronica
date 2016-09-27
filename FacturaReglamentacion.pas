@@ -25,7 +25,7 @@ type
       class procedure ReemplazarComaSiActuaComoPuntoDecimal(var aCadenaCatidad:
           String);
       class procedure RegresarConfiguracionRegionalLocal;
-      class function ObtenerCatalogoMetodosPago() : TStringList;
+      class function ObtenerCatalogoMetodosPago: TStringList;
   public
       /// <summary>Convierte el valor de moneda al formato de dinero requerido por el SAT
       /// </summary>
@@ -243,7 +243,7 @@ begin
    end;
 end;
 
-class function TFEReglamentacion.ObtenerCatalogoMetodosPago() :TStringList;
+class function TFEReglamentacion.ObtenerCatalogoMetodosPago: TStringList;
 begin
   // Ref: http://www.sat.gob.mx/fichas_tematicas/buzon_tributario/Documents/catalogo_metodos_pago.pdf
   Result := TStringList.Create;
@@ -253,13 +253,15 @@ begin
   Result.Values['TRANSFERENCIA ELECTRONICA']  := '03';
   Result.Values['TARJETA DE CREDITO']         := '04';
   Result.Values['MONEDERO']                   := '05';
+  Result.Values['MONEDEROS ELECTRONICOS']     := '05'; // Se agregan varias veces el mismo numero por si el cliente lo especifica de manera manual, se agregue el codigo del metodo correctamente en el xml
   Result.Values['DINERO ELECTRONICO']         := '06';
   Result.Values['VALES']                      := '08';
+  Result.Values['VALES DE DESPENSA']          := '08';
   Result.Values['TARJETA DE DEBITO']          := '28';
   Result.Values['TARJETA DE SERVICIO']        := '29';
-  Result.Values['NA']                         := '98';
   Result.Values['OTROS']                      := '99';
-  Result.Values['NO IDENTIFICADO']            := 'NA';
+  Result.Values['NA']                         := 'NA';
+  Result.Values['NO APLICA']                  := 'NA';
 end;
 
 
@@ -269,7 +271,7 @@ var
    I : Integer;
 begin
    try
-      catalogoMetodosDePago := TFEReglamentacion.ObtenerCatalogoMetodosPago();
+      catalogoMetodosDePago := TFEReglamentacion.ObtenerCatalogoMetodosPago;
       for I := 0 to catalogoMetodosDePago.Count - 1 do
       begin
         if catalogoMetodosDePago.ValueFromIndex[I] = aNumeroMetodoDePago then
@@ -304,7 +306,7 @@ begin
   cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'ú', 'U', [rfReplaceAll]);
 
   try
-    catalogoMetodosDePago := TFEReglamentacion.ObtenerCatalogoMetodosPago();
+    catalogoMetodosDePago := TFEReglamentacion.ObtenerCatalogoMetodosPago;
 
     // Reemplazamos nombres en plural/singular por singular
     cadenaSinAcentos := StringReplace(cadenaSinAcentos, 'TARJETAS', 'TARJETA', [rfReplaceAll, rfIgnoreCase]);
