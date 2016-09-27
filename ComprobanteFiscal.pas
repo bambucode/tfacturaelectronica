@@ -218,6 +218,7 @@ uses FacturaReglamentacion, ClaseOpenSSL, StrUtils, SelloDigital,
   {$IFDEF DEBUG} Dialogs, {$ENDIF}
   FETimbreFiscalDigital,
   FEImpuestosLocales,
+  System.RegularExpressions,
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
@@ -1172,36 +1173,69 @@ function TFEComprobanteFiscal.ConvertirCadenaMetodoPagoaNumero(const
 var
   cadenaMetodoDePago: String;
   numeroCatalogoMetodoPago: Integer;
+
+  // Ref: http://stackoverflow.com/questions/8823292/delphi-extract-numbers-from-string
+  function ExtraerSoloDigitos(const aCadena: string): String;
+  var
+    i: Integer;
+    match   : TMatch;
+    matches : TMatchCollection;
+    regex   : TRegEx;
+  begin
+    Result  := '';
+    i       := 0;
+    regex   := TRegEx.Create('[0-9]*\' + FormatSettings.DecimalSeparator + '?[0-9]*');
+    matches := regex.Matches(aCadena);
+    if matches.Count > 0 then
+    begin
+      for match in matches do
+      begin
+        Result := Result + match.Value;
+        Inc(i);
+      end;
+    end;
+  end;
 begin
   cadenaMetodoDePago := Trim(aCadenaMetodoPago);
 
   // ¿El usuario especifico un numero de catalogo? Lo "pasamos" directo
   if TryStrToInt(cadenaMetodoDePago, numeroCatalogoMetodoPago) then
   begin
-   {$IFDEF CODESITE}
+    {$IFDEF CODESITE}
       CodeSite.Send('Usando código de método de pago definido por usuario', numeroCatalogoMetodoPago);
-   {$ENDIF}
+    {$ENDIF}
 
-   Result := IntToStr(numeroCatalogoMetodoPago);
+    Result := IntToStr(numeroCatalogoMetodoPago);
 
-   // Si el método de pago es menor a 10, asignamos un 0 al principio, ya que el SAT maneja "01", en lugar de solo "1"
-   if numeroCatalogoMetodoPago < 10 then
-     Result := '0' + Result;
+    // Si el método de pago es menor a 10, asignamos un 0 al principio, ya que el SAT maneja "01", en lugar de solo "1"
+    if numeroCatalogoMetodoPago < 10 then
+      Result := '0' + Result;
   end else
   begin
-   {$IFDEF CODESITE}
-     CodeSite.Send('Intentando obtener número de método de pago: ' + cadenaMetodoDePago);
-   {$ENDIF}
-   // Si fue una cadena, tratamos de convertirla al catálogo oficial
-   Result := TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(cadenaMetodoDePago);
-   {$IFDEF CODESITE}
-     CodeSite.Send('Numero de método de pago', Result);
-   {$ENDIF}
+    {$IFDEF CODESITE}
+    CodeSite.Send('Intentando obtener número de método de pago: ' + cadenaMetodoDePago);
+    {$ENDIF}
+    // Si fue una cadena, tratamos de convertirla al catálogo oficial
+    Result := TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(cadenaMetodoDePago);
 
-   // Si regreso cadena vacia es que no encontró una equivalencia de la cadena al numero de catalogo en el SAT
-   if (Result = '') then
-    raise EFECadenaMetodoDePagoNoEnCatalogoException.Create('La cadena "' + inherited MetodoDePago +
-                                                            '" no está en el catálogo de métodos de pago del SAT. Favor de verificar');
+    // Intentamos extraer el numero de la cadena proporcionada
+    if Result = '' then
+    begin
+      {$IFDEF CODESITE}
+      CodeSite.Send('El cliente especifico un método de pago manual y se obtuvo un numero de método de pago a partir de esa cadena', Result);
+      {$ENDIF}
+
+      Result := ExtraerSoloDigitos(cadenaMetodoDePago);
+    end;
+
+    {$IFDEF CODESITE}
+    CodeSite.Send('Numero de método de pago', Result);
+    {$ENDIF}
+
+    // Si regreso cadena vacia es que no encontró una equivalencia de la cadena al numero de catalogo en el SAT
+    if (Result = '') then
+     raise EFECadenaMetodoDePagoNoEnCatalogoException.Create('La cadena "' + inherited MetodoDePago +
+                                                             '" no está en el catálogo de métodos de pago del SAT. Favor de verificar');
   end;
 end;
 
