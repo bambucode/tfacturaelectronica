@@ -267,22 +267,19 @@ end;
 
 class function TFEReglamentacion.ConvertirNumeroMetodoDePagoACadena(const aNumeroMetodoDePago: string): String;
 var
-   catalogoMetodosDePago: TStringList;
-   I : Integer;
+  catalogoMetodosDePago: TStringList;
+  I : Integer;
 begin
-   try
-      catalogoMetodosDePago := TFEReglamentacion.ObtenerCatalogoMetodosPago;
-      for I := 0 to catalogoMetodosDePago.Count - 1 do
-      begin
-        if catalogoMetodosDePago.ValueFromIndex[I] = aNumeroMetodoDePago then
-          Result := catalogoMetodosDePago.Names[I];
-      end;
-
-      if Result = '' then
-        Result := _CADENA_NO_IDENTIFICADO;
-   finally
-      catalogoMetodosDePago.Free;
-   end;
+  try
+    catalogoMetodosDePago := TFEReglamentacion.ObtenerCatalogoMetodosPago;
+    for I := 0 to catalogoMetodosDePago.Count - 1 do
+    begin
+      if catalogoMetodosDePago.ValueFromIndex[I] = aNumeroMetodoDePago then
+        Result := catalogoMetodosDePago.Names[I];
+    end;
+  finally
+    catalogoMetodosDePago.Free;
+  end;
 end;
 
 class function TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(
