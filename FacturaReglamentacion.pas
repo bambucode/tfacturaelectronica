@@ -26,6 +26,8 @@ type
           String);
       class procedure RegresarConfiguracionRegionalLocal;
       class function ObtenerCatalogoMetodosPago: TStringList;
+      class function ObtenerCadenaDeCatalogo(const aCatalogo : TStringList;
+          const aCadenaABuscar : string): string;
   public
       /// <summary>Convierte el valor de moneda al formato de dinero requerido por el SAT
       /// </summary>
@@ -260,26 +262,60 @@ begin
   Result.Values['TARJETA DE DEBITO']          := '28';
   Result.Values['TARJETA DE SERVICIO']        := '29';
   Result.Values['OTROS']                      := '99';
-  Result.Values['NA']                         := 'NA';
   Result.Values['NO APLICA']                  := 'NA';
+  Result.Values['NA']                         := 'NA';
 end;
-
 
 class function TFEReglamentacion.ConvertirNumeroMetodoDePagoACadena(const aNumeroMetodoDePago: string): String;
 var
+  auxRespuesta : string;
+  auxArrayMetodos  : TArray<string>;
   catalogoMetodosDePago: TStringList;
   I : Integer;
 begin
+  auxRespuesta := '';
   try
     catalogoMetodosDePago := TFEReglamentacion.ObtenerCatalogoMetodosPago;
-    for I := 0 to catalogoMetodosDePago.Count - 1 do
+    if (AnsiPos(',', aNumeroMetodoDePago) > 0) then
     begin
-      if catalogoMetodosDePago.ValueFromIndex[I] = aNumeroMetodoDePago then
-        Result := catalogoMetodosDePago.Names[I];
-    end;
+      auxArrayMetodos := aNumeroMetodoDePago.Split([',']);
+      for I := 0 to (Length(auxArrayMetodos) - 1 )  do
+      begin
+        auxRespuesta := auxRespuesta + ObtenerCadenaDeCatalogo(catalogoMetodosDePago, auxArrayMetodos[I]) + ', ';
+      end;
+
+      // Borramos la ultima coma
+      if Length(auxRespuesta) >= 2 then
+         Delete(auxRespuesta,Length(auxRespuesta)-1,2);
+    end else
+      auxRespuesta := ObtenerCadenaDeCatalogo(catalogoMetodosDePago, aNumeroMetodoDePago);
+
+    auxRespuesta := aNumeroMetodoDePago + ' - ' + auxRespuesta;
+
   finally
     catalogoMetodosDePago.Free;
   end;
+  Result := auxRespuesta;
+end;
+
+class function TFEReglamentacion.ObtenerCadenaDeCatalogo(const aCatalogo : TStringList;
+  const aCadenaABuscar : string): string;
+var
+  i : Integer;
+  auxRespuesta : string;
+begin
+  // En caso de que no se encuentre la cadena, se utilizará la cadena original
+  auxRespuesta := aCadenaABuscar;
+  for I := 0 to aCatalogo.Count - 1 do
+  begin
+    if aCatalogo.ValueFromIndex[I] = aCadenaABuscar then
+    begin
+      auxRespuesta := aCatalogo.Names[I];
+      break;
+    end;
+  end;
+
+  Result := auxRespuesta;
 end;
 
 class function TFEReglamentacion.ConvertirCadenaMetodoDePagoANumeroCatalogo(
