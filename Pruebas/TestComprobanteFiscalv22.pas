@@ -657,7 +657,7 @@ begin
     CodigoPostal := '31000';
     Colonia := 'Col. Roma Norte';
     Municipio := 'Cuauhtémoc';
-    Estado := 'Distrito Federal';
+    Estado := 'Ciudad de México';
     Pais := 'México';
     Localidad := '';
     Referencia := '';
