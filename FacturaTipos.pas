@@ -256,25 +256,24 @@ end;
 ///	  PAC no fue válido.
 ///	</summary>
 {$ENDREGION}
-ETimbradoXMLInvalidoException = class(EPACException);
-ETimbradoImpuestoInvalidoException = class(EPACException); // Error 301 cuando un impuesto tiene un nombre no admitido
+ETimbradoXMLInvalidoException       = class(EPACException);
+ETimbradoImpuestoInvalidoException  = class(EPACException); // Error 301 cuando un impuesto tiene un nombre no admitido
 {$REGION 'Documentation'}
 ///	<summary>
 ///	  Error estándard del SAT (302) cuando el sello del comprobante no se
 ///	  generó correctamente por algún error en el comprobante o el cálculo del
 ///	  sello.
 ///	</summary>
-{$ENDREGION}
-ETimbradoSelloEmisorInvalidoException = class(EPACException); // Error 302
-ETimbradoCertificadoNoCorrespondeException = class(EPACException); // Error 303
-ETimbradoCertificadoRevocadoException = class(EPACException); // Error 304
-ETimbradoFechaEmisionSinVigenciaException = class(EPACException); // Error 305
-ETimbradoLlaveInvalidaException = class(EPACException); // Error 306
-ETimbradoPreviamenteException = class(EPACException); // Error 307
-ETimbradoCertificadoApocrifoException = class(EPACException); // Error 308
+ETimbradoSelloEmisorInvalidoException         = class(EPACException); // Error 302
+ETimbradoCertificadoNoCorrespondeException    = class(EPACException); // Error 303
+ETimbradoCertificadoRevocadoException         = class(EPACException); // Error 304
+ETimbradoFechaEmisionSinVigenciaException     = class(EPACException); // Error 305
+ETimbradoLlaveInvalidaException               = class(EPACException); // Error 306
+ETimbradoPreviamenteException                 = class(EPACException); // Error 307
+ETimbradoCertificadoApocrifoException         = class(EPACException); // Error 308
 ETimbradoFechaGeneracionMasDe72HorasException = class(EPACException); // Error 401
-ETimbradoRegimenEmisorNoValidoException = class(EPACException); // Error 402
-ETimbradoFechaEnElPasadoException = class(EPACException); // Error 403
+ETimbradoRegimenEmisorNoValidoException       = class(EPACException); // Error 402
+ETimbradoFechaEnElPasadoException             = class(EPACException); // Error 403
 
 
 // Excepciones comunes para todos los PAC
@@ -284,15 +283,16 @@ ETimbradoFechaEnElPasadoException = class(EPACException); // Error 403
 ///	  temporalmente fuera de servicio
 ///	</summary>
 {$ENDREGION}
-EPACServicioNoDisponibleException = class(EPACException);
-EPACCredencialesIncorrectasException = class(EPACException);
-EPACEmisorNoInscritoException = class(EPACException);
-EPACErrorGenericoDeAccesoException = class(EPACException);
-EPACTimbradoRFCNoCorrespondeException = class(EPACException);
+EPACServicioNoDisponibleException             = class(EPACException);
+EPACCredencialesIncorrectasException          = class(EPACException);
+EPACEmisorNoInscritoException                 = class(EPACException);
+EPACErrorGenericoDeAccesoException            = class(EPACException);
+EPACTimbradoRFCNoCorrespondeException         = class(EPACException);
 EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
-EPACTimbradoSinFoliosDisponiblesException = class(EPACException);
-EPACCAnceladoSinCertificadosException = class(EPACException);
-EPACNoSePudoObtenerAcuseException = class(EPACException);
+EPACTimbradoSinFoliosDisponiblesException     = class(EPACException);
+EPACAcuseDeCancelacionNoEncontradoException   = class(EPACException);
+EPACCAnceladoSinCertificadosException         = class(EPACException);
+EPACNoSePudoObtenerAcuseException             = class(EPACException);
 
 {$REGION 'Documentation'}
 ///	<summary>

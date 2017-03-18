@@ -252,28 +252,33 @@ var
   mensajeExcepcion: string;
 const
   // Cadena del error: "no existen Folios disponibles para el contribuyente"
-  _ECODEX_SIN_FOLIOS_DISPONIBLES = '(800)';
-
-  _ECODEX_FUERA_DE_SERVICIO = '(22)';
-  _ERROR_ECODEX_PREVIAMENTE_TIMBRADO = '(96)';
-  _ECODEX_ALTA_EMISOR_CORREO_USADO = '(97)';
-  _ECODEX_ALTA_EMISOR_REPETIDO = '(98)';
-  _ECODEX_SIN_CERTIFICADOS_PARA_CANCELAR = '(29)';
+  _ECODEX_SIN_FOLIOS_DISPONIBLES          = '(800)';
+  _ECODEX_FUERA_DE_SERVICIO               = '(22)';
+  _ERROR_ECODEX_PREVIAMENTE_TIMBRADO      = '(96)';
+  _ECODEX_ACUSE_NO_ENCONTRADO             = 'Acuse de cancelacion del documento no encontrado';
+  _ECODEX_ALTA_EMISOR_CORREO_USADO        = '(97)';
+  _ECODEX_ALTA_EMISOR_REPETIDO            = '(98)';
+  _ECODEX_SIN_CERTIFICADOS_PARA_CANCELAR  = '(29)';
   // El rfc del Documento no corresponde al del encabezado.
-  _ECODEX_RFC_NO_CORRESPONDE = '(500)';
-  _ECODEX_ALTA_EMISOR_RFC_INVALIDO = '(890)';
-  _ECODEX_ALTA_EMISOR_CORREO_INVALIDO = '(891)';
-  _ECODEX_SERVICIO_NO_DISPONIBLE = 'Servicio no disponible';
-  _ECODEX_VERSION_NO_SOPORTADA = 'El driver no soporta esta version de cfdi';
-  _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
-  _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
-  _ERROR_IMPUESTO_INVALIDO = 'impuesto had invalid value';
+  _ECODEX_RFC_NO_CORRESPONDE              = '(500)';
+  _ECODEX_ALTA_EMISOR_RFC_INVALIDO        = '(890)';
+  _ECODEX_ALTA_EMISOR_CORREO_INVALIDO     = '(891)';
+  _ECODEX_SERVICIO_NO_DISPONIBLE          = 'Servicio no disponible';
+  _ECODEX_VERSION_NO_SOPORTADA            = 'El driver no soporta esta version de cfdi';
+  _CADENA_ERROR_DNS_ESPANOL               = 'resolver el nombre de servidor';
+  _CADENA_ERROR_DNS_INGLES                = 'address could not be resolved';
+  _ERROR_IMPUESTO_INVALIDO                = 'impuesto had invalid value';
   _ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA = 'El emisor ya se encuentra dado de alta con un integrador';
-  _ECODEX_ERROR_OBTENIENDO_ACUSE = 33;
+  _ECODEX_ERROR_OBTENIENDO_ACUSE          = 33;
   _NO_ENCONTRADO = 0;
 begin
   mensajeExcepcion := aExcepcion.Message;
 
+  if (mensajeExcepcion.Contains(_ECODEX_ACUSE_NO_ENCONTRADO)) then
+  begin
+    raise EPACAcuseDeCancelacionNoEncontradoException.Create(mensajeExcepcion, 0, 0, False);
+  end;
+  
   if (aExcepcion Is EEcodexFallaValidacionException) Or
      (aExcepcion Is EEcodexFallaServicioException) Or
      (aExcepcion is EEcodexFallaSesionException) then
