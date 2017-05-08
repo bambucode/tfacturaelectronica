@@ -936,7 +936,7 @@ implementation
 
 function GetComprobanteFiscalV33(Doc: IXMLDocument): IComprobanteFiscalV33;
 begin
-  Result := Doc.GetDocBinding('Comprobante', TComprobanteFiscalV33, TargetNamespace) as IComprobanteFiscalV33;
+  Result := Doc.GetDocBinding('cfdi:Comprobante', TComprobanteFiscalV33, TargetNamespace) as IComprobanteFiscalV33;
 end;
 
 function LoadComprobante(const FileName: string): IComprobanteFiscalV33;
