@@ -1202,7 +1202,7 @@ end;
 procedure TComprobanteFiscalV33_CfdiRelacionados.AfterConstruction;
 begin
   RegisterChildNode('CfdiRelacionado', TComprobanteFiscalV33_CfdiRelacionados_CfdiRelacionado);
-  ItemTag := 'CfdiRelacionado';
+  ItemTag := 'cfdi:CfdiRelacionado';
   ItemInterface := IComprobanteFiscalV33_CfdiRelacionados_CfdiRelacionado;
   inherited;
 end;
@@ -1333,7 +1333,7 @@ end;
 procedure TComprobanteFiscalV33_Conceptos.AfterConstruction;
 begin
   RegisterChildNode('Concepto', TComprobanteFiscalV33_Conceptos_Concepto);
-  ItemTag := 'Concepto';
+  ItemTag := 'cfdi:Concepto';
   ItemInterface := IComprobanteFiscalV33_Conceptos_Concepto;
   inherited;
 end;
@@ -1506,7 +1506,7 @@ end;
 procedure TComprobanteFiscalV33_Conceptos_Concepto_Impuestos_Traslados.AfterConstruction;
 begin
   RegisterChildNode('Traslado', TComprobanteFiscalV33_Conceptos_Concepto_Impuestos_Traslados_Traslado);
-  ItemTag := 'Traslado';
+  ItemTag := 'cfdi:Traslado';
   ItemInterface := IComprobanteFiscalV33_Conceptos_Concepto_Impuestos_Traslados_Traslado;
   inherited;
 end;
@@ -1583,7 +1583,7 @@ end;
 procedure TComprobanteFiscalV33_Conceptos_Concepto_Impuestos_Retenciones.AfterConstruction;
 begin
   RegisterChildNode('Retencion', TComprobanteFiscalV33_Conceptos_Concepto_Impuestos_Retenciones_Retencion);
-  ItemTag := 'Retencion';
+  ItemTag := 'cfdi:Retencion';
   ItemInterface := IComprobanteFiscalV33_Conceptos_Concepto_Impuestos_Retenciones_Retencion;
   inherited;
 end;
@@ -1703,7 +1703,7 @@ end;
 procedure TComprobanteFiscalV33_Conceptos_Concepto_Parte.AfterConstruction;
 begin
   RegisterChildNode('InformacionAduanera', TComprobanteFiscalV33_Conceptos_Concepto_Parte_InformacionAduanera);
-  ItemTag := 'InformacionAduanera';
+  ItemTag := 'cfdi:InformacionAduanera';
   ItemInterface := IComprobanteFiscalV33_Conceptos_Concepto_Parte_InformacionAduanera;
   inherited;
 end;
@@ -1866,7 +1866,7 @@ end;
 procedure TComprobanteFiscalV33_Impuestos_Retenciones.AfterConstruction;
 begin
   RegisterChildNode('Retencion', TComprobanteFiscalV33_Impuestos_Retenciones_Retencion);
-  ItemTag := 'Retencion';
+  ItemTag := 'cfdi:Retencion';
   ItemInterface := IComprobanteFiscalV33_Impuestos_Retenciones_Retencion;
   inherited;
 end;
@@ -1913,7 +1913,7 @@ end;
 procedure TComprobanteFiscalV33_Impuestos_Traslados.AfterConstruction;
 begin
   RegisterChildNode('Traslado', TComprobanteFiscalV33_Impuestos_Traslados_Traslado);
-  ItemTag := 'Traslado';
+  ItemTag := 'cfdi:Traslado';
   ItemInterface := IComprobanteFiscalV33_Impuestos_Traslados_Traslado;
   inherited;
 end;
