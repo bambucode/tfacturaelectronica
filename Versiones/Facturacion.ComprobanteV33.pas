@@ -969,6 +969,8 @@ begin
   RegisterChildNode('Impuestos', TComprobanteFiscalV33_Impuestos);
   RegisterChildNode('Complemento', TComprobanteFiscalV33_Complemento);
   RegisterChildNode('Addenda', TComprobanteFiscalV33_Addenda);
+
+  establecerAtributosDeCFDI(Self);
   inherited;
 end;
 
