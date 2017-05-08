@@ -923,7 +923,7 @@ type
 
 { Global Functions }
 
-function GetComprobante(Doc: IXMLDocument): IComprobanteFiscalV33;
+function GetComprobanteFiscalV33(Doc: IXMLDocument): IComprobanteFiscalV33;
 function LoadComprobante(const FileName: string): IComprobanteFiscalV33;
 function NewComprobante: IComprobanteFiscalV33;
 
@@ -934,7 +934,7 @@ implementation
 
 { Global Functions }
 
-function GetComprobante(Doc: IXMLDocument): IComprobanteFiscalV33;
+function GetComprobanteFiscalV33(Doc: IXMLDocument): IComprobanteFiscalV33;
 begin
   Result := Doc.GetDocBinding('Comprobante', TComprobanteFiscalV33, TargetNamespace) as IComprobanteFiscalV33;
 end;
