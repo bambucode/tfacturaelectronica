@@ -935,6 +935,13 @@ implementation
 
 { Global Functions }
 
+procedure establecerAtributosDeCFDI(comprobante: IComprobanteFiscalV33);
+begin
+  comprobante.SetAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+  comprobante.SetAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd');
+  comprobante.Version := '3.3';
+end;
+
 function GetComprobanteFiscalV33(Doc: IXMLDocument): IComprobanteFiscalV33;
 begin
   Result := Doc.GetDocBinding('cfdi:Comprobante', TComprobanteFiscalV33, TargetNamespace) as IComprobanteFiscalV33;
