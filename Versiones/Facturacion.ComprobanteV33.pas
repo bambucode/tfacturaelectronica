@@ -934,10 +934,17 @@ const
 
 implementation
 
+uses System.SysUtils;
+
 { Global Functions }
 
 procedure establecerAtributosDeCFDI(comprobante: IComprobanteFiscalV33);
+var
+  documentoBase: IXMLDocument;
 begin
+  // Agregamos la auto identacion
+  comprobante.OwnerDocument.Options := [doNodeAutoCreate, doAttrNull, doAutoPrefix, doNamespaceDecl, doNodeAutoIndent];
+
   comprobante.SetAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
   comprobante.SetAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd');
   comprobante.Version := '3.3';
@@ -951,12 +958,12 @@ end;
 function LoadComprobanteFiscalV33(const FileName: string):
     IComprobanteFiscalV33;
 begin
-  Result := LoadXMLDocument(FileName).GetDocBinding('Comprobante', TComprobanteFiscalV33, TargetNamespace) as IComprobanteFiscalV33;
+  Result := LoadXMLDocument(FileName).GetDocBinding('cfdi:Comprobante', TComprobanteFiscalV33, TargetNamespace) as IComprobanteFiscalV33;
 end;
 
 function NewComprobanteFiscalV33: IComprobanteFiscalV33;
 begin
-  Result := NewXMLDocument.GetDocBinding('Comprobante', TComprobanteFiscalV33, TargetNamespace) as IComprobanteFiscalV33;
+  Result := NewXMLDocument.GetDocBinding('cfdi:Comprobante', TComprobanteFiscalV33, TargetNamespace) as IComprobanteFiscalV33;
 end;
 
 { TComprobanteFiscalV33 }
