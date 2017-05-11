@@ -590,6 +590,7 @@ type
     procedure Set_Confirmacion(Value: UnicodeString);
   public
     procedure AfterConstruction; override;
+    procedure AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
   end;
 
 { TComprobanteFiscalV33_CfdiRelacionados }
@@ -950,6 +951,27 @@ begin
   comprobante.Version := '3.3';
 end;
 
+procedure TComprobanteFiscalV33.AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
+var
+  timbreConXSI : string;
+  documentoXMLTimbre : IXMLDocument;
+begin
+  timbreConXSI := aXMLTimbre;
+
+  // Si queremos leer el nodo de forma independiente tenemos que anexar la defincion del XSI:
+  // xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" para que funcione
+  // de lo contrario se lanzará una excepcion de DOM por que el namespace XSI no se encuentra definido
+  timbreConXSI := StringReplace(timbreConXSI, 'TimbreFiscalDigital"',
+                                              'TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+                                              [rfReplaceAll]);
+
+  // Creamos el XMLDocument desde el XML del timbre
+  documentoXMLTimbre := LoadXMLData(Trim(timbreConXSI));
+
+  // Agregamos el nodo del TimbreFiscalDigital al nodo Complemento del comprobante
+  Get_Complemento.ChildNodes.Add(documentoXMLTimbre.DocumentElement);
+end;
+
 function GetComprobanteFiscalV33(Doc: IXMLDocument): IComprobanteFiscalV33;
 begin
   Result := Doc.GetDocBinding('cfdi:Comprobante', TComprobanteFiscalV33, TargetNamespace) as IComprobanteFiscalV33;
@@ -979,6 +1001,7 @@ begin
   RegisterChildNode('Addenda', TComprobanteFiscalV33_Addenda);
 
   establecerAtributosDeCFDI(Self);
+
   inherited;
 end;
 
