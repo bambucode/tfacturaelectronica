@@ -1,4 +1,4 @@
-﻿TFACTURACIONELECTRONICA v2.0
+TFACTURACIONELECTRONICA v2.0
 --------------------------------------
 Esta es una librería que sirve para generar una factura electrónica (CFDI) de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
@@ -32,13 +32,20 @@ Proveedores Autorizados de Certificación (PAC) Soportados por v2.0
 
 Documentación Técnica
 -------------
-A partir de la v2.0 de la librería, se ha documentado de forma extensiva el proyecto, la estructura, su funcionamiento, etc. por lo que puedes comenzar leyendo:
+A partir de la v2.0 de la librería, se ha documentado de forma extensiva el proyecto, la estructura, su funcionamiento, etc. para ello te invitamos a consultar <https://github.com/bambucode/tfacturaelectronica/wiki>
 
-* Cómo se estructura un CFDI
-* Pasos para generar un CFDI
-* Cómo implementar una nueva versión de CFDI
-* Cómo Generar el sello digital
-* Como timbrar el CFDI.
+¿Qué falta?
+-------------------
+A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
+
+- Lectura de CFDI 3.3
+- Generación de CBB con cambios para CFDI 3.3.
+- Pruebas de unidad
+- Soporte para generación/lectura de CFDI 3.2 (para fines de compatibilidad y migración)
+- Lanzar excepciones basado en el catálogo de errores de CFDI 3.3
+- Validaciones de campos basado en los múltiples catálogos publicados por el SAT.
+- Soporte para ediciones anteriores de Delphi 2007, 2010, etc.
+
 
 ¿Cómo puedo ayudar?
 -------------------
