@@ -36,8 +36,8 @@ type
   /// </summary>
   IAdministradorFacturas = Interface
     ['{F1F6F19F-E988-4F23-99D7-98935BEDEE6D}']
-    function GetOnCadenaOriginalGenerada: TOnCadenaOriginalGeneradaEvent; stdcall;
-    function GetOnSelloGenerado: TOnSelloGeneradoEvent; stdcall;
+    function GetOnCadenaOriginalGenerada: TOnCadenaOriginalGeneradaEvent;
+    function GetOnSelloGenerado: TOnSelloGeneradoEvent;
     /// <summary>
     ///   Se encarga de crear una nueva instancia del CFDI según el parámetro
     ///   versión especificado
@@ -82,8 +82,8 @@ type
     procedure GuardarArchivo(const aComprobante: IComprobanteFiscal;
                              const aArchivoDestino: TFileName);
     procedure SetOnCadenaOriginalGenerada(const Value:
-        TOnCadenaOriginalGeneradaEvent); stdcall;
-    procedure SetOnSelloGenerado(const Value: TOnSelloGeneradoEvent); stdcall;
+        TOnCadenaOriginalGeneradaEvent);
+    procedure SetOnSelloGenerado(const Value: TOnSelloGeneradoEvent);
     property OnSelloGenerado: TOnSelloGeneradoEvent read GetOnSelloGenerado write
         SetOnSelloGenerado;
     property OnCadenaOriginalGenerada: TOnCadenaOriginalGeneradaEvent read
