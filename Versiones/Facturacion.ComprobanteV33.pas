@@ -1,12 +1,13 @@
 
-{*******************************************************************************}
-{                                                                               }
-{                               XML Data Binding                                }
-{                                                                               }
-{         Generated on: 08/05/2017 09:58:32 a. m.                               }
-{       Generated from: http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd   }
-{                                                                               }
-{*******************************************************************************}
+{*******************************************************}
+{                                                       }
+{       TFacturaElectronica                             }
+{                                                       }
+{       Copyright (C) 2017 Bambu Code SA de CV          }
+{                                                       }
+{*******************************************************}
+{Generated from: http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd   }
+
 
 unit Facturacion.ComprobanteV33;
 
