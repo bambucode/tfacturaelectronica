@@ -1,17 +1,25 @@
+{*******************************************************}
+{                                                       }
+{       TFacturaElectronica                             }
+{                                                       }
+{       Copyright (C) 2017 Bambu Code SA de CV          }
+{                                                       }
+{*******************************************************}
+
 unit PAC.Ecodex.ManejadorDeSesion;
 
 interface
 
 uses EcodexWsSeguridad,
-     SysUtils,
-     FacturaTipos;
+     Facturacion.Comprobante,
+     SysUtils;
 
 type
 
   TEcodexManejadorDeSesion = class
   private
     fDominioWebService: String;
-    fCredenciales: TFEPACCredenciales;
+    fCredenciales: TFacturacionCredencialesPAC;
     wsSeguridad : IEcodexServicioSeguridad;
     fNumeroTransaccion: Int64;
     function GetNumeroDeTransaccion: Int64;
@@ -21,7 +29,7 @@ type
     constructor Create(const aDominioWebService: String; const
         aIdTransaccionInicial: Integer);
     procedure AfterConstruction; override;
-    procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
+    procedure AsignarCredenciales(const aCredenciales: TFacturacionCredencialesPAC);
     function ObtenerNuevoTokenAltaEmisores(const aRFC, aIdIntegrador,
         aIdAltaEmisores: String): String;
     function ObtenerNuevoTokenDeUsuario: String;
@@ -30,11 +38,9 @@ type
 
 implementation
 
-uses ManejadorDeErroresComunes,
-     {$IFDEF CODESITE}
-     CodeSiteLogging,
-     {$ENDIF}
-     FacturacionHashes;
+uses System.Hash,
+     Facturacion.ManejadorErroresComunesWebServices,
+     Facturacion.ProveedorAutorizadoCertificacion;
 
 constructor TEcodexManejadorDeSesion.Create(const aDominioWebService: String;
     const aIdTransaccionInicial: Integer);
@@ -51,7 +57,7 @@ begin
   wsSeguridad := GetWsEcodexSeguridad(False, fDominioWebService + '/ServicioSeguridad.svc');
 end;
 
-procedure TEcodexManejadorDeSesion.AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
+procedure TEcodexManejadorDeSesion.AsignarCredenciales(const aCredenciales: TFacturacionCredencialesPAC);
 begin
   Assert(aCredenciales.RFC <> '', 'El RFC de las credenciales estuvo vacío');
   Assert(aCredenciales.DistribuidorID <> '', 'El ID de Integrador estuvo vacío');
@@ -105,8 +111,7 @@ begin
 
      // El token de usuario será la combinacion del token de servicio y el ID del integrador
      // concatenados por un "pipe" codificados con el agoritmo SHA1
-     Result := TFacturacionHashing.CalcularHash(fCredenciales.DistribuidorID + '|' + tokenDeServicio,
-                                                haSHA1)
+     Result := THashSHA1.GetHashString(fCredenciales.DistribuidorID + '|' + tokenDeServicio);
   except
     On E:Exception do
       raise;
@@ -131,10 +136,9 @@ begin
      // - El ID de alta de emisores (en mayusculas forzosamente)
      // - El token de servicio
      // Todos concatenados con un pipe (|) y codificados con el agoritmo SHA1
-     Result := TFacturacionHashing.CalcularHash((aIdIntegrador) + '|' +
-                                                Uppercase(aIdAltaEmisores) + '|' +
-                                                tokenDeServicio,
-                                                haSHA1)
+     Result := THashSHA1.GetHashString(aIdIntegrador + '|' +
+                                       Uppercase(aIdAltaEmisores) + '|' +
+                                       tokenDeServicio);
   except
     On E:Exception do
       raise;
@@ -154,7 +158,7 @@ begin
   if AnsiPos(_ERROR_ECODEX_EMISOR_NO_INSCRITO, mensajeFalla) > _NO_ECONTRADO then
     raise EPACEmisorNoInscritoException.Create(mensajeFalla, 0, 0, False);
 
-  TManejadorErroresComunes.LanzarExcepcionSiDetectaFallaInternet(aExcepcion);
+  TManejadorErroresComunesHelper.LanzarExcepcionSiDetectaFallaInternet(aExcepcion);
 
   // Si llegamos aqui y no se proceso ningun otro error generamos un error genérico de credenciales
   raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + mensajeFalla, 0, 0, True);

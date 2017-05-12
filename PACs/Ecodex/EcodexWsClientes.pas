@@ -507,15 +507,11 @@ type
 
 function GetWsEcodexClientes(UseWSDL: Boolean=System.False; Addr: string='';
     HTTPRIO: THTTPRIO = nil): IEcodexServicioClientes;
-function GetUltimoXMLEnviadoEcodexWsClientes: string;
-function GetUltimoXMLRecibidoEcodexWsClientes: string;
 
 
 implementation
-  uses SysUtils, uWSHelper;
+  uses SysUtils;
 
-var
-  wsHelper: TWSHelper;
 
 function GetWsEcodexClientes(UseWSDL: Boolean=System.False; Addr: string='';
     HTTPRIO: THTTPRIO = nil): IEcodexServicioClientes;
@@ -540,8 +536,6 @@ begin
   else
     RIO := HTTPRIO;
 
-  RIO.OnBeforeExecute := wsHelper.BeforeExecute;
-  RIO.OnAfterExecute := wsHelper.AfterExecute;
   try
     Result := (RIO as IEcodexServicioClientes);
     if UseWSDL then
@@ -557,15 +551,6 @@ begin
   end;
 end;
 
-function GetUltimoXMLEnviadoEcodexWsClientes: string;
-begin
-  Result := wsHelper.UltimoXMLEnviado;
-end;
-
-function GetUltimoXMLRecibidoEcodexWsClientes: string;
-begin
-  Result := wsHelper.UltimoXMLRecibido;
-end;
 
 
 procedure TEcodexResultadoRegistroEmisor.SetRFC(Index: Integer; const Astring: string);
@@ -1121,8 +1106,7 @@ initialization
   RemClassRegistry.RegisterXSClass(TEcodexSolicitudEstatusCuenta, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudEstatusCuenta');
   RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudEstatusCuenta, [xoLiteralParam]);
 
-  wsHelper := TWSHelper.Create;
+
 finalization
-  if Assigned(wsHelper) then
-    wsHelper.Free;
+
 end.

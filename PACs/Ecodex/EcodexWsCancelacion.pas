@@ -27,7 +27,7 @@ unit EcodexWSCancelacion;
 
 interface
 
-uses Soap.InvokeRegistry, Soap.SOAPHTTPClient, System.Types, Soap.XSBuiltIns, ProveedorAutorizadoCertificacion;
+uses Soap.InvokeRegistry, Soap.SOAPHTTPClient, System.Types, Soap.XSBuiltIns;
 
 const
   IS_OPTN = $0001;

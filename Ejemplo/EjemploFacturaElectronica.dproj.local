@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2015/10/20 17:16:00.000.650,=C:\Users\soporte\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2016/09/30 16:56:40.000.294,=C:\Users\soporte\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 09:48:43.000.598,C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\EjemploFacturaElectronica.dproj=C:\Users\soporte\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2017/05/08 09:58:33.000.185,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\wwwsatgobmxsitio_internetcfd3cfdv33.pas</Transaction>
+    <Transaction>2017/05/08 10:01:39.000.276,C:\Delphi\eleventa\externos\TFacturaelectronica\Versiones\Facturacion.ComprobanteV33.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\wwwsatgobmxsitio_internetcfd3cfdv33.pas</Transaction>
+    <Transaction>2017/05/08 10:49:53.000.432,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 10:50:07.000.235,C:\Delphi\eleventa\externos\TFacturaelectronica\Versiones\Facturacion.Comprobante.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 10:51:07.000.263,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 10:51:18.000.622,C:\Delphi\eleventa\externos\TFacturaelectronica\Facturacion.Administrador.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 10:59:57.000.548,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 11:00:09.000.901,C:\Delphi\eleventa\externos\TFacturaelectronica\Facturacion.GeneradorCadenaOriginal.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 11:01:31.000.914,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 11:02:12.000.333,C:\Delphi\eleventa\externos\TFacturaelectronica\Versiones\Facturacion.GeneradorCadenaOrignalV33.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 11:22:06.000.923,=C:\Delphi\eleventa\externos\TFacturaelectronica\XSLT\cadenaoriginal_3_3.xslt</Transaction>
+    <Transaction>2017/05/08 11:45:04.000.750,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 11:45:33.000.660,C:\Delphi\eleventa\externos\TFacturaelectronica\Facturacion.GeneradorSello.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 11:45:54.000.146,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 11:46:10.000.781,C:\Delphi\eleventa\externos\TFacturaelectronica\Facturacion.OpenSSL.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 11:48:16.000.182,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 11:48:30.000.695,C:\Delphi\eleventa\externos\TFacturaelectronica\Versiones\Facturacion.GeneradorSelloV33.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 16:14:06.000.070,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 16:14:27.000.980,C:\Delphi\eleventa\externos\TFacturaelectronica\Facturacion.Certificador.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 16:14:31.000.869,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 16:14:50.000.958,C:\Delphi\eleventa\externos\TFacturaelectronica\PACs\Facturacion.PAC.Ecodex.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 16:17:18.000.521,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 16:17:34.000.615,C:\Delphi\eleventa\externos\TFacturaelectronica\Facturacion.ProveedorAutorizadoCertificacion.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/08 17:09:34.000.810,C:\Delphi\eleventa\externos\TFacturaelectronica\PACs\Ecodex\Facturacion.PAC.Ecodex.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\PACs\Facturacion.PAC.Ecodex.pas</Transaction>
+    <Transaction>2017/05/08 17:16:31.000.301,=C:\Delphi\eleventa\externos\TFacturaelectronica\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas</Transaction>
+    <Transaction>2017/05/08 17:49:54.000.601,=C:\Delphi\eleventa\externos\TFacturaelectronica\PACs\Ecodex\EcodexWsCancelacion.pas</Transaction>
+    <Transaction>2017/05/08 17:50:01.000.586,=C:\Delphi\eleventa\externos\TFacturaelectronica\PACs\Ecodex\EcodexWsClientes.pas</Transaction>
+    <Transaction>2017/05/08 17:50:02.000.677,=C:\Delphi\eleventa\externos\TFacturaelectronica\PACs\Ecodex\EcodexWsComun.pas</Transaction>
+    <Transaction>2017/05/08 17:50:03.000.303,=C:\Delphi\eleventa\externos\TFacturaelectronica\PACs\Ecodex\EcodexWsSeguridad.pas</Transaction>
+    <Transaction>2017/05/08 17:50:03.000.948,=C:\Delphi\eleventa\externos\TFacturaelectronica\PACs\Ecodex\EcodexWsTimbrado.pas</Transaction>
+    <Transaction>2017/05/09 09:27:58.000.031,C:\Delphi\eleventa\externos\TFacturaelectronica\PACs\Ecodex\EcodexWsCancelacion.pas=</Transaction>
+    <Transaction>2017/05/09 16:06:26.000.414,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/09 16:07:18.000.286,C:\Delphi\eleventa\externos\TFacturaelectronica\Facturacion.AdmonCertificados.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/09 16:07:42.000.937,=C:\Delphi\eleventa\externos\TFacturaelectronica - copia\ClaseCertificadoSellos.pas</Transaction>
+    <Transaction>2017/05/09 16:09:19.000.463,=C:\Delphi\eleventa\externos\TFacturaelectronica - copia\FacturaTipos.pas</Transaction>
+    <Transaction>2017/05/10 11:19:15.000.111,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\wwwsatgobmxsitio_internetcfdTimbreFiscalDigitalTimbreFiscalDigitalv11.pas</Transaction>
+    <Transaction>2017/05/10 11:19:44.000.632,C:\Delphi\eleventa\externos\TFacturaelectronica\Versiones\Facturacion.TimbreFiscalDigitalV33.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\wwwsatgobmxsitio_internetcfdTimbreFiscalDigitalTimbreFiscalDigitalv11.pas</Transaction>
+    <Transaction>2017/05/11 16:27:28.858,C:\Delphi\eleventa\externos\TFacturaelectronica\Facturacion.CertificadoDeSellos.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Facturacion.AdmonCertificados.pas</Transaction>
+    <Transaction>2017/05/12 10:32:47.579,=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/12 10:32:56.824,C:\Delphi\eleventa\externos\TFacturaelectronica\Facturacion.Helper.pas=C:\Delphi\eleventa\externos\TFacturaelectronica\Ejemplo\Unit1.pas</Transaction>
+    <Transaction>2017/05/12 12:11:11.492,=C:\Delphi\eleventa\externos\TFacturaelectronica\PACs\Facturacion.ManejadorErroresComunesWebServices.pas</Transaction>
+  </Transactions>
+</BorlandProject>

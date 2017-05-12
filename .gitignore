@@ -1,12 +1,5 @@
 *.dcu
-*.ini
-*.~*
-*.bdsproj
-*.cfg
-*.dproj.local
+__*
 *.exe
+*.stat
 *.identcache
-Pruebas/Debug/*
-Deploy/*
-__history/
-Pruebas/ModelSupport_ProbarFacturaElectronica/*
