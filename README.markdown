@@ -1,4 +1,4 @@
-﻿TFACTURACIONELECTRONICA v1.3 (Beta) 
+﻿TFACTURACIONELECTRONICA v2.0
 --------------------------------------
 Esta es una librería que sirve para generar una factura electrónica (CFDI) de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
@@ -14,45 +14,41 @@ Algunos aspectos que busca tener esta libreria:
 - Estar implementada en clases (seguir reglas de programación orientada a objetos).
 - Esconder los detalles de implementación/técnicos al usuario final (el programador que use la clase).
 
-Más información sobre este proyecto en:
-<http://bambucode.com/codigoabierto>
-
 Requerimientos técnicos
 ------------
-- Contar con alguna edición de Delphi.
+- Contar con alguna edición de Delphi (de momento solo se garantiza funcionamiento en Delphi Seattle)
 - Contar con librerias libeay32.dll, ssleay32.dll y el ejecutable openssl.exe (solo para las pruebas automatizadas) las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/binaries.html>
 
-¿Qué falta por implementar?
--------------
-- Manejo de Adendas.
-- Manejo y pruebas de conceptos con datos aduanales.
-- Manejo y pruebas de articulos con cuenta predial.
 
-Proveedores Autorizados de Certificación (PAC) Soportados
+Limitaciones
+--------------
+A partir de la versión 2.0 de la librería, que implementa el soporte para CFDI v3.3 (Julio 2017), se estandariza el uso de las clases auto generadas por Delphi para el manejo del XML de los comprobantes permitiendo el uso de todos los nodos, atributos y propiedades de cada version según los haya definido el SAT, sin embargo de omiten las validaciones de los campos y ahora esta responsabilidad será a cargo del programador / usuario de la librería.
+
+Por ejemplo la librería te permitirá llenar el atributo `Total` de la factura con una cadena, lo cual no es correcto pero a nivel XML es válido.
+
+Proveedores Autorizados de Certificación (PAC) Soportados por v2.0
 -------------
 * Ecodex - <http://www.ecodex.com.mx>
-* Comercio Digital - <http://www.comercio-digital.com.mx> - Solo timbrado
-* FinkOk - <http://www.finkok.com> - Solo timbrado
 
-Completado
+Documentación Técnica
 -------------
-- Se agrego soporte para servidor de respaldo de cancelación de Ecodex - Abril 2014
-- Implementar soporte para impuestos locales/estatales. <Enero 2014>
-- Implementar la version 3.2 de los CFD (o comprobantes digitales en linea) con colaboración de Ing. Pablo Torres - <Completado a finales de Noviembre 2013>
-- Implementar soporte para la versión 2.2 de CFD - Completado Junio 2012.
-- Implementar la lectura de un CFD y que al mismo tiempo verifique si es válido o no. <- Completado 12 Dic 2010>
-- Una clase que genere el reporte mensual de facturas generadas en el formato requerido por el SAT. < Completado 26 Ene 2011 >
-- Se agregaron validaciones para verificar que el certificado sea de sellos y que el certificado y llave privada sean pareja <Completado 28 Diciembre 2013>
+A partir de la v2.0 de la librería, se ha documentado de forma extensiva el proyecto, la estructura, su funcionamiento, etc. por lo que puedes comenzar leyendo:
+
+* Cómo se estructura un CFDI
+* Pasos para generar un CFDI
+* Cómo implementar una nueva versión de CFDI
+* Cómo Generar el sello digital
+* Como timbrar el CFDI.
 
 ¿Cómo puedo ayudar?
--------------
-Actualmente la librería se encuentra en estado "beta" en la implementación de CFDI. La manera en que puedes ayudar es en realizar más pruebas de unidad para probar los diferentes casos y corroborar que la librería funcione como debe. También puedes implementar más PACs basándote en los actuales y el ejemplo incluído. Así como en agregar documentación técnica o colaborar en la implementación de Adendas, conceptos con datos aduanales, etc.
+-------------------
+La librería lleva más de 4 años de haber sido liberada al público, sin embargo aun falta mucho trabajo por hacer. Puedes comenzar checando el apartado de "Issues" del proyecto para ver en que puedes colaborar, una vez que lo hagas puedes mandar un pull-request para que implementemos tus cambios.
 
-Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a través del foro oficial de la librería en <https://groups.google.com/forum/#!forum/tfacturaelectronica> o bien si lo deseas puedes mandarme un "pull request" de tu "fork" de la librería.
+Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a través del foro oficial de la librería en <https://groups.google.com/forum/#!forum/tfacturaelectronica>
 
 Soporte Técnico
 ------------
-El soporte técnico se hace a través de la comunidad en el foro oficial de la librería al cual se puede acceder en: <https://groups.google.com/forum/#!forum/tfacturaelectronica> . De manera adicional, si encuentras alguna falla favor de reportarla en esta página en la sección de "Issues" para que otros usuarios puedan colaborar y encontrar una solución como comunidad, te agradecemos intentes corregir cualquier problema primero antes de reportarlo para al menos saber que has intentado solucionarlo por tu cuenta.
+El soporte técnico se hace a través de la comunidad en el foro oficial de la librería al cual se puede acceder en: <https://groups.google.com/forum/#!forum/tfacturaelectronica> . De manera adicional, si encuentras alguna falla o te gustaría alguna funcionalidad favor de reportarla en esta página en la sección de "Issues" para que otros usuarios puedan colaborar y encontrar una solución como comunidad, te agradecemos intentes corregir cualquier problema primero antes de reportarlo para al menos saber que has intentado solucionarlo por tu cuenta.
 
 Notas adicionales
 ------------
