@@ -22,6 +22,10 @@ type
   TCadenaUTF8 = UTF8String;
   {$IFEND}
 
+  TFacturacionCredencialesPAC = record
+    RFC: String;
+    DistribuidorID: string;
+  end;
 
   /// <summary>
   ///   Comprobante Fiscal "Base" comun cuyas propiedades/metodos existen en
