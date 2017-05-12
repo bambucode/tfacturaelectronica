@@ -82,7 +82,9 @@ begin
     except
        On E:Exception do
        begin
+          {$IFDEF CODESITE}
           CodeSite.SendException(E);
+          {$ENDIF}
           raise;
        end;
     end;
