@@ -943,13 +943,24 @@ uses System.SysUtils;
 procedure establecerAtributosDeCFDI(comprobante: IComprobanteFiscalV33);
 var
   documentoBase: IXMLDocument;
+const
+  _NODO_XSI     = 'xmlns:xsi';
+  _NODO_SL      = 'xsi:schemaLocation';
+  _NODO_VERSION = 'Version';
 begin
   // Agregamos la auto identacion
   comprobante.OwnerDocument.Options := [doNodeAutoCreate, doAttrNull, doAutoPrefix, doNamespaceDecl, doNodeAutoIndent];
 
-  comprobante.SetAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-  comprobante.SetAttribute('xsi:schemaLocation', 'http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd');
-  comprobante.Version := '3.3';
+  if (comprobante.AttributeNodes.FindNode(_NODO_XSI) = nil) then
+      comprobante.SetAttribute(_NODO_XSI,
+                               'http://www.w3.org/2001/XMLSchema-instance');
+
+  if (comprobante.AttributeNodes.FindNode(_NODO_SL) = nil) then
+    comprobante.SetAttribute(_NODO_SL,
+                            'http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd');
+
+  if (comprobante.AttributeNodes.FindNode(_NODO_VERSION) = nil) then
+    comprobante.Version := '3.3';
 end;
 
 procedure TComprobanteFiscalV33.AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
