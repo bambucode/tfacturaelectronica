@@ -968,6 +968,7 @@ var
   timbreConXSI : string;
   documentoXMLTimbre : IXMLDocument;
 begin
+  Assert(aXMLTimbre <> '', 'El XML del Timbre está vacio');
   timbreConXSI := aXMLTimbre;
 
   // Si queremos leer el nodo de forma independiente tenemos que anexar la defincion del XSI:
