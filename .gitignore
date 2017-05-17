@@ -3,3 +3,4 @@ __*
 *.exe
 *.stat
 *.identcache
+*.local
