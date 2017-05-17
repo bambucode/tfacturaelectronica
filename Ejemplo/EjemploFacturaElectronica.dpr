@@ -36,7 +36,11 @@ uses
   EcodexWsTimbrado in '..\PACs\Ecodex\EcodexWsTimbrado.pas',
   Facturacion.CertificadoDeSellos in '..\Facturacion.CertificadoDeSellos.pas',
   Facturacion.Helper in '..\Facturacion.Helper.pas',
-  Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas';
+  Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas',
+  Facturacion.GeneradorCBBv33 in '..\Versiones\Facturacion.GeneradorCBBv33.pas',
+  DelphiZXIngQRCode in '..\Lib\DelphiZXIngQRCode.pas',
+  Facturacion.GeneradorCBB,
+  Facturacion.GeneradorQR in '..\Facturacion.GeneradorQR.pas';
 
 var
   nuevaFactura : IComprobanteFiscal;
@@ -53,6 +57,7 @@ var
   pac: IProveedorAutorizadoCertificacion;
   certificadoSellos: ICertificadoDeSellos;
   credencialesPAC : TFacturacionCredencialesPAC;
+  generadorCBB: IGeneradorCBB;
 
 begin
   CoInitialize(nil);
@@ -83,6 +88,7 @@ begin
       generadorCadena := TGeneradorCadenaOriginalV33.Create;
       generadorSello := TGeneradorSelloV33.Create;
       generadorSello.Configurar(openSSL);
+      generadorCBB  := TGeneradorCBBv33.Create;
 
       Writeln('Llenando comprobante CFDI v3.3...');
       with facturaCFDIv33 do
@@ -167,6 +173,9 @@ begin
       // 4. La mandamos timbrar
       Writeln('Timbrando comprobante...');
       Randomize;
+      admonFacturas.GuardarArchivo(nuevaFactura,
+                                  ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.xml');
+
       xmlTimbre := pac.TimbrarDocumento(nuevaFactura, Random(9999));
 
       Writeln('Asignando Timbre Fiscal al comprobante...');
@@ -175,6 +184,10 @@ begin
       Writeln('Guardando XML...');
       admonFacturas.GuardarArchivo(nuevaFactura,
                                   ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.xml');
+
+      Writeln('Generando CBB corespondiente');
+      generadorCBB.GenerarImagenCBB(nuevaFactura,
+                                    ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.jpg');
 
       Writeln('Generación de CFDI v3.3 exitoso.');
       Readln;
