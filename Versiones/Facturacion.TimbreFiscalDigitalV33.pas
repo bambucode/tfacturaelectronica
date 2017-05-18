@@ -16,12 +16,12 @@ type
 
 { Forward Decls }
 
-  IXMLTimbreFiscalDigital = interface;
+  ITimbreFiscalDigitalV33 = interface;
 
-{ IXMLTimbreFiscalDigital }
+{ ITimbreFiscalDigitalV33 }
 
-  IXMLTimbreFiscalDigital = interface(IXMLNode)
-    ['{10E384BF-A049-4437-8112-D81E4A3989AD}']
+  ITimbreFiscalDigitalV33 = interface(IXMLNode)
+  ['{10E384BF-A049-4437-8112-D81E4A3989AD}']
     { Property Accessors }
     function Get_Version: UnicodeString;
     function Get_UUID: UnicodeString;
@@ -52,13 +52,13 @@ type
 
 { Forward Decls }
 
-  TXMLTimbreFiscalDigital = class;
+  TTimbreFiscalDigitalV33 = class;
 
-{ TXMLTimbreFiscalDigital }
+{ TTimbreFiscalDigitalV33 }
 
-  TXMLTimbreFiscalDigital = class(TXMLNode, IXMLTimbreFiscalDigital)
+  TTimbreFiscalDigitalV33 = class(TXMLNode, ITimbreFiscalDigitalV33)
   protected
-    { IXMLTimbreFiscalDigital }
+    { ITimbreFiscalDigitalV33 }
     function Get_Version: UnicodeString;
     function Get_UUID: UnicodeString;
     function Get_FechaTimbrado: UnicodeString;
@@ -79,9 +79,10 @@ type
 
 { Global Functions }
 
-function GetTimbreFiscalDigital(Doc: IXMLDocument): IXMLTimbreFiscalDigital;
-function LoadTimbreFiscalDigital(const FileName: string): IXMLTimbreFiscalDigital;
-function NewTimbreFiscalDigital: IXMLTimbreFiscalDigital;
+function GetTimbreFiscalDigitalV33(Doc: IXMLDocument): ITimbreFiscalDigitalV33;
+function LoadTimbreFiscalDigitalV33(const FileName: string):
+    ITimbreFiscalDigitalV33;
+function NewTimbreFiscalDigitalV33: ITimbreFiscalDigitalV33;
 
 const
   TargetNamespace = 'http://www.sat.gob.mx/TimbreFiscalDigital';
@@ -90,99 +91,100 @@ implementation
 
 { Global Functions }
 
-function GetTimbreFiscalDigital(Doc: IXMLDocument): IXMLTimbreFiscalDigital;
+function GetTimbreFiscalDigitalV33(Doc: IXMLDocument): ITimbreFiscalDigitalV33;
 begin
-  Result := Doc.GetDocBinding('TimbreFiscalDigital', TXMLTimbreFiscalDigital, TargetNamespace) as IXMLTimbreFiscalDigital;
+  Result := Doc.GetDocBinding('TimbreFiscalDigital', TTimbreFiscalDigitalV33, TargetNamespace) as ITimbreFiscalDigitalV33;
 end;
 
-function LoadTimbreFiscalDigital(const FileName: string): IXMLTimbreFiscalDigital;
+function LoadTimbreFiscalDigitalV33(const FileName: string):
+    ITimbreFiscalDigitalV33;
 begin
-  Result := LoadXMLDocument(FileName).GetDocBinding('TimbreFiscalDigital', TXMLTimbreFiscalDigital, TargetNamespace) as IXMLTimbreFiscalDigital;
+  Result := LoadXMLDocument(FileName).GetDocBinding('TimbreFiscalDigital', TTimbreFiscalDigitalV33, TargetNamespace) as ITimbreFiscalDigitalV33;
 end;
 
-function NewTimbreFiscalDigital: IXMLTimbreFiscalDigital;
+function NewTimbreFiscalDigitalV33: ITimbreFiscalDigitalV33;
 begin
-  Result := NewXMLDocument.GetDocBinding('TimbreFiscalDigital', TXMLTimbreFiscalDigital, TargetNamespace) as IXMLTimbreFiscalDigital;
+  Result := NewXMLDocument.GetDocBinding('TimbreFiscalDigital', TTimbreFiscalDigitalV33, TargetNamespace) as ITimbreFiscalDigitalV33;
 end;
 
-{ TXMLTimbreFiscalDigital }
+{ TTimbreFiscalDigitalV33 }
 
-function TXMLTimbreFiscalDigital.Get_Version: UnicodeString;
+function TTimbreFiscalDigitalV33.Get_Version: UnicodeString;
 begin
   Result := AttributeNodes['Version'].Text;
 end;
 
-procedure TXMLTimbreFiscalDigital.Set_Version(Value: UnicodeString);
+procedure TTimbreFiscalDigitalV33.Set_Version(Value: UnicodeString);
 begin
   SetAttribute('Version', Value);
 end;
 
-function TXMLTimbreFiscalDigital.Get_UUID: UnicodeString;
+function TTimbreFiscalDigitalV33.Get_UUID: UnicodeString;
 begin
   Result := AttributeNodes['UUID'].Text;
 end;
 
-procedure TXMLTimbreFiscalDigital.Set_UUID(Value: UnicodeString);
+procedure TTimbreFiscalDigitalV33.Set_UUID(Value: UnicodeString);
 begin
   SetAttribute('UUID', Value);
 end;
 
-function TXMLTimbreFiscalDigital.Get_FechaTimbrado: UnicodeString;
+function TTimbreFiscalDigitalV33.Get_FechaTimbrado: UnicodeString;
 begin
   Result := AttributeNodes['FechaTimbrado'].Text;
 end;
 
-procedure TXMLTimbreFiscalDigital.Set_FechaTimbrado(Value: UnicodeString);
+procedure TTimbreFiscalDigitalV33.Set_FechaTimbrado(Value: UnicodeString);
 begin
   SetAttribute('FechaTimbrado', Value);
 end;
 
-function TXMLTimbreFiscalDigital.Get_RfcProvCertif: UnicodeString;
+function TTimbreFiscalDigitalV33.Get_RfcProvCertif: UnicodeString;
 begin
   Result := AttributeNodes['RfcProvCertif'].Text;
 end;
 
-procedure TXMLTimbreFiscalDigital.Set_RfcProvCertif(Value: UnicodeString);
+procedure TTimbreFiscalDigitalV33.Set_RfcProvCertif(Value: UnicodeString);
 begin
   SetAttribute('RfcProvCertif', Value);
 end;
 
-function TXMLTimbreFiscalDigital.Get_Leyenda: UnicodeString;
+function TTimbreFiscalDigitalV33.Get_Leyenda: UnicodeString;
 begin
   Result := AttributeNodes['Leyenda'].Text;
 end;
 
-procedure TXMLTimbreFiscalDigital.Set_Leyenda(Value: UnicodeString);
+procedure TTimbreFiscalDigitalV33.Set_Leyenda(Value: UnicodeString);
 begin
   SetAttribute('Leyenda', Value);
 end;
 
-function TXMLTimbreFiscalDigital.Get_SelloCFD: UnicodeString;
+function TTimbreFiscalDigitalV33.Get_SelloCFD: UnicodeString;
 begin
   Result := AttributeNodes['SelloCFD'].Text;
 end;
 
-procedure TXMLTimbreFiscalDigital.Set_SelloCFD(Value: UnicodeString);
+procedure TTimbreFiscalDigitalV33.Set_SelloCFD(Value: UnicodeString);
 begin
   SetAttribute('SelloCFD', Value);
 end;
 
-function TXMLTimbreFiscalDigital.Get_NoCertificadoSAT: UnicodeString;
+function TTimbreFiscalDigitalV33.Get_NoCertificadoSAT: UnicodeString;
 begin
   Result := AttributeNodes['NoCertificadoSAT'].Text;
 end;
 
-procedure TXMLTimbreFiscalDigital.Set_NoCertificadoSAT(Value: UnicodeString);
+procedure TTimbreFiscalDigitalV33.Set_NoCertificadoSAT(Value: UnicodeString);
 begin
   SetAttribute('NoCertificadoSAT', Value);
 end;
 
-function TXMLTimbreFiscalDigital.Get_SelloSAT: UnicodeString;
+function TTimbreFiscalDigitalV33.Get_SelloSAT: UnicodeString;
 begin
   Result := AttributeNodes['SelloSAT'].Text;
 end;
 
-procedure TXMLTimbreFiscalDigital.Set_SelloSAT(Value: UnicodeString);
+procedure TTimbreFiscalDigitalV33.Set_SelloSAT(Value: UnicodeString);
 begin
   SetAttribute('SelloSAT', Value);
 end;
