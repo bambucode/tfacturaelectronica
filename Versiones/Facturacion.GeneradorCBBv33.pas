@@ -45,16 +45,18 @@ var
   totalComprobante : Currency;
   facturaV33 : IComprobanteFiscalV33;
 const
-  _FORMATO_CBB = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx&id=%s&re=%s&rr=%s&tt=%d&fe=%s';
+  _FORMATO_CBB = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx&id=%s&re=%s&rr=%s&tt=%s&fe=%s';
 begin
   if Not Supports(aComprobante, IComprobanteFiscalV33, facturaV33) then
     raise Exception.Create('Se intentó generar un CBB de CFDI 3.3 de un comprobante que no es de dicha versión');
+
+  Assert(facturaV33.Complemento.TimbreFiscalDigital <> nil, 'Se mando un CFDI no timbrado');
 
   // Ocho últimos caracteres del sello digital del emisor del comprobante.
   selloParcial := Copy(aComprobante.Sello, Length(aComprobante.Sello) - 8,
                        8);
 
-  uuid := aComprobante.UUID;
+  uuid := facturaV33.Complemento.TimbreFiscalDigital.UUID;
   totalComprobante := StrToCurr(facturaV33.Total);
 
   cadenaParaCBB := Format(_FORMATO_CBB,

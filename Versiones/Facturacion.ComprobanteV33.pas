@@ -984,7 +984,7 @@ begin
   // Si queremos leer el nodo de forma independiente tenemos que anexar la defincion del XSI:
   // xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" para que funcione
   // de lo contrario se lanzará una excepcion de DOM por que el namespace XSI no se encuentra definido
-  if AnsiPos('xmlns:xsi', timbreConXSI) < 0 then
+  if AnsiPos('xmlns:xsi', timbreConXSI) = 0 then
   begin
     timbreConXSI := StringReplace(timbreConXSI, 'TimbreFiscalDigital"',
                                                 'TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
