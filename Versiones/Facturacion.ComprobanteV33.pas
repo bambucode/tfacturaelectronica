@@ -14,7 +14,8 @@ unit Facturacion.ComprobanteV33;
 interface
 
 uses xmldom, XMLDoc, XMLIntf,
-     Facturacion.Comprobante;
+     Facturacion.Comprobante,
+     Facturacion.TimbreFiscalDigitalV33;
 
 type
 
@@ -504,6 +505,9 @@ type
 
   IComprobanteFiscalV33_Complemento = interface(IXMLNode)
     ['{7C11F42B-1408-4597-A5B1-2F763F8DB7C6}']
+    function GetTimbreFiscalDigital: ITimbreFiscalDigitalV33;
+    procedure SetTimbreFiscalDigital(const Value: ITimbreFiscalDigitalV33);
+    property TimbreFiscalDigital: ITimbreFiscalDigitalV33 read GetTimbreFiscalDigital write SetTimbreFiscalDigital;
   end;
 
 { IComprobanteFiscalV33_Addenda }
@@ -913,8 +917,13 @@ type
 { TComprobanteFiscalV33_Complemento }
 
   TComprobanteFiscalV33_Complemento = class(TXMLNode, IComprobanteFiscalV33_Complemento)
+  private
+    function GetTimbreFiscalDigital: ITimbreFiscalDigitalV33;
+    procedure SetTimbreFiscalDigital(const Value: ITimbreFiscalDigitalV33);
   protected
     { IComprobanteFiscalV33_Complemento }
+  public
+    procedure AfterConstruction; override;
   end;
 
 { TComprobanteFiscalV33_Addenda }
@@ -967,22 +976,27 @@ procedure TComprobanteFiscalV33.AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF
 var
   timbreConXSI : string;
   documentoXMLTimbre : IXMLDocument;
+  nodoTimbre: ITimbreFiscalDigitalV33;
 begin
-  Assert(aXMLTimbre <> '', 'El XML del Timbre está vacio');
-  timbreConXSI := aXMLTimbre;
+  Assert(aXMLTimbre <> '', 'El XML del timbre no puede estar vacio');
+  timbreConXSI := Trim(aXMLTimbre);
 
   // Si queremos leer el nodo de forma independiente tenemos que anexar la defincion del XSI:
   // xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" para que funcione
   // de lo contrario se lanzará una excepcion de DOM por que el namespace XSI no se encuentra definido
-  timbreConXSI := StringReplace(timbreConXSI, 'TimbreFiscalDigital"',
-                                              'TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
-                                              [rfReplaceAll]);
+  if AnsiPos('xmlns:xsi', timbreConXSI) < 0 then
+  begin
+    timbreConXSI := StringReplace(timbreConXSI, 'TimbreFiscalDigital"',
+                                                'TimbreFiscalDigital" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+                                                [rfReplaceAll]);
+  end;
 
   // Creamos el XMLDocument desde el XML del timbre
   documentoXMLTimbre := LoadXMLData(Trim(timbreConXSI));
+  nodoTimbre         := GetTimbreFiscalDigitalV33(documentoXMLTimbre);
 
   // Agregamos el nodo del TimbreFiscalDigital al nodo Complemento del comprobante
-  Get_Complemento.ChildNodes.Add(documentoXMLTimbre.DocumentElement);
+  Get_Complemento.ChildNodes.Add(nodoTimbre);
 end;
 
 function GetComprobanteFiscalV33(Doc: IXMLDocument): IComprobanteFiscalV33;
@@ -2009,6 +2023,25 @@ end;
 procedure TComprobanteFiscalV33_Impuestos_Traslados_Traslado.Set_Importe(Value: UnicodeString);
 begin
   SetAttribute('Importe', Value);
+end;
+
+procedure TComprobanteFiscalV33_Complemento.AfterConstruction;
+begin
+  RegisterChildNode('TimbreFiscalDigital', TTimbreFiscalDigitalV33,
+                    Facturacion.TimbreFiscalDigitalV33.TargetNamespace);
+  inherited;
+end;
+
+function TComprobanteFiscalV33_Complemento.GetTimbreFiscalDigital:
+    ITimbreFiscalDigitalV33;
+begin
+  Result := ChildNodes.FindNode('TimbreFiscalDigital', Facturacion.TimbreFiscalDigitalV33.TargetNamespace) As ITimbreFiscalDigitalV33;
+end;
+
+procedure TComprobanteFiscalV33_Complemento.SetTimbreFiscalDigital(const Value:
+    ITimbreFiscalDigitalV33);
+begin
+  ChildNodes.Add(Value);
 end;
 
 { TComprobanteFiscalV33_Complemento }

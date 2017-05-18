@@ -13,6 +13,8 @@ program EjemploFacturaElectronica;
 {$R *.res}
 
 // Incluimos el archivo de recurso .RC que contiene los XSLTs para generar las cadenas originales
+
+
 {$R *.dres}
 
 uses
@@ -40,7 +42,8 @@ uses
   Facturacion.GeneradorCBBv33 in '..\Versiones\Facturacion.GeneradorCBBv33.pas',
   DelphiZXIngQRCode in '..\Lib\DelphiZXIngQRCode.pas',
   Facturacion.GeneradorCBB,
-  Facturacion.GeneradorQR in '..\Facturacion.GeneradorQR.pas';
+  Facturacion.GeneradorQR in '..\Facturacion.GeneradorQR.pas',
+  Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas';
 
 var
   nuevaFactura : IComprobanteFiscal;
@@ -172,13 +175,18 @@ begin
       // 4. La mandamos timbrar
       Writeln('Timbrando comprobante...');
       Randomize;
-      admonFacturas.GuardarArchivo(nuevaFactura,
-                                  ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.xml');
 
       xmlTimbre := pac.TimbrarDocumento(nuevaFactura, Random(9999));
 
       Writeln('Asignando Timbre Fiscal al comprobante...');
       nuevaFactura.AsignarTimbreFiscal(xmlTimbre);
+
+      // Checamos tener el Timbre Fiscal
+      if Assigned(facturaCFDIv33.Complemento.TimbreFiscalDigital) then
+      begin
+         Writeln(facturaCFDIv33.Complemento.TimbreFiscalDigital.UUID);
+      end else
+         Writeln('**** NO SE TUVO TIMBRE ****');
 
       Writeln('Guardando XML...');
       admonFacturas.GuardarArchivo(nuevaFactura,

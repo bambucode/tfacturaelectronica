@@ -160,6 +160,8 @@
         <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
         <DCCReference Include="..\Facturacion.GeneradorQR.pas"/>
         <RcItem Include="..\XSLT\cadenaoriginal_3_3.xslt">
+        <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas"/>
+        <RcItem Include="..\Schemas\3.3\cadenaoriginal_3_3.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>XSLT_CADENAORIGINAL_V33</ResourceId>
