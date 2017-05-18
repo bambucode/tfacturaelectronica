@@ -3,7 +3,7 @@
   <xs:import namespace="http://www.sat.gob.mx/sitio_internet/cfd/tipoDatos/tdCFDI" schemaLocation="http://www.sat.gob.mx/sitio_internet/cfd/tipoDatos/tdCFDI/tdCFDI.xsd"/>
   <xs:element name="TimbreFiscalDigital">
 		<xs:annotation>
-			<xs:documentation>Complemento requerido para el Timbrado Fiscal Digital que da validez al Comprobante fiscal digital por Internet y al comprobante de retenciones.</xs:documentation>
+			<xs:documentation>Complemento requerido para el Timbrado Fiscal Digital que da validez al Comprobante fiscal digital por Internet.</xs:documentation>
 		</xs:annotation>
 		<xs:complexType>
 			<xs:attribute name="Version" use="required" fixed="1.1">
