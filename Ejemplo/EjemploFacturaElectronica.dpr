@@ -148,12 +148,11 @@ begin
       end;
       {$ENDREGION}
 
-
       // Obtenemos la cadena original y sellamos la factura automaticamente
       Writeln('Sellando comprobante...');
       admonFacturas.Sellar(nuevaFactura, generadorCadena, generadorSello);
 
-      // 2. Si queremos obtener la Cadena Original o el Sello
+      // 2. Si queremos obtener la Cadena Original o el Sello de forma separada:
       // cadenaOriginal := generadorCadena.obtenerCadenaOriginal(nuevaFactura);
       // Writeln(cadenaOriginal);
       //
