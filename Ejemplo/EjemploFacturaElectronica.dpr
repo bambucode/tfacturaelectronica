@@ -13,6 +13,8 @@ program EjemploFacturaElectronica;
 {$R *.res}
 
 // Incluimos el archivo de recurso .RC que contiene los XSLTs para generar las cadenas originales
+
+
 {$R *.dres}
 
 uses

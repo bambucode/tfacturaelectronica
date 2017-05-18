@@ -4,3 +4,6 @@ __*
 *.stat
 *.identcache
 *.local
+.DS_Store
+Ejemplo/*.xml
+Ejemplo/*.jpg
