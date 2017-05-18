@@ -156,6 +156,7 @@
         <DCCReference Include="..\Facturacion.CertificadoDeSellos.pas"/>
         <DCCReference Include="..\Facturacion.Helper.pas"/>
         <DCCReference Include="..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas"/>
         <RcItem Include="..\Schemas\3.3\cadenaoriginal_3_3.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>

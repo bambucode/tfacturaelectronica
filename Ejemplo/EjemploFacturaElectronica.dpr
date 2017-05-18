@@ -38,7 +38,8 @@ uses
   EcodexWsTimbrado in '..\PACs\Ecodex\EcodexWsTimbrado.pas',
   Facturacion.CertificadoDeSellos in '..\Facturacion.CertificadoDeSellos.pas',
   Facturacion.Helper in '..\Facturacion.Helper.pas',
-  Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas';
+  Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas',
+  Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas';
 
 var
   nuevaFactura : IComprobanteFiscal;
@@ -169,10 +170,18 @@ begin
       // 4. La mandamos timbrar
       Writeln('Timbrando comprobante...');
       Randomize;
+
       xmlTimbre := pac.TimbrarDocumento(nuevaFactura, Random(9999));
 
       Writeln('Asignando Timbre Fiscal al comprobante...');
       nuevaFactura.AsignarTimbreFiscal(xmlTimbre);
+
+      // Checamos tener el Timbre Fiscal
+      if Assigned(facturaCFDIv33.Complemento.TimbreFiscalDigital) then
+      begin
+         Writeln(facturaCFDIv33.Complemento.TimbreFiscalDigital.UUID);
+      end else
+         Writeln('**** NO SE TUVO TIMBRE ****');
 
       Writeln('Guardando XML...');
       admonFacturas.GuardarArchivo(nuevaFactura,
