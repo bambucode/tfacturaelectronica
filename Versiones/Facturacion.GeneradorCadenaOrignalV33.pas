@@ -23,12 +23,7 @@ type
 
 implementation
 
-uses  System.IOUtils,
-      System.Classes,
-      Winapi.Windows,
-      Xml.XMLIntf,
-      Xml.XMLDom,
-      Xml.XMLDoc;
+uses  System.IOUtils;
 
 const
   _NOMBRE_RECURSO = 'XSLT_CADENAORIGINAL_V33';
