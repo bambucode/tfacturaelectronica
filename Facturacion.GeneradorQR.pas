@@ -21,8 +21,8 @@ uses DelphiZXingQRCode,
      Vcl.Graphics;
 
 const
-  _ANCHO_QR_CODE = 400;
-  _ALTO_QR_CODE = 400;
+  _ANCHO_QR_CODE = 1200;
+  _ALTO_QR_CODE = 1200;
 
 { TGeneradorCBBGenerico }
 
