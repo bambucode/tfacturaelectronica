@@ -38,8 +38,8 @@ A partir de la v2.0 de la librería, se ha documentado de forma extensiva el pro
 -------------------
 A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
 
-- Lectura de CFDI 3.3
-- Generación de CBB con cambios para CFDI 3.3.
+- ~~Lectura de CFDI 3.3~~
+- ~~Generación de CBB con cambios para CFDI 3.3~~.
 - Pruebas de unidad
 - Soporte para generación/lectura de CFDI 3.2 (para fines de compatibilidad y migración)
 - Lanzar excepciones basado en el catálogo de errores de CFDI 3.3
