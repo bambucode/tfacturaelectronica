@@ -22,7 +22,24 @@
   <!--
 		En esta sección se define la inclusión de las plantillas de utilerías para colapsar espacios
 	-->
-  <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/2/cadenaoriginal_2_0/utilerias.xslt"/>
+  <!-- Manejador de datos requeridos -->
+	<xsl:template name="Requerido">
+		<xsl:param name="valor"/>|<xsl:call-template name="ManejaEspacios">
+			<xsl:with-param name="s" select="$valor"/>
+		</xsl:call-template>
+	</xsl:template>
+
+	<!-- Manejador de datos opcionales -->
+	<xsl:template name="Opcional">
+		<xsl:param name="valor"/>
+		<xsl:if test="$valor">|<xsl:call-template name="ManejaEspacios"><xsl:with-param name="s" select="$valor"/></xsl:call-template></xsl:if>
+	</xsl:template>
+	
+	<!-- Normalizador de espacios en blanco -->
+	<xsl:template name="ManejaEspacios">
+		<xsl:param name="s"/>
+		<xsl:value-of select="normalize-space(string($s))"/>
+	</xsl:template>
   <!-- 
 		En esta sección se define la inclusión de las demás plantillas de transformación para 
 		la generación de las cadenas originales de los complementos fiscales 
