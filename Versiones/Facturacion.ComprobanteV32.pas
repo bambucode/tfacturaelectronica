@@ -924,18 +924,18 @@ end;
 
 function GetComprobanteFiscalV32(Doc: IXMLDocument): IComprobanteFiscalV32;
 begin
-  Result := Doc.GetDocBinding('Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
+  Result := Doc.GetDocBinding('cfdi:Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
 end;
 
 function LoadComprobanteFiscalV32(const FileName: string):
     IComprobanteFiscalV32;
 begin
-  Result := LoadXMLDocument(FileName).GetDocBinding('Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
+  Result := LoadXMLDocument(FileName).GetDocBinding('cfdi:Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
 end;
 
 function NewComprobanteFiscalV32: IComprobanteFiscalV32;
 begin
-  Result := NewXMLDocument.GetDocBinding('Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
+  Result := NewXMLDocument.GetDocBinding('cfdi:Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
 end;
 
 { TComprobanteFiscalV32 }
@@ -1530,7 +1530,7 @@ end;
 procedure TComprobanteFiscalV32_Conceptos.AfterConstruction;
 begin
   RegisterChildNode('Concepto', TComprobanteFiscalV32_Conceptos_Concepto);
-  ItemTag := 'Concepto';
+  ItemTag := 'cfdi:Concepto';
   ItemInterface := IComprobanteFiscalV32_Conceptos_Concepto;
   inherited;
 end;
@@ -1711,7 +1711,7 @@ end;
 procedure TComprobanteFiscalV32_Conceptos_Concepto_Parte.AfterConstruction;
 begin
   RegisterChildNode('InformacionAduanera', TComprobanteFiscalV32_InformacionAduanera);
-  ItemTag := 'InformacionAduanera';
+  ItemTag := 'cfdi:InformacionAduanera';
   ItemInterface := IComprobanteFiscalV32_InformacionAduanera;
   inherited;
 end;
@@ -1852,7 +1852,7 @@ end;
 procedure TComprobanteFiscalV32_Impuestos_Retenciones.AfterConstruction;
 begin
   RegisterChildNode('Retencion', TComprobanteFiscalV32_Impuestos_Retenciones_Retencion);
-  ItemTag := 'Retencion';
+  ItemTag := 'cfdi:Retencion';
   ItemInterface := IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
   inherited;
 end;
@@ -1899,7 +1899,7 @@ end;
 procedure TComprobanteFiscalV32_Impuestos_Traslados.AfterConstruction;
 begin
   RegisterChildNode('Traslado', TComprobanteFiscalV32_Impuestos_Traslados_Traslado);
-  ItemTag := 'Traslado';
+  ItemTag := 'cfdi:Traslado';
   ItemInterface := IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
   inherited;
 end;
