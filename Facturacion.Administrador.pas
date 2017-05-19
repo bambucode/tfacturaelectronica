@@ -13,8 +13,7 @@ interface
 uses Facturacion.Comprobante,
      Facturacion.GeneradorCadenaOriginal,
      Facturacion.GeneradorSello,
-     System.SysUtils,
-     Facturacion.ComprobanteV33;
+     System.SysUtils;
 
 type
 
@@ -124,6 +123,8 @@ implementation
 
 uses System.Classes,
      Xml.XMLDoc,
+     Facturacion.ComprobanteV32,
+     Facturacion.ComprobanteV33,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
@@ -134,6 +135,9 @@ uses System.Classes,
 function TAdministradorFacturas.Nueva(const aVersion: String): IComprobanteFiscal;
 begin
   Result := nil;
+
+  if aVersion = '3.2' then
+    Result := NewComprobanteFiscalV32;
 
   if aVersion = '3.3' then
     Result := NewComprobanteFiscalV33;
@@ -225,6 +229,9 @@ begin
       versionCFDI := Trim(nodoVersion.Text);
 
       // Mandamos leer el XML usando la implementación correspondiente
+      if (versionCFDI = '3.2') then
+        Result := GetComprobanteFiscalV32(documentoXML);
+
       if (versionCFDI = '3.3') then
         Result := GetComprobanteFiscalV33(documentoXML);
     end;

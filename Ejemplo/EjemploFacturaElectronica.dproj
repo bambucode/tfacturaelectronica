@@ -160,10 +160,20 @@
         <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
         <DCCReference Include="..\Facturacion.GeneradorQR.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.ComprobanteV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv32.pas"/>
         <RcItem Include="..\Schemas\3.3\cadenaoriginal_3_3.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>XSLT_CADENAORIGINAL_V33</ResourceId>
+        </RcItem>
+        <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>XSLT_CADENAORIGINAL_V32</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
