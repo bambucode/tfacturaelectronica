@@ -39,6 +39,10 @@ uses
   Facturacion.CertificadoDeSellos in '..\Facturacion.CertificadoDeSellos.pas',
   Facturacion.Helper in '..\Facturacion.Helper.pas',
   Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas',
+  Facturacion.GeneradorCBBv33 in '..\Versiones\Facturacion.GeneradorCBBv33.pas',
+  DelphiZXIngQRCode in '..\Lib\DelphiZXIngQRCode.pas',
+  Facturacion.GeneradorCBB,
+  Facturacion.GeneradorQR in '..\Facturacion.GeneradorQR.pas',
   Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas';
 
 var
@@ -56,6 +60,7 @@ var
   pac: IProveedorAutorizadoCertificacion;
   certificadoSellos: ICertificadoDeSellos;
   credencialesPAC : TFacturacionCredencialesPAC;
+  generadorCBB: IGeneradorCBB;
 
 begin
   CoInitialize(nil);
@@ -86,6 +91,7 @@ begin
       generadorCadena := TGeneradorCadenaOriginalV33.Create;
       generadorSello := TGeneradorSelloV33.Create;
       generadorSello.Configurar(openSSL);
+      generadorCBB  := TGeneradorCBBv33.Create;
 
       Writeln('Llenando comprobante CFDI v3.3...');
       with facturaCFDIv33 do
@@ -145,12 +151,11 @@ begin
       end;
       {$ENDREGION}
 
-
       // Obtenemos la cadena original y sellamos la factura automaticamente
       Writeln('Sellando comprobante...');
       admonFacturas.Sellar(nuevaFactura, generadorCadena, generadorSello);
 
-      // 2. Si queremos obtener la Cadena Original o el Sello
+      // 2. Si queremos obtener la Cadena Original o el Sello de forma separada:
       // cadenaOriginal := generadorCadena.obtenerCadenaOriginal(nuevaFactura);
       // Writeln(cadenaOriginal);
       //
@@ -186,6 +191,10 @@ begin
       Writeln('Guardando XML...');
       admonFacturas.GuardarArchivo(nuevaFactura,
                                   ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.xml');
+
+      Writeln('Generando CBB corespondiente');
+      generadorCBB.GenerarImagenCBB(nuevaFactura,
+                                    ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.jpg');
 
       Writeln('Generación de CFDI v3.3 exitoso.');
       Readln;

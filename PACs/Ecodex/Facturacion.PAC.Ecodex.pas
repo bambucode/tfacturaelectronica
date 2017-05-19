@@ -150,6 +150,10 @@ begin
         mensajeExcepcion := 'EEcodexFallaSesionException (' + IntToStr(EEcodexFallaSesionException(aExcepcion).Estatus) + ') ' +
                             EEcodexFallaSesionException(aExcepcion).Descripcion;
       end;
+
+     // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
+     // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
+     raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
   end;
 end;
 
