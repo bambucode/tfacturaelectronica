@@ -969,7 +969,7 @@ procedure TComprobanteFiscalV32.AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF
 var
   timbreConXSI : string;
   documentoXMLTimbre : IXMLDocument;
-  //nodoTimbre: ITimbreFiscalDigitalV33;
+  nodoTimbre: ITimbreFiscalDigitalV32;
 begin
   Assert(aXMLTimbre <> '', 'El XML del timbre no puede estar vacio');
   timbreConXSI := Trim(aXMLTimbre);
@@ -986,10 +986,10 @@ begin
 
   // Creamos el XMLDocument desde el XML del timbre
   documentoXMLTimbre := LoadXMLData(Trim(timbreConXSI));
-  //nodoTimbre         := GetTimbreFiscalDigitalV33(documentoXMLTimbre);
+  nodoTimbre         := GetTimbreFiscalDigitalV32(documentoXMLTimbre);
 
   // Agregamos el nodo del TimbreFiscalDigital al nodo Complemento del comprobante
-  //Get_Complemento.ChildNodes.Add(nodoTimbre);
+  Get_Complemento.ChildNodes.Add(nodoTimbre);
 end;
 
 function TComprobanteFiscalV32.Get_Version: UnicodeString;
