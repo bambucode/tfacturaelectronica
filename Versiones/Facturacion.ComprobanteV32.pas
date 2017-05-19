@@ -10,7 +10,8 @@ unit Facturacion.ComprobanteV32;
 
 interface
 
-uses xmldom, XMLDoc, XMLIntf;
+uses xmldom, XMLDoc, XMLIntf,
+     Facturacion.Comprobante;
 
 type
 
@@ -41,7 +42,7 @@ type
 
 { IComprobanteFiscalV32 }
 
-  IComprobanteFiscalV32 = interface(IXMLNode)
+  IComprobanteFiscalV32 = interface(IComprobanteFiscal)
     ['{C018CDC5-5889-4659-A166-9E5A173406AC}']
     { Property Accessors }
     function Get_Version: UnicodeString;
