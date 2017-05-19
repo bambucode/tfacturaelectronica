@@ -886,9 +886,10 @@ type
 
 { Global Functions }
 
-function GetComprobante(Doc: IXMLDocument): IComprobanteFiscalV32;
-function LoadComprobante(const FileName: string): IComprobanteFiscalV32;
-function NewComprobante: IComprobanteFiscalV32;
+function GetComprobanteFiscalV32(Doc: IXMLDocument): IComprobanteFiscalV32;
+function LoadComprobanteFiscalV32(const FileName: string):
+    IComprobanteFiscalV32;
+function NewComprobanteFiscalV32: IComprobanteFiscalV32;
 
 const
   TargetNamespace = 'http://www.sat.gob.mx/cfd/3';
@@ -897,17 +898,18 @@ implementation
 
 { Global Functions }
 
-function GetComprobante(Doc: IXMLDocument): IComprobanteFiscalV32;
+function GetComprobanteFiscalV32(Doc: IXMLDocument): IComprobanteFiscalV32;
 begin
   Result := Doc.GetDocBinding('Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
 end;
 
-function LoadComprobante(const FileName: string): IComprobanteFiscalV32;
+function LoadComprobanteFiscalV32(const FileName: string):
+    IComprobanteFiscalV32;
 begin
   Result := LoadXMLDocument(FileName).GetDocBinding('Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
 end;
 
-function NewComprobante: IComprobanteFiscalV32;
+function NewComprobanteFiscalV32: IComprobanteFiscalV32;
 begin
   Result := NewXMLDocument.GetDocBinding('Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
 end;
