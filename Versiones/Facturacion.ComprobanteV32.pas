@@ -484,32 +484,32 @@ type
 
 { Forward Decls }
 
-  TXMLComprobante = class;
-  TXMLComprobante_Emisor = class;
-  TXMLT_UbicacionFiscal = class;
-  TXMLT_Ubicacion = class;
-  TXMLComprobante_Emisor_RegimenFiscal = class;
-  TXMLComprobante_Emisor_RegimenFiscalList = class;
-  TXMLComprobante_Receptor = class;
-  TXMLComprobante_Conceptos = class;
-  TXMLComprobante_Conceptos_Concepto = class;
-  TXMLT_InformacionAduanera = class;
-  TXMLT_InformacionAduaneraList = class;
-  TXMLComprobante_Conceptos_Concepto_CuentaPredial = class;
-  TXMLComprobante_Conceptos_Concepto_ComplementoConcepto = class;
-  TXMLComprobante_Conceptos_Concepto_Parte = class;
-  TXMLComprobante_Conceptos_Concepto_ParteList = class;
-  TXMLComprobante_Impuestos = class;
-  TXMLComprobante_Impuestos_Retenciones = class;
-  TXMLComprobante_Impuestos_Retenciones_Retencion = class;
-  TXMLComprobante_Impuestos_Traslados = class;
-  TXMLComprobante_Impuestos_Traslados_Traslado = class;
-  TXMLComprobante_Complemento = class;
-  TXMLComprobante_Addenda = class;
+  TComprobanteFiscalV32 = class;
+  TComprobanteFiscalV32_Emisor = class;
+  TComprobanteFiscalV32_UbicacionFiscal = class;
+  TComprobanteFiscalV32_Ubicacion = class;
+  TComprobanteFiscalV32_Emisor_RegimenFiscal = class;
+  TComprobanteFiscalV32_Emisor_RegimenFiscalList = class;
+  TComprobanteFiscalV32_Receptor = class;
+  TComprobanteFiscalV32_Conceptos = class;
+  TComprobanteFiscalV32_Conceptos_Concepto = class;
+  TComprobanteFiscalV32_InformacionAduanera = class;
+  TComprobanteFiscalV32_InformacionAduaneraList = class;
+  TComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial = class;
+  TComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto = class;
+  TComprobanteFiscalV32_Conceptos_Concepto_Parte = class;
+  TComprobanteFiscalV32_Conceptos_Concepto_ParteList = class;
+  TComprobanteFiscalV32_Impuestos = class;
+  TComprobanteFiscalV32_Impuestos_Retenciones = class;
+  TComprobanteFiscalV32_Impuestos_Retenciones_Retencion = class;
+  TComprobanteFiscalV32_Impuestos_Traslados = class;
+  TComprobanteFiscalV32_Impuestos_Traslados_Traslado = class;
+  TComprobanteFiscalV32_Complemento = class;
+  TComprobanteFiscalV32_Addenda = class;
 
-{ TXMLComprobante }
+{ TComprobanteFiscalV32 }
 
-  TXMLComprobante = class(TXMLNode, IComprobanteFiscalV32)
+  TComprobanteFiscalV32 = class(TXMLNode, IComprobanteFiscalV32)
   protected
     { IComprobanteFiscalV32 }
     function Get_Version: UnicodeString;
@@ -568,9 +568,9 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TXMLComprobante_Emisor }
+{ TComprobanteFiscalV32_Emisor }
 
-  TXMLComprobante_Emisor = class(TXMLNode, IComprobanteFiscalV32_Emisor)
+  TComprobanteFiscalV32_Emisor = class(TXMLNode, IComprobanteFiscalV32_Emisor)
   private
     FRegimenFiscal: IComprobanteFiscalV32_Emisor_RegimenFiscalList;
   protected
@@ -586,9 +586,10 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TXMLT_UbicacionFiscal }
+{ TComprobanteFiscalV32_UbicacionFiscal }
 
-  TXMLT_UbicacionFiscal = class(TXMLNode, IComprobanteFiscalV32_UbicacionFiscal)
+  TComprobanteFiscalV32_UbicacionFiscal = class(TXMLNode,
+      IComprobanteFiscalV32_UbicacionFiscal)
   protected
     { IComprobanteFiscalV32_UbicacionFiscal }
     function Get_Calle: UnicodeString;
@@ -613,9 +614,10 @@ type
     procedure Set_CodigoPostal(Value: UnicodeString);
   end;
 
-{ TXMLT_Ubicacion }
+{ TComprobanteFiscalV32_Ubicacion }
 
-  TXMLT_Ubicacion = class(TXMLNode, IComprobanteFiscalV32_Ubicacion)
+  TComprobanteFiscalV32_Ubicacion = class(TXMLNode,
+      IComprobanteFiscalV32_Ubicacion)
   protected
     { IComprobanteFiscalV32_Ubicacion }
     function Get_Calle: UnicodeString;
@@ -640,18 +642,20 @@ type
     procedure Set_CodigoPostal(Value: UnicodeString);
   end;
 
-{ TXMLComprobante_Emisor_RegimenFiscal }
+{ TComprobanteFiscalV32_Emisor_RegimenFiscal }
 
-  TXMLComprobante_Emisor_RegimenFiscal = class(TXMLNode, IComprobanteFiscalV32_Emisor_RegimenFiscal)
+  TComprobanteFiscalV32_Emisor_RegimenFiscal = class(TXMLNode,
+      IComprobanteFiscalV32_Emisor_RegimenFiscal)
   protected
     { IComprobanteFiscalV32_Emisor_RegimenFiscal }
     function Get_Regimen: UnicodeString;
     procedure Set_Regimen(Value: UnicodeString);
   end;
 
-{ TXMLComprobante_Emisor_RegimenFiscalList }
+{ TComprobanteFiscalV32_Emisor_RegimenFiscalList }
 
-  TXMLComprobante_Emisor_RegimenFiscalList = class(TXMLNodeCollection, IComprobanteFiscalV32_Emisor_RegimenFiscalList)
+  TComprobanteFiscalV32_Emisor_RegimenFiscalList = class(TXMLNodeCollection,
+      IComprobanteFiscalV32_Emisor_RegimenFiscalList)
   protected
     { IComprobanteFiscalV32_Emisor_RegimenFiscalList }
     function Add: IComprobanteFiscalV32_Emisor_RegimenFiscal;
@@ -660,9 +664,9 @@ type
     function Get_Item(Index: Integer): IComprobanteFiscalV32_Emisor_RegimenFiscal;
   end;
 
-{ TXMLComprobante_Receptor }
+{ TComprobanteFiscalV32_Receptor }
 
-  TXMLComprobante_Receptor = class(TXMLNode, IComprobanteFiscalV32_Receptor)
+  TComprobanteFiscalV32_Receptor = class(TXMLNode, IComprobanteFiscalV32_Receptor)
   protected
     { IComprobanteFiscalV32_Receptor }
     function Get_Rfc: UnicodeString;
@@ -674,9 +678,10 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TXMLComprobante_Conceptos }
+{ TComprobanteFiscalV32_Conceptos }
 
-  TXMLComprobante_Conceptos = class(TXMLNodeCollection, IComprobanteFiscalV32_Conceptos)
+  TComprobanteFiscalV32_Conceptos = class(TXMLNodeCollection,
+      IComprobanteFiscalV32_Conceptos)
   protected
     { IComprobanteFiscalV32_Conceptos }
     function Get_Concepto(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto;
@@ -686,9 +691,10 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TXMLComprobante_Conceptos_Concepto }
+{ TComprobanteFiscalV32_Conceptos_Concepto }
 
-  TXMLComprobante_Conceptos_Concepto = class(TXMLNode, IComprobanteFiscalV32_Conceptos_Concepto)
+  TComprobanteFiscalV32_Conceptos_Concepto = class(TXMLNode,
+      IComprobanteFiscalV32_Conceptos_Concepto)
   private
     FInformacionAduanera: IComprobanteFiscalV32_InformacionAduaneraList;
     FParte: IComprobanteFiscalV32_Conceptos_Concepto_ParteList;
@@ -714,9 +720,10 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TXMLT_InformacionAduanera }
+{ TComprobanteFiscalV32_InformacionAduanera }
 
-  TXMLT_InformacionAduanera = class(TXMLNode, IComprobanteFiscalV32_InformacionAduanera)
+  TComprobanteFiscalV32_InformacionAduanera = class(TXMLNode,
+      IComprobanteFiscalV32_InformacionAduanera)
   protected
     { IComprobanteFiscalV32_InformacionAduanera }
     function Get_Numero: UnicodeString;
@@ -727,9 +734,10 @@ type
     procedure Set_Aduana(Value: UnicodeString);
   end;
 
-{ TXMLT_InformacionAduaneraList }
+{ TComprobanteFiscalV32_InformacionAduaneraList }
 
-  TXMLT_InformacionAduaneraList = class(TXMLNodeCollection, IComprobanteFiscalV32_InformacionAduaneraList)
+  TComprobanteFiscalV32_InformacionAduaneraList = class(TXMLNodeCollection,
+      IComprobanteFiscalV32_InformacionAduaneraList)
   protected
     { IComprobanteFiscalV32_InformacionAduaneraList }
     function Add: IComprobanteFiscalV32_InformacionAduanera;
@@ -738,25 +746,28 @@ type
     function Get_Item(Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
   end;
 
-{ TXMLComprobante_Conceptos_Concepto_CuentaPredial }
+{ TComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial }
 
-  TXMLComprobante_Conceptos_Concepto_CuentaPredial = class(TXMLNode, IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial)
+  TComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial = class(TXMLNode,
+      IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial)
   protected
     { IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial }
     function Get_Numero: UnicodeString;
     procedure Set_Numero(Value: UnicodeString);
   end;
 
-{ TXMLComprobante_Conceptos_Concepto_ComplementoConcepto }
+{ TComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto }
 
-  TXMLComprobante_Conceptos_Concepto_ComplementoConcepto = class(TXMLNode, IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto)
+  TComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto = class(TXMLNode,
+      IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto)
   protected
     { IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto }
   end;
 
-{ TXMLComprobante_Conceptos_Concepto_Parte }
+{ TComprobanteFiscalV32_Conceptos_Concepto_Parte }
 
-  TXMLComprobante_Conceptos_Concepto_Parte = class(TXMLNodeCollection, IComprobanteFiscalV32_Conceptos_Concepto_Parte)
+  TComprobanteFiscalV32_Conceptos_Concepto_Parte = class(TXMLNodeCollection,
+      IComprobanteFiscalV32_Conceptos_Concepto_Parte)
   protected
     { IComprobanteFiscalV32_Conceptos_Concepto_Parte }
     function Get_Cantidad: UnicodeString;
@@ -778,9 +789,10 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TXMLComprobante_Conceptos_Concepto_ParteList }
+{ TComprobanteFiscalV32_Conceptos_Concepto_ParteList }
 
-  TXMLComprobante_Conceptos_Concepto_ParteList = class(TXMLNodeCollection, IComprobanteFiscalV32_Conceptos_Concepto_ParteList)
+  TComprobanteFiscalV32_Conceptos_Concepto_ParteList = class(TXMLNodeCollection,
+      IComprobanteFiscalV32_Conceptos_Concepto_ParteList)
   protected
     { IComprobanteFiscalV32_Conceptos_Concepto_ParteList }
     function Add: IComprobanteFiscalV32_Conceptos_Concepto_Parte;
@@ -789,9 +801,10 @@ type
     function Get_Item(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto_Parte;
   end;
 
-{ TXMLComprobante_Impuestos }
+{ TComprobanteFiscalV32_Impuestos }
 
-  TXMLComprobante_Impuestos = class(TXMLNode, IComprobanteFiscalV32_Impuestos)
+  TComprobanteFiscalV32_Impuestos = class(TXMLNode,
+      IComprobanteFiscalV32_Impuestos)
   protected
     { IComprobanteFiscalV32_Impuestos }
     function Get_TotalImpuestosRetenidos: UnicodeString;
@@ -804,9 +817,10 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TXMLComprobante_Impuestos_Retenciones }
+{ TComprobanteFiscalV32_Impuestos_Retenciones }
 
-  TXMLComprobante_Impuestos_Retenciones = class(TXMLNodeCollection, IComprobanteFiscalV32_Impuestos_Retenciones)
+  TComprobanteFiscalV32_Impuestos_Retenciones = class(TXMLNodeCollection,
+      IComprobanteFiscalV32_Impuestos_Retenciones)
   protected
     { IComprobanteFiscalV32_Impuestos_Retenciones }
     function Get_Retencion(Index: Integer): IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
@@ -816,9 +830,10 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TXMLComprobante_Impuestos_Retenciones_Retencion }
+{ TComprobanteFiscalV32_Impuestos_Retenciones_Retencion }
 
-  TXMLComprobante_Impuestos_Retenciones_Retencion = class(TXMLNode, IComprobanteFiscalV32_Impuestos_Retenciones_Retencion)
+  TComprobanteFiscalV32_Impuestos_Retenciones_Retencion = class(TXMLNode,
+      IComprobanteFiscalV32_Impuestos_Retenciones_Retencion)
   protected
     { IComprobanteFiscalV32_Impuestos_Retenciones_Retencion }
     function Get_Impuesto: UnicodeString;
@@ -827,9 +842,10 @@ type
     procedure Set_Importe(Value: UnicodeString);
   end;
 
-{ TXMLComprobante_Impuestos_Traslados }
+{ TComprobanteFiscalV32_Impuestos_Traslados }
 
-  TXMLComprobante_Impuestos_Traslados = class(TXMLNodeCollection, IComprobanteFiscalV32_Impuestos_Traslados)
+  TComprobanteFiscalV32_Impuestos_Traslados = class(TXMLNodeCollection,
+      IComprobanteFiscalV32_Impuestos_Traslados)
   protected
     { IComprobanteFiscalV32_Impuestos_Traslados }
     function Get_Traslado(Index: Integer): IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
@@ -839,9 +855,10 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TXMLComprobante_Impuestos_Traslados_Traslado }
+{ TComprobanteFiscalV32_Impuestos_Traslados_Traslado }
 
-  TXMLComprobante_Impuestos_Traslados_Traslado = class(TXMLNode, IComprobanteFiscalV32_Impuestos_Traslados_Traslado)
+  TComprobanteFiscalV32_Impuestos_Traslados_Traslado = class(TXMLNode,
+      IComprobanteFiscalV32_Impuestos_Traslados_Traslado)
   protected
     { IComprobanteFiscalV32_Impuestos_Traslados_Traslado }
     function Get_Impuesto: UnicodeString;
@@ -852,16 +869,17 @@ type
     procedure Set_Importe(Value: UnicodeString);
   end;
 
-{ TXMLComprobante_Complemento }
+{ TComprobanteFiscalV32_Complemento }
 
-  TXMLComprobante_Complemento = class(TXMLNode, IComprobanteFiscalV32_Complemento)
+  TComprobanteFiscalV32_Complemento = class(TXMLNode,
+      IComprobanteFiscalV32_Complemento)
   protected
     { IComprobanteFiscalV32_Complemento }
   end;
 
-{ TXMLComprobante_Addenda }
+{ TComprobanteFiscalV32_Addenda }
 
-  TXMLComprobante_Addenda = class(TXMLNode, IComprobanteFiscalV32_Addenda)
+  TComprobanteFiscalV32_Addenda = class(TXMLNode, IComprobanteFiscalV32_Addenda)
   protected
     { IComprobanteFiscalV32_Addenda }
   end;
@@ -881,1032 +899,1032 @@ implementation
 
 function GetComprobante(Doc: IXMLDocument): IComprobanteFiscalV32;
 begin
-  Result := Doc.GetDocBinding('Comprobante', TXMLComprobante, TargetNamespace) as IComprobanteFiscalV32;
+  Result := Doc.GetDocBinding('Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
 end;
 
 function LoadComprobante(const FileName: string): IComprobanteFiscalV32;
 begin
-  Result := LoadXMLDocument(FileName).GetDocBinding('Comprobante', TXMLComprobante, TargetNamespace) as IComprobanteFiscalV32;
+  Result := LoadXMLDocument(FileName).GetDocBinding('Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
 end;
 
 function NewComprobante: IComprobanteFiscalV32;
 begin
-  Result := NewXMLDocument.GetDocBinding('Comprobante', TXMLComprobante, TargetNamespace) as IComprobanteFiscalV32;
+  Result := NewXMLDocument.GetDocBinding('Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
 end;
 
-{ TXMLComprobante }
+{ TComprobanteFiscalV32 }
 
-procedure TXMLComprobante.AfterConstruction;
+procedure TComprobanteFiscalV32.AfterConstruction;
 begin
-  RegisterChildNode('Emisor', TXMLComprobante_Emisor);
-  RegisterChildNode('Receptor', TXMLComprobante_Receptor);
-  RegisterChildNode('Conceptos', TXMLComprobante_Conceptos);
-  RegisterChildNode('Impuestos', TXMLComprobante_Impuestos);
-  RegisterChildNode('Complemento', TXMLComprobante_Complemento);
-  RegisterChildNode('Addenda', TXMLComprobante_Addenda);
+  RegisterChildNode('Emisor', TComprobanteFiscalV32_Emisor);
+  RegisterChildNode('Receptor', TComprobanteFiscalV32_Receptor);
+  RegisterChildNode('Conceptos', TComprobanteFiscalV32_Conceptos);
+  RegisterChildNode('Impuestos', TComprobanteFiscalV32_Impuestos);
+  RegisterChildNode('Complemento', TComprobanteFiscalV32_Complemento);
+  RegisterChildNode('Addenda', TComprobanteFiscalV32_Addenda);
   inherited;
 end;
 
-function TXMLComprobante.Get_Version: UnicodeString;
+function TComprobanteFiscalV32.Get_Version: UnicodeString;
 begin
   Result := AttributeNodes['version'].Text;
 end;
 
-procedure TXMLComprobante.Set_Version(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_Version(Value: UnicodeString);
 begin
   SetAttribute('version', Value);
 end;
 
-function TXMLComprobante.Get_Serie: UnicodeString;
+function TComprobanteFiscalV32.Get_Serie: UnicodeString;
 begin
   Result := AttributeNodes['serie'].Text;
 end;
 
-procedure TXMLComprobante.Set_Serie(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_Serie(Value: UnicodeString);
 begin
   SetAttribute('serie', Value);
 end;
 
-function TXMLComprobante.Get_Folio: UnicodeString;
+function TComprobanteFiscalV32.Get_Folio: UnicodeString;
 begin
   Result := AttributeNodes['folio'].Text;
 end;
 
-procedure TXMLComprobante.Set_Folio(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_Folio(Value: UnicodeString);
 begin
   SetAttribute('folio', Value);
 end;
 
-function TXMLComprobante.Get_Fecha: UnicodeString;
+function TComprobanteFiscalV32.Get_Fecha: UnicodeString;
 begin
   Result := AttributeNodes['fecha'].Text;
 end;
 
-procedure TXMLComprobante.Set_Fecha(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_Fecha(Value: UnicodeString);
 begin
   SetAttribute('fecha', Value);
 end;
 
-function TXMLComprobante.Get_Sello: UnicodeString;
+function TComprobanteFiscalV32.Get_Sello: UnicodeString;
 begin
   Result := AttributeNodes['sello'].Text;
 end;
 
-procedure TXMLComprobante.Set_Sello(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_Sello(Value: UnicodeString);
 begin
   SetAttribute('sello', Value);
 end;
 
-function TXMLComprobante.Get_FormaDePago: UnicodeString;
+function TComprobanteFiscalV32.Get_FormaDePago: UnicodeString;
 begin
   Result := AttributeNodes['formaDePago'].Text;
 end;
 
-procedure TXMLComprobante.Set_FormaDePago(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_FormaDePago(Value: UnicodeString);
 begin
   SetAttribute('formaDePago', Value);
 end;
 
-function TXMLComprobante.Get_NoCertificado: UnicodeString;
+function TComprobanteFiscalV32.Get_NoCertificado: UnicodeString;
 begin
   Result := AttributeNodes['noCertificado'].Text;
 end;
 
-procedure TXMLComprobante.Set_NoCertificado(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_NoCertificado(Value: UnicodeString);
 begin
   SetAttribute('noCertificado', Value);
 end;
 
-function TXMLComprobante.Get_Certificado: UnicodeString;
+function TComprobanteFiscalV32.Get_Certificado: UnicodeString;
 begin
   Result := AttributeNodes['certificado'].Text;
 end;
 
-procedure TXMLComprobante.Set_Certificado(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_Certificado(Value: UnicodeString);
 begin
   SetAttribute('certificado', Value);
 end;
 
-function TXMLComprobante.Get_CondicionesDePago: UnicodeString;
+function TComprobanteFiscalV32.Get_CondicionesDePago: UnicodeString;
 begin
   Result := AttributeNodes['condicionesDePago'].Text;
 end;
 
-procedure TXMLComprobante.Set_CondicionesDePago(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_CondicionesDePago(Value: UnicodeString);
 begin
   SetAttribute('condicionesDePago', Value);
 end;
 
-function TXMLComprobante.Get_SubTotal: UnicodeString;
+function TComprobanteFiscalV32.Get_SubTotal: UnicodeString;
 begin
   Result := AttributeNodes['subTotal'].Text;
 end;
 
-procedure TXMLComprobante.Set_SubTotal(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_SubTotal(Value: UnicodeString);
 begin
   SetAttribute('subTotal', Value);
 end;
 
-function TXMLComprobante.Get_Descuento: UnicodeString;
+function TComprobanteFiscalV32.Get_Descuento: UnicodeString;
 begin
   Result := AttributeNodes['descuento'].Text;
 end;
 
-procedure TXMLComprobante.Set_Descuento(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_Descuento(Value: UnicodeString);
 begin
   SetAttribute('descuento', Value);
 end;
 
-function TXMLComprobante.Get_MotivoDescuento: UnicodeString;
+function TComprobanteFiscalV32.Get_MotivoDescuento: UnicodeString;
 begin
   Result := AttributeNodes['motivoDescuento'].Text;
 end;
 
-procedure TXMLComprobante.Set_MotivoDescuento(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_MotivoDescuento(Value: UnicodeString);
 begin
   SetAttribute('motivoDescuento', Value);
 end;
 
-function TXMLComprobante.Get_TipoCambio: UnicodeString;
+function TComprobanteFiscalV32.Get_TipoCambio: UnicodeString;
 begin
   Result := AttributeNodes['TipoCambio'].Text;
 end;
 
-procedure TXMLComprobante.Set_TipoCambio(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_TipoCambio(Value: UnicodeString);
 begin
   SetAttribute('TipoCambio', Value);
 end;
 
-function TXMLComprobante.Get_Moneda: UnicodeString;
+function TComprobanteFiscalV32.Get_Moneda: UnicodeString;
 begin
   Result := AttributeNodes['Moneda'].Text;
 end;
 
-procedure TXMLComprobante.Set_Moneda(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_Moneda(Value: UnicodeString);
 begin
   SetAttribute('Moneda', Value);
 end;
 
-function TXMLComprobante.Get_Total: UnicodeString;
+function TComprobanteFiscalV32.Get_Total: UnicodeString;
 begin
   Result := AttributeNodes['total'].Text;
 end;
 
-procedure TXMLComprobante.Set_Total(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_Total(Value: UnicodeString);
 begin
   SetAttribute('total', Value);
 end;
 
-function TXMLComprobante.Get_TipoDeComprobante: UnicodeString;
+function TComprobanteFiscalV32.Get_TipoDeComprobante: UnicodeString;
 begin
   Result := AttributeNodes['tipoDeComprobante'].Text;
 end;
 
-procedure TXMLComprobante.Set_TipoDeComprobante(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_TipoDeComprobante(Value: UnicodeString);
 begin
   SetAttribute('tipoDeComprobante', Value);
 end;
 
-function TXMLComprobante.Get_MetodoDePago: UnicodeString;
+function TComprobanteFiscalV32.Get_MetodoDePago: UnicodeString;
 begin
   Result := AttributeNodes['metodoDePago'].Text;
 end;
 
-procedure TXMLComprobante.Set_MetodoDePago(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_MetodoDePago(Value: UnicodeString);
 begin
   SetAttribute('metodoDePago', Value);
 end;
 
-function TXMLComprobante.Get_LugarExpedicion: UnicodeString;
+function TComprobanteFiscalV32.Get_LugarExpedicion: UnicodeString;
 begin
   Result := AttributeNodes['LugarExpedicion'].Text;
 end;
 
-procedure TXMLComprobante.Set_LugarExpedicion(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_LugarExpedicion(Value: UnicodeString);
 begin
   SetAttribute('LugarExpedicion', Value);
 end;
 
-function TXMLComprobante.Get_NumCtaPago: UnicodeString;
+function TComprobanteFiscalV32.Get_NumCtaPago: UnicodeString;
 begin
   Result := AttributeNodes['NumCtaPago'].Text;
 end;
 
-procedure TXMLComprobante.Set_NumCtaPago(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_NumCtaPago(Value: UnicodeString);
 begin
   SetAttribute('NumCtaPago', Value);
 end;
 
-function TXMLComprobante.Get_FolioFiscalOrig: UnicodeString;
+function TComprobanteFiscalV32.Get_FolioFiscalOrig: UnicodeString;
 begin
   Result := AttributeNodes['FolioFiscalOrig'].Text;
 end;
 
-procedure TXMLComprobante.Set_FolioFiscalOrig(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_FolioFiscalOrig(Value: UnicodeString);
 begin
   SetAttribute('FolioFiscalOrig', Value);
 end;
 
-function TXMLComprobante.Get_SerieFolioFiscalOrig: UnicodeString;
+function TComprobanteFiscalV32.Get_SerieFolioFiscalOrig: UnicodeString;
 begin
   Result := AttributeNodes['SerieFolioFiscalOrig'].Text;
 end;
 
-procedure TXMLComprobante.Set_SerieFolioFiscalOrig(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_SerieFolioFiscalOrig(Value: UnicodeString);
 begin
   SetAttribute('SerieFolioFiscalOrig', Value);
 end;
 
-function TXMLComprobante.Get_FechaFolioFiscalOrig: UnicodeString;
+function TComprobanteFiscalV32.Get_FechaFolioFiscalOrig: UnicodeString;
 begin
   Result := AttributeNodes['FechaFolioFiscalOrig'].Text;
 end;
 
-procedure TXMLComprobante.Set_FechaFolioFiscalOrig(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_FechaFolioFiscalOrig(Value: UnicodeString);
 begin
   SetAttribute('FechaFolioFiscalOrig', Value);
 end;
 
-function TXMLComprobante.Get_MontoFolioFiscalOrig: UnicodeString;
+function TComprobanteFiscalV32.Get_MontoFolioFiscalOrig: UnicodeString;
 begin
   Result := AttributeNodes['MontoFolioFiscalOrig'].Text;
 end;
 
-procedure TXMLComprobante.Set_MontoFolioFiscalOrig(Value: UnicodeString);
+procedure TComprobanteFiscalV32.Set_MontoFolioFiscalOrig(Value: UnicodeString);
 begin
   SetAttribute('MontoFolioFiscalOrig', Value);
 end;
 
-function TXMLComprobante.Get_Emisor: IComprobanteFiscalV32_Emisor;
+function TComprobanteFiscalV32.Get_Emisor: IComprobanteFiscalV32_Emisor;
 begin
   Result := ChildNodes['Emisor'] as IComprobanteFiscalV32_Emisor;
 end;
 
-function TXMLComprobante.Get_Receptor: IComprobanteFiscalV32_Receptor;
+function TComprobanteFiscalV32.Get_Receptor: IComprobanteFiscalV32_Receptor;
 begin
   Result := ChildNodes['Receptor'] as IComprobanteFiscalV32_Receptor;
 end;
 
-function TXMLComprobante.Get_Conceptos: IComprobanteFiscalV32_Conceptos;
+function TComprobanteFiscalV32.Get_Conceptos: IComprobanteFiscalV32_Conceptos;
 begin
   Result := ChildNodes['Conceptos'] as IComprobanteFiscalV32_Conceptos;
 end;
 
-function TXMLComprobante.Get_Impuestos: IComprobanteFiscalV32_Impuestos;
+function TComprobanteFiscalV32.Get_Impuestos: IComprobanteFiscalV32_Impuestos;
 begin
   Result := ChildNodes['Impuestos'] as IComprobanteFiscalV32_Impuestos;
 end;
 
-function TXMLComprobante.Get_Complemento: IComprobanteFiscalV32_Complemento;
+function TComprobanteFiscalV32.Get_Complemento: IComprobanteFiscalV32_Complemento;
 begin
   Result := ChildNodes['Complemento'] as IComprobanteFiscalV32_Complemento;
 end;
 
-function TXMLComprobante.Get_Addenda: IComprobanteFiscalV32_Addenda;
+function TComprobanteFiscalV32.Get_Addenda: IComprobanteFiscalV32_Addenda;
 begin
   Result := ChildNodes['Addenda'] as IComprobanteFiscalV32_Addenda;
 end;
 
-{ TXMLComprobante_Emisor }
+{ TComprobanteFiscalV32_Emisor }
 
-procedure TXMLComprobante_Emisor.AfterConstruction;
+procedure TComprobanteFiscalV32_Emisor.AfterConstruction;
 begin
-  RegisterChildNode('DomicilioFiscal', TXMLT_UbicacionFiscal);
-  RegisterChildNode('ExpedidoEn', TXMLT_Ubicacion);
-  RegisterChildNode('RegimenFiscal', TXMLComprobante_Emisor_RegimenFiscal);
-  FRegimenFiscal := CreateCollection(TXMLComprobante_Emisor_RegimenFiscalList, IComprobanteFiscalV32_Emisor_RegimenFiscal, 'RegimenFiscal') as IComprobanteFiscalV32_Emisor_RegimenFiscalList;
+  RegisterChildNode('DomicilioFiscal', TComprobanteFiscalV32_UbicacionFiscal);
+  RegisterChildNode('ExpedidoEn', TComprobanteFiscalV32_Ubicacion);
+  RegisterChildNode('RegimenFiscal', TComprobanteFiscalV32_Emisor_RegimenFiscal);
+  FRegimenFiscal := CreateCollection(TComprobanteFiscalV32_Emisor_RegimenFiscalList, IComprobanteFiscalV32_Emisor_RegimenFiscal, 'RegimenFiscal') as IComprobanteFiscalV32_Emisor_RegimenFiscalList;
   inherited;
 end;
 
-function TXMLComprobante_Emisor.Get_Rfc: UnicodeString;
+function TComprobanteFiscalV32_Emisor.Get_Rfc: UnicodeString;
 begin
   Result := AttributeNodes['rfc'].Text;
 end;
 
-procedure TXMLComprobante_Emisor.Set_Rfc(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Emisor.Set_Rfc(Value: UnicodeString);
 begin
   SetAttribute('rfc', Value);
 end;
 
-function TXMLComprobante_Emisor.Get_Nombre: UnicodeString;
+function TComprobanteFiscalV32_Emisor.Get_Nombre: UnicodeString;
 begin
   Result := AttributeNodes['nombre'].Text;
 end;
 
-procedure TXMLComprobante_Emisor.Set_Nombre(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Emisor.Set_Nombre(Value: UnicodeString);
 begin
   SetAttribute('nombre', Value);
 end;
 
-function TXMLComprobante_Emisor.Get_DomicilioFiscal: IComprobanteFiscalV32_UbicacionFiscal;
+function TComprobanteFiscalV32_Emisor.Get_DomicilioFiscal: IComprobanteFiscalV32_UbicacionFiscal;
 begin
   Result := ChildNodes['DomicilioFiscal'] as IComprobanteFiscalV32_UbicacionFiscal;
 end;
 
-function TXMLComprobante_Emisor.Get_ExpedidoEn: IComprobanteFiscalV32_Ubicacion;
+function TComprobanteFiscalV32_Emisor.Get_ExpedidoEn: IComprobanteFiscalV32_Ubicacion;
 begin
   Result := ChildNodes['ExpedidoEn'] as IComprobanteFiscalV32_Ubicacion;
 end;
 
-function TXMLComprobante_Emisor.Get_RegimenFiscal: IComprobanteFiscalV32_Emisor_RegimenFiscalList;
+function TComprobanteFiscalV32_Emisor.Get_RegimenFiscal: IComprobanteFiscalV32_Emisor_RegimenFiscalList;
 begin
   Result := FRegimenFiscal;
 end;
 
-{ TXMLT_UbicacionFiscal }
+{ TComprobanteFiscalV32_UbicacionFiscal }
 
-function TXMLT_UbicacionFiscal.Get_Calle: UnicodeString;
+function TComprobanteFiscalV32_UbicacionFiscal.Get_Calle: UnicodeString;
 begin
   Result := AttributeNodes['calle'].Text;
 end;
 
-procedure TXMLT_UbicacionFiscal.Set_Calle(Value: UnicodeString);
+procedure TComprobanteFiscalV32_UbicacionFiscal.Set_Calle(Value: UnicodeString);
 begin
   SetAttribute('calle', Value);
 end;
 
-function TXMLT_UbicacionFiscal.Get_NoExterior: UnicodeString;
+function TComprobanteFiscalV32_UbicacionFiscal.Get_NoExterior: UnicodeString;
 begin
   Result := AttributeNodes['noExterior'].Text;
 end;
 
-procedure TXMLT_UbicacionFiscal.Set_NoExterior(Value: UnicodeString);
+procedure TComprobanteFiscalV32_UbicacionFiscal.Set_NoExterior(Value: UnicodeString);
 begin
   SetAttribute('noExterior', Value);
 end;
 
-function TXMLT_UbicacionFiscal.Get_NoInterior: UnicodeString;
+function TComprobanteFiscalV32_UbicacionFiscal.Get_NoInterior: UnicodeString;
 begin
   Result := AttributeNodes['noInterior'].Text;
 end;
 
-procedure TXMLT_UbicacionFiscal.Set_NoInterior(Value: UnicodeString);
+procedure TComprobanteFiscalV32_UbicacionFiscal.Set_NoInterior(Value: UnicodeString);
 begin
   SetAttribute('noInterior', Value);
 end;
 
-function TXMLT_UbicacionFiscal.Get_Colonia: UnicodeString;
+function TComprobanteFiscalV32_UbicacionFiscal.Get_Colonia: UnicodeString;
 begin
   Result := AttributeNodes['colonia'].Text;
 end;
 
-procedure TXMLT_UbicacionFiscal.Set_Colonia(Value: UnicodeString);
+procedure TComprobanteFiscalV32_UbicacionFiscal.Set_Colonia(Value: UnicodeString);
 begin
   SetAttribute('colonia', Value);
 end;
 
-function TXMLT_UbicacionFiscal.Get_Localidad: UnicodeString;
+function TComprobanteFiscalV32_UbicacionFiscal.Get_Localidad: UnicodeString;
 begin
   Result := AttributeNodes['localidad'].Text;
 end;
 
-procedure TXMLT_UbicacionFiscal.Set_Localidad(Value: UnicodeString);
+procedure TComprobanteFiscalV32_UbicacionFiscal.Set_Localidad(Value: UnicodeString);
 begin
   SetAttribute('localidad', Value);
 end;
 
-function TXMLT_UbicacionFiscal.Get_Referencia: UnicodeString;
+function TComprobanteFiscalV32_UbicacionFiscal.Get_Referencia: UnicodeString;
 begin
   Result := AttributeNodes['referencia'].Text;
 end;
 
-procedure TXMLT_UbicacionFiscal.Set_Referencia(Value: UnicodeString);
+procedure TComprobanteFiscalV32_UbicacionFiscal.Set_Referencia(Value: UnicodeString);
 begin
   SetAttribute('referencia', Value);
 end;
 
-function TXMLT_UbicacionFiscal.Get_Municipio: UnicodeString;
+function TComprobanteFiscalV32_UbicacionFiscal.Get_Municipio: UnicodeString;
 begin
   Result := AttributeNodes['municipio'].Text;
 end;
 
-procedure TXMLT_UbicacionFiscal.Set_Municipio(Value: UnicodeString);
+procedure TComprobanteFiscalV32_UbicacionFiscal.Set_Municipio(Value: UnicodeString);
 begin
   SetAttribute('municipio', Value);
 end;
 
-function TXMLT_UbicacionFiscal.Get_Estado: UnicodeString;
+function TComprobanteFiscalV32_UbicacionFiscal.Get_Estado: UnicodeString;
 begin
   Result := AttributeNodes['estado'].Text;
 end;
 
-procedure TXMLT_UbicacionFiscal.Set_Estado(Value: UnicodeString);
+procedure TComprobanteFiscalV32_UbicacionFiscal.Set_Estado(Value: UnicodeString);
 begin
   SetAttribute('estado', Value);
 end;
 
-function TXMLT_UbicacionFiscal.Get_Pais: UnicodeString;
+function TComprobanteFiscalV32_UbicacionFiscal.Get_Pais: UnicodeString;
 begin
   Result := AttributeNodes['pais'].Text;
 end;
 
-procedure TXMLT_UbicacionFiscal.Set_Pais(Value: UnicodeString);
+procedure TComprobanteFiscalV32_UbicacionFiscal.Set_Pais(Value: UnicodeString);
 begin
   SetAttribute('pais', Value);
 end;
 
-function TXMLT_UbicacionFiscal.Get_CodigoPostal: UnicodeString;
+function TComprobanteFiscalV32_UbicacionFiscal.Get_CodigoPostal: UnicodeString;
 begin
   Result := AttributeNodes['codigoPostal'].Text;
 end;
 
-procedure TXMLT_UbicacionFiscal.Set_CodigoPostal(Value: UnicodeString);
+procedure TComprobanteFiscalV32_UbicacionFiscal.Set_CodigoPostal(Value: UnicodeString);
 begin
   SetAttribute('codigoPostal', Value);
 end;
 
-{ TXMLT_Ubicacion }
+{ TComprobanteFiscalV32_Ubicacion }
 
-function TXMLT_Ubicacion.Get_Calle: UnicodeString;
+function TComprobanteFiscalV32_Ubicacion.Get_Calle: UnicodeString;
 begin
   Result := AttributeNodes['calle'].Text;
 end;
 
-procedure TXMLT_Ubicacion.Set_Calle(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Ubicacion.Set_Calle(Value: UnicodeString);
 begin
   SetAttribute('calle', Value);
 end;
 
-function TXMLT_Ubicacion.Get_NoExterior: UnicodeString;
+function TComprobanteFiscalV32_Ubicacion.Get_NoExterior: UnicodeString;
 begin
   Result := AttributeNodes['noExterior'].Text;
 end;
 
-procedure TXMLT_Ubicacion.Set_NoExterior(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Ubicacion.Set_NoExterior(Value: UnicodeString);
 begin
   SetAttribute('noExterior', Value);
 end;
 
-function TXMLT_Ubicacion.Get_NoInterior: UnicodeString;
+function TComprobanteFiscalV32_Ubicacion.Get_NoInterior: UnicodeString;
 begin
   Result := AttributeNodes['noInterior'].Text;
 end;
 
-procedure TXMLT_Ubicacion.Set_NoInterior(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Ubicacion.Set_NoInterior(Value: UnicodeString);
 begin
   SetAttribute('noInterior', Value);
 end;
 
-function TXMLT_Ubicacion.Get_Colonia: UnicodeString;
+function TComprobanteFiscalV32_Ubicacion.Get_Colonia: UnicodeString;
 begin
   Result := AttributeNodes['colonia'].Text;
 end;
 
-procedure TXMLT_Ubicacion.Set_Colonia(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Ubicacion.Set_Colonia(Value: UnicodeString);
 begin
   SetAttribute('colonia', Value);
 end;
 
-function TXMLT_Ubicacion.Get_Localidad: UnicodeString;
+function TComprobanteFiscalV32_Ubicacion.Get_Localidad: UnicodeString;
 begin
   Result := AttributeNodes['localidad'].Text;
 end;
 
-procedure TXMLT_Ubicacion.Set_Localidad(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Ubicacion.Set_Localidad(Value: UnicodeString);
 begin
   SetAttribute('localidad', Value);
 end;
 
-function TXMLT_Ubicacion.Get_Referencia: UnicodeString;
+function TComprobanteFiscalV32_Ubicacion.Get_Referencia: UnicodeString;
 begin
   Result := AttributeNodes['referencia'].Text;
 end;
 
-procedure TXMLT_Ubicacion.Set_Referencia(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Ubicacion.Set_Referencia(Value: UnicodeString);
 begin
   SetAttribute('referencia', Value);
 end;
 
-function TXMLT_Ubicacion.Get_Municipio: UnicodeString;
+function TComprobanteFiscalV32_Ubicacion.Get_Municipio: UnicodeString;
 begin
   Result := AttributeNodes['municipio'].Text;
 end;
 
-procedure TXMLT_Ubicacion.Set_Municipio(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Ubicacion.Set_Municipio(Value: UnicodeString);
 begin
   SetAttribute('municipio', Value);
 end;
 
-function TXMLT_Ubicacion.Get_Estado: UnicodeString;
+function TComprobanteFiscalV32_Ubicacion.Get_Estado: UnicodeString;
 begin
   Result := AttributeNodes['estado'].Text;
 end;
 
-procedure TXMLT_Ubicacion.Set_Estado(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Ubicacion.Set_Estado(Value: UnicodeString);
 begin
   SetAttribute('estado', Value);
 end;
 
-function TXMLT_Ubicacion.Get_Pais: UnicodeString;
+function TComprobanteFiscalV32_Ubicacion.Get_Pais: UnicodeString;
 begin
   Result := AttributeNodes['pais'].Text;
 end;
 
-procedure TXMLT_Ubicacion.Set_Pais(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Ubicacion.Set_Pais(Value: UnicodeString);
 begin
   SetAttribute('pais', Value);
 end;
 
-function TXMLT_Ubicacion.Get_CodigoPostal: UnicodeString;
+function TComprobanteFiscalV32_Ubicacion.Get_CodigoPostal: UnicodeString;
 begin
   Result := AttributeNodes['codigoPostal'].Text;
 end;
 
-procedure TXMLT_Ubicacion.Set_CodigoPostal(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Ubicacion.Set_CodigoPostal(Value: UnicodeString);
 begin
   SetAttribute('codigoPostal', Value);
 end;
 
-{ TXMLComprobante_Emisor_RegimenFiscal }
+{ TComprobanteFiscalV32_Emisor_RegimenFiscal }
 
-function TXMLComprobante_Emisor_RegimenFiscal.Get_Regimen: UnicodeString;
+function TComprobanteFiscalV32_Emisor_RegimenFiscal.Get_Regimen: UnicodeString;
 begin
   Result := AttributeNodes['Regimen'].Text;
 end;
 
-procedure TXMLComprobante_Emisor_RegimenFiscal.Set_Regimen(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Emisor_RegimenFiscal.Set_Regimen(Value: UnicodeString);
 begin
   SetAttribute('Regimen', Value);
 end;
 
-{ TXMLComprobante_Emisor_RegimenFiscalList }
+{ TComprobanteFiscalV32_Emisor_RegimenFiscalList }
 
-function TXMLComprobante_Emisor_RegimenFiscalList.Add: IComprobanteFiscalV32_Emisor_RegimenFiscal;
+function TComprobanteFiscalV32_Emisor_RegimenFiscalList.Add: IComprobanteFiscalV32_Emisor_RegimenFiscal;
 begin
   Result := AddItem(-1) as IComprobanteFiscalV32_Emisor_RegimenFiscal;
 end;
 
-function TXMLComprobante_Emisor_RegimenFiscalList.Insert(const Index: Integer): IComprobanteFiscalV32_Emisor_RegimenFiscal;
+function TComprobanteFiscalV32_Emisor_RegimenFiscalList.Insert(const Index: Integer): IComprobanteFiscalV32_Emisor_RegimenFiscal;
 begin
   Result := AddItem(Index) as IComprobanteFiscalV32_Emisor_RegimenFiscal;
 end;
 
-function TXMLComprobante_Emisor_RegimenFiscalList.Get_Item(Index: Integer): IComprobanteFiscalV32_Emisor_RegimenFiscal;
+function TComprobanteFiscalV32_Emisor_RegimenFiscalList.Get_Item(Index: Integer): IComprobanteFiscalV32_Emisor_RegimenFiscal;
 begin
   Result := List[Index] as IComprobanteFiscalV32_Emisor_RegimenFiscal;
 end;
 
-{ TXMLComprobante_Receptor }
+{ TComprobanteFiscalV32_Receptor }
 
-procedure TXMLComprobante_Receptor.AfterConstruction;
+procedure TComprobanteFiscalV32_Receptor.AfterConstruction;
 begin
-  RegisterChildNode('Domicilio', TXMLT_Ubicacion);
+  RegisterChildNode('Domicilio', TComprobanteFiscalV32_Ubicacion);
   inherited;
 end;
 
-function TXMLComprobante_Receptor.Get_Rfc: UnicodeString;
+function TComprobanteFiscalV32_Receptor.Get_Rfc: UnicodeString;
 begin
   Result := AttributeNodes['rfc'].Text;
 end;
 
-procedure TXMLComprobante_Receptor.Set_Rfc(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Receptor.Set_Rfc(Value: UnicodeString);
 begin
   SetAttribute('rfc', Value);
 end;
 
-function TXMLComprobante_Receptor.Get_Nombre: UnicodeString;
+function TComprobanteFiscalV32_Receptor.Get_Nombre: UnicodeString;
 begin
   Result := AttributeNodes['nombre'].Text;
 end;
 
-procedure TXMLComprobante_Receptor.Set_Nombre(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Receptor.Set_Nombre(Value: UnicodeString);
 begin
   SetAttribute('nombre', Value);
 end;
 
-function TXMLComprobante_Receptor.Get_Domicilio: IComprobanteFiscalV32_Ubicacion;
+function TComprobanteFiscalV32_Receptor.Get_Domicilio: IComprobanteFiscalV32_Ubicacion;
 begin
   Result := ChildNodes['Domicilio'] as IComprobanteFiscalV32_Ubicacion;
 end;
 
-{ TXMLComprobante_Conceptos }
+{ TComprobanteFiscalV32_Conceptos }
 
-procedure TXMLComprobante_Conceptos.AfterConstruction;
+procedure TComprobanteFiscalV32_Conceptos.AfterConstruction;
 begin
-  RegisterChildNode('Concepto', TXMLComprobante_Conceptos_Concepto);
+  RegisterChildNode('Concepto', TComprobanteFiscalV32_Conceptos_Concepto);
   ItemTag := 'Concepto';
   ItemInterface := IComprobanteFiscalV32_Conceptos_Concepto;
   inherited;
 end;
 
-function TXMLComprobante_Conceptos.Get_Concepto(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto;
+function TComprobanteFiscalV32_Conceptos.Get_Concepto(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto;
 begin
   Result := List[Index] as IComprobanteFiscalV32_Conceptos_Concepto;
 end;
 
-function TXMLComprobante_Conceptos.Add: IComprobanteFiscalV32_Conceptos_Concepto;
+function TComprobanteFiscalV32_Conceptos.Add: IComprobanteFiscalV32_Conceptos_Concepto;
 begin
   Result := AddItem(-1) as IComprobanteFiscalV32_Conceptos_Concepto;
 end;
 
-function TXMLComprobante_Conceptos.Insert(const Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto;
+function TComprobanteFiscalV32_Conceptos.Insert(const Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto;
 begin
   Result := AddItem(Index) as IComprobanteFiscalV32_Conceptos_Concepto;
 end;
 
-{ TXMLComprobante_Conceptos_Concepto }
+{ TComprobanteFiscalV32_Conceptos_Concepto }
 
-procedure TXMLComprobante_Conceptos_Concepto.AfterConstruction;
+procedure TComprobanteFiscalV32_Conceptos_Concepto.AfterConstruction;
 begin
-  RegisterChildNode('InformacionAduanera', TXMLT_InformacionAduanera);
-  RegisterChildNode('CuentaPredial', TXMLComprobante_Conceptos_Concepto_CuentaPredial);
-  RegisterChildNode('ComplementoConcepto', TXMLComprobante_Conceptos_Concepto_ComplementoConcepto);
-  RegisterChildNode('Parte', TXMLComprobante_Conceptos_Concepto_Parte);
-  FInformacionAduanera := CreateCollection(TXMLT_InformacionAduaneraList, IComprobanteFiscalV32_InformacionAduanera, 'InformacionAduanera') as IComprobanteFiscalV32_InformacionAduaneraList;
-  FParte := CreateCollection(TXMLComprobante_Conceptos_Concepto_ParteList, IComprobanteFiscalV32_Conceptos_Concepto_Parte, 'Parte') as IComprobanteFiscalV32_Conceptos_Concepto_ParteList;
+  RegisterChildNode('InformacionAduanera', TComprobanteFiscalV32_InformacionAduanera);
+  RegisterChildNode('CuentaPredial', TComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial);
+  RegisterChildNode('ComplementoConcepto', TComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto);
+  RegisterChildNode('Parte', TComprobanteFiscalV32_Conceptos_Concepto_Parte);
+  FInformacionAduanera := CreateCollection(TComprobanteFiscalV32_InformacionAduaneraList, IComprobanteFiscalV32_InformacionAduanera, 'InformacionAduanera') as IComprobanteFiscalV32_InformacionAduaneraList;
+  FParte := CreateCollection(TComprobanteFiscalV32_Conceptos_Concepto_ParteList, IComprobanteFiscalV32_Conceptos_Concepto_Parte, 'Parte') as IComprobanteFiscalV32_Conceptos_Concepto_ParteList;
   inherited;
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_Cantidad: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto.Get_Cantidad: UnicodeString;
 begin
   Result := AttributeNodes['cantidad'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto.Set_Cantidad(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto.Set_Cantidad(Value: UnicodeString);
 begin
   SetAttribute('cantidad', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_Unidad: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto.Get_Unidad: UnicodeString;
 begin
   Result := AttributeNodes['unidad'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto.Set_Unidad(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto.Set_Unidad(Value: UnicodeString);
 begin
   SetAttribute('unidad', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_NoIdentificacion: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto.Get_NoIdentificacion: UnicodeString;
 begin
   Result := AttributeNodes['noIdentificacion'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto.Set_NoIdentificacion(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto.Set_NoIdentificacion(Value: UnicodeString);
 begin
   SetAttribute('noIdentificacion', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_Descripcion: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto.Get_Descripcion: UnicodeString;
 begin
   Result := AttributeNodes['descripcion'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto.Set_Descripcion(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto.Set_Descripcion(Value: UnicodeString);
 begin
   SetAttribute('descripcion', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_ValorUnitario: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto.Get_ValorUnitario: UnicodeString;
 begin
   Result := AttributeNodes['valorUnitario'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto.Set_ValorUnitario(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto.Set_ValorUnitario(Value: UnicodeString);
 begin
   SetAttribute('valorUnitario', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_Importe: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto.Get_Importe: UnicodeString;
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto.Set_Importe(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto.Set_Importe(Value: UnicodeString);
 begin
   SetAttribute('importe', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_InformacionAduanera: IComprobanteFiscalV32_InformacionAduaneraList;
+function TComprobanteFiscalV32_Conceptos_Concepto.Get_InformacionAduanera: IComprobanteFiscalV32_InformacionAduaneraList;
 begin
   Result := FInformacionAduanera;
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_CuentaPredial: IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial;
+function TComprobanteFiscalV32_Conceptos_Concepto.Get_CuentaPredial: IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial;
 begin
   Result := ChildNodes['CuentaPredial'] as IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial;
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_ComplementoConcepto: IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto;
+function TComprobanteFiscalV32_Conceptos_Concepto.Get_ComplementoConcepto: IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto;
 begin
   Result := ChildNodes['ComplementoConcepto'] as IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto;
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_Parte: IComprobanteFiscalV32_Conceptos_Concepto_ParteList;
+function TComprobanteFiscalV32_Conceptos_Concepto.Get_Parte: IComprobanteFiscalV32_Conceptos_Concepto_ParteList;
 begin
   Result := FParte;
 end;
 
-{ TXMLT_InformacionAduanera }
+{ TComprobanteFiscalV32_InformacionAduanera }
 
-function TXMLT_InformacionAduanera.Get_Numero: UnicodeString;
+function TComprobanteFiscalV32_InformacionAduanera.Get_Numero: UnicodeString;
 begin
   Result := AttributeNodes['numero'].Text;
 end;
 
-procedure TXMLT_InformacionAduanera.Set_Numero(Value: UnicodeString);
+procedure TComprobanteFiscalV32_InformacionAduanera.Set_Numero(Value: UnicodeString);
 begin
   SetAttribute('numero', Value);
 end;
 
-function TXMLT_InformacionAduanera.Get_Fecha: UnicodeString;
+function TComprobanteFiscalV32_InformacionAduanera.Get_Fecha: UnicodeString;
 begin
   Result := AttributeNodes['fecha'].Text;
 end;
 
-procedure TXMLT_InformacionAduanera.Set_Fecha(Value: UnicodeString);
+procedure TComprobanteFiscalV32_InformacionAduanera.Set_Fecha(Value: UnicodeString);
 begin
   SetAttribute('fecha', Value);
 end;
 
-function TXMLT_InformacionAduanera.Get_Aduana: UnicodeString;
+function TComprobanteFiscalV32_InformacionAduanera.Get_Aduana: UnicodeString;
 begin
   Result := AttributeNodes['aduana'].Text;
 end;
 
-procedure TXMLT_InformacionAduanera.Set_Aduana(Value: UnicodeString);
+procedure TComprobanteFiscalV32_InformacionAduanera.Set_Aduana(Value: UnicodeString);
 begin
   SetAttribute('aduana', Value);
 end;
 
-{ TXMLT_InformacionAduaneraList }
+{ TComprobanteFiscalV32_InformacionAduaneraList }
 
-function TXMLT_InformacionAduaneraList.Add: IComprobanteFiscalV32_InformacionAduanera;
+function TComprobanteFiscalV32_InformacionAduaneraList.Add: IComprobanteFiscalV32_InformacionAduanera;
 begin
   Result := AddItem(-1) as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
-function TXMLT_InformacionAduaneraList.Insert(const Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
+function TComprobanteFiscalV32_InformacionAduaneraList.Insert(const Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
 begin
   Result := AddItem(Index) as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
-function TXMLT_InformacionAduaneraList.Get_Item(Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
+function TComprobanteFiscalV32_InformacionAduaneraList.Get_Item(Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
 begin
   Result := List[Index] as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
-{ TXMLComprobante_Conceptos_Concepto_CuentaPredial }
+{ TComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial }
 
-function TXMLComprobante_Conceptos_Concepto_CuentaPredial.Get_Numero: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial.Get_Numero: UnicodeString;
 begin
   Result := AttributeNodes['numero'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto_CuentaPredial.Set_Numero(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial.Set_Numero(Value: UnicodeString);
 begin
   SetAttribute('numero', Value);
 end;
 
-{ TXMLComprobante_Conceptos_Concepto_ComplementoConcepto }
+{ TComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto }
 
-{ TXMLComprobante_Conceptos_Concepto_Parte }
+{ TComprobanteFiscalV32_Conceptos_Concepto_Parte }
 
-procedure TXMLComprobante_Conceptos_Concepto_Parte.AfterConstruction;
+procedure TComprobanteFiscalV32_Conceptos_Concepto_Parte.AfterConstruction;
 begin
-  RegisterChildNode('InformacionAduanera', TXMLT_InformacionAduanera);
+  RegisterChildNode('InformacionAduanera', TComprobanteFiscalV32_InformacionAduanera);
   ItemTag := 'InformacionAduanera';
   ItemInterface := IComprobanteFiscalV32_InformacionAduanera;
   inherited;
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Get_Cantidad: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto_Parte.Get_Cantidad: UnicodeString;
 begin
   Result := AttributeNodes['cantidad'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto_Parte.Set_Cantidad(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto_Parte.Set_Cantidad(Value: UnicodeString);
 begin
   SetAttribute('cantidad', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Get_Unidad: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto_Parte.Get_Unidad: UnicodeString;
 begin
   Result := AttributeNodes['unidad'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto_Parte.Set_Unidad(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto_Parte.Set_Unidad(Value: UnicodeString);
 begin
   SetAttribute('unidad', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Get_NoIdentificacion: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto_Parte.Get_NoIdentificacion: UnicodeString;
 begin
   Result := AttributeNodes['noIdentificacion'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto_Parte.Set_NoIdentificacion(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto_Parte.Set_NoIdentificacion(Value: UnicodeString);
 begin
   SetAttribute('noIdentificacion', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Get_Descripcion: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto_Parte.Get_Descripcion: UnicodeString;
 begin
   Result := AttributeNodes['descripcion'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto_Parte.Set_Descripcion(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto_Parte.Set_Descripcion(Value: UnicodeString);
 begin
   SetAttribute('descripcion', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Get_ValorUnitario: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto_Parte.Get_ValorUnitario: UnicodeString;
 begin
   Result := AttributeNodes['valorUnitario'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto_Parte.Set_ValorUnitario(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto_Parte.Set_ValorUnitario(Value: UnicodeString);
 begin
   SetAttribute('valorUnitario', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Get_Importe: UnicodeString;
+function TComprobanteFiscalV32_Conceptos_Concepto_Parte.Get_Importe: UnicodeString;
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TXMLComprobante_Conceptos_Concepto_Parte.Set_Importe(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Conceptos_Concepto_Parte.Set_Importe(Value: UnicodeString);
 begin
   SetAttribute('importe', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Get_InformacionAduanera(Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
+function TComprobanteFiscalV32_Conceptos_Concepto_Parte.Get_InformacionAduanera(Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
 begin
   Result := List[Index] as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Add: IComprobanteFiscalV32_InformacionAduanera;
+function TComprobanteFiscalV32_Conceptos_Concepto_Parte.Add: IComprobanteFiscalV32_InformacionAduanera;
 begin
   Result := AddItem(-1) as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Insert(const Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
+function TComprobanteFiscalV32_Conceptos_Concepto_Parte.Insert(const Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
 begin
   Result := AddItem(Index) as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
-{ TXMLComprobante_Conceptos_Concepto_ParteList }
+{ TComprobanteFiscalV32_Conceptos_Concepto_ParteList }
 
-function TXMLComprobante_Conceptos_Concepto_ParteList.Add: IComprobanteFiscalV32_Conceptos_Concepto_Parte;
+function TComprobanteFiscalV32_Conceptos_Concepto_ParteList.Add: IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 begin
   Result := AddItem(-1) as IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 end;
 
-function TXMLComprobante_Conceptos_Concepto_ParteList.Insert(const Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto_Parte;
+function TComprobanteFiscalV32_Conceptos_Concepto_ParteList.Insert(const Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 begin
   Result := AddItem(Index) as IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 end;
 
-function TXMLComprobante_Conceptos_Concepto_ParteList.Get_Item(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto_Parte;
+function TComprobanteFiscalV32_Conceptos_Concepto_ParteList.Get_Item(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 begin
   Result := List[Index] as IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 end;
 
-{ TXMLComprobante_Impuestos }
+{ TComprobanteFiscalV32_Impuestos }
 
-procedure TXMLComprobante_Impuestos.AfterConstruction;
+procedure TComprobanteFiscalV32_Impuestos.AfterConstruction;
 begin
-  RegisterChildNode('Retenciones', TXMLComprobante_Impuestos_Retenciones);
-  RegisterChildNode('Traslados', TXMLComprobante_Impuestos_Traslados);
+  RegisterChildNode('Retenciones', TComprobanteFiscalV32_Impuestos_Retenciones);
+  RegisterChildNode('Traslados', TComprobanteFiscalV32_Impuestos_Traslados);
   inherited;
 end;
 
-function TXMLComprobante_Impuestos.Get_TotalImpuestosRetenidos: UnicodeString;
+function TComprobanteFiscalV32_Impuestos.Get_TotalImpuestosRetenidos: UnicodeString;
 begin
   Result := AttributeNodes['totalImpuestosRetenidos'].Text;
 end;
 
-procedure TXMLComprobante_Impuestos.Set_TotalImpuestosRetenidos(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Impuestos.Set_TotalImpuestosRetenidos(Value: UnicodeString);
 begin
   SetAttribute('totalImpuestosRetenidos', Value);
 end;
 
-function TXMLComprobante_Impuestos.Get_TotalImpuestosTrasladados: UnicodeString;
+function TComprobanteFiscalV32_Impuestos.Get_TotalImpuestosTrasladados: UnicodeString;
 begin
   Result := AttributeNodes['totalImpuestosTrasladados'].Text;
 end;
 
-procedure TXMLComprobante_Impuestos.Set_TotalImpuestosTrasladados(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Impuestos.Set_TotalImpuestosTrasladados(Value: UnicodeString);
 begin
   SetAttribute('totalImpuestosTrasladados', Value);
 end;
 
-function TXMLComprobante_Impuestos.Get_Retenciones: IComprobanteFiscalV32_Impuestos_Retenciones;
+function TComprobanteFiscalV32_Impuestos.Get_Retenciones: IComprobanteFiscalV32_Impuestos_Retenciones;
 begin
   Result := ChildNodes['Retenciones'] as IComprobanteFiscalV32_Impuestos_Retenciones;
 end;
 
-function TXMLComprobante_Impuestos.Get_Traslados: IComprobanteFiscalV32_Impuestos_Traslados;
+function TComprobanteFiscalV32_Impuestos.Get_Traslados: IComprobanteFiscalV32_Impuestos_Traslados;
 begin
   Result := ChildNodes['Traslados'] as IComprobanteFiscalV32_Impuestos_Traslados;
 end;
 
-{ TXMLComprobante_Impuestos_Retenciones }
+{ TComprobanteFiscalV32_Impuestos_Retenciones }
 
-procedure TXMLComprobante_Impuestos_Retenciones.AfterConstruction;
+procedure TComprobanteFiscalV32_Impuestos_Retenciones.AfterConstruction;
 begin
-  RegisterChildNode('Retencion', TXMLComprobante_Impuestos_Retenciones_Retencion);
+  RegisterChildNode('Retencion', TComprobanteFiscalV32_Impuestos_Retenciones_Retencion);
   ItemTag := 'Retencion';
   ItemInterface := IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
   inherited;
 end;
 
-function TXMLComprobante_Impuestos_Retenciones.Get_Retencion(Index: Integer): IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
+function TComprobanteFiscalV32_Impuestos_Retenciones.Get_Retencion(Index: Integer): IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 begin
   Result := List[Index] as IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 end;
 
-function TXMLComprobante_Impuestos_Retenciones.Add: IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
+function TComprobanteFiscalV32_Impuestos_Retenciones.Add: IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 begin
   Result := AddItem(-1) as IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 end;
 
-function TXMLComprobante_Impuestos_Retenciones.Insert(const Index: Integer): IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
+function TComprobanteFiscalV32_Impuestos_Retenciones.Insert(const Index: Integer): IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 begin
   Result := AddItem(Index) as IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 end;
 
-{ TXMLComprobante_Impuestos_Retenciones_Retencion }
+{ TComprobanteFiscalV32_Impuestos_Retenciones_Retencion }
 
-function TXMLComprobante_Impuestos_Retenciones_Retencion.Get_Impuesto: UnicodeString;
+function TComprobanteFiscalV32_Impuestos_Retenciones_Retencion.Get_Impuesto: UnicodeString;
 begin
   Result := AttributeNodes['impuesto'].Text;
 end;
 
-procedure TXMLComprobante_Impuestos_Retenciones_Retencion.Set_Impuesto(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Impuestos_Retenciones_Retencion.Set_Impuesto(Value: UnicodeString);
 begin
   SetAttribute('impuesto', Value);
 end;
 
-function TXMLComprobante_Impuestos_Retenciones_Retencion.Get_Importe: UnicodeString;
+function TComprobanteFiscalV32_Impuestos_Retenciones_Retencion.Get_Importe: UnicodeString;
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TXMLComprobante_Impuestos_Retenciones_Retencion.Set_Importe(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Impuestos_Retenciones_Retencion.Set_Importe(Value: UnicodeString);
 begin
   SetAttribute('importe', Value);
 end;
 
-{ TXMLComprobante_Impuestos_Traslados }
+{ TComprobanteFiscalV32_Impuestos_Traslados }
 
-procedure TXMLComprobante_Impuestos_Traslados.AfterConstruction;
+procedure TComprobanteFiscalV32_Impuestos_Traslados.AfterConstruction;
 begin
-  RegisterChildNode('Traslado', TXMLComprobante_Impuestos_Traslados_Traslado);
+  RegisterChildNode('Traslado', TComprobanteFiscalV32_Impuestos_Traslados_Traslado);
   ItemTag := 'Traslado';
   ItemInterface := IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
   inherited;
 end;
 
-function TXMLComprobante_Impuestos_Traslados.Get_Traslado(Index: Integer): IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
+function TComprobanteFiscalV32_Impuestos_Traslados.Get_Traslado(Index: Integer): IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 begin
   Result := List[Index] as IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 end;
 
-function TXMLComprobante_Impuestos_Traslados.Add: IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
+function TComprobanteFiscalV32_Impuestos_Traslados.Add: IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 begin
   Result := AddItem(-1) as IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 end;
 
-function TXMLComprobante_Impuestos_Traslados.Insert(const Index: Integer): IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
+function TComprobanteFiscalV32_Impuestos_Traslados.Insert(const Index: Integer): IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 begin
   Result := AddItem(Index) as IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 end;
 
-{ TXMLComprobante_Impuestos_Traslados_Traslado }
+{ TComprobanteFiscalV32_Impuestos_Traslados_Traslado }
 
-function TXMLComprobante_Impuestos_Traslados_Traslado.Get_Impuesto: UnicodeString;
+function TComprobanteFiscalV32_Impuestos_Traslados_Traslado.Get_Impuesto: UnicodeString;
 begin
   Result := AttributeNodes['impuesto'].Text;
 end;
 
-procedure TXMLComprobante_Impuestos_Traslados_Traslado.Set_Impuesto(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Impuestos_Traslados_Traslado.Set_Impuesto(Value: UnicodeString);
 begin
   SetAttribute('impuesto', Value);
 end;
 
-function TXMLComprobante_Impuestos_Traslados_Traslado.Get_Tasa: UnicodeString;
+function TComprobanteFiscalV32_Impuestos_Traslados_Traslado.Get_Tasa: UnicodeString;
 begin
   Result := AttributeNodes['tasa'].Text;
 end;
 
-procedure TXMLComprobante_Impuestos_Traslados_Traslado.Set_Tasa(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Impuestos_Traslados_Traslado.Set_Tasa(Value: UnicodeString);
 begin
   SetAttribute('tasa', Value);
 end;
 
-function TXMLComprobante_Impuestos_Traslados_Traslado.Get_Importe: UnicodeString;
+function TComprobanteFiscalV32_Impuestos_Traslados_Traslado.Get_Importe: UnicodeString;
 begin
   Result := AttributeNodes['importe'].Text;
 end;
 
-procedure TXMLComprobante_Impuestos_Traslados_Traslado.Set_Importe(Value: UnicodeString);
+procedure TComprobanteFiscalV32_Impuestos_Traslados_Traslado.Set_Importe(Value: UnicodeString);
 begin
   SetAttribute('importe', Value);
 end;
 
-{ TXMLComprobante_Complemento }
+{ TComprobanteFiscalV32_Complemento }
 
-{ TXMLComprobante_Addenda }
+{ TComprobanteFiscalV32_Addenda }
 
 end.
