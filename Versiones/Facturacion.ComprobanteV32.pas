@@ -884,6 +884,8 @@ type
     { IComprobanteFiscalV32_Complemento }
     function GetTimbreFiscalDigital: ITimbreFiscalDigitalV32;
     procedure SetTimbreFiscalDigital(const Value: ITimbreFiscalDigitalV32);
+  public
+    procedure AfterConstruction; override;
   end;
 
 { TComprobanteFiscalV32_Addenda }
@@ -1993,6 +1995,13 @@ end;
 { TComprobanteFiscalV32_Addenda }
 
 { TComprobanteFiscalV32_Complemento }
+
+procedure TComprobanteFiscalV32_Complemento.AfterConstruction;
+begin
+  RegisterChildNode('TimbreFiscalDigital', TTimbreFiscalDigitalV32,
+                     Facturacion.TimbreFiscalDigitalV32.TargetNamespace);
+  inherited;
+end;
 
 function TComprobanteFiscalV32_Complemento.GetTimbreFiscalDigital: ITimbreFiscalDigitalV32;
 begin
