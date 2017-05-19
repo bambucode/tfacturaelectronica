@@ -898,6 +898,29 @@ implementation
 
 { Global Functions }
 
+procedure establecerAtributosDeCFDI(comprobante: IComprobanteFiscalV32);
+var
+  documentoBase: IXMLDocument;
+const
+  _NODO_XSI     = 'xmlns:xsi';
+  _NODO_SL      = 'xsi:schemaLocation';
+  _NODO_VERSION = 'Version';
+begin
+  // Agregamos la auto identacion
+  comprobante.OwnerDocument.Options := [doNodeAutoCreate, doAttrNull, doAutoPrefix, doNamespaceDecl, doNodeAutoIndent];
+
+  if (comprobante.AttributeNodes.FindNode(_NODO_XSI) = nil) then
+      comprobante.SetAttribute(_NODO_XSI,
+                               'http://www.w3.org/2001/XMLSchema-instance');
+
+  if (comprobante.AttributeNodes.FindNode(_NODO_SL) = nil) then
+    comprobante.SetAttribute(_NODO_SL,
+                            'http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv32.xsd');
+
+  if (comprobante.AttributeNodes.FindNode(_NODO_VERSION) = nil) then
+    comprobante.Version := '3.2';
+end;
+
 function GetComprobanteFiscalV32(Doc: IXMLDocument): IComprobanteFiscalV32;
 begin
   Result := Doc.GetDocBinding('Comprobante', TComprobanteFiscalV32, TargetNamespace) as IComprobanteFiscalV32;
@@ -924,6 +947,8 @@ begin
   RegisterChildNode('Impuestos', TComprobanteFiscalV32_Impuestos);
   RegisterChildNode('Complemento', TComprobanteFiscalV32_Complemento);
   RegisterChildNode('Addenda', TComprobanteFiscalV32_Addenda);
+
+  establecerAtributosDeCFDI(Self);
   inherited;
 end;
 
