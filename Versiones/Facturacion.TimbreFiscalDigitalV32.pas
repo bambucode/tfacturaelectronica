@@ -83,18 +83,18 @@ implementation
 
 function GetTimbreFiscalDigitalV32(Doc: IXMLDocument): ITimbreFiscalDigitalV32;
 begin
-  Result := Doc.GetDocBinding('TimbreFiscalDigital', TTimbreFiscalDigitalV32, TargetNamespace) as ITimbreFiscalDigitalV32;
+  Result := Doc.GetDocBinding('tfd:TimbreFiscalDigital', TTimbreFiscalDigitalV32, TargetNamespace) as ITimbreFiscalDigitalV32;
 end;
 
 function LoadTimbreFiscalDigitalV32(const FileName: string):
     ITimbreFiscalDigitalV32;
 begin
-  Result := LoadXMLDocument(FileName).GetDocBinding('TimbreFiscalDigital', TTimbreFiscalDigitalV32, TargetNamespace) as ITimbreFiscalDigitalV32;
+  Result := LoadXMLDocument(FileName).GetDocBinding('tfd:TimbreFiscalDigital', TTimbreFiscalDigitalV32, TargetNamespace) as ITimbreFiscalDigitalV32;
 end;
 
 function NewTimbreFiscalDigitalV32: ITimbreFiscalDigitalV32;
 begin
-  Result := NewXMLDocument.GetDocBinding('TimbreFiscalDigital', TTimbreFiscalDigitalV32, TargetNamespace) as ITimbreFiscalDigitalV32;
+  Result := NewXMLDocument.GetDocBinding('tfd:TimbreFiscalDigital', TTimbreFiscalDigitalV32, TargetNamespace) as ITimbreFiscalDigitalV32;
 end;
 
 { TTimbreFiscalDigitalV32 }
