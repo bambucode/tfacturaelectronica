@@ -16,32 +16,32 @@ type
 
 { Forward Decls }
 
-  IXMLComprobante = interface;
-  IXMLComprobante_Emisor = interface;
-  IXMLT_UbicacionFiscal = interface;
-  IXMLT_Ubicacion = interface;
-  IXMLComprobante_Emisor_RegimenFiscal = interface;
-  IXMLComprobante_Emisor_RegimenFiscalList = interface;
-  IXMLComprobante_Receptor = interface;
-  IXMLComprobante_Conceptos = interface;
-  IXMLComprobante_Conceptos_Concepto = interface;
-  IXMLT_InformacionAduanera = interface;
-  IXMLT_InformacionAduaneraList = interface;
-  IXMLComprobante_Conceptos_Concepto_CuentaPredial = interface;
-  IXMLComprobante_Conceptos_Concepto_ComplementoConcepto = interface;
-  IXMLComprobante_Conceptos_Concepto_Parte = interface;
-  IXMLComprobante_Conceptos_Concepto_ParteList = interface;
-  IXMLComprobante_Impuestos = interface;
-  IXMLComprobante_Impuestos_Retenciones = interface;
-  IXMLComprobante_Impuestos_Retenciones_Retencion = interface;
-  IXMLComprobante_Impuestos_Traslados = interface;
-  IXMLComprobante_Impuestos_Traslados_Traslado = interface;
-  IXMLComprobante_Complemento = interface;
-  IXMLComprobante_Addenda = interface;
+  IComprobanteFiscalV32 = interface;
+  IComprobanteFiscalV32_Emisor = interface;
+  IComprobanteFiscalV32_UbicacionFiscal = interface;
+  IComprobanteFiscalV32_Ubicacion = interface;
+  IComprobanteFiscalV32_Emisor_RegimenFiscal = interface;
+  IComprobanteFiscalV32_Emisor_RegimenFiscalList = interface;
+  IComprobanteFiscalV32_Receptor = interface;
+  IComprobanteFiscalV32_Conceptos = interface;
+  IComprobanteFiscalV32_Conceptos_Concepto = interface;
+  IComprobanteFiscalV32_InformacionAduanera = interface;
+  IComprobanteFiscalV32_InformacionAduaneraList = interface;
+  IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial = interface;
+  IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto = interface;
+  IComprobanteFiscalV32_Conceptos_Concepto_Parte = interface;
+  IComprobanteFiscalV32_Conceptos_Concepto_ParteList = interface;
+  IComprobanteFiscalV32_Impuestos = interface;
+  IComprobanteFiscalV32_Impuestos_Retenciones = interface;
+  IComprobanteFiscalV32_Impuestos_Retenciones_Retencion = interface;
+  IComprobanteFiscalV32_Impuestos_Traslados = interface;
+  IComprobanteFiscalV32_Impuestos_Traslados_Traslado = interface;
+  IComprobanteFiscalV32_Complemento = interface;
+  IComprobanteFiscalV32_Addenda = interface;
 
-{ IXMLComprobante }
+{ IComprobanteFiscalV32 }
 
-  IXMLComprobante = interface(IXMLNode)
+  IComprobanteFiscalV32 = interface(IXMLNode)
     ['{C018CDC5-5889-4659-A166-9E5A173406AC}']
     { Property Accessors }
     function Get_Version: UnicodeString;
@@ -67,12 +67,12 @@ type
     function Get_SerieFolioFiscalOrig: UnicodeString;
     function Get_FechaFolioFiscalOrig: UnicodeString;
     function Get_MontoFolioFiscalOrig: UnicodeString;
-    function Get_Emisor: IXMLComprobante_Emisor;
-    function Get_Receptor: IXMLComprobante_Receptor;
-    function Get_Conceptos: IXMLComprobante_Conceptos;
-    function Get_Impuestos: IXMLComprobante_Impuestos;
-    function Get_Complemento: IXMLComprobante_Complemento;
-    function Get_Addenda: IXMLComprobante_Addenda;
+    function Get_Emisor: IComprobanteFiscalV32_Emisor;
+    function Get_Receptor: IComprobanteFiscalV32_Receptor;
+    function Get_Conceptos: IComprobanteFiscalV32_Conceptos;
+    function Get_Impuestos: IComprobanteFiscalV32_Impuestos;
+    function Get_Complemento: IComprobanteFiscalV32_Complemento;
+    function Get_Addenda: IComprobanteFiscalV32_Addenda;
     procedure Set_Version(Value: UnicodeString);
     procedure Set_Serie(Value: UnicodeString);
     procedure Set_Folio(Value: UnicodeString);
@@ -120,37 +120,37 @@ type
     property SerieFolioFiscalOrig: UnicodeString read Get_SerieFolioFiscalOrig write Set_SerieFolioFiscalOrig;
     property FechaFolioFiscalOrig: UnicodeString read Get_FechaFolioFiscalOrig write Set_FechaFolioFiscalOrig;
     property MontoFolioFiscalOrig: UnicodeString read Get_MontoFolioFiscalOrig write Set_MontoFolioFiscalOrig;
-    property Emisor: IXMLComprobante_Emisor read Get_Emisor;
-    property Receptor: IXMLComprobante_Receptor read Get_Receptor;
-    property Conceptos: IXMLComprobante_Conceptos read Get_Conceptos;
-    property Impuestos: IXMLComprobante_Impuestos read Get_Impuestos;
-    property Complemento: IXMLComprobante_Complemento read Get_Complemento;
-    property Addenda: IXMLComprobante_Addenda read Get_Addenda;
+    property Emisor: IComprobanteFiscalV32_Emisor read Get_Emisor;
+    property Receptor: IComprobanteFiscalV32_Receptor read Get_Receptor;
+    property Conceptos: IComprobanteFiscalV32_Conceptos read Get_Conceptos;
+    property Impuestos: IComprobanteFiscalV32_Impuestos read Get_Impuestos;
+    property Complemento: IComprobanteFiscalV32_Complemento read Get_Complemento;
+    property Addenda: IComprobanteFiscalV32_Addenda read Get_Addenda;
   end;
 
-{ IXMLComprobante_Emisor }
+{ IComprobanteFiscalV32_Emisor }
 
-  IXMLComprobante_Emisor = interface(IXMLNode)
+  IComprobanteFiscalV32_Emisor = interface(IXMLNode)
     ['{741EBD22-84AE-42F0-8C6B-E40A782D35B1}']
     { Property Accessors }
     function Get_Rfc: UnicodeString;
     function Get_Nombre: UnicodeString;
-    function Get_DomicilioFiscal: IXMLT_UbicacionFiscal;
-    function Get_ExpedidoEn: IXMLT_Ubicacion;
-    function Get_RegimenFiscal: IXMLComprobante_Emisor_RegimenFiscalList;
+    function Get_DomicilioFiscal: IComprobanteFiscalV32_UbicacionFiscal;
+    function Get_ExpedidoEn: IComprobanteFiscalV32_Ubicacion;
+    function Get_RegimenFiscal: IComprobanteFiscalV32_Emisor_RegimenFiscalList;
     procedure Set_Rfc(Value: UnicodeString);
     procedure Set_Nombre(Value: UnicodeString);
     { Methods & Properties }
     property Rfc: UnicodeString read Get_Rfc write Set_Rfc;
     property Nombre: UnicodeString read Get_Nombre write Set_Nombre;
-    property DomicilioFiscal: IXMLT_UbicacionFiscal read Get_DomicilioFiscal;
-    property ExpedidoEn: IXMLT_Ubicacion read Get_ExpedidoEn;
-    property RegimenFiscal: IXMLComprobante_Emisor_RegimenFiscalList read Get_RegimenFiscal;
+    property DomicilioFiscal: IComprobanteFiscalV32_UbicacionFiscal read Get_DomicilioFiscal;
+    property ExpedidoEn: IComprobanteFiscalV32_Ubicacion read Get_ExpedidoEn;
+    property RegimenFiscal: IComprobanteFiscalV32_Emisor_RegimenFiscalList read Get_RegimenFiscal;
   end;
 
-{ IXMLT_UbicacionFiscal }
+{ IComprobanteFiscalV32_UbicacionFiscal }
 
-  IXMLT_UbicacionFiscal = interface(IXMLNode)
+  IComprobanteFiscalV32_UbicacionFiscal = interface(IXMLNode)
     ['{F8F04714-6452-4B4A-8A37-BC7AF7ACF117}']
     { Property Accessors }
     function Get_Calle: UnicodeString;
@@ -186,9 +186,9 @@ type
     property CodigoPostal: UnicodeString read Get_CodigoPostal write Set_CodigoPostal;
   end;
 
-{ IXMLT_Ubicacion }
+{ IComprobanteFiscalV32_Ubicacion }
 
-  IXMLT_Ubicacion = interface(IXMLNode)
+  IComprobanteFiscalV32_Ubicacion = interface(IXMLNode)
     ['{D611FB84-616C-4C83-8FAA-A98323EF5093}']
     { Property Accessors }
     function Get_Calle: UnicodeString;
@@ -224,9 +224,9 @@ type
     property CodigoPostal: UnicodeString read Get_CodigoPostal write Set_CodigoPostal;
   end;
 
-{ IXMLComprobante_Emisor_RegimenFiscal }
+{ IComprobanteFiscalV32_Emisor_RegimenFiscal }
 
-  IXMLComprobante_Emisor_RegimenFiscal = interface(IXMLNode)
+  IComprobanteFiscalV32_Emisor_RegimenFiscal = interface(IXMLNode)
     ['{1CAF225E-E683-45EF-B4E5-A2926CF6ECE4}']
     { Property Accessors }
     function Get_Regimen: UnicodeString;
@@ -235,49 +235,49 @@ type
     property Regimen: UnicodeString read Get_Regimen write Set_Regimen;
   end;
 
-{ IXMLComprobante_Emisor_RegimenFiscalList }
+{ IComprobanteFiscalV32_Emisor_RegimenFiscalList }
 
-  IXMLComprobante_Emisor_RegimenFiscalList = interface(IXMLNodeCollection)
+  IComprobanteFiscalV32_Emisor_RegimenFiscalList = interface(IXMLNodeCollection)
     ['{41691E65-0E45-4ED1-B5D9-BEDC6EA29D53}']
     { Methods & Properties }
-    function Add: IXMLComprobante_Emisor_RegimenFiscal;
-    function Insert(const Index: Integer): IXMLComprobante_Emisor_RegimenFiscal;
+    function Add: IComprobanteFiscalV32_Emisor_RegimenFiscal;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_Emisor_RegimenFiscal;
 
-    function Get_Item(Index: Integer): IXMLComprobante_Emisor_RegimenFiscal;
-    property Items[Index: Integer]: IXMLComprobante_Emisor_RegimenFiscal read Get_Item; default;
+    function Get_Item(Index: Integer): IComprobanteFiscalV32_Emisor_RegimenFiscal;
+    property Items[Index: Integer]: IComprobanteFiscalV32_Emisor_RegimenFiscal read Get_Item; default;
   end;
 
-{ IXMLComprobante_Receptor }
+{ IComprobanteFiscalV32_Receptor }
 
-  IXMLComprobante_Receptor = interface(IXMLNode)
+  IComprobanteFiscalV32_Receptor = interface(IXMLNode)
     ['{397F2929-F701-4886-9D41-B0800E3CAAF1}']
     { Property Accessors }
     function Get_Rfc: UnicodeString;
     function Get_Nombre: UnicodeString;
-    function Get_Domicilio: IXMLT_Ubicacion;
+    function Get_Domicilio: IComprobanteFiscalV32_Ubicacion;
     procedure Set_Rfc(Value: UnicodeString);
     procedure Set_Nombre(Value: UnicodeString);
     { Methods & Properties }
     property Rfc: UnicodeString read Get_Rfc write Set_Rfc;
     property Nombre: UnicodeString read Get_Nombre write Set_Nombre;
-    property Domicilio: IXMLT_Ubicacion read Get_Domicilio;
+    property Domicilio: IComprobanteFiscalV32_Ubicacion read Get_Domicilio;
   end;
 
-{ IXMLComprobante_Conceptos }
+{ IComprobanteFiscalV32_Conceptos }
 
-  IXMLComprobante_Conceptos = interface(IXMLNodeCollection)
+  IComprobanteFiscalV32_Conceptos = interface(IXMLNodeCollection)
     ['{3BB9E2A7-AAC7-41F3-9513-BF95B5723081}']
     { Property Accessors }
-    function Get_Concepto(Index: Integer): IXMLComprobante_Conceptos_Concepto;
+    function Get_Concepto(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto;
     { Methods & Properties }
-    function Add: IXMLComprobante_Conceptos_Concepto;
-    function Insert(const Index: Integer): IXMLComprobante_Conceptos_Concepto;
-    property Concepto[Index: Integer]: IXMLComprobante_Conceptos_Concepto read Get_Concepto; default;
+    function Add: IComprobanteFiscalV32_Conceptos_Concepto;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto;
+    property Concepto[Index: Integer]: IComprobanteFiscalV32_Conceptos_Concepto read Get_Concepto; default;
   end;
 
-{ IXMLComprobante_Conceptos_Concepto }
+{ IComprobanteFiscalV32_Conceptos_Concepto }
 
-  IXMLComprobante_Conceptos_Concepto = interface(IXMLNode)
+  IComprobanteFiscalV32_Conceptos_Concepto = interface(IXMLNode)
     ['{B345F4BA-72C4-4C51-8940-152F8C205DE3}']
     { Property Accessors }
     function Get_Cantidad: UnicodeString;
@@ -286,10 +286,10 @@ type
     function Get_Descripcion: UnicodeString;
     function Get_ValorUnitario: UnicodeString;
     function Get_Importe: UnicodeString;
-    function Get_InformacionAduanera: IXMLT_InformacionAduaneraList;
-    function Get_CuentaPredial: IXMLComprobante_Conceptos_Concepto_CuentaPredial;
-    function Get_ComplementoConcepto: IXMLComprobante_Conceptos_Concepto_ComplementoConcepto;
-    function Get_Parte: IXMLComprobante_Conceptos_Concepto_ParteList;
+    function Get_InformacionAduanera: IComprobanteFiscalV32_InformacionAduaneraList;
+    function Get_CuentaPredial: IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial;
+    function Get_ComplementoConcepto: IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto;
+    function Get_Parte: IComprobanteFiscalV32_Conceptos_Concepto_ParteList;
     procedure Set_Cantidad(Value: UnicodeString);
     procedure Set_Unidad(Value: UnicodeString);
     procedure Set_NoIdentificacion(Value: UnicodeString);
@@ -303,15 +303,15 @@ type
     property Descripcion: UnicodeString read Get_Descripcion write Set_Descripcion;
     property ValorUnitario: UnicodeString read Get_ValorUnitario write Set_ValorUnitario;
     property Importe: UnicodeString read Get_Importe write Set_Importe;
-    property InformacionAduanera: IXMLT_InformacionAduaneraList read Get_InformacionAduanera;
-    property CuentaPredial: IXMLComprobante_Conceptos_Concepto_CuentaPredial read Get_CuentaPredial;
-    property ComplementoConcepto: IXMLComprobante_Conceptos_Concepto_ComplementoConcepto read Get_ComplementoConcepto;
-    property Parte: IXMLComprobante_Conceptos_Concepto_ParteList read Get_Parte;
+    property InformacionAduanera: IComprobanteFiscalV32_InformacionAduaneraList read Get_InformacionAduanera;
+    property CuentaPredial: IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial read Get_CuentaPredial;
+    property ComplementoConcepto: IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto read Get_ComplementoConcepto;
+    property Parte: IComprobanteFiscalV32_Conceptos_Concepto_ParteList read Get_Parte;
   end;
 
-{ IXMLT_InformacionAduanera }
+{ IComprobanteFiscalV32_InformacionAduanera }
 
-  IXMLT_InformacionAduanera = interface(IXMLNode)
+  IComprobanteFiscalV32_InformacionAduanera = interface(IXMLNode)
     ['{177ED3AD-2515-4AA7-BEA3-5BB635ABBB19}']
     { Property Accessors }
     function Get_Numero: UnicodeString;
@@ -326,21 +326,21 @@ type
     property Aduana: UnicodeString read Get_Aduana write Set_Aduana;
   end;
 
-{ IXMLT_InformacionAduaneraList }
+{ IComprobanteFiscalV32_InformacionAduaneraList }
 
-  IXMLT_InformacionAduaneraList = interface(IXMLNodeCollection)
+  IComprobanteFiscalV32_InformacionAduaneraList = interface(IXMLNodeCollection)
     ['{52290AE7-F241-4A39-BF1C-29845CCFD677}']
     { Methods & Properties }
-    function Add: IXMLT_InformacionAduanera;
-    function Insert(const Index: Integer): IXMLT_InformacionAduanera;
+    function Add: IComprobanteFiscalV32_InformacionAduanera;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
 
-    function Get_Item(Index: Integer): IXMLT_InformacionAduanera;
-    property Items[Index: Integer]: IXMLT_InformacionAduanera read Get_Item; default;
+    function Get_Item(Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
+    property Items[Index: Integer]: IComprobanteFiscalV32_InformacionAduanera read Get_Item; default;
   end;
 
-{ IXMLComprobante_Conceptos_Concepto_CuentaPredial }
+{ IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial }
 
-  IXMLComprobante_Conceptos_Concepto_CuentaPredial = interface(IXMLNode)
+  IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial = interface(IXMLNode)
     ['{B543873D-8F4C-45FB-B780-E7DD3D58E063}']
     { Property Accessors }
     function Get_Numero: UnicodeString;
@@ -349,15 +349,15 @@ type
     property Numero: UnicodeString read Get_Numero write Set_Numero;
   end;
 
-{ IXMLComprobante_Conceptos_Concepto_ComplementoConcepto }
+{ IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto }
 
-  IXMLComprobante_Conceptos_Concepto_ComplementoConcepto = interface(IXMLNode)
+  IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto = interface(IXMLNode)
     ['{BCD040CF-864E-4946-9F72-C9264E007274}']
   end;
 
-{ IXMLComprobante_Conceptos_Concepto_Parte }
+{ IComprobanteFiscalV32_Conceptos_Concepto_Parte }
 
-  IXMLComprobante_Conceptos_Concepto_Parte = interface(IXMLNodeCollection)
+  IComprobanteFiscalV32_Conceptos_Concepto_Parte = interface(IXMLNodeCollection)
     ['{F511025E-8991-4717-9558-3B420B08A294}']
     { Property Accessors }
     function Get_Cantidad: UnicodeString;
@@ -366,7 +366,7 @@ type
     function Get_Descripcion: UnicodeString;
     function Get_ValorUnitario: UnicodeString;
     function Get_Importe: UnicodeString;
-    function Get_InformacionAduanera(Index: Integer): IXMLT_InformacionAduanera;
+    function Get_InformacionAduanera(Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
     procedure Set_Cantidad(Value: UnicodeString);
     procedure Set_Unidad(Value: UnicodeString);
     procedure Set_NoIdentificacion(Value: UnicodeString);
@@ -374,62 +374,62 @@ type
     procedure Set_ValorUnitario(Value: UnicodeString);
     procedure Set_Importe(Value: UnicodeString);
     { Methods & Properties }
-    function Add: IXMLT_InformacionAduanera;
-    function Insert(const Index: Integer): IXMLT_InformacionAduanera;
+    function Add: IComprobanteFiscalV32_InformacionAduanera;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
     property Cantidad: UnicodeString read Get_Cantidad write Set_Cantidad;
     property Unidad: UnicodeString read Get_Unidad write Set_Unidad;
     property NoIdentificacion: UnicodeString read Get_NoIdentificacion write Set_NoIdentificacion;
     property Descripcion: UnicodeString read Get_Descripcion write Set_Descripcion;
     property ValorUnitario: UnicodeString read Get_ValorUnitario write Set_ValorUnitario;
     property Importe: UnicodeString read Get_Importe write Set_Importe;
-    property InformacionAduanera[Index: Integer]: IXMLT_InformacionAduanera read Get_InformacionAduanera; default;
+    property InformacionAduanera[Index: Integer]: IComprobanteFiscalV32_InformacionAduanera read Get_InformacionAduanera; default;
   end;
 
-{ IXMLComprobante_Conceptos_Concepto_ParteList }
+{ IComprobanteFiscalV32_Conceptos_Concepto_ParteList }
 
-  IXMLComprobante_Conceptos_Concepto_ParteList = interface(IXMLNodeCollection)
+  IComprobanteFiscalV32_Conceptos_Concepto_ParteList = interface(IXMLNodeCollection)
     ['{D63E7450-EBC8-43F5-A2E6-3D224BD05ADF}']
     { Methods & Properties }
-    function Add: IXMLComprobante_Conceptos_Concepto_Parte;
-    function Insert(const Index: Integer): IXMLComprobante_Conceptos_Concepto_Parte;
+    function Add: IComprobanteFiscalV32_Conceptos_Concepto_Parte;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 
-    function Get_Item(Index: Integer): IXMLComprobante_Conceptos_Concepto_Parte;
-    property Items[Index: Integer]: IXMLComprobante_Conceptos_Concepto_Parte read Get_Item; default;
+    function Get_Item(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto_Parte;
+    property Items[Index: Integer]: IComprobanteFiscalV32_Conceptos_Concepto_Parte read Get_Item; default;
   end;
 
-{ IXMLComprobante_Impuestos }
+{ IComprobanteFiscalV32_Impuestos }
 
-  IXMLComprobante_Impuestos = interface(IXMLNode)
+  IComprobanteFiscalV32_Impuestos = interface(IXMLNode)
     ['{BC6F24CC-0717-4373-89FA-1C4263E394C9}']
     { Property Accessors }
     function Get_TotalImpuestosRetenidos: UnicodeString;
     function Get_TotalImpuestosTrasladados: UnicodeString;
-    function Get_Retenciones: IXMLComprobante_Impuestos_Retenciones;
-    function Get_Traslados: IXMLComprobante_Impuestos_Traslados;
+    function Get_Retenciones: IComprobanteFiscalV32_Impuestos_Retenciones;
+    function Get_Traslados: IComprobanteFiscalV32_Impuestos_Traslados;
     procedure Set_TotalImpuestosRetenidos(Value: UnicodeString);
     procedure Set_TotalImpuestosTrasladados(Value: UnicodeString);
     { Methods & Properties }
     property TotalImpuestosRetenidos: UnicodeString read Get_TotalImpuestosRetenidos write Set_TotalImpuestosRetenidos;
     property TotalImpuestosTrasladados: UnicodeString read Get_TotalImpuestosTrasladados write Set_TotalImpuestosTrasladados;
-    property Retenciones: IXMLComprobante_Impuestos_Retenciones read Get_Retenciones;
-    property Traslados: IXMLComprobante_Impuestos_Traslados read Get_Traslados;
+    property Retenciones: IComprobanteFiscalV32_Impuestos_Retenciones read Get_Retenciones;
+    property Traslados: IComprobanteFiscalV32_Impuestos_Traslados read Get_Traslados;
   end;
 
-{ IXMLComprobante_Impuestos_Retenciones }
+{ IComprobanteFiscalV32_Impuestos_Retenciones }
 
-  IXMLComprobante_Impuestos_Retenciones = interface(IXMLNodeCollection)
+  IComprobanteFiscalV32_Impuestos_Retenciones = interface(IXMLNodeCollection)
     ['{47987050-FACB-4816-A3F4-F31B92946E58}']
     { Property Accessors }
-    function Get_Retencion(Index: Integer): IXMLComprobante_Impuestos_Retenciones_Retencion;
+    function Get_Retencion(Index: Integer): IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
     { Methods & Properties }
-    function Add: IXMLComprobante_Impuestos_Retenciones_Retencion;
-    function Insert(const Index: Integer): IXMLComprobante_Impuestos_Retenciones_Retencion;
-    property Retencion[Index: Integer]: IXMLComprobante_Impuestos_Retenciones_Retencion read Get_Retencion; default;
+    function Add: IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
+    property Retencion[Index: Integer]: IComprobanteFiscalV32_Impuestos_Retenciones_Retencion read Get_Retencion; default;
   end;
 
-{ IXMLComprobante_Impuestos_Retenciones_Retencion }
+{ IComprobanteFiscalV32_Impuestos_Retenciones_Retencion }
 
-  IXMLComprobante_Impuestos_Retenciones_Retencion = interface(IXMLNode)
+  IComprobanteFiscalV32_Impuestos_Retenciones_Retencion = interface(IXMLNode)
     ['{7FCAC018-4976-4A74-A853-B140589CA4F1}']
     { Property Accessors }
     function Get_Impuesto: UnicodeString;
@@ -441,21 +441,21 @@ type
     property Importe: UnicodeString read Get_Importe write Set_Importe;
   end;
 
-{ IXMLComprobante_Impuestos_Traslados }
+{ IComprobanteFiscalV32_Impuestos_Traslados }
 
-  IXMLComprobante_Impuestos_Traslados = interface(IXMLNodeCollection)
+  IComprobanteFiscalV32_Impuestos_Traslados = interface(IXMLNodeCollection)
     ['{D5857541-E1BC-4180-BA1B-58580307C404}']
     { Property Accessors }
-    function Get_Traslado(Index: Integer): IXMLComprobante_Impuestos_Traslados_Traslado;
+    function Get_Traslado(Index: Integer): IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
     { Methods & Properties }
-    function Add: IXMLComprobante_Impuestos_Traslados_Traslado;
-    function Insert(const Index: Integer): IXMLComprobante_Impuestos_Traslados_Traslado;
-    property Traslado[Index: Integer]: IXMLComprobante_Impuestos_Traslados_Traslado read Get_Traslado; default;
+    function Add: IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
+    property Traslado[Index: Integer]: IComprobanteFiscalV32_Impuestos_Traslados_Traslado read Get_Traslado; default;
   end;
 
-{ IXMLComprobante_Impuestos_Traslados_Traslado }
+{ IComprobanteFiscalV32_Impuestos_Traslados_Traslado }
 
-  IXMLComprobante_Impuestos_Traslados_Traslado = interface(IXMLNode)
+  IComprobanteFiscalV32_Impuestos_Traslados_Traslado = interface(IXMLNode)
     ['{7D3DEDAA-FC75-4E56-8D66-DA65C7B6DFD9}']
     { Property Accessors }
     function Get_Impuesto: UnicodeString;
@@ -470,15 +470,15 @@ type
     property Importe: UnicodeString read Get_Importe write Set_Importe;
   end;
 
-{ IXMLComprobante_Complemento }
+{ IComprobanteFiscalV32_Complemento }
 
-  IXMLComprobante_Complemento = interface(IXMLNode)
+  IComprobanteFiscalV32_Complemento = interface(IXMLNode)
     ['{A213DB70-FC9C-48EC-A4AF-552E5289A052}']
   end;
 
-{ IXMLComprobante_Addenda }
+{ IComprobanteFiscalV32_Addenda }
 
-  IXMLComprobante_Addenda = interface(IXMLNode)
+  IComprobanteFiscalV32_Addenda = interface(IXMLNode)
     ['{C1D14BE8-CAC8-40B0-BA9E-21E92D055253}']
   end;
 
@@ -509,9 +509,9 @@ type
 
 { TXMLComprobante }
 
-  TXMLComprobante = class(TXMLNode, IXMLComprobante)
+  TXMLComprobante = class(TXMLNode, IComprobanteFiscalV32)
   protected
-    { IXMLComprobante }
+    { IComprobanteFiscalV32 }
     function Get_Version: UnicodeString;
     function Get_Serie: UnicodeString;
     function Get_Folio: UnicodeString;
@@ -535,12 +535,12 @@ type
     function Get_SerieFolioFiscalOrig: UnicodeString;
     function Get_FechaFolioFiscalOrig: UnicodeString;
     function Get_MontoFolioFiscalOrig: UnicodeString;
-    function Get_Emisor: IXMLComprobante_Emisor;
-    function Get_Receptor: IXMLComprobante_Receptor;
-    function Get_Conceptos: IXMLComprobante_Conceptos;
-    function Get_Impuestos: IXMLComprobante_Impuestos;
-    function Get_Complemento: IXMLComprobante_Complemento;
-    function Get_Addenda: IXMLComprobante_Addenda;
+    function Get_Emisor: IComprobanteFiscalV32_Emisor;
+    function Get_Receptor: IComprobanteFiscalV32_Receptor;
+    function Get_Conceptos: IComprobanteFiscalV32_Conceptos;
+    function Get_Impuestos: IComprobanteFiscalV32_Impuestos;
+    function Get_Complemento: IComprobanteFiscalV32_Complemento;
+    function Get_Addenda: IComprobanteFiscalV32_Addenda;
     procedure Set_Version(Value: UnicodeString);
     procedure Set_Serie(Value: UnicodeString);
     procedure Set_Folio(Value: UnicodeString);
@@ -570,16 +570,16 @@ type
 
 { TXMLComprobante_Emisor }
 
-  TXMLComprobante_Emisor = class(TXMLNode, IXMLComprobante_Emisor)
+  TXMLComprobante_Emisor = class(TXMLNode, IComprobanteFiscalV32_Emisor)
   private
-    FRegimenFiscal: IXMLComprobante_Emisor_RegimenFiscalList;
+    FRegimenFiscal: IComprobanteFiscalV32_Emisor_RegimenFiscalList;
   protected
-    { IXMLComprobante_Emisor }
+    { IComprobanteFiscalV32_Emisor }
     function Get_Rfc: UnicodeString;
     function Get_Nombre: UnicodeString;
-    function Get_DomicilioFiscal: IXMLT_UbicacionFiscal;
-    function Get_ExpedidoEn: IXMLT_Ubicacion;
-    function Get_RegimenFiscal: IXMLComprobante_Emisor_RegimenFiscalList;
+    function Get_DomicilioFiscal: IComprobanteFiscalV32_UbicacionFiscal;
+    function Get_ExpedidoEn: IComprobanteFiscalV32_Ubicacion;
+    function Get_RegimenFiscal: IComprobanteFiscalV32_Emisor_RegimenFiscalList;
     procedure Set_Rfc(Value: UnicodeString);
     procedure Set_Nombre(Value: UnicodeString);
   public
@@ -588,9 +588,9 @@ type
 
 { TXMLT_UbicacionFiscal }
 
-  TXMLT_UbicacionFiscal = class(TXMLNode, IXMLT_UbicacionFiscal)
+  TXMLT_UbicacionFiscal = class(TXMLNode, IComprobanteFiscalV32_UbicacionFiscal)
   protected
-    { IXMLT_UbicacionFiscal }
+    { IComprobanteFiscalV32_UbicacionFiscal }
     function Get_Calle: UnicodeString;
     function Get_NoExterior: UnicodeString;
     function Get_NoInterior: UnicodeString;
@@ -615,9 +615,9 @@ type
 
 { TXMLT_Ubicacion }
 
-  TXMLT_Ubicacion = class(TXMLNode, IXMLT_Ubicacion)
+  TXMLT_Ubicacion = class(TXMLNode, IComprobanteFiscalV32_Ubicacion)
   protected
-    { IXMLT_Ubicacion }
+    { IComprobanteFiscalV32_Ubicacion }
     function Get_Calle: UnicodeString;
     function Get_NoExterior: UnicodeString;
     function Get_NoInterior: UnicodeString;
@@ -642,32 +642,32 @@ type
 
 { TXMLComprobante_Emisor_RegimenFiscal }
 
-  TXMLComprobante_Emisor_RegimenFiscal = class(TXMLNode, IXMLComprobante_Emisor_RegimenFiscal)
+  TXMLComprobante_Emisor_RegimenFiscal = class(TXMLNode, IComprobanteFiscalV32_Emisor_RegimenFiscal)
   protected
-    { IXMLComprobante_Emisor_RegimenFiscal }
+    { IComprobanteFiscalV32_Emisor_RegimenFiscal }
     function Get_Regimen: UnicodeString;
     procedure Set_Regimen(Value: UnicodeString);
   end;
 
 { TXMLComprobante_Emisor_RegimenFiscalList }
 
-  TXMLComprobante_Emisor_RegimenFiscalList = class(TXMLNodeCollection, IXMLComprobante_Emisor_RegimenFiscalList)
+  TXMLComprobante_Emisor_RegimenFiscalList = class(TXMLNodeCollection, IComprobanteFiscalV32_Emisor_RegimenFiscalList)
   protected
-    { IXMLComprobante_Emisor_RegimenFiscalList }
-    function Add: IXMLComprobante_Emisor_RegimenFiscal;
-    function Insert(const Index: Integer): IXMLComprobante_Emisor_RegimenFiscal;
+    { IComprobanteFiscalV32_Emisor_RegimenFiscalList }
+    function Add: IComprobanteFiscalV32_Emisor_RegimenFiscal;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_Emisor_RegimenFiscal;
 
-    function Get_Item(Index: Integer): IXMLComprobante_Emisor_RegimenFiscal;
+    function Get_Item(Index: Integer): IComprobanteFiscalV32_Emisor_RegimenFiscal;
   end;
 
 { TXMLComprobante_Receptor }
 
-  TXMLComprobante_Receptor = class(TXMLNode, IXMLComprobante_Receptor)
+  TXMLComprobante_Receptor = class(TXMLNode, IComprobanteFiscalV32_Receptor)
   protected
-    { IXMLComprobante_Receptor }
+    { IComprobanteFiscalV32_Receptor }
     function Get_Rfc: UnicodeString;
     function Get_Nombre: UnicodeString;
-    function Get_Domicilio: IXMLT_Ubicacion;
+    function Get_Domicilio: IComprobanteFiscalV32_Ubicacion;
     procedure Set_Rfc(Value: UnicodeString);
     procedure Set_Nombre(Value: UnicodeString);
   public
@@ -676,34 +676,34 @@ type
 
 { TXMLComprobante_Conceptos }
 
-  TXMLComprobante_Conceptos = class(TXMLNodeCollection, IXMLComprobante_Conceptos)
+  TXMLComprobante_Conceptos = class(TXMLNodeCollection, IComprobanteFiscalV32_Conceptos)
   protected
-    { IXMLComprobante_Conceptos }
-    function Get_Concepto(Index: Integer): IXMLComprobante_Conceptos_Concepto;
-    function Add: IXMLComprobante_Conceptos_Concepto;
-    function Insert(const Index: Integer): IXMLComprobante_Conceptos_Concepto;
+    { IComprobanteFiscalV32_Conceptos }
+    function Get_Concepto(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto;
+    function Add: IComprobanteFiscalV32_Conceptos_Concepto;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto;
   public
     procedure AfterConstruction; override;
   end;
 
 { TXMLComprobante_Conceptos_Concepto }
 
-  TXMLComprobante_Conceptos_Concepto = class(TXMLNode, IXMLComprobante_Conceptos_Concepto)
+  TXMLComprobante_Conceptos_Concepto = class(TXMLNode, IComprobanteFiscalV32_Conceptos_Concepto)
   private
-    FInformacionAduanera: IXMLT_InformacionAduaneraList;
-    FParte: IXMLComprobante_Conceptos_Concepto_ParteList;
+    FInformacionAduanera: IComprobanteFiscalV32_InformacionAduaneraList;
+    FParte: IComprobanteFiscalV32_Conceptos_Concepto_ParteList;
   protected
-    { IXMLComprobante_Conceptos_Concepto }
+    { IComprobanteFiscalV32_Conceptos_Concepto }
     function Get_Cantidad: UnicodeString;
     function Get_Unidad: UnicodeString;
     function Get_NoIdentificacion: UnicodeString;
     function Get_Descripcion: UnicodeString;
     function Get_ValorUnitario: UnicodeString;
     function Get_Importe: UnicodeString;
-    function Get_InformacionAduanera: IXMLT_InformacionAduaneraList;
-    function Get_CuentaPredial: IXMLComprobante_Conceptos_Concepto_CuentaPredial;
-    function Get_ComplementoConcepto: IXMLComprobante_Conceptos_Concepto_ComplementoConcepto;
-    function Get_Parte: IXMLComprobante_Conceptos_Concepto_ParteList;
+    function Get_InformacionAduanera: IComprobanteFiscalV32_InformacionAduaneraList;
+    function Get_CuentaPredial: IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial;
+    function Get_ComplementoConcepto: IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto;
+    function Get_Parte: IComprobanteFiscalV32_Conceptos_Concepto_ParteList;
     procedure Set_Cantidad(Value: UnicodeString);
     procedure Set_Unidad(Value: UnicodeString);
     procedure Set_NoIdentificacion(Value: UnicodeString);
@@ -716,9 +716,9 @@ type
 
 { TXMLT_InformacionAduanera }
 
-  TXMLT_InformacionAduanera = class(TXMLNode, IXMLT_InformacionAduanera)
+  TXMLT_InformacionAduanera = class(TXMLNode, IComprobanteFiscalV32_InformacionAduanera)
   protected
-    { IXMLT_InformacionAduanera }
+    { IComprobanteFiscalV32_InformacionAduanera }
     function Get_Numero: UnicodeString;
     function Get_Fecha: UnicodeString;
     function Get_Aduana: UnicodeString;
@@ -729,75 +729,75 @@ type
 
 { TXMLT_InformacionAduaneraList }
 
-  TXMLT_InformacionAduaneraList = class(TXMLNodeCollection, IXMLT_InformacionAduaneraList)
+  TXMLT_InformacionAduaneraList = class(TXMLNodeCollection, IComprobanteFiscalV32_InformacionAduaneraList)
   protected
-    { IXMLT_InformacionAduaneraList }
-    function Add: IXMLT_InformacionAduanera;
-    function Insert(const Index: Integer): IXMLT_InformacionAduanera;
+    { IComprobanteFiscalV32_InformacionAduaneraList }
+    function Add: IComprobanteFiscalV32_InformacionAduanera;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
 
-    function Get_Item(Index: Integer): IXMLT_InformacionAduanera;
+    function Get_Item(Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
   end;
 
 { TXMLComprobante_Conceptos_Concepto_CuentaPredial }
 
-  TXMLComprobante_Conceptos_Concepto_CuentaPredial = class(TXMLNode, IXMLComprobante_Conceptos_Concepto_CuentaPredial)
+  TXMLComprobante_Conceptos_Concepto_CuentaPredial = class(TXMLNode, IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial)
   protected
-    { IXMLComprobante_Conceptos_Concepto_CuentaPredial }
+    { IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial }
     function Get_Numero: UnicodeString;
     procedure Set_Numero(Value: UnicodeString);
   end;
 
 { TXMLComprobante_Conceptos_Concepto_ComplementoConcepto }
 
-  TXMLComprobante_Conceptos_Concepto_ComplementoConcepto = class(TXMLNode, IXMLComprobante_Conceptos_Concepto_ComplementoConcepto)
+  TXMLComprobante_Conceptos_Concepto_ComplementoConcepto = class(TXMLNode, IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto)
   protected
-    { IXMLComprobante_Conceptos_Concepto_ComplementoConcepto }
+    { IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto }
   end;
 
 { TXMLComprobante_Conceptos_Concepto_Parte }
 
-  TXMLComprobante_Conceptos_Concepto_Parte = class(TXMLNodeCollection, IXMLComprobante_Conceptos_Concepto_Parte)
+  TXMLComprobante_Conceptos_Concepto_Parte = class(TXMLNodeCollection, IComprobanteFiscalV32_Conceptos_Concepto_Parte)
   protected
-    { IXMLComprobante_Conceptos_Concepto_Parte }
+    { IComprobanteFiscalV32_Conceptos_Concepto_Parte }
     function Get_Cantidad: UnicodeString;
     function Get_Unidad: UnicodeString;
     function Get_NoIdentificacion: UnicodeString;
     function Get_Descripcion: UnicodeString;
     function Get_ValorUnitario: UnicodeString;
     function Get_Importe: UnicodeString;
-    function Get_InformacionAduanera(Index: Integer): IXMLT_InformacionAduanera;
+    function Get_InformacionAduanera(Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
     procedure Set_Cantidad(Value: UnicodeString);
     procedure Set_Unidad(Value: UnicodeString);
     procedure Set_NoIdentificacion(Value: UnicodeString);
     procedure Set_Descripcion(Value: UnicodeString);
     procedure Set_ValorUnitario(Value: UnicodeString);
     procedure Set_Importe(Value: UnicodeString);
-    function Add: IXMLT_InformacionAduanera;
-    function Insert(const Index: Integer): IXMLT_InformacionAduanera;
+    function Add: IComprobanteFiscalV32_InformacionAduanera;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
   public
     procedure AfterConstruction; override;
   end;
 
 { TXMLComprobante_Conceptos_Concepto_ParteList }
 
-  TXMLComprobante_Conceptos_Concepto_ParteList = class(TXMLNodeCollection, IXMLComprobante_Conceptos_Concepto_ParteList)
+  TXMLComprobante_Conceptos_Concepto_ParteList = class(TXMLNodeCollection, IComprobanteFiscalV32_Conceptos_Concepto_ParteList)
   protected
-    { IXMLComprobante_Conceptos_Concepto_ParteList }
-    function Add: IXMLComprobante_Conceptos_Concepto_Parte;
-    function Insert(const Index: Integer): IXMLComprobante_Conceptos_Concepto_Parte;
+    { IComprobanteFiscalV32_Conceptos_Concepto_ParteList }
+    function Add: IComprobanteFiscalV32_Conceptos_Concepto_Parte;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 
-    function Get_Item(Index: Integer): IXMLComprobante_Conceptos_Concepto_Parte;
+    function Get_Item(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto_Parte;
   end;
 
 { TXMLComprobante_Impuestos }
 
-  TXMLComprobante_Impuestos = class(TXMLNode, IXMLComprobante_Impuestos)
+  TXMLComprobante_Impuestos = class(TXMLNode, IComprobanteFiscalV32_Impuestos)
   protected
-    { IXMLComprobante_Impuestos }
+    { IComprobanteFiscalV32_Impuestos }
     function Get_TotalImpuestosRetenidos: UnicodeString;
     function Get_TotalImpuestosTrasladados: UnicodeString;
-    function Get_Retenciones: IXMLComprobante_Impuestos_Retenciones;
-    function Get_Traslados: IXMLComprobante_Impuestos_Traslados;
+    function Get_Retenciones: IComprobanteFiscalV32_Impuestos_Retenciones;
+    function Get_Traslados: IComprobanteFiscalV32_Impuestos_Traslados;
     procedure Set_TotalImpuestosRetenidos(Value: UnicodeString);
     procedure Set_TotalImpuestosTrasladados(Value: UnicodeString);
   public
@@ -806,21 +806,21 @@ type
 
 { TXMLComprobante_Impuestos_Retenciones }
 
-  TXMLComprobante_Impuestos_Retenciones = class(TXMLNodeCollection, IXMLComprobante_Impuestos_Retenciones)
+  TXMLComprobante_Impuestos_Retenciones = class(TXMLNodeCollection, IComprobanteFiscalV32_Impuestos_Retenciones)
   protected
-    { IXMLComprobante_Impuestos_Retenciones }
-    function Get_Retencion(Index: Integer): IXMLComprobante_Impuestos_Retenciones_Retencion;
-    function Add: IXMLComprobante_Impuestos_Retenciones_Retencion;
-    function Insert(const Index: Integer): IXMLComprobante_Impuestos_Retenciones_Retencion;
+    { IComprobanteFiscalV32_Impuestos_Retenciones }
+    function Get_Retencion(Index: Integer): IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
+    function Add: IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
   public
     procedure AfterConstruction; override;
   end;
 
 { TXMLComprobante_Impuestos_Retenciones_Retencion }
 
-  TXMLComprobante_Impuestos_Retenciones_Retencion = class(TXMLNode, IXMLComprobante_Impuestos_Retenciones_Retencion)
+  TXMLComprobante_Impuestos_Retenciones_Retencion = class(TXMLNode, IComprobanteFiscalV32_Impuestos_Retenciones_Retencion)
   protected
-    { IXMLComprobante_Impuestos_Retenciones_Retencion }
+    { IComprobanteFiscalV32_Impuestos_Retenciones_Retencion }
     function Get_Impuesto: UnicodeString;
     function Get_Importe: UnicodeString;
     procedure Set_Impuesto(Value: UnicodeString);
@@ -829,21 +829,21 @@ type
 
 { TXMLComprobante_Impuestos_Traslados }
 
-  TXMLComprobante_Impuestos_Traslados = class(TXMLNodeCollection, IXMLComprobante_Impuestos_Traslados)
+  TXMLComprobante_Impuestos_Traslados = class(TXMLNodeCollection, IComprobanteFiscalV32_Impuestos_Traslados)
   protected
-    { IXMLComprobante_Impuestos_Traslados }
-    function Get_Traslado(Index: Integer): IXMLComprobante_Impuestos_Traslados_Traslado;
-    function Add: IXMLComprobante_Impuestos_Traslados_Traslado;
-    function Insert(const Index: Integer): IXMLComprobante_Impuestos_Traslados_Traslado;
+    { IComprobanteFiscalV32_Impuestos_Traslados }
+    function Get_Traslado(Index: Integer): IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
+    function Add: IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
+    function Insert(const Index: Integer): IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
   public
     procedure AfterConstruction; override;
   end;
 
 { TXMLComprobante_Impuestos_Traslados_Traslado }
 
-  TXMLComprobante_Impuestos_Traslados_Traslado = class(TXMLNode, IXMLComprobante_Impuestos_Traslados_Traslado)
+  TXMLComprobante_Impuestos_Traslados_Traslado = class(TXMLNode, IComprobanteFiscalV32_Impuestos_Traslados_Traslado)
   protected
-    { IXMLComprobante_Impuestos_Traslados_Traslado }
+    { IComprobanteFiscalV32_Impuestos_Traslados_Traslado }
     function Get_Impuesto: UnicodeString;
     function Get_Tasa: UnicodeString;
     function Get_Importe: UnicodeString;
@@ -854,23 +854,23 @@ type
 
 { TXMLComprobante_Complemento }
 
-  TXMLComprobante_Complemento = class(TXMLNode, IXMLComprobante_Complemento)
+  TXMLComprobante_Complemento = class(TXMLNode, IComprobanteFiscalV32_Complemento)
   protected
-    { IXMLComprobante_Complemento }
+    { IComprobanteFiscalV32_Complemento }
   end;
 
 { TXMLComprobante_Addenda }
 
-  TXMLComprobante_Addenda = class(TXMLNode, IXMLComprobante_Addenda)
+  TXMLComprobante_Addenda = class(TXMLNode, IComprobanteFiscalV32_Addenda)
   protected
-    { IXMLComprobante_Addenda }
+    { IComprobanteFiscalV32_Addenda }
   end;
 
 { Global Functions }
 
-function GetComprobante(Doc: IXMLDocument): IXMLComprobante;
-function LoadComprobante(const FileName: string): IXMLComprobante;
-function NewComprobante: IXMLComprobante;
+function GetComprobante(Doc: IXMLDocument): IComprobanteFiscalV32;
+function LoadComprobante(const FileName: string): IComprobanteFiscalV32;
+function NewComprobante: IComprobanteFiscalV32;
 
 const
   TargetNamespace = 'http://www.sat.gob.mx/cfd/3';
@@ -879,19 +879,19 @@ implementation
 
 { Global Functions }
 
-function GetComprobante(Doc: IXMLDocument): IXMLComprobante;
+function GetComprobante(Doc: IXMLDocument): IComprobanteFiscalV32;
 begin
-  Result := Doc.GetDocBinding('Comprobante', TXMLComprobante, TargetNamespace) as IXMLComprobante;
+  Result := Doc.GetDocBinding('Comprobante', TXMLComprobante, TargetNamespace) as IComprobanteFiscalV32;
 end;
 
-function LoadComprobante(const FileName: string): IXMLComprobante;
+function LoadComprobante(const FileName: string): IComprobanteFiscalV32;
 begin
-  Result := LoadXMLDocument(FileName).GetDocBinding('Comprobante', TXMLComprobante, TargetNamespace) as IXMLComprobante;
+  Result := LoadXMLDocument(FileName).GetDocBinding('Comprobante', TXMLComprobante, TargetNamespace) as IComprobanteFiscalV32;
 end;
 
-function NewComprobante: IXMLComprobante;
+function NewComprobante: IComprobanteFiscalV32;
 begin
-  Result := NewXMLDocument.GetDocBinding('Comprobante', TXMLComprobante, TargetNamespace) as IXMLComprobante;
+  Result := NewXMLDocument.GetDocBinding('Comprobante', TXMLComprobante, TargetNamespace) as IComprobanteFiscalV32;
 end;
 
 { TXMLComprobante }
@@ -1137,34 +1137,34 @@ begin
   SetAttribute('MontoFolioFiscalOrig', Value);
 end;
 
-function TXMLComprobante.Get_Emisor: IXMLComprobante_Emisor;
+function TXMLComprobante.Get_Emisor: IComprobanteFiscalV32_Emisor;
 begin
-  Result := ChildNodes['Emisor'] as IXMLComprobante_Emisor;
+  Result := ChildNodes['Emisor'] as IComprobanteFiscalV32_Emisor;
 end;
 
-function TXMLComprobante.Get_Receptor: IXMLComprobante_Receptor;
+function TXMLComprobante.Get_Receptor: IComprobanteFiscalV32_Receptor;
 begin
-  Result := ChildNodes['Receptor'] as IXMLComprobante_Receptor;
+  Result := ChildNodes['Receptor'] as IComprobanteFiscalV32_Receptor;
 end;
 
-function TXMLComprobante.Get_Conceptos: IXMLComprobante_Conceptos;
+function TXMLComprobante.Get_Conceptos: IComprobanteFiscalV32_Conceptos;
 begin
-  Result := ChildNodes['Conceptos'] as IXMLComprobante_Conceptos;
+  Result := ChildNodes['Conceptos'] as IComprobanteFiscalV32_Conceptos;
 end;
 
-function TXMLComprobante.Get_Impuestos: IXMLComprobante_Impuestos;
+function TXMLComprobante.Get_Impuestos: IComprobanteFiscalV32_Impuestos;
 begin
-  Result := ChildNodes['Impuestos'] as IXMLComprobante_Impuestos;
+  Result := ChildNodes['Impuestos'] as IComprobanteFiscalV32_Impuestos;
 end;
 
-function TXMLComprobante.Get_Complemento: IXMLComprobante_Complemento;
+function TXMLComprobante.Get_Complemento: IComprobanteFiscalV32_Complemento;
 begin
-  Result := ChildNodes['Complemento'] as IXMLComprobante_Complemento;
+  Result := ChildNodes['Complemento'] as IComprobanteFiscalV32_Complemento;
 end;
 
-function TXMLComprobante.Get_Addenda: IXMLComprobante_Addenda;
+function TXMLComprobante.Get_Addenda: IComprobanteFiscalV32_Addenda;
 begin
-  Result := ChildNodes['Addenda'] as IXMLComprobante_Addenda;
+  Result := ChildNodes['Addenda'] as IComprobanteFiscalV32_Addenda;
 end;
 
 { TXMLComprobante_Emisor }
@@ -1174,7 +1174,7 @@ begin
   RegisterChildNode('DomicilioFiscal', TXMLT_UbicacionFiscal);
   RegisterChildNode('ExpedidoEn', TXMLT_Ubicacion);
   RegisterChildNode('RegimenFiscal', TXMLComprobante_Emisor_RegimenFiscal);
-  FRegimenFiscal := CreateCollection(TXMLComprobante_Emisor_RegimenFiscalList, IXMLComprobante_Emisor_RegimenFiscal, 'RegimenFiscal') as IXMLComprobante_Emisor_RegimenFiscalList;
+  FRegimenFiscal := CreateCollection(TXMLComprobante_Emisor_RegimenFiscalList, IComprobanteFiscalV32_Emisor_RegimenFiscal, 'RegimenFiscal') as IComprobanteFiscalV32_Emisor_RegimenFiscalList;
   inherited;
 end;
 
@@ -1198,17 +1198,17 @@ begin
   SetAttribute('nombre', Value);
 end;
 
-function TXMLComprobante_Emisor.Get_DomicilioFiscal: IXMLT_UbicacionFiscal;
+function TXMLComprobante_Emisor.Get_DomicilioFiscal: IComprobanteFiscalV32_UbicacionFiscal;
 begin
-  Result := ChildNodes['DomicilioFiscal'] as IXMLT_UbicacionFiscal;
+  Result := ChildNodes['DomicilioFiscal'] as IComprobanteFiscalV32_UbicacionFiscal;
 end;
 
-function TXMLComprobante_Emisor.Get_ExpedidoEn: IXMLT_Ubicacion;
+function TXMLComprobante_Emisor.Get_ExpedidoEn: IComprobanteFiscalV32_Ubicacion;
 begin
-  Result := ChildNodes['ExpedidoEn'] as IXMLT_Ubicacion;
+  Result := ChildNodes['ExpedidoEn'] as IComprobanteFiscalV32_Ubicacion;
 end;
 
-function TXMLComprobante_Emisor.Get_RegimenFiscal: IXMLComprobante_Emisor_RegimenFiscalList;
+function TXMLComprobante_Emisor.Get_RegimenFiscal: IComprobanteFiscalV32_Emisor_RegimenFiscalList;
 begin
   Result := FRegimenFiscal;
 end;
@@ -1431,19 +1431,19 @@ end;
 
 { TXMLComprobante_Emisor_RegimenFiscalList }
 
-function TXMLComprobante_Emisor_RegimenFiscalList.Add: IXMLComprobante_Emisor_RegimenFiscal;
+function TXMLComprobante_Emisor_RegimenFiscalList.Add: IComprobanteFiscalV32_Emisor_RegimenFiscal;
 begin
-  Result := AddItem(-1) as IXMLComprobante_Emisor_RegimenFiscal;
+  Result := AddItem(-1) as IComprobanteFiscalV32_Emisor_RegimenFiscal;
 end;
 
-function TXMLComprobante_Emisor_RegimenFiscalList.Insert(const Index: Integer): IXMLComprobante_Emisor_RegimenFiscal;
+function TXMLComprobante_Emisor_RegimenFiscalList.Insert(const Index: Integer): IComprobanteFiscalV32_Emisor_RegimenFiscal;
 begin
-  Result := AddItem(Index) as IXMLComprobante_Emisor_RegimenFiscal;
+  Result := AddItem(Index) as IComprobanteFiscalV32_Emisor_RegimenFiscal;
 end;
 
-function TXMLComprobante_Emisor_RegimenFiscalList.Get_Item(Index: Integer): IXMLComprobante_Emisor_RegimenFiscal;
+function TXMLComprobante_Emisor_RegimenFiscalList.Get_Item(Index: Integer): IComprobanteFiscalV32_Emisor_RegimenFiscal;
 begin
-  Result := List[Index] as IXMLComprobante_Emisor_RegimenFiscal;
+  Result := List[Index] as IComprobanteFiscalV32_Emisor_RegimenFiscal;
 end;
 
 { TXMLComprobante_Receptor }
@@ -1474,9 +1474,9 @@ begin
   SetAttribute('nombre', Value);
 end;
 
-function TXMLComprobante_Receptor.Get_Domicilio: IXMLT_Ubicacion;
+function TXMLComprobante_Receptor.Get_Domicilio: IComprobanteFiscalV32_Ubicacion;
 begin
-  Result := ChildNodes['Domicilio'] as IXMLT_Ubicacion;
+  Result := ChildNodes['Domicilio'] as IComprobanteFiscalV32_Ubicacion;
 end;
 
 { TXMLComprobante_Conceptos }
@@ -1485,23 +1485,23 @@ procedure TXMLComprobante_Conceptos.AfterConstruction;
 begin
   RegisterChildNode('Concepto', TXMLComprobante_Conceptos_Concepto);
   ItemTag := 'Concepto';
-  ItemInterface := IXMLComprobante_Conceptos_Concepto;
+  ItemInterface := IComprobanteFiscalV32_Conceptos_Concepto;
   inherited;
 end;
 
-function TXMLComprobante_Conceptos.Get_Concepto(Index: Integer): IXMLComprobante_Conceptos_Concepto;
+function TXMLComprobante_Conceptos.Get_Concepto(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto;
 begin
-  Result := List[Index] as IXMLComprobante_Conceptos_Concepto;
+  Result := List[Index] as IComprobanteFiscalV32_Conceptos_Concepto;
 end;
 
-function TXMLComprobante_Conceptos.Add: IXMLComprobante_Conceptos_Concepto;
+function TXMLComprobante_Conceptos.Add: IComprobanteFiscalV32_Conceptos_Concepto;
 begin
-  Result := AddItem(-1) as IXMLComprobante_Conceptos_Concepto;
+  Result := AddItem(-1) as IComprobanteFiscalV32_Conceptos_Concepto;
 end;
 
-function TXMLComprobante_Conceptos.Insert(const Index: Integer): IXMLComprobante_Conceptos_Concepto;
+function TXMLComprobante_Conceptos.Insert(const Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto;
 begin
-  Result := AddItem(Index) as IXMLComprobante_Conceptos_Concepto;
+  Result := AddItem(Index) as IComprobanteFiscalV32_Conceptos_Concepto;
 end;
 
 { TXMLComprobante_Conceptos_Concepto }
@@ -1512,8 +1512,8 @@ begin
   RegisterChildNode('CuentaPredial', TXMLComprobante_Conceptos_Concepto_CuentaPredial);
   RegisterChildNode('ComplementoConcepto', TXMLComprobante_Conceptos_Concepto_ComplementoConcepto);
   RegisterChildNode('Parte', TXMLComprobante_Conceptos_Concepto_Parte);
-  FInformacionAduanera := CreateCollection(TXMLT_InformacionAduaneraList, IXMLT_InformacionAduanera, 'InformacionAduanera') as IXMLT_InformacionAduaneraList;
-  FParte := CreateCollection(TXMLComprobante_Conceptos_Concepto_ParteList, IXMLComprobante_Conceptos_Concepto_Parte, 'Parte') as IXMLComprobante_Conceptos_Concepto_ParteList;
+  FInformacionAduanera := CreateCollection(TXMLT_InformacionAduaneraList, IComprobanteFiscalV32_InformacionAduanera, 'InformacionAduanera') as IComprobanteFiscalV32_InformacionAduaneraList;
+  FParte := CreateCollection(TXMLComprobante_Conceptos_Concepto_ParteList, IComprobanteFiscalV32_Conceptos_Concepto_Parte, 'Parte') as IComprobanteFiscalV32_Conceptos_Concepto_ParteList;
   inherited;
 end;
 
@@ -1577,22 +1577,22 @@ begin
   SetAttribute('importe', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_InformacionAduanera: IXMLT_InformacionAduaneraList;
+function TXMLComprobante_Conceptos_Concepto.Get_InformacionAduanera: IComprobanteFiscalV32_InformacionAduaneraList;
 begin
   Result := FInformacionAduanera;
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_CuentaPredial: IXMLComprobante_Conceptos_Concepto_CuentaPredial;
+function TXMLComprobante_Conceptos_Concepto.Get_CuentaPredial: IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial;
 begin
-  Result := ChildNodes['CuentaPredial'] as IXMLComprobante_Conceptos_Concepto_CuentaPredial;
+  Result := ChildNodes['CuentaPredial'] as IComprobanteFiscalV32_Conceptos_Concepto_CuentaPredial;
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_ComplementoConcepto: IXMLComprobante_Conceptos_Concepto_ComplementoConcepto;
+function TXMLComprobante_Conceptos_Concepto.Get_ComplementoConcepto: IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto;
 begin
-  Result := ChildNodes['ComplementoConcepto'] as IXMLComprobante_Conceptos_Concepto_ComplementoConcepto;
+  Result := ChildNodes['ComplementoConcepto'] as IComprobanteFiscalV32_Conceptos_Concepto_ComplementoConcepto;
 end;
 
-function TXMLComprobante_Conceptos_Concepto.Get_Parte: IXMLComprobante_Conceptos_Concepto_ParteList;
+function TXMLComprobante_Conceptos_Concepto.Get_Parte: IComprobanteFiscalV32_Conceptos_Concepto_ParteList;
 begin
   Result := FParte;
 end;
@@ -1631,19 +1631,19 @@ end;
 
 { TXMLT_InformacionAduaneraList }
 
-function TXMLT_InformacionAduaneraList.Add: IXMLT_InformacionAduanera;
+function TXMLT_InformacionAduaneraList.Add: IComprobanteFiscalV32_InformacionAduanera;
 begin
-  Result := AddItem(-1) as IXMLT_InformacionAduanera;
+  Result := AddItem(-1) as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
-function TXMLT_InformacionAduaneraList.Insert(const Index: Integer): IXMLT_InformacionAduanera;
+function TXMLT_InformacionAduaneraList.Insert(const Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
 begin
-  Result := AddItem(Index) as IXMLT_InformacionAduanera;
+  Result := AddItem(Index) as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
-function TXMLT_InformacionAduaneraList.Get_Item(Index: Integer): IXMLT_InformacionAduanera;
+function TXMLT_InformacionAduaneraList.Get_Item(Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
 begin
-  Result := List[Index] as IXMLT_InformacionAduanera;
+  Result := List[Index] as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
 { TXMLComprobante_Conceptos_Concepto_CuentaPredial }
@@ -1666,7 +1666,7 @@ procedure TXMLComprobante_Conceptos_Concepto_Parte.AfterConstruction;
 begin
   RegisterChildNode('InformacionAduanera', TXMLT_InformacionAduanera);
   ItemTag := 'InformacionAduanera';
-  ItemInterface := IXMLT_InformacionAduanera;
+  ItemInterface := IComprobanteFiscalV32_InformacionAduanera;
   inherited;
 end;
 
@@ -1730,36 +1730,36 @@ begin
   SetAttribute('importe', Value);
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Get_InformacionAduanera(Index: Integer): IXMLT_InformacionAduanera;
+function TXMLComprobante_Conceptos_Concepto_Parte.Get_InformacionAduanera(Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
 begin
-  Result := List[Index] as IXMLT_InformacionAduanera;
+  Result := List[Index] as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Add: IXMLT_InformacionAduanera;
+function TXMLComprobante_Conceptos_Concepto_Parte.Add: IComprobanteFiscalV32_InformacionAduanera;
 begin
-  Result := AddItem(-1) as IXMLT_InformacionAduanera;
+  Result := AddItem(-1) as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
-function TXMLComprobante_Conceptos_Concepto_Parte.Insert(const Index: Integer): IXMLT_InformacionAduanera;
+function TXMLComprobante_Conceptos_Concepto_Parte.Insert(const Index: Integer): IComprobanteFiscalV32_InformacionAduanera;
 begin
-  Result := AddItem(Index) as IXMLT_InformacionAduanera;
+  Result := AddItem(Index) as IComprobanteFiscalV32_InformacionAduanera;
 end;
 
 { TXMLComprobante_Conceptos_Concepto_ParteList }
 
-function TXMLComprobante_Conceptos_Concepto_ParteList.Add: IXMLComprobante_Conceptos_Concepto_Parte;
+function TXMLComprobante_Conceptos_Concepto_ParteList.Add: IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 begin
-  Result := AddItem(-1) as IXMLComprobante_Conceptos_Concepto_Parte;
+  Result := AddItem(-1) as IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 end;
 
-function TXMLComprobante_Conceptos_Concepto_ParteList.Insert(const Index: Integer): IXMLComprobante_Conceptos_Concepto_Parte;
+function TXMLComprobante_Conceptos_Concepto_ParteList.Insert(const Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 begin
-  Result := AddItem(Index) as IXMLComprobante_Conceptos_Concepto_Parte;
+  Result := AddItem(Index) as IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 end;
 
-function TXMLComprobante_Conceptos_Concepto_ParteList.Get_Item(Index: Integer): IXMLComprobante_Conceptos_Concepto_Parte;
+function TXMLComprobante_Conceptos_Concepto_ParteList.Get_Item(Index: Integer): IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 begin
-  Result := List[Index] as IXMLComprobante_Conceptos_Concepto_Parte;
+  Result := List[Index] as IComprobanteFiscalV32_Conceptos_Concepto_Parte;
 end;
 
 { TXMLComprobante_Impuestos }
@@ -1791,14 +1791,14 @@ begin
   SetAttribute('totalImpuestosTrasladados', Value);
 end;
 
-function TXMLComprobante_Impuestos.Get_Retenciones: IXMLComprobante_Impuestos_Retenciones;
+function TXMLComprobante_Impuestos.Get_Retenciones: IComprobanteFiscalV32_Impuestos_Retenciones;
 begin
-  Result := ChildNodes['Retenciones'] as IXMLComprobante_Impuestos_Retenciones;
+  Result := ChildNodes['Retenciones'] as IComprobanteFiscalV32_Impuestos_Retenciones;
 end;
 
-function TXMLComprobante_Impuestos.Get_Traslados: IXMLComprobante_Impuestos_Traslados;
+function TXMLComprobante_Impuestos.Get_Traslados: IComprobanteFiscalV32_Impuestos_Traslados;
 begin
-  Result := ChildNodes['Traslados'] as IXMLComprobante_Impuestos_Traslados;
+  Result := ChildNodes['Traslados'] as IComprobanteFiscalV32_Impuestos_Traslados;
 end;
 
 { TXMLComprobante_Impuestos_Retenciones }
@@ -1807,23 +1807,23 @@ procedure TXMLComprobante_Impuestos_Retenciones.AfterConstruction;
 begin
   RegisterChildNode('Retencion', TXMLComprobante_Impuestos_Retenciones_Retencion);
   ItemTag := 'Retencion';
-  ItemInterface := IXMLComprobante_Impuestos_Retenciones_Retencion;
+  ItemInterface := IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
   inherited;
 end;
 
-function TXMLComprobante_Impuestos_Retenciones.Get_Retencion(Index: Integer): IXMLComprobante_Impuestos_Retenciones_Retencion;
+function TXMLComprobante_Impuestos_Retenciones.Get_Retencion(Index: Integer): IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 begin
-  Result := List[Index] as IXMLComprobante_Impuestos_Retenciones_Retencion;
+  Result := List[Index] as IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 end;
 
-function TXMLComprobante_Impuestos_Retenciones.Add: IXMLComprobante_Impuestos_Retenciones_Retencion;
+function TXMLComprobante_Impuestos_Retenciones.Add: IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 begin
-  Result := AddItem(-1) as IXMLComprobante_Impuestos_Retenciones_Retencion;
+  Result := AddItem(-1) as IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 end;
 
-function TXMLComprobante_Impuestos_Retenciones.Insert(const Index: Integer): IXMLComprobante_Impuestos_Retenciones_Retencion;
+function TXMLComprobante_Impuestos_Retenciones.Insert(const Index: Integer): IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 begin
-  Result := AddItem(Index) as IXMLComprobante_Impuestos_Retenciones_Retencion;
+  Result := AddItem(Index) as IComprobanteFiscalV32_Impuestos_Retenciones_Retencion;
 end;
 
 { TXMLComprobante_Impuestos_Retenciones_Retencion }
@@ -1854,23 +1854,23 @@ procedure TXMLComprobante_Impuestos_Traslados.AfterConstruction;
 begin
   RegisterChildNode('Traslado', TXMLComprobante_Impuestos_Traslados_Traslado);
   ItemTag := 'Traslado';
-  ItemInterface := IXMLComprobante_Impuestos_Traslados_Traslado;
+  ItemInterface := IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
   inherited;
 end;
 
-function TXMLComprobante_Impuestos_Traslados.Get_Traslado(Index: Integer): IXMLComprobante_Impuestos_Traslados_Traslado;
+function TXMLComprobante_Impuestos_Traslados.Get_Traslado(Index: Integer): IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 begin
-  Result := List[Index] as IXMLComprobante_Impuestos_Traslados_Traslado;
+  Result := List[Index] as IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 end;
 
-function TXMLComprobante_Impuestos_Traslados.Add: IXMLComprobante_Impuestos_Traslados_Traslado;
+function TXMLComprobante_Impuestos_Traslados.Add: IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 begin
-  Result := AddItem(-1) as IXMLComprobante_Impuestos_Traslados_Traslado;
+  Result := AddItem(-1) as IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 end;
 
-function TXMLComprobante_Impuestos_Traslados.Insert(const Index: Integer): IXMLComprobante_Impuestos_Traslados_Traslado;
+function TXMLComprobante_Impuestos_Traslados.Insert(const Index: Integer): IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 begin
-  Result := AddItem(Index) as IXMLComprobante_Impuestos_Traslados_Traslado;
+  Result := AddItem(Index) as IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 end;
 
 { TXMLComprobante_Impuestos_Traslados_Traslado }
