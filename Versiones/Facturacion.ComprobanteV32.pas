@@ -2005,13 +2005,13 @@ end;
 
 function TComprobanteFiscalV32_Complemento.GetTimbreFiscalDigital: ITimbreFiscalDigitalV32;
 begin
-  // Pendiente
+  Result := ChildNodes.FindNode('TimbreFiscalDigital', Facturacion.TimbreFiscalDigitalV32.TargetNamespace) As ITimbreFiscalDigitalV32;
 end;
 
 procedure TComprobanteFiscalV32_Complemento.SetTimbreFiscalDigital(
   const Value: ITimbreFiscalDigitalV32);
 begin
-  // Pendiente
+  ChildNodes.Add(Value);
 end;
 
 end.
