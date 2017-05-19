@@ -16,6 +16,7 @@ uses Facturacion.Comprobante,
 type
 
   EXSLTNoEncontradoException = class(Exception);
+  EProblemaConXSLTException = class(Exception);
 
   /// <summary>
   ///   Instancia base para cualquier generador de cadena original,
@@ -46,6 +47,7 @@ implementation
 uses  System.IOUtils,
       System.Classes,
       Winapi.Windows,
+      System.Win.ComObj,
       Xml.XMLIntf,
       Xml.XMLDom,
       Xml.XMLDoc;
@@ -85,11 +87,18 @@ var
   xmlInput, xsltInput, xmlOutput: IXMLDocument;
   LOutput: XmlDomString;
 begin
-  xmlInput := LoadXMLData(aXMLData);
-  xsltInput := LoadXMLData(aXSLT);
-  xmlOutput := NewXMLDocument;
-  xmlInput.DocumentElement.TransformNode(xsltInput.DocumentElement, LOutput);
-  Result := TCadenaUTF8(LOutput);
+  try
+    xmlInput := LoadXMLData(aXMLData);
+    xsltInput := LoadXMLData(aXSLT);
+    xmlOutput := NewXMLDocument;
+    xmlInput.DocumentElement.TransformNode(xsltInput.DocumentElement, LOutput);
+    Result := TCadenaUTF8(LOutput);
+  except
+    on E:EOleException do
+    begin
+      raise EProblemaConXSLTException.Create('No se pudo transformar con XSLT proporcionado: '+ E.Message);
+    end;
+  end;
 end;
 
 
