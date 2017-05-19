@@ -11,7 +11,8 @@ unit Facturacion.ComprobanteV32;
 interface
 
 uses xmldom, XMLDoc, XMLIntf,
-     Facturacion.Comprobante;
+     Facturacion.Comprobante,
+     Facturacion.TimbreFiscalDigitalV32;
 
 type
 
@@ -475,6 +476,10 @@ type
 
   IComprobanteFiscalV32_Complemento = interface(IXMLNode)
     ['{A213DB70-FC9C-48EC-A4AF-552E5289A052}']
+    function GetTimbreFiscalDigital: ITimbreFiscalDigitalV32;
+    procedure SetTimbreFiscalDigital(const Value: ITimbreFiscalDigitalV32);
+    { Methods & Properties }
+    property TimbreFiscalDigital: ITimbreFiscalDigitalV32 read GetTimbreFiscalDigital write SetTimbreFiscalDigital;
   end;
 
 { IComprobanteFiscalV32_Addenda }
@@ -877,6 +882,8 @@ type
       IComprobanteFiscalV32_Complemento)
   protected
     { IComprobanteFiscalV32_Complemento }
+    function GetTimbreFiscalDigital: ITimbreFiscalDigitalV32;
+    procedure SetTimbreFiscalDigital(const Value: ITimbreFiscalDigitalV32);
   end;
 
 { TComprobanteFiscalV32_Addenda }
@@ -1984,5 +1991,18 @@ end;
 { TComprobanteFiscalV32_Complemento }
 
 { TComprobanteFiscalV32_Addenda }
+
+{ TComprobanteFiscalV32_Complemento }
+
+function TComprobanteFiscalV32_Complemento.GetTimbreFiscalDigital: ITimbreFiscalDigitalV32;
+begin
+  // Pendiente
+end;
+
+procedure TComprobanteFiscalV32_Complemento.SetTimbreFiscalDigital(
+  const Value: ITimbreFiscalDigitalV32);
+begin
+  // Pendiente
+end;
 
 end.
