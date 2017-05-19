@@ -6,7 +6,7 @@
 {                                                       }
 {*******************************************************}
 
-unit Facturacion.GeneradorCadenaOrignalV33;
+unit Facturacion.GeneradorCadenaOrignalV32;
 
 interface
 
@@ -16,7 +16,7 @@ uses  Facturacion.Comprobante,
 
 type
 
-  TGeneradorCadenaOriginalV33 = class(TInterfacedObject, IGeneradorCadenaOriginal)
+  TGeneradorCadenaOriginalV32 = class(TInterfacedObject, IGeneradorCadenaOriginal)
   public
     function obtenerCadenaOriginal(const aComprobante: IComprobanteFiscal) : TCadenaUTF8;
   end;
@@ -31,29 +31,30 @@ uses  System.IOUtils,
       Xml.XMLDoc;
 
 const
-  _NOMBRE_RECURSO = 'XSLT_CADENAORIGINAL_V33';
+  _NOMBRE_RECURSO = 'XSLT_CADENAORIGINAL_V32';
 
-{ TGeneradorCadenaOriginalV33 }
+{ TGeneradorCadenaOriginalV32 }
 
-function TGeneradorCadenaOriginalV33.obtenerCadenaOriginal(const aComprobante: IComprobanteFiscal): TCadenaUTF8;
+function TGeneradorCadenaOriginalV32.obtenerCadenaOriginal(const aComprobante: IComprobanteFiscal): TCadenaUTF8;
 var
   contenidoXMLComprobante: TCadenaUTF8;
   contenidoXSLTCadenaOriginal: TCadenaUTF8;
   transformador : TTransformadorDeXML;
 begin
   // Verificamos que la versión del comprobante sea 3.3 pues solo será una cadena original válida para dicha versión
-  Assert(aComprobante.Version = '3.3', 'La version del CFDI no fue 3.3');
+  Assert(aComprobante.Version = '3.2', 'La version del CFDI no fue 3.2');
 
   transformador := TTransformadorDeXML.Create;
   try
     contenidoXMLComprobante := aComprobante.XML;
     contenidoXSLTCadenaOriginal := transformador.obtenerXSLTDeRecurso(_NOMBRE_RECURSO);
-    // Obtenemos la Cadena originak del CFDI 3.3 usando el archivo XSLT proveido por el SAT
+    // Obtenemos la Cadena originak del CFDI 3.2 usando el archivo XSLT proveido por el SAT
     Result := UTF8Encode('|' + transformador.TransformarXML(contenidoXMLComprobante, contenidoXSLTCadenaOriginal) + '||');
   finally
     FreeAndNil(transformador);
   end;
 end;
+
 
 end.
 
