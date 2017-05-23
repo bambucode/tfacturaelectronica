@@ -6,6 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
   Facturacion.ComprobanteV33,
+  Facturacion.ComprobanteV32,
   Facturacion.Comprobante,
   Facturacion.Administrador,
   Facturacion.GeneradorCadenaOriginal,
@@ -34,11 +35,15 @@ type
     dlgOpenAbrir: TOpenDialog;
     edtEmisor: TLabeledEdit;
     mmoXML: TMemo;
+    chkTieneTimbre: TCheckBox;
+    edtUUID: TLabeledEdit;
     procedure FormCreate(Sender: TObject);
     procedure btn1Click(Sender: TObject);
   private
     { Private declarations }
     admonFacturas: IAdministradorFacturas;
+    procedure leerCFDIv32(aComprobante: IComprobanteFiscal);
+    procedure leerCFDIv33(aComprobante: IComprobanteFiscal);
   public
     { Public declarations }
   end;
@@ -58,11 +63,8 @@ end;
 
 procedure TfrmPrin.btn1Click(Sender: TObject);
 var
-  rutaArchivo, claveProd, noIdent, cant, claveUnidad, Unidad, Desc, valorUnitario, importe, descuento: string;
+  rutaArchivo: String;
   comprobante: IComprobanteFiscal;
-  facturaCFDIv33: IComprobanteFiscalV33;
-  I: Integer;
-  concepto: IComprobanteFiscalV33_Conceptos_Concepto;
 begin
   if Not dlgOpenAbrir.Execute then
     Exit;
@@ -73,9 +75,28 @@ begin
   edtVersion.Text := comprobante.Version;
   mmoXML.Text     := FormatXMLData(comprobante.XML);
 
-  if Not Supports(comprobante, IComprobanteFiscalv33, facturaCFDIv33) then
+  mmoConceptos.Lines.Clear;
+  chkTieneTimbre.Checked := False;
+
+  // Usamos la interfase adecuada segun la version
+  if comprobante.Version = '3.3' then
+    leerCFDIv33(comprobante);
+
+  if comprobante.Version = '3.2' then
+    leerCFDIv32(comprobante);
+end;
+
+procedure TfrmPrin.leerCFDIv33(aComprobante: IComprobanteFiscal);
+var
+  claveProd, noIdent, cant, claveUnidad, Unidad, Desc, valorUnitario, importe, descuento: string;
+  facturaCFDIv33: IComprobanteFiscalV33;
+  I: Integer;
+  concepto: IComprobanteFiscalV33_Conceptos_Concepto;
+begin
+
+  if Not Supports(aComprobante, IComprobanteFiscalv33, facturaCFDIv33) then
   begin
-    ShowMessage('El comprobante leido no fue un Comprobante Fiscal v33');
+    ShowMessage('El aComprobante leido no fue un aComprobante Fiscal v33');
     Exit;
   end;
 
@@ -99,6 +120,53 @@ begin
       descuento := concepto.Descuento;
 
       mmoConceptos.Lines.Add(cant + ' x ' + Desc + ' - ' + valorUnitario);
+    end;
+
+    if facturaCFDIv33.Complemento.TimbreFiscalDigital <> nil then
+    begin
+      chkTieneTimbre.Checked := True;
+      edtUUID.Text := facturaCFDIv33.Complemento.TimbreFiscalDigital.UUID;
+    end;
+  end;
+end;
+
+procedure TfrmPrin.leerCFDIv32(aComprobante: IComprobanteFiscal);
+var
+  claveProd, noIdent, cant, claveUnidad, Unidad, Desc, valorUnitario, importe, descuento: string;
+  facturaCFDIv32: IComprobanteFiscalV32;
+  I: Integer;
+  concepto: IComprobanteFiscalV32_Conceptos_Concepto;
+begin
+
+  if Not Supports(aComprobante, IComprobanteFiscalv32, facturaCFDIv32) then
+  begin
+    ShowMessage('El aComprobante leido no fue un aComprobante Fiscal v3.2');
+    Exit;
+  end;
+
+  with facturaCFDIv32 do
+  begin
+    edtFolio.Text := facturaCFDIv32.Folio;
+    edtEmisor.Text := facturaCFDIv32.Emisor.Nombre;
+
+    // Leemos los conceptos y los mostramos en el Memo
+    for I := 0 to  facturaCFDIv32.Conceptos.ChildNodes.Count -1  do
+    begin
+      concepto := facturaCFDIv32.Conceptos.ChildNodes[I] AS IComprobanteFiscalV32_Conceptos_Concepto;
+      noIdent := concepto.NoIdentificacion;
+      cant := concepto.Cantidad;
+      Unidad := concepto.Unidad;
+      Desc := concepto.Descripcion;
+      valorUnitario := concepto.ValorUnitario;
+      importe := concepto.Importe;
+
+      mmoConceptos.Lines.Add(cant + ' x ' + Desc + ' - ' + valorUnitario);
+    end;
+
+    if facturaCFDIv32.Complemento.TimbreFiscalDigital <> nil then
+    begin
+      chkTieneTimbre.Checked := True;
+      edtUUID.Text := facturaCFDIv32.Complemento.TimbreFiscalDigital.UUID;
     end;
   end;
 end;
