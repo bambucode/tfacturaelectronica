@@ -77,6 +77,7 @@ var
   credencialesPAC : TFacturacionCredencialesPAC;
   generadorCBB: IGeneradorCBB;
 
+  queVersion: string;
 const
   _URL_ECODEX_PRUEBAS_V32 = 'https://pruebas.ecodex.com.mx:2045';
   _URL_ECODEX_PRUEBAS_V33 = 'https://wsdev.ecodex.com.mx:2045';
@@ -92,9 +93,13 @@ begin
       certificadoSellos := TCertificadoDeSellos.Create;
       certificadoSellos.Leer(ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer');
 
+      Writeln('Por favor escribe la version del CFDI que deseas generar (3.2 o 3.3):');
+      ReadLn(queVersion);
+
       // Generamos una nueva factura
       admonFacturas := TAdministradorFacturas.Create;
-      nuevaFactura := admonFacturas.Nueva('3.2');
+      nuevaFactura := admonFacturas.Nueva(queVersion);
+      Writeln;
 
       Writeln('Generando CFDI v' + nuevaFactura.Version + '...');
 
@@ -294,11 +299,15 @@ begin
                                     ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.jpg');
 
       Writeln('Generación de CFDI v' + nuevaFactura.Version + ' exitoso.');
+      Writeln;
+      Writeln('Presiona cualquier tecla para salir...');
       Readln;
     except
       on E: Exception do
       begin
+        Writeln('** Ocurrio un error inesperado: ');
         Writeln(E.ClassName, ': ', E.Message);
+        Writeln('Presiona cualquier tecla para salir...');
         Readln;
       end;
     end;
