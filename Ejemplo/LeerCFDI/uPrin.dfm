@@ -37,7 +37,7 @@ object frmPrin: TfrmPrin
     Left = 8
     Top = 194
     Width = 355
-    Height = 324
+    Height = 247
     TabOrder = 2
   end
   object edtFolio: TLabeledEdit
@@ -76,6 +76,24 @@ object frmPrin: TfrmPrin
     ScrollBars = ssBoth
     TabOrder = 5
     WordWrap = False
+  end
+  object chkTieneTimbre: TCheckBox
+    Left = 8
+    Top = 447
+    Width = 97
+    Height = 17
+    Caption = #191'Est'#225' timbrada?'
+    TabOrder = 6
+  end
+  object edtUUID: TLabeledEdit
+    Left = 12
+    Top = 490
+    Width = 351
+    Height = 21
+    EditLabel.Width = 25
+    EditLabel.Height = 13
+    EditLabel.Caption = 'UUID'
+    TabOrder = 7
   end
   object dlgOpenAbrir: TOpenDialog
     Filter = 'Archivos XML|*.xml'

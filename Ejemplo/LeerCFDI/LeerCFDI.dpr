@@ -1,5 +1,6 @@
 program LeerCFDI;
 
+
 uses
   Vcl.Forms,
   uPrin in 'uPrin.pas' {frmPrin},
@@ -23,7 +24,10 @@ uses
   Facturacion.ManejadorErroresComunesWebServices in '..\..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas' {$R *.res},
   libeay32 in '..\..\OpenSSL\libeay32.pas',
   LibEay32Plus in '..\..\OpenSSL\LibEay32Plus.pas',
-  OpenSSLUtils in '..\..\OpenSSL\OpenSSLUtils.pas';
+  OpenSSLUtils in '..\..\OpenSSL\OpenSSLUtils.pas',
+  Facturacion.TimbreFiscalDigitalV32 in '..\..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas',
+  Facturacion.TimbreFiscalDigitalV33 in '..\..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas',
+  Facturacion.ComprobanteV32 in '..\..\Versiones\Facturacion.ComprobanteV32.pas';
 
 {$R *.res}
 
