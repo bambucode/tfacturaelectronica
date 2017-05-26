@@ -31,7 +31,43 @@
   <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/EstadoDeCuentaCombustible/ecc11.xslt"/> 
   <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/donat/donat11.xslt"/>
   <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/divisas/divisas.xslt"/>
-  <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xslt"/>
+  
+  <!-- Manejador de nodos tipo implocal -->
+	<xsl:template match="implocal:ImpuestosLocales">
+		<!--Iniciamos el tratamiento de los atributos de ImpuestosLocales -->
+		<xsl:call-template name="Requerido">
+			<xsl:with-param name="valor" select="./@version"/>
+		</xsl:call-template>
+		<xsl:call-template name="Requerido">
+			<xsl:with-param name="valor" select="./@TotaldeRetenciones"/>
+		</xsl:call-template>
+		<xsl:call-template name="Requerido">
+			<xsl:with-param name="valor" select="./@TotaldeTraslados"/>
+		</xsl:call-template>
+		<xsl:for-each select="implocal:RetencionesLocales">
+			<xsl:call-template name="Requerido">
+				<xsl:with-param name="valor" select="./@ImpLocRetenido"/>
+			</xsl:call-template>
+			<xsl:call-template name="Requerido">
+				<xsl:with-param name="valor" select="./@TasadeRetencion"/>
+			</xsl:call-template>
+			<xsl:call-template name="Requerido">
+				<xsl:with-param name="valor" select="./@Importe"/>
+			</xsl:call-template>
+		</xsl:for-each>
+		<xsl:for-each select="implocal:TrasladosLocales">
+			<xsl:call-template name="Requerido">
+				<xsl:with-param name="valor" select="./@ImpLocTrasladado"/>
+			</xsl:call-template>
+			<xsl:call-template name="Requerido">
+				<xsl:with-param name="valor" select="./@TasadeTraslado"/>
+			</xsl:call-template>
+			<xsl:call-template name="Requerido">
+				<xsl:with-param name="valor" select="./@Importe"/>
+			</xsl:call-template>
+		</xsl:for-each>
+	</xsl:template>
+	
   <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/leyendasFiscales/leyendasFisc.xslt"/>
   <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/pfic/pfic.xslt"/>
   <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/TuristaPasajeroExtranjero/TuristaPasajeroExtranjero.xslt"/>
