@@ -165,6 +165,7 @@
         <DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV32.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV32.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv32.pas"/>
+        <DCCReference Include="..\Facturacion.Tipos.pas"/>
         <RcItem Include="..\Schemas\3.3\cadenaoriginal_3_3.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>

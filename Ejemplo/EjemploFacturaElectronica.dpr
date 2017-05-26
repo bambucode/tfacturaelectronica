@@ -48,7 +48,8 @@ uses
   Facturacion.TimbreFiscalDigitalV32 in '..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas',
   Facturacion.GeneradorCadenaOrignalV32 in '..\Versiones\Facturacion.GeneradorCadenaOrignalV32.pas',
   Facturacion.GeneradorSelloV32 in '..\Versiones\Facturacion.GeneradorSelloV32.pas',
-  Facturacion.GeneradorCBBv32 in '..\Versiones\Facturacion.GeneradorCBBv32.pas';
+  Facturacion.GeneradorCBBv32 in '..\Versiones\Facturacion.GeneradorCBBv32.pas',
+  Facturacion.Tipos in '..\Facturacion.Tipos.pas';
 
 var
   nuevaFactura : IComprobanteFiscal;
@@ -94,7 +95,8 @@ begin
       certificadoSellos.Leer(ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer');
 
       Writeln('Por favor escribe la version del CFDI que deseas generar (3.2 o 3.3):');
-      ReadLn(queVersion);
+      //ReadLn(queVersion);
+      queVersion := '3.3';
 
       // Generamos una nueva factura
       admonFacturas := TAdministradorFacturas.Create;
@@ -198,32 +200,31 @@ begin
 
           NoCertificado := certificadoSellos.NoCertificado;
           Certificado   := certificadoSellos.ContenidoBase64;
-
-          FormaPago     := '01';
+          FormaPago         := '01'; // De catálogo
           CondicionesDePago := 'Credito a 30 dias';
-          Subtotal      := '100.00';
-          Descuento     := '0.00';
-          Moneda        := 'MXN';
-          TipoCambio    := '1.00';
-          Total         := '116.00';
-          TipoDeComprobante := 'I';
-          MetodoPago    := 'PUE';
-          LugarExpedicion := '76030';
+          Subtotal          := '100.00'; // Solo 2 decimales
+          Descuento         := TFacturacionHelper.ComoMoneda(0);
+          Moneda            := 'MXN'; // De catálogo
+          TipoCambio        := TFacturacionHelper.ComoMoneda(1);
+          Total             := TFacturacionHelper.ComoMoneda(116);
+          TipoDeComprobante := 'I'; // De catálogo
+          MetodoPago        := 'PUE';
+          LugarExpedicion   := '76030';
 
-          Emisor.Rfc    := certificadoSellos.EmitidoParaRFC;
-          Emisor.Nombre := certificadoSellos.EmitidoParaNombre;
-          Emisor.RegimenFiscal := '601';
+          Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
+          Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
+          Emisor.RegimenFiscal := '601'; // De catálogo
 
-          Receptor.Rfc  := 'MTI0806042N7';
-          Receptor.Nombre := 'Juan & José & ''Niño'' & "Niña"';
-          Receptor.UsoCFDI := 'G01';
+          Receptor.Rfc         := 'MTI0806042N7';
+          Receptor.Nombre      := 'Juan & José & ''Niño'' & "Niña"';
+          Receptor.UsoCFDI     := 'G01';
 
           concepto33 := Conceptos.Add;
-          concepto33.ClaveProdServ := '52161529';
+          concepto33.ClaveProdServ    := '52161529';  // De catálogo
           concepto33.NoIdentificacion := '1';
           concepto33.Cantidad         := '1';
-          concepto33.ClaveUnidad      := 'EA';
-          concepto33.Unidad           := 'PZA';
+          concepto33.ClaveUnidad      := 'EA';  // De catálogo
+          concepto33.Unidad           := 'PZA'; // De catálogo
           concepto33.Descripcion      := 'Concepto No 1';
           concepto33.ValorUnitario    := '100.00';
           concepto33.Importe          := '100.00';
