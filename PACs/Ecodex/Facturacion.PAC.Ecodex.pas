@@ -39,6 +39,7 @@ implementation
 
 uses Classes,
      xmldom,
+     Facturacion.Tipos,
      XMLIntf,
      System.RegularExpressions,
      {$IF Compilerversion >= 20}
@@ -126,6 +127,7 @@ end;
 procedure TProveedorEcodex.ProcesarExcepcionDePAC(const aExcepcion: Exception);
 var
   mensajeExcepcion : string;
+  numeroErrorSAT: Integer;
 begin
   mensajeExcepcion := aExcepcion.Message;
 
@@ -135,8 +137,23 @@ begin
   begin
       if (aExcepcion Is EEcodexFallaValidacionException)  then
       begin
-        mensajeExcepcion := 'EFallaValidacionException (' + IntToStr(EEcodexFallaValidacionException(aExcepcion).Numero) + ') ' +
-                        EEcodexFallaValidacionException(aExcepcion).Descripcion;
+        mensajeExcepcion := EEcodexFallaValidacionException(aExcepcion).Descripcion;
+
+        numeroErrorSAT := EEcodexFallaValidacionException(aExcepcion).Numero;
+
+        case numeroErrorSAT of
+          33101: raise ESATFechaIncorrectaException.Create(mensajeExcepcion, numeroErrorSAT, False);
+          33102: raise ESATSelloIncorrectoException.Create(mensajeExcepcion, numeroErrorSAT, False);
+          33104: raise ESATFormaPagoSinValorDeCatalogoException.Create(mensajeExcepcion, numeroErrorSAT, False);
+          33105: raise ESATCertificadoIncorrectoException.Create(mensajeExcepcion, numeroErrorSAT, False);
+          33125: raise ESATLugarDeExpedicionNoValidoException.Create(mensajeExcepcion, numeroErrorSAT, False);
+          33132: raise ESATRFCReceptorNoEnListaValidosException.Create(mensajeExcepcion, numeroErrorSAT, False);
+          33142: raise ESATClaveProdServNoValidaException.Create(mensajeExcepcion, numeroErrorSAT, False);
+          33196: raise ESATNoIdentificadoException.Create(mensajeExcepcion, numeroErrorSAT, False);
+        else
+          raise ESATErrorGenericoException.Create('EFallaValidacionException (' + IntToStr(EEcodexFallaValidacionException(aExcepcion).Numero) + ') ' +
+                                                  mensajeExcepcion, numeroErrorSAT, False);
+        end;
       end;
 
       if (aExcepcion Is EEcodexFallaServicioException)  then
