@@ -1,4 +1,4 @@
-TFACTURACIONELECTRONICA v2.0
+TFACTURACIONELECTRONICA v2.0 - Alpha
 --------------------------------------
 Esta es una librería que sirve para generar una factura electrónica (CFDI) de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
@@ -40,12 +40,12 @@ A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
 
 - ~~Lectura de CFDI 3.3~~
 - ~~Generación de CBB con cambios para CFDI 3.3~~.
+- ~~Soporte para generación/lectura de CFDI 3.2 (para fines de compatibilidad y migración)~~
+- ~~Lanzar excepciones basado en el catálogo de errores de CFDI 3.3~~ (Parcial)
+- ~~Poder incluir impuestos locales (3.2 y 3.3)~~.
 - Pruebas de unidad
-- Soporte para generación/lectura de CFDI 3.2 (para fines de compatibilidad y migración)
-- Lanzar excepciones basado en el catálogo de errores de CFDI 3.3
 - Validaciones de campos basado en los múltiples catálogos publicados por el SAT.
 - Soporte para ediciones anteriores de Delphi 2007, 2010, etc.
-
 
 ¿Cómo puedo ayudar?
 -------------------
