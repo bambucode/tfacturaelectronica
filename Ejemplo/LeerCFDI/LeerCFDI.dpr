@@ -27,7 +27,8 @@ uses
   OpenSSLUtils in '..\..\OpenSSL\OpenSSLUtils.pas',
   Facturacion.TimbreFiscalDigitalV32 in '..\..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas',
   Facturacion.TimbreFiscalDigitalV33 in '..\..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas',
-  Facturacion.ComprobanteV32 in '..\..\Versiones\Facturacion.ComprobanteV32.pas';
+  Facturacion.ComprobanteV32 in '..\..\Versiones\Facturacion.ComprobanteV32.pas',
+  Facturacion.ImpuestosLocalesV1 in '..\..\Versiones\Facturacion.ImpuestosLocalesV1.pas';
 
 {$R *.res}
 
