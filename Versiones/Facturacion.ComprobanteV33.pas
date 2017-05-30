@@ -946,8 +946,7 @@ const
 
 implementation
 
-uses System.SysUtils,
-     CodeSiteLogging;
+uses System.SysUtils;
 
 { Global Functions }
 
@@ -976,7 +975,7 @@ end;
 
 procedure TComprobanteFiscalV33.AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
 var
-  timbreConXSI, test : string;
+  timbreConXSI : string;
   documentoXMLTimbre : IXMLDocument;
   nodoTimbre: ITimbreFiscalDigitalV33;
 begin
@@ -997,12 +996,8 @@ begin
   documentoXMLTimbre := LoadXMLData(Trim(timbreConXSI));
   nodoTimbre         := GetTimbreFiscalDigitalV33(documentoXMLTimbre);
 
-  test := (nodoTimbre As IXMLNode).GetXML;
-  CodeSite.Send('Complemento TFD', test);
   // Agregamos el nodo del TimbreFiscalDigital al nodo Complemento del comprobante
-  CodeSite.SendXmlData('Pre-AsignarTimbre', Self.GetXML);
   Get_Complemento.ChildNodes.Add(nodoTimbre);
-  CodeSite.SendXmlData('Post-AsignarTimbre', Self.GetXML);
 end;
 
 procedure TComprobanteFiscalV33.AgregarComplemento(aNodoAAgregar: IXMLNode);
@@ -2052,10 +2047,6 @@ end;
 function TComprobanteFiscalV33_Complemento.GetTimbreFiscalDigital:
     ITimbreFiscalDigitalV33;
 begin
-  CodeSite.SendXmlData('Complemento', Self.GetXML);
-  CodeSite.Send('TFD1 nil?', ChildNodes.FindNode('TimbreFiscalDigital') = nil);
-  CodeSite.Send('TFD2 nil?', ChildNodes.FindNode('TimbreFiscalDigital', Facturacion.TimbreFiscalDigitalV33.TargetNamespace) = nil);
-
   if (Self.HasChildNode('TimbreFiscalDigital', Facturacion.TimbreFiscalDigitalV33.TargetNamespace)) then
     Result := ChildNodes.FindNode('TimbreFiscalDigital', Facturacion.TimbreFiscalDigitalV33.TargetNamespace) As ITimbreFiscalDigitalV33
   else
@@ -2065,9 +2056,7 @@ end;
 procedure TComprobanteFiscalV33_Complemento.SetTimbreFiscalDigital(const Value:
     ITimbreFiscalDigitalV33);
 begin
-  CodeSite.SendXmlData('Pre-SetTimbre', Self.GetXML);
   ChildNodes.Add(Value);
-  CodeSite.SendXmlData('Post-SetTimbre', Self.GetXML);
 end;
 
 { TComprobanteFiscalV33_Complemento }
