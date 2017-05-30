@@ -44,8 +44,8 @@ type
   private
     { Private declarations }
     admonFacturas: IAdministradorFacturas;
-    procedure leerCFDIv32(aComprobante: IComprobanteFiscal);
-    procedure leerCFDIv33(aComprobante: IComprobanteFiscal);
+    procedure LeerCFDIv32(aComprobante: IComprobanteFiscal);
+    procedure LeerCFDIv33(aComprobante: IComprobanteFiscal);
     procedure MostrarImpuestosLocales(const aNodoImpuestosLocales: IXMLNode);
   public
     { Public declarations }
@@ -89,7 +89,7 @@ begin
     leerCFDIv32(comprobante);
 end;
 
-procedure TfrmPrin.leerCFDIv33(aComprobante: IComprobanteFiscal);
+procedure TfrmPrin.LeerCFDIv33(aComprobante: IComprobanteFiscal);
 var
   claveProd, noIdent, cant, claveUnidad, Unidad, Desc, valorUnitario, importe, descuento: string;
   facturaCFDIv33: IComprobanteFiscalV33;
@@ -140,7 +140,7 @@ begin
   end;
 end;
 
-procedure TfrmPrin.leerCFDIv32(aComprobante: IComprobanteFiscal);
+procedure TfrmPrin.LeerCFDIv32(aComprobante: IComprobanteFiscal);
 var
   claveProd, noIdent, cant, claveUnidad, Unidad, Desc, valorUnitario, importe, descuento: string;
   facturaCFDIv32: IComprobanteFiscalV32;
