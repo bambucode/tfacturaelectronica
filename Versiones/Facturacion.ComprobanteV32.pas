@@ -573,6 +573,7 @@ type
   public
     procedure AfterConstruction; override;
     procedure AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
+    procedure AgregarComplemento(aNodoAAgregar: IXMLNode);
   end;
 
 { TComprobanteFiscalV32_Emisor }
@@ -963,6 +964,17 @@ begin
 
   establecerAtributosDeCFDI(Self);
   inherited;
+end;
+
+procedure TComprobanteFiscalV32.AgregarComplemento(aNodoAAgregar: IXMLNode);
+var
+  copiaLocal : IXMLNode;
+begin
+  Assert(aNodoAAgregar <> nil, 'La instancia aNodoAAgregar no debio ser nula');
+  // Para evitar que se libere el nodo parámetro que nos estan proporcionando
+  // creamos nuestra propia copia.
+  copiaLocal := aNodoAAgregar.CloneNode(True);
+  Get_Complemento.ChildNodes.Add(copiaLocal);
 end;
 
 procedure TComprobanteFiscalV32.AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);

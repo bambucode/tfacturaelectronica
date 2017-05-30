@@ -596,6 +596,7 @@ type
   public
     procedure AfterConstruction; override;
     procedure AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
+    procedure AgregarComplemento(aNodoAAgregar: IXMLNode);
   end;
 
 { TComprobanteFiscalV33_CfdiRelacionados }
@@ -997,6 +998,17 @@ begin
 
   // Agregamos el nodo del TimbreFiscalDigital al nodo Complemento del comprobante
   Get_Complemento.ChildNodes.Add(nodoTimbre);
+end;
+
+procedure TComprobanteFiscalV33.AgregarComplemento(aNodoAAgregar: IXMLNode);
+var
+  copiaLocal : IXMLNode;
+begin
+  Assert(aNodoAAgregar <> nil, 'La instancia aNodoAAgregar no debio ser nula');
+  // Para evitar que se libere el nodo parámetro que nos estan proporcionando
+  // creamos nuestra propia copia.
+  copiaLocal := aNodoAAgregar.CloneNode(True);
+  Get_Complemento.ChildNodes.Add(copiaLocal);
 end;
 
 function GetComprobanteFiscalV33(Doc: IXMLDocument): IComprobanteFiscalV33;
@@ -2035,7 +2047,10 @@ end;
 function TComprobanteFiscalV33_Complemento.GetTimbreFiscalDigital:
     ITimbreFiscalDigitalV33;
 begin
-  Result := ChildNodes.FindNode('TimbreFiscalDigital', Facturacion.TimbreFiscalDigitalV33.TargetNamespace) As ITimbreFiscalDigitalV33;
+  if (Self.HasChildNode('TimbreFiscalDigital', Facturacion.TimbreFiscalDigitalV33.TargetNamespace)) then
+    Result := ChildNodes.FindNode('TimbreFiscalDigital', Facturacion.TimbreFiscalDigitalV33.TargetNamespace) As ITimbreFiscalDigitalV33
+  else
+    Result := nil;
 end;
 
 procedure TComprobanteFiscalV33_Complemento.SetTimbreFiscalDigital(const Value:

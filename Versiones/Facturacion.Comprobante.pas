@@ -61,6 +61,7 @@ type
     ///   XML del timbre tal cual lo mandó el PAC
     /// </param>
     procedure AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
+    procedure AgregarComplemento(aNodoAAgregar: IXMLNode);
   end;
 
 implementation
