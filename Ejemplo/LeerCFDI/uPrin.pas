@@ -22,7 +22,9 @@ uses
   EcodexWsSeguridad,
   EcodexWsTimbrado,
   Facturacion.CertificadoDeSellos,
+  Facturacion.ImpuestosLocalesV1,
   Facturacion.Helper,
+  Xml.XMLIntf,
   Facturacion.ManejadorErroresComunesWebServices;
 
 type
@@ -44,6 +46,7 @@ type
     admonFacturas: IAdministradorFacturas;
     procedure leerCFDIv32(aComprobante: IComprobanteFiscal);
     procedure leerCFDIv33(aComprobante: IComprobanteFiscal);
+    procedure MostrarImpuestosLocales(const aNodoImpuestosLocales: IXMLNode);
   public
     { Public declarations }
   end;
@@ -92,6 +95,8 @@ var
   facturaCFDIv33: IComprobanteFiscalV33;
   I: Integer;
   concepto: IComprobanteFiscalV33_Conceptos_Concepto;
+  impuestosLocales: IImpuestosLocalesV1;
+  nodoImpuestosLocales: IXMLNode;
 begin
 
   if Not Supports(aComprobante, IComprobanteFiscalv33, facturaCFDIv33) then
@@ -127,6 +132,11 @@ begin
       chkTieneTimbre.Checked := True;
       edtUUID.Text := facturaCFDIv33.Complemento.TimbreFiscalDigital.UUID;
     end;
+
+    // ¿Tiene impuestos locales?
+    nodoImpuestosLocales := facturaCFDIv33.Complemento.ChildNodes.FindNode('ImpuestosLocales',
+                                                                            Facturacion.ImpuestosLocalesV1.TargetNamespace);
+    MostrarImpuestosLocales(nodoImpuestosLocales);
   end;
 end;
 
@@ -136,6 +146,7 @@ var
   facturaCFDIv32: IComprobanteFiscalV32;
   I: Integer;
   concepto: IComprobanteFiscalV32_Conceptos_Concepto;
+  nodoImpuestosLocales: IXMLNode;
 begin
 
   if Not Supports(aComprobante, IComprobanteFiscalv32, facturaCFDIv32) then
@@ -168,6 +179,26 @@ begin
       chkTieneTimbre.Checked := True;
       edtUUID.Text := facturaCFDIv32.Complemento.TimbreFiscalDigital.UUID;
     end;
+
+    // ¿Tiene impuestos locales?
+    nodoImpuestosLocales := facturaCFDIv32.Complemento.ChildNodes.FindNode('ImpuestosLocales',
+                                                                            Facturacion.ImpuestosLocalesV1.TargetNamespace);
+    MostrarImpuestosLocales(nodoImpuestosLocales);
+  end;
+end;
+
+procedure TfrmPrin.MostrarImpuestosLocales(const aNodoImpuestosLocales:
+    IXMLNode);
+var
+  impuestosLocales: IImpuestosLocalesV1;
+begin
+  if aNodoImpuestosLocales <> nil then
+  begin
+    // Leemos el nodo de impuestos directo desde el XML del CFDI
+    impuestosLocales := GetImpuestosLocalesV1(LoadXMLData(aNodoImpuestosLocales.XML));
+    mmoConceptos.Lines.Add('----- Impuestos Locales ---------------');
+    mmoConceptos.Lines.Add('Total traslados = ' + impuestosLocales.TotaldeTraslados);
+    mmoConceptos.Lines.Add('Total retenciones = ' + impuestosLocales.TotaldeRetenciones);
   end;
 end;
 
