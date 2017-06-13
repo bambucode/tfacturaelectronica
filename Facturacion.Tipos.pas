@@ -36,6 +36,10 @@ type
 
   ESATNoIdentificadoException                 = class(ESATErrorGenericoException); // CFDI33196
 
+const
+  _RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';
+  _RFC_VENTA_EXTRANJEROS        = 'XEXX010101000';
+
 implementation
 
 constructor ESATErrorGenericoException.Create(const aMensajeExcepcion: String;

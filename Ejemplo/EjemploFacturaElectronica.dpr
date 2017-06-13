@@ -318,11 +318,7 @@ begin
 
           Writeln('Asignando Timbre Fiscal al comprobante...');
           nuevaFactura.AsignarTimbreFiscal(xmlTimbre);
-          TFacturacionHelper.AgregarSchemaLocation(nuevaFactura,
-                                                  'http://www.sat.gob.mx/TimbreFiscalDigital');
-          TFacturacionHelper.AgregarSchemaLocation(nuevaFactura,
-                                                  'http://www.sat.gob.mx/sitio_internet/cfd/timbrefiscaldigital/TimbreFiscalDigitalv11.xsd');
-
+          
           // Recibimos el timbre de forma exitosa, dejamos de "reintentar"
           reintentar := False;
         except

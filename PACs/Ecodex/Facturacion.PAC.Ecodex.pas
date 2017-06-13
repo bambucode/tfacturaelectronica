@@ -31,8 +31,8 @@ type
   public
     procedure Configurar(const aDominioWebService: string;
                          const aCredencialesPAC: TFacturacionCredencialesPAC);
-    function TimbrarDocumento(var aComprobante: IComprobanteFiscal;
-                              const aTransaccion: Int64): TCadenaUTF8;
+    function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
+        aTransaccion: Int64): TCadenaUTF8;
   end;
 
 implementation
@@ -64,7 +64,7 @@ begin
   fwsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
 end;
 
-function TProveedorEcodex.TimbrarDocumento(var aComprobante:
+function TProveedorEcodex.TimbrarDocumento(const aComprobante:
     IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8;
 var
   solicitudTimbrado: TSolicitudTimbradoEcodex;

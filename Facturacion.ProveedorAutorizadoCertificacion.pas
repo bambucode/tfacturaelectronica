@@ -79,7 +79,7 @@ type
     ['{BB3456F4-277A-46B7-B2BC-A430E35130E8}']
     procedure Configurar(const aDominioWebService: string;
                          const aCredencialesPAC: TFacturacionCredencialesPAC);
-    function TimbrarDocumento(var aComprobante: IComprobanteFiscal;
+    function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
                               const aTransaccion: Int64) : TCadenaUTF8;
   end;
 
