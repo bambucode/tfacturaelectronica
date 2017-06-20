@@ -3,7 +3,7 @@ unit ConstantesFixtures;
 interface
 
 const
-  _RUTA_CERTIFICADO = 'openssl\aaa010101aaa_csd_01.cer';
+  _RUTA_CERTIFICADO = 'openssl\VOC990129I26.cer';
 
 implementation
 

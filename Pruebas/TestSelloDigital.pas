@@ -26,7 +26,7 @@ type
   public
     procedure SetUp; override;
   published
-      procedure SelloCalcualado_DeCadenaOriginalConMD5_SeaCorrecto;
+      procedure SelloCalculado_DeCadenaOriginalConMD5_SeaCorrecto;
   end;
 
 implementation
@@ -40,37 +40,37 @@ begin
    // Leemos la cadena original que vamos a usar en las pruebas
    fCadenaOriginalAProbar:=leerContenidoDeFixture('sello_digital/cadena_original_validada_en_utf8.txt');
    // Especificamos la llave privada de pruebas del SAT usadas en las pruebas
-   fCertificado.LlavePrivada.Ruta:=fRutaFixtures + 'openssl\aaa010101aaa_CSD_01.key';
-   fCertificado.LlavePrivada.Clave:=leerContenidoDeFixture('openssl\aaa010101aaa_CSD_01_clave.txt');
+   fCertificado.LlavePrivada.Ruta:=fRutaFixtures + 'openssl\VOC990129I26.key';
+   fCertificado.LlavePrivada.Clave:=leerContenidoDeFixture('openssl\VOC990129I26_clave.txt');
 end;
 
-procedure TestTSelloDigital.SelloCalcualado_DeCadenaOriginalConMD5_SeaCorrecto;
+procedure TestTSelloDigital.SelloCalculado_DeCadenaOriginalConMD5_SeaCorrecto;
 var
   SelloDigitalCorrecto, ResultadoSelloCalculado: String;
 const
   _LONGITUD_SELLO_DIGITAL = 172;
 begin
-    // Ahora la calculada previamente con el programa MicroE del SAT
-    SelloDigitalCorrecto:=leerContenidoDeFixture('sello_digital/sello_digital_correcto.txt');
+  // Ahora la calculada previamente con el programa MicroE del SAT
+  SelloDigitalCorrecto := leerContenidoDeFixture('sello_digital/sello_digital_correcto.txt');
 
-    // Creamos el objeto de Sello Digital
-    fSelloDigital := TSelloDigital.Create(fCadenaOriginalAProbar,fCertificado, tdMD5);
+  // Creamos el objeto de Sello Digital
+  fSelloDigital := TSelloDigital.Create(fCadenaOriginalAProbar, fCertificado, tdMD5);
 
-    try
-      // Hacemos que calcule el Sello Digital para la cadena original proveida
-      ResultadoSelloCalculado:=fSelloDigital.SelloCalculado;
+  try
+    // Hacemos que calcule el Sello Digital para la cadena original proveida
+    ResultadoSelloCalculado := fSelloDigital.SelloCalculado;
 
-      CodeSite.Send(ResultadoSelloCalculado);
+    CodeSite.Send(ResultadoSelloCalculado);
 
-      CheckEquals(SelloDigitalCorrecto, ResultadoSelloCalculado,
-                  'El procedimiento para calcular el sello digital fallo, el resultado no fue el mismo que el ejemplo del SAT');
+    CheckEquals(SelloDigitalCorrecto, ResultadoSelloCalculado,
+                'El procedimiento para calcular el sello digital fallo, el resultado no fue el mismo que el ejemplo del SAT');
 
-      CheckEquals(_LONGITUD_SELLO_DIGITAL, Length(ResultadoSelloCalculado),
-                  'La longitud del sello digital no fue la correcta, debe de ser siempre de  ' +
-                  IntToStr(_LONGITUD_SELLO_DIGITAL));
-    finally
-       FreeAndNil(fSelloDigital);
-    end;
+    CheckEquals(_LONGITUD_SELLO_DIGITAL, Length(ResultadoSelloCalculado),
+                'La longitud del sello digital no fue la correcta, debe de ser siempre de  ' +
+                IntToStr(_LONGITUD_SELLO_DIGITAL));
+  finally
+    FreeAndNil(fSelloDigital);
+  end;
 end;
 
 initialization

@@ -71,7 +71,7 @@ procedure TestTCertificadoSellos.Tipo_ConArchivoDeSellosl_RegreseTipoSellos;
 var
   certificadoSellos: TCertificadoSellos;
 const
-  _ARCHIVO_CERTIFICADO_SELLOS = 'openssl\aaa010101aaa_CSD_01.cer';
+  _ARCHIVO_CERTIFICADO_SELLOS = 'openssl\VOC990129I26.cer';
 begin
   certificadoSellos := TCertificadoSellos.Create(fRutaFixtures + _ARCHIVO_CERTIFICADO_SELLOS);
   try

@@ -48,7 +48,7 @@ uses
 procedure TestTOpenSSL.SetUp;
 begin
   inherited;
-  fArchivoLlavePrivada := fRutaFixtures + '\openssl\aaa010101aaa_csd_01.key';
+  fArchivoLlavePrivada := fRutaFixtures + '\openssl\VOC990129I26.key';
   fClaveLlavePrivada := '12345678a';
   // Creamos el objeto OpenSSL
   fOpenSSL := TOpenSSL.Create();
@@ -65,8 +65,8 @@ var
   sResultadoMD5OpenSSL: WideString;
   TipoEncripcion: String;
 const
-  _ARCHIVO_CERTIFICADO = 'aaa010101aaa_CSD_01.cer';
-  _ARCHIVO_LLAVE_PEM = 'aaa010101aaa_CSD_01.pem';
+  _ARCHIVO_CERTIFICADO = 'VOC990129I26.cer';
+  _ARCHIVO_LLAVE_PEM = 'VOC990129I26.pem';
   _ARCHIVO_CADENA_TEMPORAL = 'cadena_hacerdigestion.txt';
   _ARCHIVO_TEMPORAL_RESULTADO_OPENSSL = 'cadena_hacerdigestion.txt';
 begin
