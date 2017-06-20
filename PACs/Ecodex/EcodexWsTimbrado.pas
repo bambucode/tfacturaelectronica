@@ -25,8 +25,7 @@ unit EcodexWsTimbrado;
 
 interface
 
-uses InvokeRegistry, SOAPHTTPClient, Types, XSBuiltIns,
-     ProveedorAutorizadoCertificacion;
+uses InvokeRegistry, SOAPHTTPClient, Types, XSBuiltIns;
 
 const
   IS_OPTN = $0001;
@@ -36,6 +35,8 @@ const
 
 
 type
+
+  TTipoComprobanteXML = String;
 
   // ************************************************************************ //
   // The following types, referred to in the WSDL document are not being represented
@@ -457,15 +458,11 @@ type
 
 function GetWsEcodexTimbrado(UseWSDL: Boolean=System.False; Addr: string='';
     HTTPRIO: THTTPRIO = nil): IEcodexServicioTimbrado;
-function GetUltimoXMLEnviadoEcodexWsTimbrado: string;
-function GetUltimoXMLRecibidoEcodexWsTimbrado: string;
 
 implementation
 
-uses SysUtils, uWSHelper;
+uses SysUtils;
 
-var
-  wsHelper: TWSHelper;
 
 function GetWsEcodexTimbrado(UseWSDL: Boolean=System.False; Addr: string='';
     HTTPRIO: THTTPRIO = nil): IEcodexServicioTimbrado;
@@ -492,8 +489,8 @@ begin
 
   // Configuramos uso de UTF8 (Probablemente solo para Delphi 2010 y menores)
   //RIO.HTTPWebNode.UseUTF8InHeader := True;
-  RIO.OnBeforeExecute := wsHelper.BeforeExecute;
-  RIO.OnAfterExecute := wsHelper.AfterExecute;
+  //RIO.OnBeforeExecute := wsHelper.BeforeExecute;
+  //RIO.OnAfterExecute := wsHelper.AfterExecute;
 
   try
     Result := (RIO as IEcodexServicioTimbrado);
@@ -508,22 +505,6 @@ begin
     if (Result = nil) and (HTTPRIO = nil) then
       RIO.Free;
   end;
-end;
-
-function GetUltimoXMLEnviadoEcodexWsTimbrado: string;
-begin
-  Result := '';
-
-  if wsHelper <> nil then
-    Result := wsHelper.UltimoXMLEnviado;
-end;
-
-function GetUltimoXMLRecibidoEcodexWsTimbrado: string;
-begin
-  Result := '';
-
-  if wsHelper <> nil then
-    Result := wsHelper.UltimoXMLRecibido;
 end;
 
 procedure TEcodexComprobanteXML.SetDatosXML(Index: Integer; const Astring:
@@ -1005,8 +986,7 @@ initialization
   RemClassRegistry.RegisterXSClass(TEcodexSolicitudCancelacion, 'http://Ecodex.WS.Model/2011/CFDI', 'SolicitudCancelaTimbrado');
   RemClassRegistry.RegisterSerializeOptions(TEcodexSolicitudCancelacion, [xoLiteralParam]);
 
-  wsHelper := TWSHelper.Create;
+
 finalization
-  if Assigned(wsHelper) then
-    wsHelper.Free;
+
 end.
