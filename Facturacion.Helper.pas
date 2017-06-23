@@ -16,7 +16,8 @@ type
 
 implementation
 
-uses System.SysUtils;
+uses System.SysUtils,
+     Soap.XSBuiltIns;
 
 { TFacturacionHelper }
 
@@ -51,7 +52,13 @@ end;
 class function TFacturacionHelper.DesdeFechaISO8601(
   const aCadenaFecha: String): TDateTime;
 begin
-  Result := StrToDate(aCadenaFecha);
+  with TXSDate.Create() do
+  try
+    XSToNative(aCadenaFecha); // convert from WideString
+    Result := AsDate; // convert to TDateTime
+  finally
+    Free;
+  end;
 end;
 
 end.
