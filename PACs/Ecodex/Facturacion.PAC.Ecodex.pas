@@ -29,8 +29,8 @@ type
     function ExtraerNodoTimbre(const aComprobanteXML : TEcodexComprobanteXML): TCadenaUTF8;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
   public
-    procedure Configurar(const aDominioWebService: string;
-                         const aCredencialesPAC: TFacturacionCredencialesPAC);
+    procedure Configurar(const aDominioWebService: string; const aCredencialesPAC:
+        TFacturacionCredencialesPAC; const aTransaccionInicial: Int64);
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
         aTransaccion: Int64): TCadenaUTF8;
   end;
@@ -51,13 +51,14 @@ uses Classes,
 
 { TProveedorEcodex }
 
-procedure TProveedorEcodex.Configurar(const aDominioWebService: string;
-  const aCredencialesPAC: TFacturacionCredencialesPAC);
+procedure TProveedorEcodex.Configurar(const aDominioWebService: string; const
+    aCredencialesPAC: TFacturacionCredencialesPAC; const aTransaccionInicial:
+    Int64);
 begin
   fDominioWebService := aDominioWebService;
   fCredencialesPAC := aCredencialesPAC;
 
-  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService, 1234);
+  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService, aTransaccionInicial);
   fManejadorDeSesion.AsignarCredenciales(fCredencialesPAC);
 
   // Incializamos las instancias de los WebServices
