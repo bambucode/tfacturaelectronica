@@ -46,6 +46,7 @@ end;
 
 class function TFacturacionHelper.ComoMoneda(const aValor: Currency): string;
 begin
+  // NOTA: Esta moneda es para el XML, NO debe llevar simbolo de moneda
   Result := CurrToStrF(aValor, ffFixed, 2);
 end;
 

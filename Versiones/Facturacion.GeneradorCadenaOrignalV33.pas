@@ -60,6 +60,7 @@ var
   transformador : TTransformadorDeXML;
   facturaV33: IComprobanteFiscalV33;
 begin
+  Assert(aComprobante <> nil, 'La instancia aComprobante no debio ser nula');
   // Verificamos que la versión del comprobante sea 3.3 pues solo será una cadena original válida para dicha versión
   Assert(aComprobante.Version = '3.3', 'La version del CFDI no fue 3.3');
 
