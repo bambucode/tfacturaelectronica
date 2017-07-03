@@ -34,6 +34,17 @@ type
     ///   Cadena Original en formato UTF8
     /// </returns>
     function obtenerCadenaOriginal(const aComprobante: IComprobanteFiscal) : TCadenaUTF8;
+     /// <summary>
+    ///   Se encarga de procesar el comprobante previamente timbrado y regresar la
+    ///   cadena Original del Timbre Fiscal Digital
+    /// </summary>
+    /// <param name="aComprobante">
+    ///   Instancia del comprobante timbrado
+    /// </param>
+    /// <returns>
+    ///   Cadena Original de TFD en formato UTF8
+    /// </returns>
+    function obtenerCadenaOriginalDeTimbre(const aComprobante: IComprobanteFiscal) : TCadenaUTF8;
   end;
 
   TTransformadorDeXML = class

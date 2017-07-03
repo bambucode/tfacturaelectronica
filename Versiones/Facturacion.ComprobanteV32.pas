@@ -910,15 +910,16 @@ implementation
 
 uses System.SysUtils;
 
+const
+  _NODO_XSI     = 'xmlns:xsi';
+  _NODO_SL      = 'xsi:schemaLocation';
+  _NODO_VERSION = 'Version';
+
 { Global Functions }
 
 procedure establecerAtributosDeCFDI(comprobante: IComprobanteFiscalV32);
 var
   documentoBase: IXMLDocument;
-const
-  _NODO_XSI     = 'xmlns:xsi';
-  _NODO_SL      = 'xsi:schemaLocation';
-  _NODO_VERSION = 'Version';
 begin
   // Agregamos la auto identacion
   comprobante.OwnerDocument.Options := [doNodeAutoCreate, doAttrNull, doAutoPrefix, doNamespaceDecl, doNodeAutoIndent];
@@ -979,7 +980,7 @@ end;
 
 procedure TComprobanteFiscalV32.AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
 var
-  timbreConXSI : string;
+  timbreConXSI, schemaLocation : string;
   documentoXMLTimbre : IXMLDocument;
   nodoTimbre: ITimbreFiscalDigitalV32;
 begin
@@ -1002,6 +1003,10 @@ begin
 
   // Agregamos el nodo del TimbreFiscalDigital al nodo Complemento del comprobante
   Get_Complemento.ChildNodes.Add(nodoTimbre);
+
+  schemaLocation := Self.AttributeNodes.FindNode(_NODO_SL).Text;
+  Self.SetAttribute(_NODO_SL, 'http://www.sat.gob.mx/TimbreFiscalDigital' +
+                             ' http://www.sat.gob.mx/sitio_internet/cfd/timbrefiscaldigital/TimbreFiscalDigitalv11.xsd');
 end;
 
 function TComprobanteFiscalV32.Get_Version: UnicodeString;

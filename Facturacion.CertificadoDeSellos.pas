@@ -63,6 +63,10 @@ type
 
 implementation
 
+{$IFDEF CODESITE}
+uses CodeSiteLogging;
+{$ENDIF}
+
 { TCertificadoDeSellos }
 
 procedure TCertificadoDeSellos.Leer(const aRutaCertificado: TFileName);

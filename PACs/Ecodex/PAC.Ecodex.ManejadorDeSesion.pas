@@ -40,6 +40,9 @@ implementation
 
 uses System.Hash,
      Facturacion.ManejadorErroresComunesWebServices,
+     {$IFDEF CODESITE}
+     CodeSiteLogging,
+     {$ENDIF}
      Facturacion.ProveedorAutorizadoCertificacion;
 
 constructor TEcodexManejadorDeSesion.Create(const aDominioWebService: String;

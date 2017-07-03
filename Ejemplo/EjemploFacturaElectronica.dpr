@@ -306,10 +306,12 @@ begin
           // Dependiendo de la version usamos diferente servidor de pruebas
           if nuevaFactura.Version = '3.3' then
             pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
-                         credencialesPAC)
+                         credencialesPAC,
+                         1)
           else
             pac.Configurar(_URL_ECODEX_PRUEBAS_V32,
-                           credencialesPAC);
+                           credencialesPAC,
+                           1);
 
           // 4. La mandamos timbrar
           Writeln('Intentando timbrar comprobante...');
@@ -318,11 +320,7 @@ begin
 
           Writeln('Asignando Timbre Fiscal al comprobante...');
           nuevaFactura.AsignarTimbreFiscal(xmlTimbre);
-          TFacturacionHelper.AgregarSchemaLocation(nuevaFactura,
-                                                  'http://www.sat.gob.mx/TimbreFiscalDigital');
-          TFacturacionHelper.AgregarSchemaLocation(nuevaFactura,
-                                                  'http://www.sat.gob.mx/sitio_internet/cfd/timbrefiscaldigital/TimbreFiscalDigitalv11.xsd');
-
+          
           // Recibimos el timbre de forma exitosa, dejamos de "reintentar"
           reintentar := False;
         except
@@ -341,6 +339,9 @@ begin
 //         Writeln(facturaCFDIv33.Complemento.TimbreFiscalDigital.UUID);
 //      end else
 //         Writeln('**** NO SE TUVO TIMBRE ****');
+
+      Writeln('Cadena Original de Timbre:');
+      Writeln(generadorCadena.obtenerCadenaOriginalDeTimbre(nuevaFactura));
 
       Writeln('Guardando XML...');
       admonFacturas.GuardarArchivo(nuevaFactura,

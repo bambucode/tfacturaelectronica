@@ -29,10 +29,10 @@ type
     function ExtraerNodoTimbre(const aComprobanteXML : TEcodexComprobanteXML): TCadenaUTF8;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
   public
-    procedure Configurar(const aDominioWebService: string;
-                         const aCredencialesPAC: TFacturacionCredencialesPAC);
-    function TimbrarDocumento(var aComprobante: IComprobanteFiscal;
-                              const aTransaccion: Int64): TCadenaUTF8;
+    procedure Configurar(const aDominioWebService: string; const aCredencialesPAC:
+        TFacturacionCredencialesPAC; const aTransaccionInicial: Int64);
+    function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
+        aTransaccion: Int64): TCadenaUTF8;
   end;
 
 implementation
@@ -51,20 +51,21 @@ uses Classes,
 
 { TProveedorEcodex }
 
-procedure TProveedorEcodex.Configurar(const aDominioWebService: string;
-  const aCredencialesPAC: TFacturacionCredencialesPAC);
+procedure TProveedorEcodex.Configurar(const aDominioWebService: string; const
+    aCredencialesPAC: TFacturacionCredencialesPAC; const aTransaccionInicial:
+    Int64);
 begin
   fDominioWebService := aDominioWebService;
   fCredencialesPAC := aCredencialesPAC;
 
-  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService, 1234);
+  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService, aTransaccionInicial);
   fManejadorDeSesion.AsignarCredenciales(fCredencialesPAC);
 
   // Incializamos las instancias de los WebServices
   fwsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
 end;
 
-function TProveedorEcodex.TimbrarDocumento(var aComprobante:
+function TProveedorEcodex.TimbrarDocumento(const aComprobante:
     IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8;
 var
   solicitudTimbrado: TSolicitudTimbradoEcodex;
