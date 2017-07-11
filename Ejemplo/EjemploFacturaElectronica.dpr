@@ -76,12 +76,11 @@ var
   trasladosImpuestosLocalesV1: IImpuestosLocalesV1_TrasladosLocales;
 
   // Instancias comunes independientes de la version
-  cadenaOriginal : TCadenaUTF8;
   admonFacturas: IAdministradorFacturas;
   generadorCadena : IGeneradorCadenaOriginal;
   generadorSello : IGeneradorSello;
   openSSL : IOpenSSL;
-  selloDeLaFactura, xmlTimbre : TCadenaUTF8;
+  xmlTimbre : TCadenaUTF8;
   pac: IProveedorAutorizadoCertificacion;
   certificadoSellos: ICertificadoDeSellos;
   credencialesPAC : TFacturacionCredencialesPAC;

@@ -7,7 +7,7 @@ uses Facturacion.Comprobante;
 type
 
   TFacturacionHelper = class
-    class function ComoFechaISO8601(const aFecha: TDateTime): TCadenaUTF8;
+    class function ComoFechaISO8601(const aFecha: TDateTime): string;
     class function DesdeFechaISO8601(const aCadenaFecha: String): TDateTime;
     class function ComoMoneda(const aValor: Currency) : string;
     class function ComoCantidad(const aValor: Double) : string;
@@ -39,7 +39,7 @@ begin
 end;
 
 class function TFacturacionHelper.ComoFechaISO8601(const aFecha: TDateTime):
-    TCadenaUTF8;
+    string;
 begin
   Result := FormatDateTime('yyyy-mm-dd', aFecha) + 'T' + FormatDateTime('hh:nn:ss', aFecha);
 end;
