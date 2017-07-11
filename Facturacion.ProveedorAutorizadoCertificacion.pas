@@ -82,6 +82,7 @@ type
                          const aTransaccionInicial: Int64);
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
                               const aTransaccion: Int64) : TCadenaUTF8;
+    function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
   end;
 
 implementation

@@ -33,7 +33,7 @@ type
     /// <returns>
     ///   Cadena Original en formato UTF8
     /// </returns>
-    function obtenerCadenaOriginal(const aComprobante: IComprobanteFiscal) : TCadenaUTF8;
+    function ObtenerCadenaOriginal(const aComprobante: IComprobanteFiscal) : TCadenaUTF8;
      /// <summary>
     ///   Se encarga de procesar el comprobante previamente timbrado y regresar la
     ///   cadena Original del Timbre Fiscal Digital
@@ -44,12 +44,12 @@ type
     /// <returns>
     ///   Cadena Original de TFD en formato UTF8
     /// </returns>
-    function obtenerCadenaOriginalDeTimbre(const aComprobante: IComprobanteFiscal) : TCadenaUTF8;
+    function ObtenerCadenaOriginalDeTimbre(const aComprobante: IComprobanteFiscal) : TCadenaUTF8;
   end;
 
   TTransformadorDeXML = class
   public
-    function obtenerXSLTDeRecurso(const aNombreRecurso: string): TCadenaUTF8;
+    function ObtenerXSLTDeRecurso(const aNombreRecurso: string): TCadenaUTF8;
     function TransformarXML(const aXMLData: string; aXSLT: string): TCadenaUTF8;
   end;
 
@@ -65,7 +65,7 @@ uses  System.IOUtils,
 
 { TTransformadorDeXML }
 
-function TTransformadorDeXML.obtenerXSLTDeRecurso(const aNombreRecurso:
+function TTransformadorDeXML.ObtenerXSLTDeRecurso(const aNombreRecurso:
     string): TCadenaUTF8;
 var
   Stream: TResourceStream;
