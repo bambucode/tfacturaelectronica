@@ -13,7 +13,7 @@ interface
 uses Facturacion.Comprobante,
      Facturacion.GeneradorCadenaOriginal,
      Facturacion.GeneradorSello,
-     System.SysUtils;
+     SysUtils;
 
 type
 
@@ -121,14 +121,14 @@ type
 
 implementation
 
-uses System.Classes,
-     Xml.XMLDoc,
+uses Classes,
+     XMLDoc,
      Facturacion.ComprobanteV32,
      Facturacion.ComprobanteV33,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
-     Xml.XMLIntf;
+     XMLIntf;
 
 { TAdministradorFacturas }
 

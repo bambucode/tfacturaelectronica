@@ -908,7 +908,7 @@ const
 
 implementation
 
-uses System.SysUtils;
+uses SysUtils;
 
 const
   _NODO_XSI     = 'xmlns:xsi';

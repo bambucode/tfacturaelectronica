@@ -22,9 +22,9 @@ program EjemploFacturaElectronica;
 
 uses
   FastMM4,
-  System.SysUtils,
+  SysUtils,
   activex,
-  Vcl.Forms,
+  Forms,
   Facturacion.ComprobanteV33 in '..\Versiones\Facturacion.ComprobanteV33.pas',
   Facturacion.Comprobante in '..\Versiones\Facturacion.Comprobante.pas',
   Facturacion.Administrador in '..\Facturacion.Administrador.pas',
@@ -76,11 +76,12 @@ var
   trasladosImpuestosLocalesV1: IImpuestosLocalesV1_TrasladosLocales;
 
   // Instancias comunes independientes de la version
+  cadenaOriginal : TCadenaUTF8;
   admonFacturas: IAdministradorFacturas;
   generadorCadena : IGeneradorCadenaOriginal;
   generadorSello : IGeneradorSello;
   openSSL : IOpenSSL;
-  xmlTimbre : TCadenaUTF8;
+  selloDeLaFactura, xmlTimbre : TCadenaUTF8;
   pac: IProveedorAutorizadoCertificacion;
   certificadoSellos: ICertificadoDeSellos;
   credencialesPAC : TFacturacionCredencialesPAC;

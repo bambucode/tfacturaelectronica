@@ -2,20 +2,21 @@ unit Facturacion.Tipos;
 
 interface
 
-uses System.SysUtils;
+uses SysUtils;
 
 type
 
-{$REGION 'Excepciones de validacion de la matriz de validaciones de CFDI 3.3'}
+  {$REGION 'Excepciones de validacion de la matriz de validaciones de CFDI 3.3'}
   ESATErrorGenericoException = class(Exception)
   private
     fCodigoError: Integer;
-    fReintentable: Boolean;
+    fReintentable : Boolean;
   public
     constructor Create(const aMensajeExcepcion: String;
-      const aCodigoError: Integer; const aReintentable: Boolean);
+                       const aCodigoError: Integer;
+                       const aReintentable: Boolean);
     property CodigoError: Integer read fCodigoError;
-    property Reintentable: Boolean read fReintentable default false;
+    property Reintentable : Boolean read fReintentable default false;
   end;
 
 
@@ -25,21 +26,15 @@ type
   // NOTA: Solo se implementaron las excepciones más comunes
   // si se desea se puede agregar el resto de las excepciones faltantes.
 
-  // Los errores técnicos, donde se omiten nodos, no coincide, etc. no se calculó bien, etc
-  // serán heredados de la siguiente excepcion. Estos errores deberán ser corregidos
-  // en la librería directamente
-  ESATErrorTecnicoXMLException            = class(ESATErrorGenericoException);
-  // Los errores de "configuracion" donde algun dato del emisor está mal segun el SAT
-  ESATDatoEmisorIncorrectoException       = class(ESATErrorGenericoException);
-  ESATDatoReceptorIncorrectoException     = class(ESATErrorGenericoException);
-  // Cuando algun valor de un campo de catalogo no existió en el mismo
-  ESATValorNoEnCatalogoException          = class(ESATErrorGenericoException);
-  // Existió un error arimético en el XML
-  ESATProblemaDeLlenadoException          = class(ESATErrorGenericoException);
-  ESATCampoConfirmacionRequeridoException = class(ESATErrorGenericoException);
-  ESATNoIdentificadoException             = class(ESATErrorGenericoException); // CFDI33196
+  ESATFechaIncorrectaException                = class(ESATErrorGenericoException); // CFDI33101
+  ESATSelloIncorrectoException                = class(ESATErrorGenericoException); // CFDI33102
+  ESATFormaPagoSinValorDeCatalogoException    = class(ESATErrorGenericoException); // CFDI33104
+  ESATCertificadoIncorrectoException          = class(ESATErrorGenericoException); // CFDI33105
+  ESATLugarDeExpedicionNoValidoException      = class(ESATErrorGenericoException); // CFDI33125
+  ESATRFCReceptorNoEnListaValidosException     = class(ESATErrorGenericoException); // CFDI33132
+  ESATClaveProdServNoValidaException          = class(ESATErrorGenericoException); // CFDI33142
 
-{$ENDREGION}
+  ESATNoIdentificadoException                 = class(ESATErrorGenericoException); // CFDI33196
 
 const
   _RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';
@@ -48,11 +43,12 @@ const
 implementation
 
 constructor ESATErrorGenericoException.Create(const aMensajeExcepcion: String;
-  const aCodigoError: Integer; const aReintentable: Boolean);
+                       const aCodigoError: Integer;
+                       const aReintentable: Boolean);
 begin
   inherited Create(aMensajeExcepcion);
   fReintentable := aReintentable;
-  fCodigoError := aCodigoError;
+  fCodigoError  := aCodigoError;
 end;
 
 end.

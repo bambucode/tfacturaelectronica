@@ -11,7 +11,7 @@ unit Facturacion.GeneradorCadenaOriginal;
 interface
 
 uses Facturacion.Comprobante,
-     System.SysUtils;
+     SysUtils;
 
 type
 
@@ -55,13 +55,13 @@ type
 
 implementation
 
-uses  System.IOUtils,
-      System.Classes,
-      Winapi.Windows,
-      System.Win.ComObj,
-      Xml.XMLIntf,
-      Xml.XMLDom,
-      Xml.XMLDoc;
+uses  IOUtils,
+      Classes,
+      Windows,
+      ComObj,
+      XMLIntf,
+      XMLDom,
+      XMLDoc;
 
 { TTransformadorDeXML }
 
@@ -96,7 +96,7 @@ function TTransformadorDeXML.TransformarXML(const aXMLData: string; aXSLT:
     string): TCadenaUTF8;
 var
   xmlInput, xsltInput, xmlOutput: IXMLDocument;
-  LOutput: XmlDomString;
+  LOutput: WideString; //XmlDomString;
 begin
   try
     xmlInput := LoadXMLData(aXMLData);

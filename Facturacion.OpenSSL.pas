@@ -13,8 +13,8 @@ uses Facturacion.Comprobante,
      libeay32,
      OpenSSLUtils,
      LibEay32plus,
-     Winapi.Windows,
-     System.SysUtils;
+     Windows,
+     SysUtils;
 
 type
 
@@ -113,9 +113,11 @@ type
 
 implementation
 
-uses System.StrUtils,
+uses StrUtils,
      CodeSiteLogging,
-     System.Hash;
+     IdHash;
+
+{TEncoding}
 
 { TOpenSSL }
 
@@ -167,9 +169,9 @@ begin
     Raise ELlaveLecturaException.Create('No se tiene asiganada la llave privada, favor de asignarla con el metodo AsignarLlavePrivada');
 
   Tam:=Length(aCadena); // Obtenemos el tamaño de la cadena original
-  try
-      System.SysUtils.StrPLCopy(inbuf, aCadena, Tam);  // Copiamos la cadena original al buffer de entrada
-  except
+  Try
+    SysUtils.StrPLCopy(inbuf, aCadena, Tam);  // Copiamos la cadena original al buffer de entrada
+  Except
       On E:Exception do
       begin
           if Pos('Access', E.Message) > 0 then
@@ -186,7 +188,7 @@ begin
   end;
 
   // Establece los datos que vamos a usar
-  EVP_SignUpdate(@mdctx,@inbuf,System.SysUtils.StrLen(inbuf));
+  EVP_SignUpdate(@mdctx,@inbuf,SysUtils.StrLen(inbuf));
 
   // Realiza la digestion usando la llave privada que obtuvimos y leimos en memoria
   EVP_SignFinal(@mdctx, @outbuf, Len, fLlavePrivadaDesencriptada);
@@ -214,7 +216,7 @@ begin
 
   // Usamos la funcion nativa de Delphi para SHA1
   {$IF CompilerVersion >= 20}
-    Result := THashSHA1.GetHashString(aCadena);
+    Result:= TIdHash.HashString(aCadena,GetDefault); //THashSHA1.GetHashString(aCadena);
   {$ELSE}
     raise Exception.Create('Soporte SHA1 nativo para versiones anteriores no implementado');
 
@@ -225,7 +227,7 @@ begin
     EVP_DigestUpdate(@ctx, @Inbuf, StrLen(Inbuf));
     EVP_DigestFinal(@ctx, PByte(@Outbuf), Len);
     Result := BinToBase64(@Outbuf, Length(Outbuf));
-  {$ENDIF}
+  {$IFEND}
 end;
 
 // Funcion obtenida de: DelphiAccess - http://www.delphiaccess.com/forum/index.php?topic=3092.0
@@ -334,9 +336,9 @@ begin
   // Convertimos al tipo adecuado de acuerdo a la version de Delphi...
   {$IF CompilerVersion >= 20}
       // Delphi 2009 o superior
-      p8pass:=PAnsiChar(AnsiString(aClaveLlavePrivada));
+      p8pass:= PAnsiChar(AnsiString(aClaveLlavePrivada));
   {$ELSE}
-      p8pass:=PChar(AnsiString(aClaveLlavePrivada));
+      p8pass:= PChar(AnsiString(aClaveLlavePrivada));
   {$IFEND}
 
   p8:=nil;
