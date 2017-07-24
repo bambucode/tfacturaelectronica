@@ -2,7 +2,7 @@ unit Facturacion.Tipos;
 
 interface
 
-uses System.SysUtils;
+uses SysUtils;
 
 type
 

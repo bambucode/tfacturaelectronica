@@ -16,7 +16,7 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
      EcodexWsTimbrado,
      EcodexWsClientes,
      PAC.Ecodex.ManejadorDeSesion,
-     System.SysUtils;
+     SysUtils;
 
 type
 
@@ -46,8 +46,8 @@ uses Classes,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
-     System.RegularExpressions,
-     {$IF Compilerversion >= 20}
+     RegularExpressions,
+     {$IF Compilerversion >= 23}
      Xml.Win.Msxmldom,
      {$ELSE}
      msxmldom,

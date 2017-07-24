@@ -2,7 +2,7 @@ unit Facturacion.GeneradorQR;
 
 interface
 
-uses System.SysUtils;
+uses SysUtils;
 
 type
 
@@ -15,10 +15,10 @@ type
 implementation
 
 uses DelphiZXingQRCode,
-     Vcl.Imaging.pngimage,
-     Vcl.Imaging.jpeg,
-     System.Classes,
-     Vcl.Graphics;
+     pngimage,
+     jpeg,
+     Classes,
+     Graphics;
 
 const
   _ANCHO_QR_CODE = 1200;

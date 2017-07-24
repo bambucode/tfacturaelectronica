@@ -22,9 +22,9 @@ program EjemploFacturaElectronica;
 
 uses
   FastMM4,
-  System.SysUtils,
+  SysUtils,
   activex,
-  Vcl.Forms,
+  Forms,
   Facturacion.ComprobanteV33 in '..\Versiones\Facturacion.ComprobanteV33.pas',
   Facturacion.Comprobante in '..\Versiones\Facturacion.Comprobante.pas',
   Facturacion.Administrador in '..\Facturacion.Administrador.pas',

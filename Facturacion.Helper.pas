@@ -16,8 +16,8 @@ type
 
 implementation
 
-uses System.SysUtils,
-     Soap.XSBuiltIns;
+uses SysUtils,
+     XSBuiltIns;
 
 { TFacturacionHelper }
 
