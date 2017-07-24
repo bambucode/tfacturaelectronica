@@ -78,9 +78,11 @@ type
   IProveedorAutorizadoCertificacion = interface
     ['{BB3456F4-277A-46B7-B2BC-A430E35130E8}']
     procedure Configurar(const aDominioWebService: string;
-                         const aCredencialesPAC: TFacturacionCredencialesPAC);
-    function TimbrarDocumento(var aComprobante: IComprobanteFiscal;
+                         const aCredencialesPAC: TFacturacionCredencialesPAC;
+                         const aTransaccionInicial: Int64);
+    function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
                               const aTransaccion: Int64) : TCadenaUTF8;
+    function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
   end;
 
 implementation

@@ -17,12 +17,15 @@ type
 
   EFECertificadoNoExisteException = class(Exception);
 
+  TTipoCertificado = (tcFIEL, tcSellos);
+
   ICertificadoDeSellos = Interface
     ['{C4F1BC13-8975-4944-AF8F-5FB885C155FF}']
     function GetContenidoBase64: string;
     function GetEmitidoParaNombre: string;
     function GetEmitidoParaRFC: String;
     function GetNoCertificado: string;
+    function GetTipoCertificado: TTipoCertificado;
     function GetVigenciaFin: TDateTime;
     function GetVigenciaInicio: TDateTime;
     procedure Leer(const aRutaCertificado: TFileName);
@@ -30,6 +33,7 @@ type
     property EmitidoParaNombre: string read GetEmitidoParaNombre;
     property EmitidoParaRFC: String read GetEmitidoParaRFC;
     property NoCertificado: string read GetNoCertificado;
+    property TipoCertificado: TTipoCertificado read GetTipoCertificado;
     property VigenciaFin: TDateTime read GetVigenciaFin;
     property VigenciaInicio: TDateTime read GetVigenciaInicio;
   End;
@@ -43,12 +47,15 @@ type
     fNoCertificado: string;
     FContenidoBase64: string;
     fSubjectCertificado: String;
+    fTipoCertificado: TTipoCertificado;
     function GetContenidoBase64: string;
     function GetEmitidoParaNombre: string;
     function GetEmitidoParaRFC: String;
     function GetNoCertificado: string;
+    function GetTipoCertificado: TTipoCertificado;
     function GetVigenciaFin: TDateTime;
     function GetVigenciaInicio: TDateTime;
+    procedure IdentificarTipoDeCertificado(const aContenidoCertificado: String);
   public
     destructor Destroy; override;
     procedure Leer(const aRutaCertificado: TFileName);
@@ -56,12 +63,17 @@ type
     property EmitidoParaNombre: string read GetEmitidoParaNombre;
     property EmitidoParaRFC: String read GetEmitidoParaRFC;
     property NoCertificado: string read GetNoCertificado;
+    property TipoCertificado: TTipoCertificado read GetTipoCertificado;
     property VigenciaFin: TDateTime read GetVigenciaFin;
     property VigenciaInicio: TDateTime read GetVigenciaInicio;
   end;
 
 
 implementation
+
+{$IFDEF CODESITE}
+uses CodeSiteLogging;
+{$ENDIF}
 
 { TCertificadoDeSellos }
 
@@ -100,11 +112,11 @@ begin
     {$ENDIF}
 
     // Identificamos el tipo de certificado (FIEL o sellos)
-    //IdentificarTipoDeCertificado(fx509Certificado.Text);
+    IdentificarTipoDeCertificado(fx509Certificado.Text);
 
     // Leemos las propiedades
-    fVigenteDesde  := fx509Certificado.NotBefore;
-    fVigenteHasta  := fx509Certificado.NotAfter;
+    fVigenteDesde  := fx509Certificado.NotAfter;
+    fVigenteHasta  := fx509Certificado.NotBefore;
     fNoCertificado := fx509Certificado.SerialNumber;
 
     fSubjectCertificado := fx509Certificado.Subject;
@@ -179,9 +191,29 @@ begin
   Result := UpperCase(Result);
 end;
 
+procedure TCertificadoDeSellos.IdentificarTipoDeCertificado(const
+    aContenidoCertificado: String);
+const
+  // Las siguientes cadenas solo se encuentran en un certificado de FIEL
+  // despues de X509v3 Key Usage
+  _CADENA_USO_X509V3_CIFRADO = 'Data Encipherment';
+  _CADENA_USO_X509V3_LLAVE = 'Key Agreement';
+begin
+  if ((AnsiPos(_CADENA_USO_X509V3_CIFRADO, aContenidoCertificado) > 0) And
+     (AnsiPos(_CADENA_USO_X509V3_LLAVE, aContenidoCertificado) > 0)) then
+    fTipoCertificado := tcFIEL
+  else
+    fTipoCertificado := tcSellos;
+end;
+
 function TCertificadoDeSellos.GetNoCertificado: string;
 begin
   Result := fNoCertificado;
+end;
+
+function TCertificadoDeSellos.GetTipoCertificado: TTipoCertificado;
+begin
+  Result := fTipoCertificado;
 end;
 
 function TCertificadoDeSellos.GetVigenciaFin: TDateTime;

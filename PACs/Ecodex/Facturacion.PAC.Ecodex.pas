@@ -23,16 +23,18 @@ type
   TProveedorEcodex = class(TInterfacedObject, IProveedorAutorizadoCertificacion)
   private
     fwsTimbradoEcodex: IEcodexServicioTimbrado;
+    fwsClientesEcodex : IEcodexServicioClientes;
     fManejadorDeSesion : TEcodexManejadorDeSesion;
     fDominioWebService : string;
     fCredencialesPAC :  TFacturacionCredencialesPAC;
     function ExtraerNodoTimbre(const aComprobanteXML : TEcodexComprobanteXML): TCadenaUTF8;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
   public
-    procedure Configurar(const aDominioWebService: string;
-                         const aCredencialesPAC: TFacturacionCredencialesPAC);
-    function TimbrarDocumento(var aComprobante: IComprobanteFiscal;
-                              const aTransaccion: Int64): TCadenaUTF8;
+    procedure Configurar(const aDominioWebService: string; const aCredencialesPAC:
+        TFacturacionCredencialesPAC; const aTransaccionInicial: Int64);
+    function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
+        aTransaccion: Int64): TCadenaUTF8;
+    function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
   end;
 
 implementation
@@ -41,6 +43,9 @@ uses Classes,
      xmldom,
      Facturacion.Tipos,
      XMLIntf,
+     {$IFDEF CODESITE}
+     CodeSiteLogging,
+     {$ENDIF}
      System.RegularExpressions,
      {$IF Compilerversion >= 20}
      Xml.Win.Msxmldom,
@@ -51,20 +56,22 @@ uses Classes,
 
 { TProveedorEcodex }
 
-procedure TProveedorEcodex.Configurar(const aDominioWebService: string;
-  const aCredencialesPAC: TFacturacionCredencialesPAC);
+procedure TProveedorEcodex.Configurar(const aDominioWebService: string; const
+    aCredencialesPAC: TFacturacionCredencialesPAC; const aTransaccionInicial:
+    Int64);
 begin
   fDominioWebService := aDominioWebService;
   fCredencialesPAC := aCredencialesPAC;
 
-  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService, 1234);
+  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService, aTransaccionInicial);
   fManejadorDeSesion.AsignarCredenciales(fCredencialesPAC);
 
   // Incializamos las instancias de los WebServices
   fwsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService + '/ServicioTimbrado.svc');
+  fwsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService + '/ServicioClientes.svc');
 end;
 
-function TProveedorEcodex.TimbrarDocumento(var aComprobante:
+function TProveedorEcodex.TimbrarDocumento(const aComprobante:
     IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8;
 var
   solicitudTimbrado: TSolicitudTimbradoEcodex;
@@ -106,6 +113,64 @@ begin
       solicitudTimbrado.Free;
   end;
 
+end;
+
+
+function TProveedorEcodex.ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
+var
+  solicitudEdoCuenta: TEcodexSolicitudEstatusCuenta;
+  respuestaEdoCuenta: TEcodexRespuestaEstatusCuenta;
+  tokenDeUsuario : string;
+  I: Integer;
+begin
+  Assert(Trim(aRFC) <> '', 'El RFC para la solicitud de saldo fue vacio');
+  Assert(fManejadorDeSesion <> nil, 'La instancia fManejadorDeSesion no debio ser nula');
+  Assert(fwsClientesEcodex <> nil, 'La instancia fwsClientesEcodex no debio ser nula');
+
+  Result := 0;
+
+  // 1. Creamos la solicitud del edo de cuenta
+  solicitudEdoCuenta := TEcodexSolicitudEstatusCuenta.Create;
+
+  // 2. Iniciamos una nueva sesion solicitando un nuevo token
+  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+
+  try
+    solicitudEdoCuenta.RFC           := aRFC;
+    solicitudEdoCuenta.Token         := tokenDeUsuario;
+    solicitudEdoCuenta.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+
+    try
+      respuestaEdoCuenta := fwsClientesEcodex.EstatusCuenta(solicitudEdoCuenta);
+      {$IFDEF CODESITE}
+        CodeSite.Send('Codigo', respuestaEdoCuenta.Estatus.Codigo);
+        CodeSite.Send('Descripcion', respuestaEdoCuenta.Estatus.Descripcion);
+        CodeSite.Send('Fecha de Inicio', respuestaEdoCuenta.Estatus.FechaInicio);
+        CodeSite.Send('Fecha de fin', respuestaEdoCuenta.Estatus.FechaFin);
+        CodeSite.Send('Timbres asignados', respuestaEdoCuenta.Estatus.TimbresAsignados);
+        CodeSite.Send('Timbres disponibles', respuestaEdoCuenta.Estatus.TimbresDisponibles);
+        CodeSite.Send('Num certificados cargados', Length(respuestaEdoCuenta.Estatus.Certificados));
+        // Mostramos los certificados cargados
+        for I := 0 to Length(respuestaEdoCuenta.Estatus.Certificados) - 1 do
+        begin
+          CodeSite.Send('Certificado cargado Num. ' + IntToStr(I), respuestaEdoCuenta.Estatus.Certificados[I]);
+        end;
+      {$ENDIF}
+
+      // 3. Regresamos los timbres disponibles y no los asignados
+      Result := respuestaEdoCuenta.Estatus.TimbresDisponibles;
+    except
+      On E:Exception do
+         if Not (E Is EPACException) then
+          ProcesarExcepcionDePAC(E)
+        else
+          raise;
+    end;
+  finally
+    //fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsClientes;
+    //fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsClientes;
+    solicitudEdoCuenta.Free;
+  end;
 end;
 
 function TProveedorEcodex.ExtraerNodoTimbre(const aComprobanteXML : TEcodexComprobanteXML): TCadenaUTF8;

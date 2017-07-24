@@ -87,22 +87,37 @@ var
   credencialesPAC : TFacturacionCredencialesPAC;
   generadorCBB: IGeneradorCBB;
 
-  queVersion: string;
+  queVersion, rutaCertificado, rutaLlavePrivada, claveLlavePrivada: string;
   reintentar: Boolean;
 const
-  _URL_ECODEX_PRUEBAS_V32 = 'https://pruebas.ecodex.com.mx:2045';
-  _URL_ECODEX_PRUEBAS_V33 = 'https://wsdev.ecodex.com.mx:2045';
+  _URL_ECODEX_PRUEBAS_V32        = 'https://pruebas.ecodex.com.mx:2045';
+  _URL_ECODEX_PRUEBAS_V33        = 'https://wsdev.ecodex.com.mx:2045';
+  _NUEMRO_TRANSACCION_INICIAL    = 1;
 
 begin
   CoInitialize(nil);
   try
     try
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.key';
+      claveLlavePrivada := '12345678a';
+
       openSSL := TOpenSSL.Create;
-      openSSL.AsignarLlavePrivada(ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.key',
-                                  '12345678a');
+      openSSL.AsignarLlavePrivada(rutaLlavePrivada,
+                                  claveLlavePrivada);
 
       certificadoSellos := TCertificadoDeSellos.Create;
-      certificadoSellos.Leer(ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer');
+      certificadoSellos.Leer(rutaCertificado);
+
+      // Checamos que el certificado y la llave privada sean pareja
+      WriteLn('Verificando certificado de sellos y llave privada...');
+      if Not openSSL.SonPareja(rutaCertificado, rutaLlavePrivada, claveLlavePrivada) then
+      begin
+        Writeln('Los archivos de certificado y llave privada no son pareja. Favor de verificar');
+        Exit;
+      end;
+      WriteLn('Certificado y llave ... OK');
+
 
       {$IFDEF FullDebugMode}
         Writeln('FastMM4 Habilitado :)');
@@ -306,10 +321,12 @@ begin
           // Dependiendo de la version usamos diferente servidor de pruebas
           if nuevaFactura.Version = '3.3' then
             pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
-                         credencialesPAC)
+                         credencialesPAC,
+                         _NUEMRO_TRANSACCION_INICIAL)
           else
             pac.Configurar(_URL_ECODEX_PRUEBAS_V32,
-                           credencialesPAC);
+                           credencialesPAC,
+                           _NUEMRO_TRANSACCION_INICIAL);
 
           // 4. La mandamos timbrar
           Writeln('Intentando timbrar comprobante...');
@@ -318,11 +335,7 @@ begin
 
           Writeln('Asignando Timbre Fiscal al comprobante...');
           nuevaFactura.AsignarTimbreFiscal(xmlTimbre);
-          TFacturacionHelper.AgregarSchemaLocation(nuevaFactura,
-                                                  'http://www.sat.gob.mx/TimbreFiscalDigital');
-          TFacturacionHelper.AgregarSchemaLocation(nuevaFactura,
-                                                  'http://www.sat.gob.mx/sitio_internet/cfd/timbrefiscaldigital/TimbreFiscalDigitalv11.xsd');
-
+          
           // Recibimos el timbre de forma exitosa, dejamos de "reintentar"
           reintentar := False;
         except
@@ -341,6 +354,9 @@ begin
 //         Writeln(facturaCFDIv33.Complemento.TimbreFiscalDigital.UUID);
 //      end else
 //         Writeln('**** NO SE TUVO TIMBRE ****');
+
+      Writeln('Cadena Original de Timbre:');
+      Writeln(generadorCadena.obtenerCadenaOriginalDeTimbre(nuevaFactura));
 
       Writeln('Guardando XML...');
       admonFacturas.GuardarArchivo(nuevaFactura,

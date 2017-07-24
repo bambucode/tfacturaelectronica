@@ -79,6 +79,7 @@ type
     ///   </note>
     /// </remarks>
     function CalcularSHA1(const aCadena: TCadenaUTF8) : TCadenaUTF8;
+    function SonPareja(const aRutaCertificado, aRutaLlavePrivada: TFileName; const aClaveLlavePrivada : String): Boolean;
   end;
 
 
@@ -95,11 +96,15 @@ type
     procedure LiberarLlavePrivadaSiAsignada;
     function ObtenerUltimoMensajeDeError: string;
     function BinToBase64(const PDat: PBYTE; const DatLen: DWORD): string;
+    function ObtenerModulusDeCertificado(const aRutaCertificado: string): String;
+    function ObtenerModulusDeLlavePrivada(const aRutaLlavePrivada, aClaveLlavePrivada: String): String;
   public
     destructor Destroy; override;
     procedure AsignarLlavePrivada(const aRutaArchivoLlavePrivada, aContrasena:
         string);
     procedure AfterConstruction; override;
+    function SonPareja(const aRutaCertificado, aRutaLlavePrivada: TFileName; const
+        aClaveLlavePrivada : String): Boolean;
     function HacerDigestion(const aCadena: TCadenaUTF8;
                             const aTipoDigestion: TMetodoDigestion): TCadenaUTF8;
 
@@ -404,6 +409,107 @@ begin
 
   if not Assigned(fLlavePrivadaDesencriptada) then
     Raise ELlaveLecturaException.Create('No fue posible leer la llave privada');
+end;
+
+function TOpenSSL.ObtenerModulusDeCertificado(const aRutaCertificado: string): String;
+var
+  llavePublica: PEVP_PKEY;
+  bioModulus: pBIO;
+  rsaInfo: pRSA;
+  Inbuf: Array[0..1000] of AnsiChar;
+  certificadoX509: TX509Certificate;
+  longitudModulus: Integer;
+begin
+  bioModulus := BIO_new(BIO_s_mem());
+  try
+    certificadoX509 := TX509Certificate.Create;
+    certificadoX509.LoadFromFile(aRutaCertificado);
+
+    // Obtenemos la llave publica del certificado
+    llavePublica := X509_get_pubkey(certificadoX509.fCertificate);
+    if (llavePublica <> nil) then
+    begin
+      // Replicamos el codigo de x509.c lineas 820 -> 830
+      if llavePublica.ktype = EVP_PKEY_RSA then
+      begin
+         rsaInfo := EVP_PKEY_get1_RSA(llavePublica);
+         if BN_print(bioModulus, rsaInfo.n) <= 0 then
+           raise Exception.Create('No fue posible obtener el Modulus del Certificado');
+
+        // Leemos el Modulus del BIO en el buffer de cadena
+        longitudModulus := BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
+
+        {$IFDEF CODESITE}
+          CodeSite.Send('Modulus Certificado', Copy(StrPas(InBuf), 1, longitudModulus));
+        {$ENDIF};
+
+        Result := Copy(StrPas(InBuf), 1, longitudModulus);
+      end else
+        raise Exception.Create('No se soporta la lectura de certificados que no son RSA');
+  end;
+  finally
+    BIO_free_all(bioModulus);
+    certificadoX509.Free;
+  end;
+end;
+
+function TOpenSSL.ObtenerModulusDeLlavePrivada(const aRutaLlavePrivada,
+    aClaveLlavePrivada: String): String;
+var
+  rsaInfo: pRSA;
+  bioModulus: pBIO;
+  llaveDesencriptada: pEVP_PKEY;
+  Inbuf: Array[0..1000] of AnsiChar;
+  longitudModulus : Integer;
+begin
+  llaveDesencriptada := ObtenerLlavePrivadaDesencriptada(aRutaLlavePrivada, aClaveLlavePrivada);
+  // Obtenemos las propiedades RSA de la Llave privada
+  rsaInfo := EVP_PKEY_get1_RSA(llaveDesencriptada);
+  // Creamos un BIO en memoria para almacenar el dato del Modulus
+  bioModulus := BIO_new(BIO_s_mem());
+  try
+    // Asignamos el Modulus (propieda N del record RSA, rsa.c linea 336)
+    if rsaInfo.n <> nil then
+    begin
+      // La funcion BN_print copia el apuntador del BIGNUMBER del modulus con un formato amigable dentro del BIO
+      if BN_print(bioModulus, rsaInfo.n) <= 0 then
+        raise Exception.Create('No fue posible obtner el Modulus de la Llave Privada');
+
+      // Leemos el Modulus del BIO en el buffer de cadena
+      longitudModulus := BIO_read(bioModulus, @Inbuf, SizeOf(Inbuf));
+
+      {$IFDEF CODESITE}
+        CodeSite.Send('Modulus Llave Privada', Copy(StrPas(InBuf), 1, longitudModulus));
+      {$ENDIF};
+
+      Result := Copy(StrPas(InBuf), 1, longitudModulus);
+    end else
+      Result := '';
+  finally
+     // Liberamos el BIO que teniamos en memoria
+     BIO_free_all(bioModulus);
+     EVP_PKEY_free(llaveDesencriptada);
+  end;
+end;
+
+
+function TOpenSSL.SonPareja(const aRutaCertificado, aRutaLlavePrivada: TFileName; const aClaveLlavePrivada : String): Boolean;
+var
+  moduloLlavePrivada, moduloCertificado : string;
+begin
+  if Not FileExists(aRutaLlavePrivada) then
+    raise Exception.Create('El archivo de llave privada no existe: ' + aRutaLlavePrivada);
+
+  moduloLlavePrivada  := ObtenerModulusDeLlavePrivada(aRutaLlavePrivada, aClaveLlavePrivada);
+  moduloCertificado   := ObtenerModulusDeCertificado(aRutaCertificado);
+
+  {$IFDEF CODESITE}
+  CodeSite.Send('Modulus Llave Privada', moduloLlavePrivada);
+  CodeSite.Send('Modulus Certificado', moduloCertificado);
+  CodeSite.Send('¿Son Pareja?', moduloCertificado = moduloLlavePrivada);
+  {$ENDIF}
+
+  Result := (moduloLlavePrivada = moduloCertificado);
 end;
 
 procedure TOpenSSL.LiberarLlavePrivadaSiAsignada;
