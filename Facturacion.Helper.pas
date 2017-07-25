@@ -44,7 +44,7 @@ begin
   // Anexo 20:
   // "En este campo se debe registrar la cantidad de bienes o servicios que
   // correspondan a cada concepto, puede contener de cero hasta seis decimales."
-  Result := FloatToStrF(aValor, ffFixed, 4, 3);
+  Result := FloatToStrF(aValor, ffFixed, 4, 4);
 end;
 
 class function TFacturacionHelper.ComoFechaISO8601(const aFecha: TDateTime):
