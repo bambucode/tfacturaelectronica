@@ -9,7 +9,8 @@ type
   TFacturacionHelper = class
     class function ComoFechaISO8601(const aFecha: TDateTime): string;
     class function DesdeFechaISO8601(const aCadenaFecha: String): TDateTime;
-    class function ComoMoneda(const aValor: Currency) : string;
+    class function ComoMoneda(const aValor: Currency; const aNumeroDecimales:
+        Integer = 2): string;
     class function ComoCantidad(const aValor: Double) : string;
     class procedure AgregarSchemaLocation(const aComprobante: IComprobanteFiscal; const aCadena: String);
     class function VerificarImporteEnRangoDeRedondeo(const aCantidad: Double; const
@@ -44,7 +45,7 @@ begin
   // Anexo 20:
   // "En este campo se debe registrar la cantidad de bienes o servicios que
   // correspondan a cada concepto, puede contener de cero hasta seis decimales."
-  Result := FloatToStrF(aValor, ffFixed, 20, 4);
+  Result := FormatFloat('0.####', aValor); //FloatToStrF(aValor, ffFixed, 20, 4);
 end;
 
 class function TFacturacionHelper.ComoFechaISO8601(const aFecha: TDateTime):
@@ -53,10 +54,11 @@ begin
   Result := FormatDateTime('yyyy-mm-dd', aFecha) + 'T' + FormatDateTime('hh:nn:ss', aFecha);
 end;
 
-class function TFacturacionHelper.ComoMoneda(const aValor: Currency): string;
+class function TFacturacionHelper.ComoMoneda(const aValor: Currency; const
+    aNumeroDecimales: Integer = 2): string;
 begin
   // NOTA: Esta moneda es para el XML, NO debe llevar simbolo de moneda
-  Result := CurrToStrF(aValor, ffFixed, 2);
+  Result := CurrToStrF(aValor, ffFixed, aNumeroDecimales);
 end;
 
 class function TFacturacionHelper.DesdeFechaISO8601(
