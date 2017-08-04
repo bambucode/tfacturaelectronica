@@ -335,6 +335,8 @@ type
     procedure Set_ImpSaldoAnt(Value: UnicodeString);
     procedure Set_ImpPagado(Value: UnicodeString);
     procedure Set_ImpSaldoInsoluto(Value: UnicodeString);
+  public
+    procedure AfterConstruction; override;
   end;
 
 { TPagos_Pago_DoctoRelacionadoListV1 }
@@ -464,7 +466,7 @@ begin
     Self.Set_Version('1.0');
 
   RegisterChildNode('Pago', TPagos_PagoV1);
-  ItemTag := 'Pago';
+  ItemTag := 'Pago10:Pago';
   ItemInterface := IPagos_PagoV1;
   inherited;
 end;
@@ -498,7 +500,7 @@ end;
 
 procedure TPagos_PagoV1.AfterConstruction;
 begin
-  RegisterChildNode('DoctoRelacionado', TPagos_Pago_DoctoRelacionadoV1);
+  RegisterChildNode('DoctoRelacionado', TPagos_Pago_DoctoRelacionadoV1, TargetNamespace);
   RegisterChildNode('Impuestos', TPagos_Pago_ImpuestosV1);
   FDoctoRelacionado := CreateCollection(TPagos_Pago_DoctoRelacionadoListV1, IPagos_Pago_DoctoRelacionadoV1, 'DoctoRelacionado') as IPagos_Pago_DoctoRelacionadoListV1;
   FImpuestos := CreateCollection(TPagos_Pago_ImpuestosListV1, IPagos_Pago_ImpuestosV1, 'Impuestos') as IPagos_Pago_ImpuestosListV1;
@@ -663,6 +665,11 @@ end;
 function TPagos_PagoV1.Get_Impuestos: IPagos_Pago_ImpuestosListV1;
 begin
   Result := FImpuestos;
+end;
+
+procedure TPagos_Pago_DoctoRelacionadoV1.AfterConstruction;
+begin
+   inherited;
 end;
 
 { TPagos_Pago_DoctoRelacionadoV1 }
