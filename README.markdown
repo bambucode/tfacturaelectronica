@@ -43,6 +43,8 @@ A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
 - ~~Soporte para generación/lectura de CFDI 3.2 (para fines de compatibilidad y migración)~~
 - ~~Lanzar excepciones basado en el catálogo de errores de CFDI 3.3~~ (Parcial)
 - ~~Poder incluir impuestos locales (3.2 y 3.3)~~.
+- ~~Complemento de pagos~~ con ayuda de @ffaccinetto
+- Otros complementos (comercio electronico, etc.)
 - Pruebas de unidad
 - Validaciones de campos basado en los múltiples catálogos publicados por el SAT.
 - Soporte para ediciones anteriores de Delphi 2007, 2010, etc.
@@ -74,3 +76,4 @@ Colaboradores actuales.
 * Ing. Luis Carrasco - Bambú Code SA de CV - <http://github.com/lcarrasco>
 * Ing. Eduardo  Padilla - Bambú Code SA de CV - <https://github.com/epadillac>
 * Ing. Pablo Torres - <http://www.tecsisnet.net>
+* Felipe Faccinetto <https://github.com/ffaccinetto>
