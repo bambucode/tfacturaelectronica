@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/07/17 14:34:28.000.040,=D:\Delphi 10.2 Lib\TFacturaElectronica v2\Ejemplo\wwwsatgobmxsitio_internetcfdPagosPagos10.pas</Transaction>
+    <Transaction>2017/07/17 14:37:27.000.911,D:\Delphi 10.2 Lib\TFacturaElectronica v2\Ejemplo\wwwsatgobmxsitio_internetcfdPagosPagos10.pas=D:\Delphi 10.2 Lib\TFacturaElectronica v2\Versiones\Facturacion.ComplementoPagoV33.pas</Transaction>
+    <Transaction>2017/07/17 15:04:07.000.209,D:\Delphi 10.2 Lib\TFacturaElectronica v2\Versiones\Facturacion.ComplementoPagoV33.pas=D:\Delphi 10.2 Lib\TFacturaElectronica v2\Versiones\Facturacion.ComplementoPagoV1.pas</Transaction>
+    <Transaction>2017/07/20 15:08:46.000.370,D:\Delphi 10.2 Lib\TFacturaElectronica v2\Ejemplo Pago\EjemploFacturaElectronica.dproj=D:\Delphi 10.2 Lib\TFacturaElectronica v2\Ejemplo Pago\EjemploFacturaElectronicaPago.dproj</Transaction>
+    <Transaction>2017/08/02 01:16:49.000.616,=D:\Delphi 10.2 Lib\TFacturaElectronica v3\Schemas\3.2\cadenaoriginal_Pagos_1_0.xslt</Transaction>
+    <Transaction>2017/08/02 01:16:49.000.511,=D:\Delphi 10.2 Lib\TFacturaElectronica v3\Schemas\3.3\cadenaoriginal_Pagos_1_0.xslt</Transaction>
+    <Transaction>2017/08/02 01:42:23.000.948,D:\Delphi 10.2 Lib\TFacturaElectronica v3\Schemas\3.2\cadenaoriginal_Pagos_1_0.xslt=</Transaction>
+    <Transaction>2017/08/02 01:42:24.000.108,D:\Delphi 10.2 Lib\TFacturaElectronica v3\Schemas\3.3\cadenaoriginal_Pagos_1_0.xslt=</Transaction>
+    <Transaction>2017/08/02 13:07:22.271,D:\Delphi 10.2 Lib\TFacturaElectronica v3\Schemas\3.3\cadenaoriginal_3_3.xslt=</Transaction>
+    <Transaction>2017/08/02 13:07:55.476,=D:\Delphi 10.2 Lib\TFacturaElectronica v3\Schemas\3.3\cadenaoriginal_3_3.xslt</Transaction>
+  </Transactions>
+</BorlandProject>
