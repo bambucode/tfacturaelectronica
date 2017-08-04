@@ -247,9 +247,9 @@ begin
 
               NoCertificado      := certificadoSellos.NoCertificado;
               Certificado        := certificadoSellos.ContenidoBase64;
-              Subtotal           := '0.00';   // Cero por Definicion
+              Subtotal           := '0';   // Cero por Definicion
               Moneda             := 'XXX';    // Cero por Definicion
-              Total              := '0.00';   // Cero por Definicion
+              Total              := '0';   // Cero por Definicion
               TipoDeComprobante  := 'P';      // De catálogo
               LugarExpedicion    := '76030';
 
@@ -266,8 +266,8 @@ begin
               concepto33.Cantidad         := '1';           // Por Definicion del SAT
               concepto33.ClaveUnidad      := 'ACT';         // Por Definicion del SAT
               concepto33.Descripcion      := 'Pago';        // Por Definicion del SAT
-              concepto33.ValorUnitario    := '0.00';        // Por Definicion del SAT
-              concepto33.Importe          := '0.00';        // Por Definicion del SAT
+              concepto33.ValorUnitario    := '0';        // Por Definicion del SAT
+              concepto33.Importe          := '0';        // Por Definicion del SAT
             end;
             {$ENDREGION}
           end;
@@ -279,7 +279,7 @@ begin
           pagoComplementPagoV1.FechaPago        := TFacturacionHelper.ComoFechaISO8601(Now);
           pagoComplementPagoV1.FormaDePagoP     := '02';
           pagoComplementPagoV1.MonedaP          := 'MXN';
-          pagoComplementPagoV1.TipoCambioP      := '1.00';
+          //pagoComplementPagoV1.TipoCambioP      := '1.00';
           pagoComplementPagoV1.Monto            := '1850.00';
           pagoComplementPagoV1.NumOperacion     := '323232';
           pagoComplementPagoV1.RfcEmisorCtaOrd  := 'BBA940707IE1';
@@ -333,23 +333,23 @@ begin
            selloDeLaFactura := generadorSello.GenerarSelloDeFactura(cadenaOriginal);
            Writeln(selloDeLaFactura);
 
-//          // Dependiendo de la version usamos diferente servidor de pruebas
-//          if nuevaFactura.Version = '3.3' then
-//            pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
-//                         credencialesPAC,
-//                         _NUEMRO_TRANSACCION_INICIAL)
-//          else
-//            pac.Configurar(_URL_ECODEX_PRUEBAS_V32,
-//                           credencialesPAC,
-//                           _NUEMRO_TRANSACCION_INICIAL);
-//
-//          // 4. La mandamos timbrar
-//          Writeln('Intentando timbrar comprobante...');
-//          Randomize;
-//          xmlTimbre := pac.TimbrarDocumento(nuevaFactura, Random(9999));
-//
-//          Writeln('Asignando Timbre Fiscal al comprobante...');
-//          nuevaFactura.AsignarTimbreFiscal(xmlTimbre);
+          // Dependiendo de la version usamos diferente servidor de pruebas
+          if nuevaFactura.Version = '3.3' then
+            pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
+                         credencialesPAC,
+                         _NUEMRO_TRANSACCION_INICIAL)
+          else
+            pac.Configurar(_URL_ECODEX_PRUEBAS_V32,
+                           credencialesPAC,
+                           _NUEMRO_TRANSACCION_INICIAL);
+
+          // 4. La mandamos timbrar
+          Writeln('Intentando timbrar comprobante...');
+          Randomize;
+          xmlTimbre := pac.TimbrarDocumento(nuevaFactura, Random(9999));
+
+          Writeln('Asignando Timbre Fiscal al comprobante...');
+          nuevaFactura.AsignarTimbreFiscal(xmlTimbre);
 
 //          // Recibimos el timbre de forma exitosa, dejamos de "reintentar"
           reintentar := False;
