@@ -1,291 +1,384 @@
-(******************************************************************************
- PROYECTO FACTURACION ELECTRONICA
- Copyright (C) 2010-2014 - Bambu Code SA de CV - Ing. Luis Carrasco
+{*******************************************************}
+{                                                       }
+{       TFacturaElectronica                             }
+{                                                       }
+{       Copyright (C) 2017 Bambu Code SA de CV          }
+{                                                       }
+{*******************************************************}
 
- Proyecto de consola que genera una Factura Electronica de ejemplo
-
- Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
- http://bambucode.com/codigoabierto
-
- Cambios para CFDI v3.2 Por Ing. Pablo Torres TecSisNet.net Cd. Juarez Chihuahua
- el 11-24-2013
-
- La licencia de este codigo fuente se encuentra en:
- http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
- ******************************************************************************)
 program EjemploFacturaElectronica;
 
 {$APPTYPE CONSOLE}
-{.$DEFINE CODESITE}
+
+{$R *.res}
+
+// Incluimos el archivo de recurso .RC que contiene los XSLTs para generar las cadenas originales
+{$R *.dres}
+
+// ¿Se quiere soporte para el Debugger FASTMM?
+{$IFDEF FASTMM}
+  {$INCLUDE FastMM4Options.inc}
+{$ENDIF}
 
 uses
-  SysUtils,
-  ActiveX,
-  ShlObj,
-  Forms,
-  ExtCtrls,
-  Classes,
-  ClaseOpenSSL in '..\ClaseOpenSSL.pas',
-  ComprobanteFiscal in '..\ComprobanteFiscal.pas',
-  FacturaElectronica in '..\FacturaElectronica.pas',
-  FacturaReglamentacion in '..\FacturaReglamentacion.pas',
-  FacturaTipos in '..\FacturaTipos.pas',
-  libeay32 in '..\libeay32.pas',
-  LibEay32Plus in '..\LibEay32Plus.pas',
-  OpenSSLUtils in '..\OpenSSLUtils.pas',
-  SelloDigital in '..\SelloDigital.pas',
-  DateUtils,
-  DocComprobanteFiscal in '..\DocComprobanteFiscal.pas',
-  CadenaOriginal in '..\CadenaOriginal.pas',
-  FeCFDv22 in '..\CFD\FeCFDv22.pas',
-  FeCFDv2 in '..\CFD\FeCFDv2.pas' {/,},
-  FeCFDv32 in '..\CFD\FeCFDv32.pas',
-  FETimbreFiscalDigital in '..\CFD\FETimbreFiscalDigital.pas',
-  ProveedorAutorizadoCertificacion in '..\PACs\ProveedorAutorizadoCertificacion.pas',
-  FeCFD in '..\CFD\FeCFD.pas',
-  EcodexWsTimbrado in '..\PACs\Ecodex\EcodexWsTimbrado.pas',
-  EcodexWsSeguridad in '..\PACs\Ecodex\EcodexWsSeguridad.pas',
+  FastMM4,
+  System.SysUtils,
+  activex,
+  Vcl.Forms,
+  Facturacion.ComprobanteV33 in '..\Versiones\Facturacion.ComprobanteV33.pas',
+  Facturacion.Comprobante in '..\Versiones\Facturacion.Comprobante.pas',
+  Facturacion.Administrador in '..\Facturacion.Administrador.pas',
+  Facturacion.GeneradorCadenaOriginal in '..\Facturacion.GeneradorCadenaOriginal.pas',
+  Facturacion.GeneradorCadenaOrignalV33 in '..\Versiones\Facturacion.GeneradorCadenaOrignalV33.pas',
+  Facturacion.GeneradorSello in '..\Facturacion.GeneradorSello.pas',
+  Facturacion.OpenSSL in '..\Facturacion.OpenSSL.pas',
+  Facturacion.GeneradorSelloV33 in '..\Versiones\Facturacion.GeneradorSelloV33.pas',
+  Facturacion.PAC.Ecodex in '..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas',
+  Facturacion.ProveedorAutorizadoCertificacion in '..\Facturacion.ProveedorAutorizadoCertificacion.pas',
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
-  FacturacionHashes in '..\FacturacionHashes.pas',
-  PACEcodex in '..\PACs\Ecodex\PACEcodex.pas',
-  {$IFDEF CODESITE}
-  CodeSiteLogging,
-  {$ENDIF}
-  PACComercioDigital in '..\PACs\ComercioDigital\PACComercioDigital.pas',
-  PACEjemplo in '..\PACs\Ejemplo\PACEjemplo.pas',
-  GeneradorCBB in '..\GeneradorCBB\GeneradorCBB.pas',
-  QuricolAPI in '..\GeneradorCBB\QuricolAPI.pas',
-  QuricolCode in '..\GeneradorCBB\QuricolCode.pas',
-  FinkOkWsTimbrado in '..\PACs\FinkOk\FinkOkWsTimbrado.pas',
-  PACFinkOk in '..\PACs\FinkOk\PACFinkOk.pas',
-  FECancelaComercioDigital in '..\PACs\ComercioDigital\FECancelaComercioDigital.pas';
+  EcodexWsClientes in '..\PACs\Ecodex\EcodexWsClientes.pas',
+  EcodexWsComun in '..\PACs\Ecodex\EcodexWsComun.pas',
+  EcodexWsSeguridad in '..\PACs\Ecodex\EcodexWsSeguridad.pas',
+  EcodexWsTimbrado in '..\PACs\Ecodex\EcodexWsTimbrado.pas',
+  Facturacion.CertificadoDeSellos in '..\Facturacion.CertificadoDeSellos.pas',
+  Facturacion.Helper in '..\Facturacion.Helper.pas',
+  Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas',
+  Facturacion.GeneradorCBBv33 in '..\Versiones\Facturacion.GeneradorCBBv33.pas',
+  DelphiZXIngQRCode in '..\Lib\DelphiZXIngQRCode.pas',
+  Facturacion.GeneradorCBB,
+  Facturacion.GeneradorQR in '..\Facturacion.GeneradorQR.pas',
+  Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas',
+  Facturacion.ComprobanteV32 in '..\Versiones\Facturacion.ComprobanteV32.pas',
+  Facturacion.TimbreFiscalDigitalV32 in '..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas',
+  Facturacion.GeneradorCadenaOrignalV32 in '..\Versiones\Facturacion.GeneradorCadenaOrignalV32.pas',
+  Facturacion.GeneradorSelloV32 in '..\Versiones\Facturacion.GeneradorSelloV32.pas',
+  Facturacion.GeneradorCBBv32 in '..\Versiones\Facturacion.GeneradorCBBv32.pas',
+  Facturacion.Tipos in '..\Facturacion.Tipos.pas',
+  Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas';
 
 var
-   ProveedorTimbrado : TProveedorAutorizadoCertificacion;
-   TimbreDeFactura : TFETimbre;
-   archivoFacturaXML, rutaImagenCBB: String;
-   Factura: TFacturaElectronica;
-   Emisor, Receptor: TFEContribuyente;
-   Certificado: TFECertificado;
-   BloqueFolios: TFEBloqueFolios;
-   Impuesto1, Impuesto2: TFEImpuestoTrasladado;
-   Concepto1, Concepto2 : TFEConcepto;
-   generadorCBB: TGeneradorCBB;
-   CredencialesPAC: TFEPACCredenciales;
-   function GetDesktopFolder: string;
-   var
-     buf: array[0..255] of char;
-     pidList: PItemIDList;
-   begin
-     Result := 'No Desktop Folder found.';
-     SHGetSpecialFolderLocation(Application.Handle, CSIDL_DESKTOP, pidList);
-     if (pidList <> nil) then
-      if (SHGetPathFromIDList(pidList, buf)) then
-        Result := buf;
-   end;
+  nuevaFactura : IComprobanteFiscal;
+
+  // Instancias especificas para V32
+  facturaCFDIv32: IComprobanteFiscalV32;
+  regimen32 : IComprobanteFiscalV32_Emisor_RegimenFiscal;
+  concepto32: IComprobanteFiscalV32_Conceptos_Concepto;
+  iva32: IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
+
+  // Instancias especificas para V33
+  facturaCFDIv33 : IComprobanteFiscalV33;
+  concepto33 : IComprobanteFiscalV33_Conceptos_Concepto;
+  iva33 : IComprobanteFiscalV33_Conceptos_Concepto_Impuestos_Traslados_Traslado;
+  totalIVA33 : IComprobanteFiscalV33_Impuestos_Traslados_Traslado;
+
+  // Instancia de impuestos locales v1.0 (compatible con CFDI 3.2 y 3.3)
+  impuestoLocalV1: IImpuestosLocalesV1;
+  trasladosImpuestosLocalesV1: IImpuestosLocalesV1_TrasladosLocales;
+
+  // Instancias comunes independientes de la version
+  admonFacturas: IAdministradorFacturas;
+  generadorCadena : IGeneradorCadenaOriginal;
+  generadorSello : IGeneradorSello;
+  openSSL : IOpenSSL;
+  xmlTimbre : TCadenaUTF8;
+  pac: IProveedorAutorizadoCertificacion;
+  certificadoSellos: ICertificadoDeSellos;
+  credencialesPAC : TFacturacionCredencialesPAC;
+  generadorCBB: IGeneradorCBB;
+
+  queVersion, rutaCertificado, rutaLlavePrivada, claveLlavePrivada: string;
+  reintentar: Boolean;
+const
+  _URL_ECODEX_PRUEBAS_V32        = 'https://pruebas.ecodex.com.mx:2045';
+  _URL_ECODEX_PRUEBAS_V33        = 'https://wsdev.ecodex.com.mx:2045';
+  _NUEMRO_TRANSACCION_INICIAL    = 1;
 
 begin
-
-
-  // Checamos la presencia de archivos necesarios para el ejemplo
-  if Not FileExists('./libeay32.dll') then
-  begin
-    WriteLn('Favor de copiar el archivo libeay32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
-    Readln;
-    exit;
-  end;
-
-  if Not FileExists('./libssl32.dll') then
-  begin
-    WriteLn('Favor de copiar el archivo libssl32.dll del paquete OpenSSL descargable de: http://www.openssl.org/related/binaries.html');
-    Readln;
-    exit;
-  end;
-
-  // Checamos la presencia del DLL de la libreria para generacion de CBB
-  if Not FileExists('./quricol32.dll') then
-  begin
-    WriteLn('Favor de copiar el archivo quricol32.dll de la subcarpeta \GeneradorCBB a la carpeta donde esta el ejecutable');
-    Readln;
-    exit;
-  end;
-
-  {$IF CompilerVersion < 20}  // se movio porque no alcanza a mostrar el mensaje de error de librerias
-      // Bajo Delphi < 2009 tenemos que mandar llamar la siguiente rutina
-      // para poder usar rutinas de la clase ActiveX, en este caso la rutina
-      // para obtener la ruta al Escritorio de Windows.
-      CoInitialize(nil);
-  {$IFEND}
-
+  CoInitialize(nil);
   try
-      // 1. Definimos los datos del emisor y receptor
-      Emisor.RFC:='AAD990814BP7';
-      Emisor.Nombre:='Mi Empresa SA de CV';
-      Emisor.Direccion.Calle:='Calle de la Amargura';
-      Emisor.Direccion.NoExterior:='123';
-      Emisor.Direccion.NoInterior:='456';
-      Emisor.Direccion.CodigoPostal:='87345';
-      Emisor.Direccion.Colonia:='Col. Bondojito';
-      Emisor.Direccion.Municipio:='Oaxaca';
-      Emisor.Direccion.Estado:='Oaxaca';
-      Emisor.Direccion.Pais:='México';
-      Emisor.Direccion.Localidad:='Oaxaca';
-      //Emisor.Direccion.Referencia:='ZZZ';
+    try
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.key';
+      claveLlavePrivada := '12345678a';
 
-       // 2. Agregamos los régimenes fiscales (requerido en CFD >= 2.2)
-      SetLength(Emisor.Regimenes, 1);
-      Emisor.Regimenes[0] := 'Regimen General de Ley';
+      openSSL := TOpenSSL.Create;
+      openSSL.AsignarLlavePrivada(rutaLlavePrivada,
+                                  claveLlavePrivada);
 
-      // Asignamos los valores iguales a la direcion del emisor suponiendo que se genera en el mismo lugar que se emitio
-      Emisor.ExpedidoEn.Calle:=Emisor.Direccion.Calle;
-      Emisor.ExpedidoEn.NoExterior:=Emisor.Direccion.NoExterior;
-      Emisor.ExpedidoEn.NoInterior:=Emisor.Direccion.NoInterior;
-      Emisor.ExpedidoEn.CodigoPostal:=Emisor.Direccion.CodigoPostal;
-      Emisor.ExpedidoEn.Colonia:=Emisor.Direccion.Colonia;
-      Emisor.ExpedidoEn.Municipio:=Emisor.Direccion.Municipio;
-      Emisor.ExpedidoEn.Estado:=Emisor.Direccion.Estado;
-      Emisor.ExpedidoEn.Pais:=Emisor.Direccion.Pais;
-      Emisor.ExpedidoEn.Localidad:=Emisor.Direccion.Localidad;
-      Emisor.ExpedidoEn.Referencia:=Emisor.Direccion.Referencia;
+      certificadoSellos := TCertificadoDeSellos.Create;
+      certificadoSellos.Leer(rutaCertificado);
 
-      Receptor.RFC:='PWD090210DR5';
-      Receptor.Nombre:='Mi Cliente SA de CV';
-      Receptor.Direccion.Calle:='Patriotismo';
-      Receptor.Direccion.NoExterior:='4579';
-      Receptor.Direccion.NoInterior:='94';
-      Receptor.Direccion.CodigoPostal:='75489';
-      Receptor.Direccion.Colonia:='La Añoranza';
-      //Receptor.Direccion.Municipio:='Coyoacán';
-      Receptor.Direccion.Estado:='Veracruz';
-      Receptor.Direccion.Pais:='México';
-      Receptor.Direccion.Localidad:='Boca del Rio';
-      //Receptor.Direccion.Referencia:='IZQ';
+      // Checamos que el certificado y la llave privada sean pareja
+      WriteLn('Verificando certificado de sellos y llave privada...');
+      if Not openSSL.SonPareja(rutaCertificado, rutaLlavePrivada, claveLlavePrivada) then
+      begin
+        Writeln('Los archivos de certificado y llave privada no son pareja. Favor de verificar');
+        Exit;
+      end;
+      WriteLn('Certificado y llave ... OK');
 
-      // 3. Definimos los datos de los folios que nos autorizo el SAT (solo para CFD 2.2)
-      {BloqueFolios.NumeroAprobacion:=1;
-      BloqueFolios.AnoAprobacion:=2010;
-      BloqueFolios.Serie:='A';
-      BloqueFolios.FolioInicial:=1;
-      BloqueFolios.FolioFinal:=1000; }
 
-      // 4. Definimos el certificado junto con su llave privada
-      Certificado.Ruta:=ExtractFilePath(Application.ExeName) + '\aad990814bp7_1210261233s.cer';
-      Certificado.LlavePrivada.Ruta:=ExtractFilePath(Application.ExeName) + '\aad990814bp7_1210261233s.key';
-      Certificado.LlavePrivada.Clave:='12345678a';
+      {$IFDEF FullDebugMode}
+        Writeln('FastMM4 Habilitado :)');
+      {$ENDIF}
 
-      // 5. Creamos la clase Factura con los parametros minimos.
-      WriteLn('Generando factura CFD ...');
-      Factura:=TFacturaElectronica.Create(Emisor, Receptor, BloqueFolios, Certificado, tcIngreso);
+      Writeln('Por favor escribe la version del CFDI que deseas generar (3.2 o 3.3):');
+      ReadLn(queVersion);
+      Writeln;
 
-      //Factura.AutoAsignarFechaGeneracion := False;
-      //Factura.FechaGeneracion := EncodeDateTime(2012, 05, 12, 19, 47, 22, 0);
-      //Factura.OnComprobanteGenerado:=onComprobanteGenerado;
+      Writeln('Creando instancia de PAC...');
+      pac := TProveedorEcodex.Create;
 
-      Factura.MetodoDePago:='Tarjeta de credito';
-      //Factura.NumeroDeCuenta:='1234';
+      // Configuramos al PAC con los datos para pruebas
+      credencialesPAC.RFC            := 'VOC990129I26';
+      credencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
 
-      // Asignamos el lugar de expedición (requerido en  CFD >= 2.2)
-      Factura.LugarDeExpedicion:='Queretaro, Qro';
+      // Inicializamos la variable de re-intentar en verdadero para intentar timbrar
+      // cada vez que falle el servicio del PAC
+      reintentar := True;
+      while reintentar do
+      begin
+        try
+          // Generamos una nueva factura
+          admonFacturas := TAdministradorFacturas.Create;
+          nuevaFactura := admonFacturas.Nueva(queVersion);
+          Writeln('Generando CFDI v' + nuevaFactura.Version + '...');
 
-      // Definimos todos los conceptos que incluyo la factura
-      Concepto1.Cantidad:=10.25;
-      Concepto1.Unidad:='Kilo';
-      Concepto1.Descripcion:='Arroz blanco precocido';
-      Concepto1.ValorUnitario:=12.23;
-      Factura.AgregarConcepto(Concepto1);
+          // Checamos que la interfase sea de la version correcta
+          if nuevaFactura.Version = '3.2' then
+          begin
+            if Not Supports(nuevaFactura, IComprobanteFiscalv32, facturaCFDIv32) then
+            begin
+              Writeln('nuevaFactura no fue un Comprobante Fiscal v32');
+              Exit;
+            end;
 
-      // Agregamos el impuesto del concepto 1
-      Impuesto1.Nombre:='IVA';
-      Impuesto1.Tasa:=16;
-      Impuesto1.Importe:=(Concepto1.ValorUnitario * Concepto1.Cantidad) * (Impuesto1.Tasa/100);
-      Factura.AgregarImpuestoTrasladado(Impuesto1);
+            {$REGION 'Factura V32'}
+            // Creamos las instancias correspondientes para la v33
+            generadorCadena := TGeneradorCadenaOriginalV32.Create;
+            generadorSello := TGeneradorSelloV32.Create;
+            generadorSello.Configurar(openSSL);
+            generadorCBB  := TGeneradorCBBv32.Create;
 
-      Concepto2.Cantidad:=5;
-      Concepto2.Unidad:='PZA';
-      Concepto2.Descripcion:='Piña dulce del bajio';
-      Concepto2.ValorUnitario:=18.90;
-      Factura.AgregarConcepto(Concepto2);
+            with facturaCFDIv32 do
+            begin
+              Serie     := 'Ver32';
+              Randomize;
+              Folio     := IntToStr(Random(999999999));
+              Fecha     := TFacturacionHelper.ComoFechaISO8601(Now);
 
-      // Le damos un descuento
-      //Factura.AsignarDescuento(5, 'Por pronto pago');
+              NoCertificado := certificadoSellos.NoCertificado;
+              Certificado   := certificadoSellos.ContenidoBase64;
 
-      // Mandamos generar la factura con el siguiente folio disponible
-      if Not(DirectoryExists(GetDesktopFolder() + '\Prueba-CFDI')) then
-        CreateDir(GetDesktopFolder() + '\Prueba-CFDI');
+              FormaDePago       := '01';
+              CondicionesDePago := 'Credito a 30 dias';
+              Subtotal          := '100.00';
+              Descuento         := '0.00';
+              Total             := '116.00';
+              TipoDeComprobante := 'ingreso';
+              MetodoDePago      := '01';
+              LugarExpedicion   := 'Chihuahua, Chihuahua';
 
-      archivoFacturaXML:=GetDesktopFolder() + '\Prueba-CFDI\MiFactura.xml';
-      rutaImagenCBB := GetDesktopFolder() + '\Prueba-CFDI\MiFactura-CBB.jpg';
+              Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
+              Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
 
-      // Mandamos generar el CFD en memoria antes de timbrarlo
-      Factura.Generar(12345, fpUnaSolaExhibicion);
-      
-      // Ya que tenemos el comprobante, lo mandamos timbrar con el PAC de nuestra elección,
-      // por cuestiones de ejemplo, usaremos al PAC "Ecodex"
+              regimen32 := Emisor.RegimenFiscal.Add;
+              regimen32.Regimen := 'Regimen General de Ley';
 
-//      ProveedorTimbrado := TPACFinkOk.Create;
-      ProveedorTimbrado := TPACComercioDigital.Create; // Si queremos usar a Comercio Digital solo des-comentamos aqui
+              Receptor.Rfc  := 'MTI0806042N7';
+              Receptor.Nombre := 'Juan & José & ''Niño'' & "Niña" S.A. de C.V.';
+              Receptor.Domicilio.Calle := 'Mi Calle';
+              Receptor.Domicilio.NoExterior := '120';
+              Receptor.Domicilio.Colonia := 'Centro';
+              Receptor.Domicilio.Municipio := 'Chihuahua';
+              Receptor.Domicilio.Estado := 'Chihuahua';
+              Receptor.Domicilio.Pais := 'Méxito';
 
-      try
-        CredencialesPAC.RFC   := 'AAA010101AAA';
-        CredencialesPAC.Clave := 'PWD';
-//        CredencialesPAC.RFCEmisor   := 'AAD990814BP7';
-        CredencialesPAC.Certificado.Ruta:=Certificado.Ruta;
-        CredencialesPAC.Certificado.LlavePrivada.Ruta:=Certificado.LlavePrivada.Ruta;
-        CredencialesPAC.Certificado.LlavePrivada.Clave:=Certificado.LlavePrivada.Clave;
-        // Este es el "ID de Integrador" de pruebas de Ecodex
-        CredencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
-        // Asignamos nuestras credenciales de acceso con el PAC
-        ProveedorTimbrado.AsignarCredenciales(CredencialesPAC);
-//        if ProveedorTimbrado.CancelarDocumento(Archivo.XML.Text) then
-//         writeln('Cancelado');
-        TimbreDeFactura := ProveedorTimbrado.TimbrarDocumento(Factura.XML);
-        // Asignamos el timbre a la factura para que sea válida
-        WriteLn('Asignando timbre a factura para generar CFDI');
-        Factura.AsignarTimbreFiscal(TimbreDeFactura);
+              concepto32 := Conceptos.Add;
+              concepto32.NoIdentificacion := '1';
+              concepto32.Cantidad         := '1';
+              concepto32.Unidad           := 'PZA';
+              concepto32.Descripcion      := 'Concepto No 1';
+              concepto32.ValorUnitario    := '100.00';
+              concepto32.Importe          := '100.00';
 
-///////  Ejemplo para agregar,editar y eliminar clientes en FinkOK
-//        WriteLn(ProveedorTimbrado.BorraCliente('GPA980211KC0'));
-//        WriteLn(ProveedorTimbrado.AgregaCliente('GPA980211KC0'));
-//        WriteLn(ProveedorTimbrado.EditaCliente('GPA980211KC0',True));
+              // Asignamos el total del impuesto de la factura
+              iva32 := Impuestos.Traslados.Add;
+              iva32.Tasa        := '16.00';
+              iva32.Impuesto    := 'IVA';
+              iva32.Importe     := '16.00';
 
-        // Ahora generamos el CBB del CFDI
-        generadorCBB := TGeneradorCBB.Create;
+              Impuestos.TotalImpuestosTrasladados  := '16.00';
+            end;
+            {$ENDREGION}
 
-        // Generamos el CBB que por default se genera de 1200x1200px para que tenga la resolucion necesaria
-        generadorCBB.GenerarImagen(Emisor,
-                                   Receptor,
-                                   Factura.Total,
-                                   TimbreDeFactura.UUID,
-                                   rutaImagenCBB);
+          end;
 
-      finally
-        ProveedorTimbrado.Free;
-        generadorCBB.Free;
+          if nuevaFactura.Version = '3.3' then
+          begin
+            if Not Supports(nuevaFactura, IComprobanteFiscalv33, facturaCFDIv33) then
+            begin
+              Writeln('nuevaFactura no fue un Comprobante Fiscal v33');
+              Exit;
+            end;
+
+            {$REGION 'Factura V33'}
+            // Creamos las instancias correspondientes para la v33
+            generadorCadena := TGeneradorCadenaOriginalV33.Create;
+            generadorSello := TGeneradorSelloV33.Create;
+            generadorSello.Configurar(openSSL);
+            generadorCBB  := TGeneradorCBBv33.Create;
+
+            Writeln('Llenando comprobante CFDI v3.3...');
+            with facturaCFDIv33 do
+            begin
+              Serie     := 'Ver33';
+              Randomize;
+              Folio     := IntToStr(Random(999999999));
+              Fecha     := TFacturacionHelper.ComoFechaISO8601(Now);
+
+              NoCertificado := certificadoSellos.NoCertificado;
+              Certificado   := certificadoSellos.ContenidoBase64;
+              FormaPago         := '01'; // De catálogo
+              CondicionesDePago := 'Credito a 30 dias';
+              Subtotal          := '100.00'; // Solo 2 decimales
+              Descuento         := TFacturacionHelper.ComoMoneda(0);
+              Moneda            := 'MXN'; // De catálogo
+              TipoCambio        := TFacturacionHelper.ComoMoneda(1);
+              Total             := TFacturacionHelper.ComoMoneda(116);
+              TipoDeComprobante := 'I'; // De catálogo
+              MetodoPago        := 'PUE';
+              LugarExpedicion   := '76030';
+
+              Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
+              Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
+              Emisor.RegimenFiscal := '601'; // De catálogo
+
+              Receptor.Rfc         := 'MTI0806042N7';
+              Receptor.Nombre      := 'Juan & José & ''Niño'' & "Niña"';
+              Receptor.UsoCFDI     := 'G01';
+
+              concepto33 := Conceptos.Add;
+              concepto33.ClaveProdServ    := '52161529';  // De catálogo
+              concepto33.NoIdentificacion := '1';
+              concepto33.Cantidad         := '1';
+              concepto33.ClaveUnidad      := 'EA';  // De catálogo
+              concepto33.Unidad           := 'PZA'; // De catálogo
+              concepto33.Descripcion      := 'Concepto No 1';
+              concepto33.ValorUnitario    := '100.00';
+              concepto33.Importe          := '100.00';
+              concepto33.Descuento        := '0.00';
+
+              iva33 := concepto33.Impuestos.Traslados.Add;
+              iva33.Base        := '100.00';
+              iva33.Impuesto    := '002';
+              iva33.TipoFactor  := 'Tasa';
+              iva33.TasaOCuota  := '0.160000';
+              iva33.Importe     := '16.00';
+
+              Impuestos.TotalImpuestosTrasladados  := '16.00';
+
+              totalIVA33 := Impuestos.Traslados.Add;
+              totalIVA33.Impuesto := '002';
+              totalIVA33.TipoFactor := 'Tasa';
+              totalIVA33.TasaOCuota := '0.160000';
+              totalIVA33.Importe    := '16.00';
+            end;
+            {$ENDREGION}
+          end;
+
+          // Agregamos el impuesto local el cual se maneja de forma especial
+          {$REGION 'Impuestos locales'}
+          impuestoLocalv1 := NewImpuestosLocalesV1;
+          impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
+          impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
+          trasladosImpuestosLocalesv1 := impuestoLocalv1.TrasladosLocales.Add;
+          trasladosImpuestosLocalesv1.ImpLocTrasladado := 'Otro';
+          trasladosImpuestosLocalesv1.TasadeTraslado   := '0.01';
+          trasladosImpuestosLocalesv1.Importe          := '1.00';
+
+          nuevaFactura.DeclareNamespace('implocal', 'http://www.sat.gob.mx/implocal');
+          TFacturacionHelper.AgregarSchemaLocation(nuevaFactura, 'http://www.sat.gob.mx/implocal');
+          TFacturacionHelper.AgregarSchemaLocation(nuevaFactura, 'http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
+          nuevaFactura.AgregarComplemento(impuestoLocalv1);
+          {$ENDREGION}
+
+          //admonFacturas.GuardarArchivo(nuevaFactura,
+          //                            ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi-pre.xml');
+
+          // Obtenemos la cadena original y sellamos la factura automaticamente
+          Writeln('Sellando comprobante...');
+          admonFacturas.Sellar(nuevaFactura, generadorCadena, generadorSello);
+
+          // 2. Si queremos obtener la Cadena Original o el Sello de forma separada:
+          // cadenaOriginal := generadorCadena.obtenerCadenaOriginal(nuevaFactura);
+          // Writeln(cadenaOriginal);
+          //
+          // selloDeLaFactura := generadorSello.GenerarSelloDeFactura(cadenaOriginal);
+          // Writeln(selloDeLaFactura);
+
+          // Dependiendo de la version usamos diferente servidor de pruebas
+          if nuevaFactura.Version = '3.3' then
+            pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
+                         credencialesPAC,
+                         _NUEMRO_TRANSACCION_INICIAL)
+          else
+            pac.Configurar(_URL_ECODEX_PRUEBAS_V32,
+                           credencialesPAC,
+                           _NUEMRO_TRANSACCION_INICIAL);
+
+          // 4. La mandamos timbrar
+          Writeln('Intentando timbrar comprobante...');
+          Randomize;
+          xmlTimbre := pac.TimbrarDocumento(nuevaFactura, Random(9999));
+
+          Writeln('Asignando Timbre Fiscal al comprobante...');
+          nuevaFactura.AsignarTimbreFiscal(xmlTimbre);
+          
+          // Recibimos el timbre de forma exitosa, dejamos de "reintentar"
+          reintentar := False;
+        except
+          On E: EPACErrorGenericoException do
+          begin
+            Writeln('--------------------------------------------------');
+            Writeln('Problema temporal al timbrar, re-intentando en 3 segundos: ', E.Message);
+            Sleep(3000);
+          end;
+        end;
       end;
 
-      // Finalmente ya que la factura fue timbrada mandamos guardar la factura
-//      Factura.Guardar(archivoFacturaXML);
+      // Checamos tener el Timbre Fiscal
+//      if Assigned(facturaCFDIv33.Complemento.TimbreFiscalDigital) then
+//      begin
+//         Writeln(facturaCFDIv33.Complemento.TimbreFiscalDigital.UUID);
+//      end else
+//         Writeln('**** NO SE TUVO TIMBRE ****');
 
-      // Para la representación gráfica debemos generar el Codigo de Barras Bidimensional (CBB)
-      // TODO: Implementar generacion de CBB con libreria que no dependa de Google Charts.
+      Writeln('Cadena Original de Timbre:');
+      Writeln(generadorCadena.obtenerCadenaOriginalDeTimbre(nuevaFactura));
 
-      FreeAndNil(Factura);
-      WriteLn('CFDI generado con éxito en ' + archivoFacturaXML + '. Presiona cualquier tecla para salir');
+      Writeln('Guardando XML...');
+      admonFacturas.GuardarArchivo(nuevaFactura,
+                                  ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.xml');
+
+      Writeln('Generando CBB corespondiente');
+      generadorCBB.GenerarImagenCBB(nuevaFactura,
+                                    ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.jpg');
+
+      Writeln('Generación de CFDI v' + nuevaFactura.Version + ' exitoso.');
+      Writeln;
+      Writeln('Presiona cualquier tecla para salir...');
       Readln;
-  except
-    on E: Exception do
-    begin
-      WriteLn('Ocurrio un error:');
-      Writeln(E.ClassName, ': ', E.Message);
-      ReadLn;
+    except
+      on E: Exception do
+      begin
+        Writeln('** Ocurrio un error inesperado: ');
+        Writeln(E.ClassName, ': ', E.Message);
+        Writeln('Presiona cualquier tecla para salir...');
+        Readln;
+      end;
     end;
+  finally
+    CoInitialize(nil);
   end;
-
-  {$IF CompilerVersion < 20}
-      CoUnInitialize; // Liberamos la memoria usada por la unidad ActiveX
-  {$IFEND}
-
 end.
-
-
-

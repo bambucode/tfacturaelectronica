@@ -1,71 +1,89 @@
+{*******************************************************}
+{                                                       }
+{       TFacturaElectronica                             }
+{                                                       }
+{       Copyright (C) 2017 Bambu Code SA de CV          }
+{                                                       }
+{*******************************************************}
+
 unit PAC.Ecodex.ManejadorDeSesion;
 
 interface
 
 uses EcodexWsSeguridad,
-     FacturaTipos;
+     Facturacion.Comprobante,
+     SysUtils;
 
 type
 
   TEcodexManejadorDeSesion = class
   private
-    fCredenciales: TFEPACCredenciales;
+    fDominioWebService: String;
+    fCredenciales: TFacturacionCredencialesPAC;
     wsSeguridad : IEcodexServicioSeguridad;
-    fNumeroTransaccion: Integer;
-    function GetNumeroDeTransaccion: Integer;
-    function ObtenerNuevoTokenDeServicio: String;
-    procedure ProcesarFallaEcodex(const aMensajeFalla: String);
+    fNumeroTransaccion: Int64;
+    function GetNumeroDeTransaccion: Int64;
+    function ObtenerNuevoTokenDeServicio(const aRFC: String): String;
+    procedure ProcesarFallaEcodex(const aExcepcion: Exception);
   public
+    constructor Create(const aDominioWebService: String; const
+        aIdTransaccionInicial: Integer);
     procedure AfterConstruction; override;
-    procedure AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
+    procedure AsignarCredenciales(const aCredenciales: TFacturacionCredencialesPAC);
+    function ObtenerNuevoTokenAltaEmisores(const aRFC, aIdIntegrador,
+        aIdAltaEmisores: String): String;
     function ObtenerNuevoTokenDeUsuario: String;
-    property NumeroDeTransaccion: Integer read GetNumeroDeTransaccion;
+    property NumeroDeTransaccion: Int64 read GetNumeroDeTransaccion;
   end;
 
 implementation
 
-uses SysUtils,
+uses System.Hash,
+     Facturacion.ManejadorErroresComunesWebServices,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
-     FacturacionHashes;
+     Facturacion.ProveedorAutorizadoCertificacion;
+
+constructor TEcodexManejadorDeSesion.Create(const aDominioWebService: String;
+    const aIdTransaccionInicial: Integer);
+begin
+  fDominioWebService := aDominioWebService;
+  // Establecemos el numero de transaccion con que comenzaremos para que sea un consecutivo
+  fNumeroTransaccion := aIdTransaccionInicial;
+end;
 
 procedure TEcodexManejadorDeSesion.AfterConstruction;
 begin
   inherited;
-  wsSeguridad := GetWsEcodexSeguridad();
-
-  // El numero de transacción comenzará como un numero aleatorio
-  // (excepto en las pruebas de unidad)
-  Randomize;
-  fNumeroTransaccion := Random(10000);
+  // Obtenemos la instancia del WebService de Sesion usando el dominio especificado por el usuario
+  wsSeguridad := GetWsEcodexSeguridad(False, fDominioWebService + '/ServicioSeguridad.svc');
 end;
 
-procedure TEcodexManejadorDeSesion.AsignarCredenciales(const aCredenciales: TFEPACCredenciales);
+procedure TEcodexManejadorDeSesion.AsignarCredenciales(const aCredenciales: TFacturacionCredencialesPAC);
 begin
   Assert(aCredenciales.RFC <> '', 'El RFC de las credenciales estuvo vacío');
-  Assert(aCredenciales.Clave <> '', 'La clave de las credenciales estuvo vacía');
   Assert(aCredenciales.DistribuidorID <> '', 'El ID de Integrador estuvo vacío');
 
   fCredenciales := aCredenciales;
 end;
 
-function TEcodexManejadorDeSesion.GetNumeroDeTransaccion: Integer;
+function TEcodexManejadorDeSesion.GetNumeroDeTransaccion: Int64;
 begin
   Result := fNumeroTransaccion;
 end;
 
-function TEcodexManejadorDeSesion.ObtenerNuevoTokenDeServicio: String;
+function TEcodexManejadorDeSesion.ObtenerNuevoTokenDeServicio(const aRFC:
+    String): String;
 var
   nuevaSolicitudDeToken: TEcodexSolicitudDeToken;
   respuestaSolicitudDeToken: TEcodexRespuestaObtenerToken;
-  mensajeFalla: string;
 begin
   Assert(fCredenciales.RFC <> '', 'Las credenciales del PAC no fueron asignadas');
   {$IFDEF CODESITE} CodeSite.EnterMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
+  nuevaSolicitudDeToken := TEcodexSolicitudDeToken.Create;
   try
-    nuevaSolicitudDeToken := TEcodexSolicitudDeToken.Create;
-    nuevaSolicitudDeToken.RFC := fCredenciales.RFC;
+    nuevaSolicitudDeToken.RFC := aRFC;
     nuevaSolicitudDeToken.TransaccionID := fNumeroTransaccion;
 
     try
@@ -74,11 +92,8 @@ begin
       Result := respuestaSolicitudDeToken.Token;
     except
       on E:Exception do
-        mensajeFalla := E.Message;
+       ProcesarFallaEcodex(E);
     end;
-
-    if (mensajeFalla <> '') then
-      ProcesarFallaEcodex(mensajeFalla);
   finally
     nuevaSolicitudDeToken.Free;
     {$IFDEF CODESITE} CodeSite.ExitMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
@@ -95,29 +110,61 @@ begin
   Inc(fNumeroTransaccion);
 
   try
-     tokenDeServicio := ObtenerNuevoTokenDeServicio();
+     tokenDeServicio := ObtenerNuevoTokenDeServicio(fCredenciales.RFC);
 
      // El token de usuario será la combinacion del token de servicio y el ID del integrador
      // concatenados por un "pipe" codificados con el agoritmo SHA1
-     Result := TFacturacionHashing.CalcularHash(fCredenciales.DistribuidorID + '|' + tokenDeServicio,
-                                                haSHA1)
+     Result := THashSHA1.GetHashString(fCredenciales.DistribuidorID + '|' + tokenDeServicio);
   except
     On E:Exception do
       raise;
   end;
 end;
 
-procedure TEcodexManejadorDeSesion.ProcesarFallaEcodex(const aMensajeFalla:
-    String);
+function TEcodexManejadorDeSesion.ObtenerNuevoTokenAltaEmisores(const aRFC,
+    aIdIntegrador, aIdAltaEmisores: String): String;
+var
+  tokenDeServicio: string;
+begin
+  Assert(fCredenciales.RFC <> '', 'Las credenciales del PAC no fueron asignadas');
+
+  // Incrementamos el numero de transaccion
+  Inc(fNumeroTransaccion);
+
+  try
+     tokenDeServicio := ObtenerNuevoTokenDeServicio(aRFC);
+
+     // El token de alta de emisores será la combinacion de:
+     // - El ID del integrador
+     // - El ID de alta de emisores (en mayusculas forzosamente)
+     // - El token de servicio
+     // Todos concatenados con un pipe (|) y codificados con el agoritmo SHA1
+     Result := THashSHA1.GetHashString(aIdIntegrador + '|' +
+                                       Uppercase(aIdAltaEmisores) + '|' +
+                                       tokenDeServicio);
+  except
+    On E:Exception do
+      raise;
+  end;
+end;
+
+procedure TEcodexManejadorDeSesion.ProcesarFallaEcodex(const aExcepcion:
+    Exception);
+var
+  mensajeFalla: string;
 const
   _NO_ECONTRADO = 0;
-  _ERROR_ECODEX_EMISOR_NO_INSCRITO = 'Emisor no encontrado';
+  _ERROR_ECODEX_EMISOR_NO_INSCRITO           = 'Emisor no encontrado';
 begin
-   if AnsiPos(_ERROR_ECODEX_EMISOR_NO_INSCRITO, aMensajeFalla) > _NO_ECONTRADO then
-    raise EPACEmisorNoInscritoException.Create(aMensajeFalla);
+  mensajeFalla := aExcepcion.Message;
 
-   // Si llegamos aqui y no se proceso ningun otro error generamos un error genérico de credenciales
-   raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + aMensajeFalla);
+  if AnsiPos(_ERROR_ECODEX_EMISOR_NO_INSCRITO, mensajeFalla) > _NO_ECONTRADO then
+    raise EPACEmisorNoInscritoException.Create(mensajeFalla, 0, 0, False);
+
+  TManejadorErroresComunesHelper.LanzarExcepcionSiDetectaFallaInternet(aExcepcion);
+
+  // Si llegamos aqui y no se proceso ningun otro error generamos un error genérico de credenciales
+  raise EPACErrorGenericoDeAccesoException.Create('Error al acceder a Ecodex:' + mensajeFalla, 0, 0, True);
 end;
 
 
