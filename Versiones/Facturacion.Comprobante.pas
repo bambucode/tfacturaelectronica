@@ -25,6 +25,7 @@ type
   TFacturacionCredencialesPAC = record
     RFC: String;
     DistribuidorID: string;
+    Clave : String;
   end;
 
   /// <summary>
