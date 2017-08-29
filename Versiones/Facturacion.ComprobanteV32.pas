@@ -573,7 +573,10 @@ type
   public
     procedure AfterConstruction; override;
     procedure AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
-    procedure AgregarComplemento(aNodoAAgregar: IXMLNode);
+    procedure AgregarComplemento(aNodoAAgregar: IXMLNode;
+                                 const aNameSpacePrefijo : String;
+                                 const aNameSpaceURI: String;
+                                 const aAnexarSchema: String);
   end;
 
 { TComprobanteFiscalV32_Emisor }
@@ -967,15 +970,25 @@ begin
   inherited;
 end;
 
-procedure TComprobanteFiscalV32.AgregarComplemento(aNodoAAgregar: IXMLNode);
+procedure TComprobanteFiscalV32.AgregarComplemento(aNodoAAgregar: IXMLNode;
+    const aNameSpacePrefijo : String; const aNameSpaceURI: String; const
+    aAnexarSchema: String);
 var
   copiaLocal : IXMLNode;
+  schemaLocation: string;
 begin
   Assert(aNodoAAgregar <> nil, 'La instancia aNodoAAgregar no debio ser nula');
   // Para evitar que se libere el nodo parámetro que nos estan proporcionando
   // creamos nuestra propia copia.
   copiaLocal := aNodoAAgregar.CloneNode(True);
   Get_Complemento.ChildNodes.Add(copiaLocal);
+
+   // Anexamos el Namespace del complemento
+  Self.DeclareNamespace(aNameSpacePrefijo, aNameSpaceURI);
+
+  // Agregamos el XSD del TFD
+  schemaLocation := Self.AttributeNodes.FindNode(_NODO_SL).Text;
+  Self.SetAttribute(_NODO_SL, aAnexarSchema);
 end;
 
 procedure TComprobanteFiscalV32.AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);

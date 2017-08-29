@@ -114,7 +114,9 @@ type
 implementation
 
 uses System.StrUtils,
+{$IFDEF CODESITE}
      CodeSiteLogging,
+{$ENDIF}
      System.Hash;
 
 { TOpenSSL }

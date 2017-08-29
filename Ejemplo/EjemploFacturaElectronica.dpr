@@ -33,6 +33,9 @@ uses
   Facturacion.GeneradorSello in '..\Facturacion.GeneradorSello.pas',
   Facturacion.OpenSSL in '..\Facturacion.OpenSSL.pas',
   Facturacion.GeneradorSelloV33 in '..\Versiones\Facturacion.GeneradorSelloV33.pas',
+  FinkOkWsTimbrado in '..\PACs\FinkOK\FinkOkWsTimbrado.pas',
+  Facturacion.PAC.FInkOk in '..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas',
+  Facturacion.PAC.Comercio in '..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas',
   Facturacion.PAC.Ecodex in '..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas',
   Facturacion.ProveedorAutorizadoCertificacion in '..\Facturacion.ProveedorAutorizadoCertificacion.pas',
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
@@ -45,7 +48,7 @@ uses
   Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas',
   Facturacion.GeneradorCBBv33 in '..\Versiones\Facturacion.GeneradorCBBv33.pas',
   DelphiZXIngQRCode in '..\Lib\DelphiZXIngQRCode.pas',
-  Facturacion.GeneradorCBB,
+  Facturacion.GeneradorCBB in '..\Facturacion.GeneradorCBB.pas',
   Facturacion.GeneradorQR in '..\Facturacion.GeneradorQR.pas',
   Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas',
   Facturacion.ComprobanteV32 in '..\Versiones\Facturacion.ComprobanteV32.pas',
@@ -91,15 +94,21 @@ var
 const
   _URL_ECODEX_PRUEBAS_V32        = 'https://pruebas.ecodex.com.mx:2045';
   _URL_ECODEX_PRUEBAS_V33        = 'https://wsdev.ecodex.com.mx:2045';
+  _URL_FINKOK_PRUEBAS            = 'http://demo-facturacion.finkok.com/servicios/soap';
+  _URL_COMERCIO_PRUEBAS            = 'https://pruebas.comercio-digital.mx';
   _NUEMRO_TRANSACCION_INICIAL    = 1;
 
 begin
   CoInitialize(nil);
   try
     try
+// El primer sello es para Ecodex
       rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer';
       rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.key';
-      claveLlavePrivada := '12345678a';
+//Este sello se usa Para finkOk
+{      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_LAN7008173R5.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_LAN7008173R5.key';
+}      claveLlavePrivada := '12345678a';
 
       openSSL := TOpenSSL.Create;
       openSSL.AsignarLlavePrivada(rutaLlavePrivada,
@@ -128,11 +137,17 @@ begin
 
       Writeln('Creando instancia de PAC...');
       pac := TProveedorEcodex.Create;
-
-      // Configuramos al PAC con los datos para pruebas
+              // Configuramos al PAC con los datos para pruebas
       credencialesPAC.RFC            := 'VOC990129I26';
       credencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
+{      pac := TProveedorComercio.Create;
+      CredencialesPAC.RFC   := 'AAA010101AAA';
+      CredencialesPAC.Clave := 'PWD';
 
+{      pac := TProveedorFinkOk.Create;
+      CredencialesPAC.RFC   := 'TuUsuario';
+      CredencialesPAC.Clave := 'TuPassword';
+}
       // Inicializamos la variable de re-intentar en verdadero para intentar timbrar
       // cada vez que falle el servicio del PAC
       reintentar := True;
@@ -244,8 +259,8 @@ begin
               Subtotal          := '100.00'; // Solo 2 decimales
               Descuento         := TFacturacionHelper.ComoMoneda(0);
               Moneda            := 'MXN'; // De catálogo
-              TipoCambio        := TFacturacionHelper.ComoMoneda(1);
-              Total             := TFacturacionHelper.ComoMoneda(116);
+              TipoCambio        := '1';//TFacturacionHelper.ComoMoneda(1);
+              Total             := TFacturacionHelper.ComoMoneda(117);
               TipoDeComprobante := 'I'; // De catálogo
               MetodoPago        := 'PUE';
               LugarExpedicion   := '76030';
@@ -297,10 +312,10 @@ begin
           trasladosImpuestosLocalesv1.TasadeTraslado   := '0.01';
           trasladosImpuestosLocalesv1.Importe          := '1.00';
 
-          nuevaFactura.DeclareNamespace('implocal', 'http://www.sat.gob.mx/implocal');
-          TFacturacionHelper.AgregarSchemaLocation(nuevaFactura, 'http://www.sat.gob.mx/implocal');
-          TFacturacionHelper.AgregarSchemaLocation(nuevaFactura, 'http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
-          nuevaFactura.AgregarComplemento(impuestoLocalv1);
+          nuevaFactura.AgregarComplemento(impuestoLocalv1,
+                                              'implocal',
+                                              'http://www.sat.gob.mx/implocal',
+                                              'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
           {$ENDREGION}
 
           //admonFacturas.GuardarArchivo(nuevaFactura,
@@ -318,6 +333,19 @@ begin
           // Writeln(selloDeLaFactura);
 
           // Dependiendo de la version usamos diferente servidor de pruebas
+
+// si el pac es Comercio
+{        pac.Configurar(_URL_COMERCIO_PRUEBAS,
+                         credencialesPAC,
+                         _NUEMRO_TRANSACCION_INICIAL);
+
+}// si el pac es finkok
+{       pac.Configurar(_URL_FINKOK_PRUEBAS,
+                         credencialesPAC,
+                         _NUEMRO_TRANSACCION_INICIAL);
+
+}
+//     si el pac es ecodex
           if nuevaFactura.Version = '3.3' then
             pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
                          credencialesPAC,
@@ -334,7 +362,7 @@ begin
 
           Writeln('Asignando Timbre Fiscal al comprobante...');
           nuevaFactura.AsignarTimbreFiscal(xmlTimbre);
-          
+
           // Recibimos el timbre de forma exitosa, dejamos de "reintentar"
           reintentar := False;
         except

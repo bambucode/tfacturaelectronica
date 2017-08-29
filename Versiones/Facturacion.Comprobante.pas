@@ -25,6 +25,7 @@ type
   TFacturacionCredencialesPAC = record
     RFC: String;
     DistribuidorID: string;
+    Clave : String;
   end;
 
   /// <summary>
@@ -61,7 +62,10 @@ type
     ///   XML del timbre tal cual lo mandó el PAC
     /// </param>
     procedure AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
-    procedure AgregarComplemento(aNodoAAgregar: IXMLNode);
+    procedure AgregarComplemento(aNodoAAgregar: IXMLNode;
+                                 const aNameSpacePrefijo : String;
+                                 const aNameSpaceURI: String;
+                                 const aAnexarSchema: String);
   end;
 
 implementation

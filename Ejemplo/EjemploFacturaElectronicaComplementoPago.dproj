@@ -3,7 +3,7 @@
         <ProjectGuid>{68FBBB60-7CCE-4A95-9ABE-703A6861E850}</ProjectGuid>
         <ProjectVersion>18.2</ProjectVersion>
         <FrameworkType>None</FrameworkType>
-        <MainSource>EjemploFacturaElectronica.dpr</MainSource>
+        <MainSource>EjemploFacturaElectronicaComplementoPago.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -67,7 +67,7 @@
     <PropertyGroup Condition="'$(Base)'!=''">
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>2058</VerInfo_Locale>
-        <SanitizedProjectName>EjemploFacturaElectronica</SanitizedProjectName>
+        <SanitizedProjectName>EjemploFacturaElectronicaComplementoPago</SanitizedProjectName>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\</DCC_ExeOutput>
@@ -123,13 +123,10 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
-        <DCC_RangeChecking>true</DCC_RangeChecking>
-        <DCC_UnitSearchPath>D:\Proyectos\Codigo\GitHub\tfacturaelectronica\OpenSSL;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>C:\Delphi\eleventa\externos\TFacturaelectronica\OpenSSL;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>None</Manifest_File>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
-        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -149,9 +146,6 @@
         <DCCReference Include="..\Facturacion.GeneradorSello.pas"/>
         <DCCReference Include="..\Facturacion.OpenSSL.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV33.pas"/>
-        <DCCReference Include="..\PACs\FinkOK\FinkOkWsTimbrado.pas"/>
-        <DCCReference Include="..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas"/>
-        <DCCReference Include="..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas"/>
         <DCCReference Include="..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas"/>
         <DCCReference Include="..\Facturacion.ProveedorAutorizadoCertificacion.pas"/>
         <DCCReference Include="..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas"/>
@@ -164,7 +158,6 @@
         <DCCReference Include="..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv33.pas"/>
         <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
-        <DCCReference Include="..\Facturacion.GeneradorCBB.pas"/>
         <DCCReference Include="..\Facturacion.GeneradorQR.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ComprobanteV32.pas"/>
@@ -174,11 +167,7 @@
         <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv32.pas"/>
         <DCCReference Include="..\Facturacion.Tipos.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ImpuestosLocalesV1.pas"/>
-        <RcItem Include="..\Schemas\3.3\cadenaoriginal_3_3.xslt">
-            <ContainerId>ResourceItem</ContainerId>
-            <ResourceType>RCDATA</ResourceType>
-            <ResourceId>XSLT_CADENAORIGINAL_V33</ResourceId>
-        </RcItem>
+        <DCCReference Include="..\Versiones\Facturacion.ComplementoPagoV1.pas"/>
         <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
@@ -193,6 +182,11 @@
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>XSLT_CADENAORIGINALTFD_V32</ResourceId>
+        </RcItem>
+        <RcItem Include="..\Schemas\3.3\cadenaoriginal_3_3.xslt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>XSLT_CADENAORIGINAL_V33</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
@@ -212,16 +206,36 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">EjemploFacturaElectronica.dpr</Source>
+                    <Source Name="MainSource">EjemploFacturaElectronicaComplementoPago.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k250.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp250.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k230.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp230.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\DCLgtDocEngD23.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\DCLgtDocEngD23.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtAdvGridExpD23.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtAdvGridExpD23.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtRichVwExpD23.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtRichVwExpD23.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtRBExpD23.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtRBExpD23.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtRaveExpD23.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtRaveExpD23.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtHtmVwExpD23.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtHtmVwExpD23.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtQRExpD23.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtQRExpD23.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtFRExpD23.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtFRExpD23.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtXPressExpD23.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtXPressExpD23.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtAceExpD23.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtAceExpD23.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtScaleRichVwExpD23.bpl">File C:\Delphi\eleventa\externos\LibreriasDelphi\eDocEngineVCL\Lib\RAD10\Win32\ExpIntf\DCLgtScaleRichVwExpD23.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\17.0\Bpl\TMSXlsDXE9.bpl">TMS TAdvStringGrid Excel support</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\17.0\Bpl\TMSWizDXE9.bpl">TMS Component Pack Wizards</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
+                <DeployFile LocalName="EjemploFacturaElectronicaComplementoPago.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_3_2.xslt" Configuration="Debug" Class="ProjectFile"/>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
+                    <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -230,17 +244,14 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule">
-                    <Platform Name="iOSSimulator">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
+                <DeployFile LocalName="..\Schemas\3.3\cadenaoriginal_TFD_1_1.xslt" Configuration="Debug" Class="ProjectFile"/>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule">
                     <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="EjemploFacturaElectronica.exe" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_TFD_1_0.xslt" Configuration="Debug" Class="ProjectFile"/>
+                <DeployFile LocalName="..\Schemas\3.3\cadenaoriginal_3_3.xslt" Configuration="Debug" Class="ProjectFile"/>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="iOSSimulator">
                         <Operation>1</Operation>
