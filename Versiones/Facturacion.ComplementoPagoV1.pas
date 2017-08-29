@@ -671,7 +671,6 @@ procedure TPagos_Pago_DoctoRelacionadoV1.AfterConstruction;
 begin
    inherited;
 end;
-
 { TPagos_Pago_DoctoRelacionadoV1 }
 
 function TPagos_Pago_DoctoRelacionadoV1.Get_IdDocumento: UnicodeString;
