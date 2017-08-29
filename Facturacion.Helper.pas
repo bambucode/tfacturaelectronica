@@ -19,12 +19,12 @@ type
 
 implementation
 
-uses System.SysUtils,
-     System.Math,
+uses SysUtils,
+     Math,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
-     Soap.XSBuiltIns;
+     XSBuiltIns;
 
 { TFacturacionHelper }
 
@@ -99,7 +99,7 @@ begin
   limiteSuperior := Ceil(limiteSuperior * 100) / 100;
 
   // ¿El importe calculado, esta dentro de rango validado por el SAT?
-  Result := System.Math.InRange(aImporte, limiteInferior, limiteSuperior);
+  Result := Math.InRange(aImporte, limiteInferior, limiteSuperior);
 end;
 
 end.

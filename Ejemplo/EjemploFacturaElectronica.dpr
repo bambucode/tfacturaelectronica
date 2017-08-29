@@ -22,9 +22,9 @@ program EjemploFacturaElectronica;
 
 uses
   FastMM4,
-  System.SysUtils,
+  SysUtils,
   activex,
-  Vcl.Forms,
+  Forms,
   Facturacion.ComprobanteV33 in '..\Versiones\Facturacion.ComprobanteV33.pas',
   Facturacion.Comprobante in '..\Versiones\Facturacion.Comprobante.pas',
   Facturacion.Administrador in '..\Facturacion.Administrador.pas',
@@ -143,10 +143,10 @@ begin
 {      pac := TProveedorComercio.Create;
       CredencialesPAC.RFC   := 'AAA010101AAA';
       CredencialesPAC.Clave := 'PWD';
-
-{      pac := TProveedorFinkOk.Create;
-      CredencialesPAC.RFC   := 'TuUsuario';
-      CredencialesPAC.Clave := 'TuPassword';
+{
+      pac := TProveedorFinkOk.Create;
+      CredencialesPAC.RFC   := 'MiUsuario';
+      CredencialesPAC.Clave := 'Clave';
 }
       // Inicializamos la variable de re-intentar en verdadero para intentar timbrar
       // cada vez que falle el servicio del PAC
@@ -300,27 +300,24 @@ begin
               totalIVA33.Importe    := '16.00';
             end;
             {$ENDREGION}
-          end;
+
 
           // Agregamos el impuesto local el cual se maneja de forma especial
           {$REGION 'Impuestos locales'}
-          impuestoLocalv1 := NewImpuestosLocalesV1;
-          impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
-          impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
-          trasladosImpuestosLocalesv1 := impuestoLocalv1.TrasladosLocales.Add;
-          trasladosImpuestosLocalesv1.ImpLocTrasladado := 'Otro';
-          trasladosImpuestosLocalesv1.TasadeTraslado   := '0.01';
-          trasladosImpuestosLocalesv1.Importe          := '1.00';
+            impuestoLocalv1 := NewImpuestosLocalesV1;
+            impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
+            impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
+            trasladosImpuestosLocalesv1 := impuestoLocalv1.TrasladosLocales.Add;
+            trasladosImpuestosLocalesv1.ImpLocTrasladado := 'Otro';
+            trasladosImpuestosLocalesv1.TasadeTraslado   := '0.01';
+            trasladosImpuestosLocalesv1.Importe          := '1.00';
 
-          nuevaFactura.AgregarComplemento(impuestoLocalv1,
-                                              'implocal',
-                                              'http://www.sat.gob.mx/implocal',
-                                              'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
+            nuevaFactura.AgregarComplemento(impuestoLocalv1,
+                                                'implocal',
+                                                'http://www.sat.gob.mx/implocal',
+                                                'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
           {$ENDREGION}
-
-          //admonFacturas.GuardarArchivo(nuevaFactura,
-          //                            ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi-pre.xml');
-
+          end;
           // Obtenemos la cadena original y sellamos la factura automaticamente
           Writeln('Sellando comprobante...');
           admonFacturas.Sellar(nuevaFactura, generadorCadena, generadorSello);
@@ -339,14 +336,14 @@ begin
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL);
 
-}// si el pac es finkok
+// si el pac es finkok
 {       pac.Configurar(_URL_FINKOK_PRUEBAS,
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL);
 
-}
+
 //     si el pac es ecodex
-          if nuevaFactura.Version = '3.3' then
+}          if nuevaFactura.Version = '3.3' then
             pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL)

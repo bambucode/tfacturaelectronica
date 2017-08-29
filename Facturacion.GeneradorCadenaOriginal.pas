@@ -10,8 +10,8 @@ unit Facturacion.GeneradorCadenaOriginal;
 
 interface
 
-uses Facturacion.Comprobante,
-     System.SysUtils;
+uses Facturacion.Comprobante,Facturacion.Tipos,
+     SysUtils;
 
 type
 
@@ -50,18 +50,21 @@ type
   TTransformadorDeXML = class
   public
     function ObtenerXSLTDeRecurso(const aNombreRecurso: string): TCadenaUTF8;
-    function TransformarXML(const aXMLData: string; aXSLT: string): TCadenaUTF8;
+    function TransformarXML(const aXMLData: String; aXSLT: string): TCadenaUTF8;
   end;
 
 implementation
 
-uses  System.IOUtils,
-      System.Classes,
-      Winapi.Windows,
-      System.Win.ComObj,
-      Xml.XMLIntf,
-      Xml.XMLDom,
-      Xml.XMLDoc;
+uses
+  {$IF Compilerversion >= 20}
+   System.IOUtils,
+  {$IFEND}
+      Classes,
+      Windows,
+      ComObj,
+      XMLIntf,
+      XMLDom,
+      XMLDoc;
 
 { TTransformadorDeXML }
 
@@ -92,14 +95,23 @@ begin
 
 end;
 
-function TTransformadorDeXML.TransformarXML(const aXMLData: string; aXSLT:
+function TTransformadorDeXML.TransformarXML(const aXMLData: String; aXSLT:
     string): TCadenaUTF8;
 var
   xmlInput, xsltInput, xmlOutput: IXMLDocument;
-  LOutput: XmlDomString;
+  {$IF Compilerversion >= 20}
+   LOutput: XmlDomString;
+  {$ELSE}
+   LOutput: DomString;
+  {$IFEND}
+
 begin
   try
+   {$IF Compilerversion >= 20}
     xmlInput := LoadXMLData(aXMLData);
+   {$ELSE}
+    xmlInput := LoadXMLData(UTF8Encode(aXMLData));
+   {$IFEND}
     xsltInput := LoadXMLData(aXSLT);
     xmlOutput := NewXMLDocument;
     xmlInput.DocumentElement.TransformNode(xsltInput.DocumentElement, LOutput);

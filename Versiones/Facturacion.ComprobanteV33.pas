@@ -14,7 +14,7 @@ unit Facturacion.ComprobanteV33;
 interface
 
 uses xmldom, XMLDoc, XMLIntf,
-     Facturacion.Comprobante,
+     Facturacion.Comprobante,Facturacion.Tipos,
      Facturacion.TimbreFiscalDigitalV33;
 
 type
@@ -947,7 +947,7 @@ const
 
 implementation
 
-uses System.SysUtils,
+uses SysUtils,
      Facturacion.Helper;
 
 const
@@ -996,7 +996,7 @@ begin
   end;
 
   // Creamos el XMLDocument desde el XML del timbre
-  documentoXMLTimbre := LoadXMLData(Trim(timbreConXSI));
+  documentoXMLTimbre := LoadXMLData(UTF8Encode(Trim(timbreConXSI)));
   nodoTimbre         := GetTimbreFiscalDigitalV33(documentoXMLTimbre);
 
   // Agregamos el nodo del TimbreFiscalDigital al nodo Complemento del comprobante

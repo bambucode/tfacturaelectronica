@@ -11,7 +11,7 @@ unit Facturacion.ComprobanteV32;
 interface
 
 uses xmldom, XMLDoc, XMLIntf,
-     Facturacion.Comprobante,
+     Facturacion.Comprobante,Facturacion.Tipos,
      Facturacion.TimbreFiscalDigitalV32;
 
 type
@@ -911,7 +911,7 @@ const
 
 implementation
 
-uses System.SysUtils;
+uses SysUtils;
 
 const
   _NODO_XSI     = 'xmlns:xsi';

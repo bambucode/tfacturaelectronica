@@ -9,12 +9,12 @@ unit Facturacion.OpenSSL;
 
 interface
 
-uses Facturacion.Comprobante,
+uses Facturacion.Tipos,
      libeay32,
      OpenSSLUtils,
      LibEay32plus,
-     Winapi.Windows,
-     System.SysUtils;
+     Windows,
+     SysUtils;
 
 type
 
@@ -113,11 +113,16 @@ type
 
 implementation
 
-uses System.StrUtils,
+uses
 {$IFDEF CODESITE}
      CodeSiteLogging,
 {$ENDIF}
-     System.Hash;
+  {$IF Compilerversion >= 20}
+     System.Hash,
+  {$ELSE}
+  {$IFEND}
+    StrUtils;
+
 
 { TOpenSSL }
 
@@ -170,7 +175,7 @@ begin
 
   Tam:=Length(aCadena); // Obtenemos el tamaño de la cadena original
   try
-      System.SysUtils.StrPLCopy(inbuf, aCadena, Tam);  // Copiamos la cadena original al buffer de entrada
+      SysUtils.StrPLCopy(inbuf, aCadena, Tam);  // Copiamos la cadena original al buffer de entrada
   except
       On E:Exception do
       begin
@@ -188,7 +193,7 @@ begin
   end;
 
   // Establece los datos que vamos a usar
-  EVP_SignUpdate(@mdctx,@inbuf,System.SysUtils.StrLen(inbuf));
+  EVP_SignUpdate(@mdctx,@inbuf,StrLen(inbuf));
 
   // Realiza la digestion usando la llave privada que obtuvimos y leimos en memoria
   EVP_SignFinal(@mdctx, @outbuf, Len, fLlavePrivadaDesencriptada);
@@ -227,7 +232,7 @@ begin
     EVP_DigestUpdate(@ctx, @Inbuf, StrLen(Inbuf));
     EVP_DigestFinal(@ctx, PByte(@Outbuf), Len);
     Result := BinToBase64(@Outbuf, Length(Outbuf));
-  {$ENDIF}
+  {$IFEND}
 end;
 
 // Funcion obtenida de: DelphiAccess - http://www.delphiaccess.com/forum/index.php?topic=3092.0

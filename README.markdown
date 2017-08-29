@@ -16,7 +16,7 @@ Algunos aspectos que busca tener esta libreria:
 
 Requerimientos técnicos
 ------------
-- Contar con alguna edición de Delphi (de momento solo se garantiza funcionamiento en Delphi Seattle)
+- Contar con alguna edición de Delphi (de momento solo se garantiza funcionamiento en Delphi 2007,Seattle,Tokyo)
 - Contar con librerias libeay32.dll, ssleay32.dll y el ejecutable openssl.exe (solo para las pruebas automatizadas) las cuales se encuentran en la siguiente liga: <http://www.openssl.org/related/binaries.html>
 
 
@@ -29,6 +29,8 @@ Por ejemplo la librería te permitirá llenar el atributo `Total` de la factura 
 Proveedores Autorizados de Certificación (PAC) Soportados por v2.0
 -------------
 * Ecodex - <http://www.ecodex.com.mx>
+* FinkOk - <http://www.finkok.com>
+* Comercio-digital <http://www.comercio-digital.com>
 
 Documentación Técnica
 -------------

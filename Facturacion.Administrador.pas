@@ -10,10 +10,10 @@ unit Facturacion.Administrador;
 
 interface
 
-uses Facturacion.Comprobante,
+uses Facturacion.Comprobante,Facturacion.Tipos,
      Facturacion.GeneradorCadenaOriginal,
      Facturacion.GeneradorSello,
-     System.SysUtils;
+     SysUtils;
 
 type
 
@@ -121,14 +121,14 @@ type
 
 implementation
 
-uses System.Classes,
-     Xml.XMLDoc,
+uses Classes,
+     XMLDoc,
      Facturacion.ComprobanteV32,
      Facturacion.ComprobanteV33,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
-     Xml.XMLIntf;
+     XMLIntf;
 
 { TAdministradorFacturas }
 
@@ -176,14 +176,27 @@ end;
 procedure TAdministradorFacturas.GuardarArchivo(const aComprobante: IComprobanteFiscal;
                                                  const aArchivoDestino: TFileName);
 var
-  Writer: TStreamWriter;
+  {$IF Compilerversion >= 20}
+   Writer: TStreamWriter;
 begin
-  Writer := TStreamWriter.Create(aArchivoDestino, false, TEncoding.UTF8);
-  try
-    Writer.Write(aComprobante.XML);
-  finally
-    Writer.Free();
-  end;
+   Writer := TStreamWriter.Create(aArchivoDestino, false, TEncoding.UTF8);
+    try
+      Writer.Write(aComprobante.XML);
+    finally
+      Writer.Free();
+    end;
+  {$ELSE}
+   Temp: Utf8String;
+   Stream: TStringStream;
+begin
+   Temp:= Utf8Encode (aComprobante.XML);
+   Stream:= TStringStream.Create(aArchivoDestino);
+   try
+    Stream.Write(Pointer (Temp) ^, Length (Temp));
+   finally
+    Stream. Free;
+    end;
+  {$IFEND}
 end;
 
 function TAdministradorFacturas.LeerDesdeArchivo(const aRutaComprobante: TFileName): IComprobanteFiscal;

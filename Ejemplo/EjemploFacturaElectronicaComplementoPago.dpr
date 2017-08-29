@@ -44,7 +44,6 @@ uses
   Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas',
   Facturacion.GeneradorCBBv33 in '..\Versiones\Facturacion.GeneradorCBBv33.pas',
   DelphiZXIngQRCode in '..\Lib\DelphiZXIngQRCode.pas',
-  Facturacion.GeneradorCBB,
   Facturacion.GeneradorQR in '..\Facturacion.GeneradorQR.pas',
   Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas',
   Facturacion.ComprobanteV32 in '..\Versiones\Facturacion.ComprobanteV32.pas',
@@ -54,7 +53,11 @@ uses
   Facturacion.GeneradorCBBv32 in '..\Versiones\Facturacion.GeneradorCBBv32.pas',
   Facturacion.Tipos in '..\Facturacion.Tipos.pas',
   Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas',
-  Facturacion.ComplementoPagoV1 in '..\Versiones\Facturacion.ComplementoPagoV1.pas';
+  Facturacion.ComplementoPagoV1 in '..\Versiones\Facturacion.ComplementoPagoV1.pas',
+  Facturacion.GeneradorCBB in '..\Facturacion.GeneradorCBB.pas',
+  Facturacion.PAC.Comercio in '..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas',
+  Facturacion.PAC.FInkOk in '..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas',
+  FinkOkWsTimbrado in '..\PACs\FinkOK\FinkOkWsTimbrado.pas';
 
 var
   nuevaFactura : IComprobanteFiscal;
@@ -93,6 +96,8 @@ var
 const
   _URL_ECODEX_PRUEBAS_V32        = 'https://pruebas.ecodex.com.mx:2045';
   _URL_ECODEX_PRUEBAS_V33        = 'https://wsdev.ecodex.com.mx:2045';
+  _URL_FINKOK_PRUEBAS            = 'http://demo-facturacion.finkok.com/servicios/soap';
+  _URL_COMERCIO_PRUEBAS            = 'https://pruebas.comercio-digital.mx';
   _NUEMRO_TRANSACCION_INICIAL    = 1;
 
 begin
@@ -129,11 +134,28 @@ begin
       Writeln;
 
       Writeln('Creando instancia de PAC...');
-      pac := TProveedorEcodex.Create;
-
-      // Configuramos al PAC con los datos para pruebas
+{      pac := TProveedorEcodex.Create;
+              // Configuramos al PAC con los datos para pruebas
       credencialesPAC.RFC            := 'VOC990129I26';
       credencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
+}      pac := TProveedorComercio.Create;
+      CredencialesPAC.RFC   := 'AAA010101AAA';
+      CredencialesPAC.Clave := 'PWD';
+
+{      pac := TProveedorFinkOk.Create;
+      CredencialesPAC.RFC   := 'pablo@tecsisnet.net';
+      CredencialesPAC.Clave := 'Dani2369.';
+}
+
+
+      // Configuramos al PAC con los datos para pruebas
+// El primer sello es para Ecodex
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.key';
+//Este sello se usa Para finkOk
+{      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_LAN7008173R5.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_LAN7008173R5.key';
+}      claveLlavePrivada := '12345678a';
 
       // Inicializamos la variable de re-intentar en verdadero para intentar timbrar
       // cada vez que falle el servicio del PAC
@@ -262,10 +284,27 @@ begin
            Writeln(selloDeLaFactura);
 
           // Dependiendo de la version usamos diferente servidor de pruebas
-          pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
+// si el pac es Comercio
+        pac.Configurar(_URL_COMERCIO_PRUEBAS,
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL);
 
+// si el pac es finkok
+{       pac.Configurar(_URL_FINKOK_PRUEBAS,
+                         credencialesPAC,
+                         _NUEMRO_TRANSACCION_INICIAL);
+
+}
+//     si el pac es ecodex
+{          if nuevaFactura.Version = '3.3' then
+            pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
+                         credencialesPAC,
+                         _NUEMRO_TRANSACCION_INICIAL)
+          else
+            pac.Configurar(_URL_ECODEX_PRUEBAS_V32,
+                           credencialesPAC,
+                           _NUEMRO_TRANSACCION_INICIAL);
+}
           // 4. La mandamos timbrar
           Writeln('Intentando timbrar comprobante...');
           Randomize;

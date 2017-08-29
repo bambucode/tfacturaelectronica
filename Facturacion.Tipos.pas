@@ -2,9 +2,19 @@ unit Facturacion.Tipos;
 
 interface
 
-uses System.SysUtils;
+uses SysUtils;
 
 type
+  // Definimos el tipo de Cadena estándard que manejaremos en toda la libreia
+  // con codificacion en UTF8
+  {$IF Compilerversion >= 20}
+  TCadenaUTF8 = RawByteString;
+  {$ELSE}
+  TCadenaUTF8 = UTF8String;
+  {$IFEND}
+  {$IF Compilerversion < 20}
+   UnicodeString =  UTF8String;
+  {$IFEND}
 
 {$REGION 'Excepciones de validacion de la matriz de validaciones de CFDI 3.3'}
   ESATErrorGenericoException = class(Exception)
@@ -44,7 +54,6 @@ type
 const
   _RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';
   _RFC_VENTA_EXTRANJEROS        = 'XEXX010101000';
-
 implementation
 
 constructor ESATErrorGenericoException.Create(const aMensajeExcepcion: String;

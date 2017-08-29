@@ -12,11 +12,12 @@ interface
 
 uses Facturacion.ProveedorAutorizadoCertificacion,
   Facturacion.Comprobante,
+  Facturacion.Tipos,
   EcodexWsComun,
   EcodexWsTimbrado,
   EcodexWsClientes,
   PAC.Ecodex.ManejadorDeSesion,
-  System.SysUtils;
+  SysUtils;
 
 type
 
@@ -43,15 +44,15 @@ implementation
 
 uses Classes,
   xmldom,
-  Facturacion.Tipos,
   XMLIntf,
 {$IFDEF CODESITE}
   CodeSiteLogging,
 {$ENDIF}
-  System.RegularExpressions,
 {$IF Compilerversion >= 20}
+  System.RegularExpressions,
   Xml.Win.Msxmldom,
 {$ELSE}
+  PerlRegex,
   Msxmldom,
 {$IFEND}
   XMLDoc;
@@ -80,6 +81,9 @@ function TProveedorEcodex.ExtraerNodoTimbre(const aComprobanteXML
   : TEcodexComprobanteXML): TCadenaUTF8;
 var
   contenidoComprobanteXML: TCadenaUTF8;
+ {$IF Compilerversion < 20}
+  TRegex : TPerlRegex;
+ {$ifend}   
 const
   _REGEX_TIMBRE = '<tfd:TimbreFiscalDigital.*?/>';
 begin
@@ -88,10 +92,18 @@ begin
 {$IF Compilerversion >= 20}
   // Delphi 2010 y superiores
   contenidoComprobanteXML := aComprobanteXML.DatosXML;
+  Result := TRegEx.Match(contenidoComprobanteXML,_REGEX_TIMBRE).Value;
 {$ELSE}
-  contenidoComprobanteXML := UTF8Encode(aComprobanteXML.DatosXML);
+   Try
+     TRegex.Subject:=UTF8Encode(aComprobanteXML.DatosXML);
+     TRegex.RegEx:=_REGEX_TIMBRE;
+     if TRegex.Match then
+      Result:=Trim(aComprobanteXML.DatosXML);
+    Except
+       on E: Exception do
+        Writeln(E.ClassName, ': ', E.Message);
+    End;
 {$IFEND}
-  Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
   Assert(Result <> '', 'El XML del timbre estuvo vacio');
 end;
 

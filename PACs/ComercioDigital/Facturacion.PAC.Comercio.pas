@@ -15,9 +15,10 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
      SynaCode,
      HTTPSend,
      Facturacion.Comprobante,
+     Facturacion.Tipos,
      ssl_openssl,
      Classes,
-     System.SysUtils;
+     SysUtils;
 
 type
 
@@ -46,13 +47,12 @@ type
 implementation
 
 uses xmldom,
-     Facturacion.Tipos,
      XMLIntf,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
-     System.RegularExpressions,
      {$IF Compilerversion >= 20}
+     System.RegularExpressions,
      Xml.Win.Msxmldom,
      {$ELSE}
      msxmldom,
@@ -123,7 +123,7 @@ var
 begin
   try
     // Paso 1. Mandamos solicitar el timbre por medio del API Rest de Comercio Digital
-    respuestaCadena := RealizarPeticionREST(URLTimbrado,aComprobante.XML);
+    respuestaCadena := RealizarPeticionREST(URLTimbrado,UTF8Encode(aComprobante.XML));
     // Checamos haber recibido el timbrado correctamente
     if Copy(Trim(respuestaCadena),1,4)='<tfd' then
     Begin

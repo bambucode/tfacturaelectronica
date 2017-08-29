@@ -38,7 +38,12 @@ type
 
 implementation
 
-uses System.Hash,
+uses
+     {$IF Compilerversion >= 20}
+      System.Hash,
+     {$ELSE}
+      IdHashSHA1, 
+     {$IFEND}      
      Facturacion.ManejadorErroresComunesWebServices,
      {$IFDEF CODESITE}
      CodeSiteLogging,
@@ -114,7 +119,16 @@ begin
 
      // El token de usuario será la combinacion del token de servicio y el ID del integrador
      // concatenados por un "pipe" codificados con el agoritmo SHA1
-     Result := THashSHA1.GetHashString(fCredenciales.DistribuidorID + '|' + tokenDeServicio);
+     {$IF Compilerversion >= 20}
+      Result := THashSHA1.GetHashString(fCredenciales.DistribuidorID + '|' + tokenDeServicio);
+     {$ELSE}
+      with TIdHashSHA1.Create do
+      try
+          Result := HashStringAsHex(fCredenciales.DistribuidorID + '|' + tokenDeServicio);
+      finally
+          Free;
+      end;
+     {$IFEND}
   except
     On E:Exception do
       raise;
@@ -139,9 +153,20 @@ begin
      // - El ID de alta de emisores (en mayusculas forzosamente)
      // - El token de servicio
      // Todos concatenados con un pipe (|) y codificados con el agoritmo SHA1
-     Result := THashSHA1.GetHashString(aIdIntegrador + '|' +
+     {$IF Compilerversion >= 20}
+           Result := THashSHA1.GetHashString(aIdIntegrador + '|' +
                                        Uppercase(aIdAltaEmisores) + '|' +
                                        tokenDeServicio);
+     {$ELSE}
+      with TIdHashSHA1.Create do
+      try
+          Result := HashStringAsHex(aIdIntegrador + '|' +
+                                       Uppercase(aIdAltaEmisores) + '|' +
+                                       tokenDeServicio);
+      finally
+          Free;
+      end;
+     {$IFEND}
   except
     On E:Exception do
       raise;

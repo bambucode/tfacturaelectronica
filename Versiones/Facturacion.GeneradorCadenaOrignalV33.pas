@@ -10,8 +10,8 @@ unit Facturacion.GeneradorCadenaOrignalV33;
 
 interface
 
-uses  Facturacion.Comprobante,
-      System.SysUtils,
+uses  Facturacion.Comprobante,Facturacion.Tipos,
+      SysUtils,
       Facturacion.GeneradorCadenaOriginal;
 
 type
@@ -24,7 +24,10 @@ type
 
 implementation
 
-uses  System.IOUtils,
+uses
+  {$IF Compilerversion >= 20}
+   System.IOUtils,
+  {$IFEND}
       Facturacion.ComprobanteV33;
 
 const

@@ -9,8 +9,8 @@ unit Facturacion.ProveedorAutorizadoCertificacion;
 
 interface
 
-uses Facturacion.Comprobante,
-     System.SysUtils;
+uses Facturacion.Comprobante,Facturacion.Tipos,
+     SysUtils;
 
 type
 
