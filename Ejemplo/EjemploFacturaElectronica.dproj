@@ -1,70 +1,211 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <ProjectGuid>{6a67de98-cb77-40d6-ae8b-6b4a316cb72d}</ProjectGuid>
-    <MainSource>EjemploFacturaElectronica.dpr</MainSource>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-    <DCC_DependencyCheckOutputName>EjemploFacturaElectronica.exe</DCC_DependencyCheckOutputName>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Version>7.0</Version>
-    <DCC_DebugInformation>False</DCC_DebugInformation>
-    <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
-    <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
-    <DCC_Define>RELEASE</DCC_Define>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <Version>7.0</Version>
-    <DCC_Define>DEBUG</DCC_Define>
-    <DCC_UnitSearchPath>D:\Proyectos\Codigo\GitHub\tfacturaelectronica\OpenSSL</DCC_UnitSearchPath>
-    <DCC_ResourcePath>D:\Proyectos\Codigo\GitHub\tfacturaelectronica\OpenSSL</DCC_ResourcePath>
-    <DCC_ObjPath>D:\Proyectos\Codigo\GitHub\tfacturaelectronica\OpenSSL</DCC_ObjPath>
-    <DCC_IncludePath>D:\Proyectos\Codigo\GitHub\tfacturaelectronica\OpenSSL</DCC_IncludePath>
-  </PropertyGroup>
-  <ProjectExtensions>
-    <Borland.Personality>Delphi.Personality</Borland.Personality>
-    <Borland.ProjectType>VCLApplication</Borland.ProjectType>
-    <BorlandProject>
-<BorlandProject><Delphi.Personality><Parameters><Parameters Name="UseLauncher">False</Parameters><Parameters Name="LoadAllSymbols">True</Parameters><Parameters Name="LoadUnspecifiedSymbols">False</Parameters></Parameters><VersionInfo><VersionInfo Name="IncludeVerInfo">True</VersionInfo><VersionInfo Name="AutoIncBuild">False</VersionInfo><VersionInfo Name="MajorVer">1</VersionInfo><VersionInfo Name="MinorVer">0</VersionInfo><VersionInfo Name="Release">0</VersionInfo><VersionInfo Name="Build">0</VersionInfo><VersionInfo Name="Debug">False</VersionInfo><VersionInfo Name="PreRelease">False</VersionInfo><VersionInfo Name="Special">False</VersionInfo><VersionInfo Name="Private">False</VersionInfo><VersionInfo Name="DLL">False</VersionInfo><VersionInfo Name="Locale">2058</VersionInfo><VersionInfo Name="CodePage">1252</VersionInfo></VersionInfo><VersionInfoKeys><VersionInfoKeys Name="CompanyName"></VersionInfoKeys><VersionInfoKeys Name="FileDescription"></VersionInfoKeys><VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="InternalName"></VersionInfoKeys><VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys><VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys><VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys><VersionInfoKeys Name="ProductName"></VersionInfoKeys><VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys><VersionInfoKeys Name="Comments"></VersionInfoKeys></VersionInfoKeys><Source><Source Name="MainSource">EjemploFacturaElectronica.dpr</Source></Source></Delphi.Personality></BorlandProject></BorlandProject>
-  </ProjectExtensions>
-  <Import Project="$(MSBuildBinPath)\Borland.Delphi.Targets" />
-  <ItemGroup>
-    <DelphiCompile Include="EjemploFacturaElectronica.dpr">
-      <MainSource>MainSource</MainSource>
-    </DelphiCompile>
-    <DCCReference Include="..\Facturacion.Administrador.pas" />
-    <DCCReference Include="..\Facturacion.CertificadoDeSellos.pas" />
-    <DCCReference Include="..\Facturacion.GeneradorCadenaOriginal.pas" />
-    <DCCReference Include="..\Facturacion.GeneradorCBB.pas" />
-    <DCCReference Include="..\Facturacion.GeneradorQR.pas" />
-    <DCCReference Include="..\Facturacion.GeneradorSello.pas" />
-    <DCCReference Include="..\Facturacion.Helper.pas" />
-    <DCCReference Include="..\Facturacion.OpenSSL.pas" />
-    <DCCReference Include="..\Facturacion.ProveedorAutorizadoCertificacion.pas" />
-    <DCCReference Include="..\Facturacion.Tipos.pas" />
-    <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas" />
-    <DCCReference Include="..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas" />
-    <DCCReference Include="..\PACs\Ecodex\EcodexWsClientes.pas" />
-    <DCCReference Include="..\PACs\Ecodex\EcodexWsComun.pas" />
-    <DCCReference Include="..\PACs\Ecodex\EcodexWsSeguridad.pas" />
-    <DCCReference Include="..\PACs\Ecodex\EcodexWsTimbrado.pas" />
-    <DCCReference Include="..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas" />
-    <DCCReference Include="..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas" />
-    <DCCReference Include="..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas" />
-    <DCCReference Include="..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas" />
-    <DCCReference Include="..\PACs\FinkOK\FinkOkWsTimbrado.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.Comprobante.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.ComprobanteV32.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.ComprobanteV33.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV32.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV33.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv32.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv33.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV32.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV33.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.ImpuestosLocalesV1.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas" />
-    <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas" />
-  </ItemGroup>
+    <PropertyGroup>
+        <ProjectGuid>{6a67de98-cb77-40d6-ae8b-6b4a316cb72d}</ProjectGuid>
+        <MainSource>EjemploFacturaElectronica.dpr</MainSource>
+        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+        <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+        <DCC_DependencyCheckOutputName>EjemploFacturaElectronica.exe</DCC_DependencyCheckOutputName>
+        <FrameworkType>VCL</FrameworkType>
+        <ProjectVersion>18.2</ProjectVersion>
+        <Base>True</Base>
+        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>1153</TargetedPlatforms>
+        <AppType>Application</AppType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='iOSDevice64' and '$(Cfg_2)'=='true') or '$(Cfg_2_iOSDevice64)'!=''">
+        <Cfg_2_iOSDevice64>true</Cfg_2_iOSDevice64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <SanitizedProjectName>EjemploFacturaElectronica</SanitizedProjectName>
+        <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;DUnitX.MemoryLeakMonitor;Winapi;System.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Locale>2058</VerInfo_Locale>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <BT_BuildType>Debug</BT_BuildType>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName)</VerInfo_Keys>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <Icon_MainIcon>EjemploFacturaElectronica_Icon.ico</Icon_MainIcon>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <Icon_MainIcon>EjemploFacturaElectronica_Icon.ico</Icon_MainIcon>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <Version>7.0</Version>
+        <DCC_DebugInformation>0</DCC_DebugInformation>
+        <DCC_LocalDebugSymbols>False</DCC_LocalDebugSymbols>
+        <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+        <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppEnableHighDPI>true</AppEnableHighDPI>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2)'!=''">
+        <Version>7.0</Version>
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <DCC_UnitSearchPath>D:\Proyectos\Codigo\GitHub\tfacturaelectronica\OpenSSL;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_ResourcePath>D:\Proyectos\Codigo\GitHub\tfacturaelectronica\OpenSSL;$(DCC_ResourcePath)</DCC_ResourcePath>
+        <DCC_ObjPath>D:\Proyectos\Codigo\GitHub\tfacturaelectronica\OpenSSL;$(DCC_ObjPath)</DCC_ObjPath>
+        <DCC_IncludePath>D:\Proyectos\Codigo\GitHub\tfacturaelectronica\OpenSSL;$(DCC_IncludePath)</DCC_IncludePath>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_iOSDevice64)'!=''">
+        <BT_BuildType>Debug</BT_BuildType>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppEnableHighDPI>true</AppEnableHighDPI>
+    </PropertyGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType>VCLApplication</Borland.ProjectType>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Parameters>
+                    <Parameters Name="UseLauncher">False</Parameters>
+                    <Parameters Name="LoadAllSymbols">True</Parameters>
+                    <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+                </Parameters>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+                    <VersionInfo Name="MajorVer">1</VersionInfo>
+                    <VersionInfo Name="MinorVer">0</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">0</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">2058</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName"/>
+                    <VersionInfoKeys Name="FileDescription"/>
+                    <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName"/>
+                    <VersionInfoKeys Name="LegalCopyright"/>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename"/>
+                    <VersionInfoKeys Name="ProductName"/>
+                    <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments"/>
+                </VersionInfoKeys>
+                <Source>
+                    <Source Name="MainSource">EjemploFacturaElectronica.dpr</Source>
+                </Source>
+            </Delphi.Personality>
+            <Platforms>
+                <Platform value="iOSDevice64">True</Platform>
+                <Platform value="Linux64">True</Platform>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">False</Platform>
+            </Platforms>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="..\Versiones\Facturacion.ComprobanteV33.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.Comprobante.pas"/>
+        <DCCReference Include="..\Facturacion.Administrador.pas"/>
+        <DCCReference Include="..\Facturacion.GeneradorCadenaOriginal.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV33.pas"/>
+        <DCCReference Include="..\Facturacion.GeneradorSello.pas"/>
+        <DCCReference Include="..\Facturacion.OpenSSL.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV33.pas"/>
+        <DCCReference Include="..\PACs\FinkOK\FinkOkWsTimbrado.pas"/>
+        <DCCReference Include="..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas"/>
+        <DCCReference Include="..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas"/>
+        <DCCReference Include="..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas"/>
+        <DCCReference Include="..\Facturacion.ProveedorAutorizadoCertificacion.pas"/>
+        <DCCReference Include="..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas"/>
+        <DCCReference Include="..\PACs\Ecodex\EcodexWsClientes.pas"/>
+        <DCCReference Include="..\PACs\Ecodex\EcodexWsComun.pas"/>
+        <DCCReference Include="..\PACs\Ecodex\EcodexWsSeguridad.pas"/>
+        <DCCReference Include="..\PACs\Ecodex\EcodexWsTimbrado.pas"/>
+        <DCCReference Include="..\Facturacion.CertificadoDeSellos.pas"/>
+        <DCCReference Include="..\Facturacion.Helper.pas"/>
+        <DCCReference Include="..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv33.pas"/>
+        <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
+        <DCCReference Include="..\Facturacion.GeneradorCBB.pas"/>
+        <DCCReference Include="..\Facturacion.GeneradorQR.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.ComprobanteV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv32.pas"/>
+        <DCCReference Include="..\Facturacion.Tipos.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.ImpuestosLocalesV1.pas"/>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Release">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
+    <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
 </Project>

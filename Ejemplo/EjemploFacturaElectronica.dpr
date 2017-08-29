@@ -143,10 +143,10 @@ begin
 {      pac := TProveedorComercio.Create;
       CredencialesPAC.RFC   := 'AAA010101AAA';
       CredencialesPAC.Clave := 'PWD';
-{
-      pac := TProveedorFinkOk.Create;
+}
+{      pac := TProveedorFinkOk.Create;
       CredencialesPAC.RFC   := 'MiUsuario';
-      CredencialesPAC.Clave := 'Clave';
+      CredencialesPAC.Clave := 'MiClave';
 }
       // Inicializamos la variable de re-intentar en verdadero para intentar timbrar
       // cada vez que falle el servicio del PAC
@@ -336,14 +336,14 @@ begin
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL);
 
-// si el pac es finkok
+}// si el pac es finkok
 {       pac.Configurar(_URL_FINKOK_PRUEBAS,
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL);
 
-
+}
 //     si el pac es ecodex
-}          if nuevaFactura.Version = '3.3' then
+         if nuevaFactura.Version = '3.3' then
             pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL)
