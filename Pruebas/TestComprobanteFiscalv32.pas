@@ -213,6 +213,8 @@ procedure TestTFEComprobanteFiscalV32.SelloDigital_DeMilConceptos_SeaCorrecto;
 var
      sSelloDigitalDelXML, sSelloCalculado: String;
      Certificado: TFECertificado;
+     concepto : TFEConcepto;
+     I: integer;
 begin
       ConfigurarCertificadoDePrueba(Certificado);
 
@@ -222,13 +224,30 @@ begin
                               Certificado,
                               fComprobanteFiscalv32);
 
+
+
      // Quitamos la cadena original y sellos del XML para re-calcularlos
      fComprobanteFiscalv32.FacturaGenerada:=False;
      fComprobanteFiscalv32.fCadenaOriginalCalculada:='';
      fComprobanteFiscalv32.fSelloDigitalCalculado:='';
 
-     // Mandamos calcular el sello digital del XML el cual ya tiene mil artículos
+      // Mandamos calcular el sello digital del XML el cual ya tiene mil artículos
      sSelloCalculado:=fComprobanteFiscalv32.SelloDigital;
+
+//     fComprobanteFiscalv32.fComprobanteLleno := False;
+//
+//     for I := 1 to 1000 do
+//     begin
+//      concepto.Cantidad := I;
+//      concepto.Unidad := 'PZA';
+//      concepto.Descripcion := 'Descirpción';
+//      concepto.ValorUnitario := 10;
+//      fComprobanteFiscalv32.AgregarConcepto(concepto);
+//     end;
+
+
+
+     //fComprobanteFiscalv32.GuardarEnArchivo('C:\Debug\Soporte\reportes\miles.xml');
 
      // Verificamos que el sello sea correcto
      CheckEquals(sSelloDigitalDelXML,
@@ -247,6 +266,8 @@ begin
   sSelloDigitalCorrecto := LeerXMLDePruebaEnComprobante
     (fRutaFixtures + 'comprobante_fiscal/v32/comprobante_para_sello_digital.xml',
     Certificado, fComprobanteFiscalv32);
+
+  fComprobanteFiscalv32.GuardarEnArchivo('C:\Debug\Soporte\reportes\latest.xml');
 
   CheckEquals(sSelloDigitalCorrecto, fComprobanteFiscalv32.SelloDigital,
               'El sello digital no fue calculado correctamente');
@@ -542,7 +563,7 @@ begin
   comprobanteNuevo.XML:=UTF8ToString(xmlDeComprobante);
 
   // Configuramos el certificado de prueba
-  Certificado.Ruta := fRutaFixtures + _RUTA_CERTIFICADO;
+  Certificado.Ruta := fRutaFixtures + _CERTIFICADO_PRUEBAS_SAT;
   Certificado.LlavePrivada.Ruta := fRutaFixtures + _LLAVE_PRIVADA_PRUEBAS_SAT;
   Certificado.LlavePrivada.Clave := _CLAVE_LLAVE_PRIVADA_PRUEBAS_SAT;
   comprobanteNuevo.Certificado := Certificado;

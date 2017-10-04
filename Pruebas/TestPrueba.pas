@@ -38,8 +38,8 @@ type
   end;
 
 const
-  _CERTIFICADO_PRUEBAS_SAT          = 'comprobante_fiscal\aaa010101aaa_csd_01.cer';
-  _LLAVE_PRIVADA_PRUEBAS_SAT        = 'comprobante_fiscal\aaa010101aaa_csd_01.key';
+  _CERTIFICADO_PRUEBAS_SAT          = 'comprobante_fiscal\CSD_Pruebas_CFDI_LAN7008173R5.cer';
+  _LLAVE_PRIVADA_PRUEBAS_SAT        = 'comprobante_fiscal\CSD_Pruebas_CFDI_LAN7008173R5.key';
   _CLAVE_LLAVE_PRIVADA_PRUEBAS_SAT  = '12345678a';
 
 implementation
