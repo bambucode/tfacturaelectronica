@@ -15,7 +15,7 @@ program EjemploFacturaElectronica;
 // Incluimos el archivo de recurso .RC que contiene los XSLTs para generar las cadenas originales
 {$R *.dres}
 
-// øSe quiere soporte para el Debugger FASTMM?
+// ¬øSe quiere soporte para el Debugger FASTMM?
 {$IFDEF FASTMM}
   {$INCLUDE FastMM4Options.inc}
 {$ENDIF}
@@ -201,13 +201,13 @@ begin
               regimen32.Regimen := 'Regimen General de Ley';
 
               Receptor.Rfc  := 'MTI0806042N7';
-              Receptor.Nombre := 'Juan & JosÈ & ''NiÒo'' & "NiÒa" S.A. de C.V.';
+              Receptor.Nombre := 'Juan & Jos√© & ''Ni√±o'' & "Ni√±a" S.A. de C.V.';
               Receptor.Domicilio.Calle := 'Mi Calle';
               Receptor.Domicilio.NoExterior := '120';
               Receptor.Domicilio.Colonia := 'Centro';
               Receptor.Domicilio.Municipio := 'Chihuahua';
               Receptor.Domicilio.Estado := 'Chihuahua';
-              Receptor.Domicilio.Pais := 'MÈxito';
+              Receptor.Domicilio.Pais := 'M√©xito';
 
               concepto32 := Conceptos.Add;
               concepto32.NoIdentificacion := '1';
@@ -254,31 +254,31 @@ begin
 
               NoCertificado := certificadoSellos.NoCertificado;
               Certificado   := certificadoSellos.ContenidoBase64;
-              FormaPago         := '01'; // De cat·logo
+              FormaPago         := '01'; // De cat√°logo
               CondicionesDePago := 'Credito a 30 dias';
               Subtotal          := '100.00'; // Solo 2 decimales
               Descuento         := TFacturacionHelper.ComoMoneda(0);
-              Moneda            := 'MXN'; // De cat·logo
+              Moneda            := 'MXN'; // De cat√°logo
               TipoCambio        := '1';//TFacturacionHelper.ComoMoneda(1);
               Total             := TFacturacionHelper.ComoMoneda(117);
-              TipoDeComprobante := 'I'; // De cat·logo
+              TipoDeComprobante := 'I'; // De cat√°logo
               MetodoPago        := 'PUE';
               LugarExpedicion   := '76030';
 
               Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
               Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
-              Emisor.RegimenFiscal := '601'; // De cat·logo
+              Emisor.RegimenFiscal := '601'; // De cat√°logo
 
               Receptor.Rfc         := 'MTI0806042N7';
-              Receptor.Nombre      := 'Juan & JosÈ & ''NiÒo'' & "NiÒa"';
+              Receptor.Nombre      := 'Juan & Jos√© & ''Ni√±o'' & "Ni√±a"';
               Receptor.UsoCFDI     := 'G01';
 
               concepto33 := Conceptos.Add;
-              concepto33.ClaveProdServ    := '52161529';  // De cat·logo
+              concepto33.ClaveProdServ    := '52161529';  // De cat√°logo
               concepto33.NoIdentificacion := '1';
               concepto33.Cantidad         := '1';
-              concepto33.ClaveUnidad      := 'EA';  // De cat·logo
-              concepto33.Unidad           := 'PZA'; // De cat·logo
+              concepto33.ClaveUnidad      := 'EA';  // De cat√°logo
+              concepto33.Unidad           := 'PZA'; // De cat√°logo
               concepto33.Descripcion      := 'Concepto No 1';
               concepto33.ValorUnitario    := '100.00';
               concepto33.Importe          := '100.00';
@@ -290,6 +290,10 @@ begin
               iva33.TipoFactor  := 'Tasa';
               iva33.TasaOCuota  := '0.160000';
               iva33.Importe     := '16.00';
+              
+              // NOTA: Agregamos el numero cuenta predial justo despu√©s de indicar
+              // los impuestos del concepto pues el orden importa.
+              concepto33.CuentaPredial.Numero := '234989';
 
               Impuestos.TotalImpuestosTrasladados  := '16.00';
 
@@ -393,7 +397,7 @@ begin
       generadorCBB.GenerarImagenCBB(nuevaFactura,
                                     ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.jpg');
 
-      Writeln('GeneraciÛn de CFDI v' + nuevaFactura.Version + ' exitoso.');
+      Writeln('Generaci√≥n de CFDI v' + nuevaFactura.Version + ' exitoso.');
       Writeln;
       Writeln('Presiona cualquier tecla para salir...');
       Readln;
