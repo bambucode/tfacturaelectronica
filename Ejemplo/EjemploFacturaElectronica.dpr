@@ -21,7 +21,6 @@ program EjemploFacturaElectronica;
 {$ENDIF}
 
 uses
-  FastMM4,
   System.SysUtils,
   activex,
   Vcl.Forms,
@@ -34,8 +33,8 @@ uses
   Facturacion.OpenSSL in '..\Facturacion.OpenSSL.pas',
   Facturacion.GeneradorSelloV33 in '..\Versiones\Facturacion.GeneradorSelloV33.pas',
   FinkOkWsTimbrado in '..\PACs\FinkOK\FinkOkWsTimbrado.pas',
-  Facturacion.PAC.FInkOk in '..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas',
-  Facturacion.PAC.Comercio in '..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas',
+  Facturacion.PAC.SolucionFactible in '..\PACs\SolucionFactible\Facturacion.PAC.SolucionFactible.pas',
+  SolucionFactibleWsTimbrado in '..\PACs\SolucionFactible\SolucionFactibleWsTimbrado.pas',
   Facturacion.PAC.Ecodex in '..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas',
   Facturacion.ProveedorAutorizadoCertificacion in '..\Facturacion.ProveedorAutorizadoCertificacion.pas',
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
@@ -95,20 +94,33 @@ const
   _URL_ECODEX_PRUEBAS_V32        = 'https://pruebas.ecodex.com.mx:2045';
   _URL_ECODEX_PRUEBAS_V33        = 'https://wsdev.ecodex.com.mx:2045';
   _URL_FINKOK_PRUEBAS            = 'http://demo-facturacion.finkok.com/servicios/soap';
-  _URL_COMERCIO_PRUEBAS            = 'https://pruebas.comercio-digital.mx';
+  _URL_COMERCIO_PRUEBAS          = 'https://pruebas.comercio-digital.mx';
+  _URL_SOLUCIONFACTIBLE_PRUEBAS  = 'https://testing.solucionfactible.com/ws/services/Timbrado';
   _NUEMRO_TRANSACCION_INICIAL    = 1;
 
 begin
   CoInitialize(nil);
   try
     try
+
+{
+ NOTAS:
+         Recuerde que para realizar pruebas con Solución Factible debe registrarse con el PAC para el proceso de pruebas.
+         Para realizar pruebas con Edicom, se requiere una cuenta valida registrada en el PAC
+}
+
 // El primer sello es para Ecodex
+
       rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer';
       rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.key';
+
 //Este sello se usa Para finkOk
-{      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_LAN7008173R5.cer';
+{
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_LAN7008173R5.cer';
       rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_LAN7008173R5.key';
-}      claveLlavePrivada := '12345678a';
+}
+      claveLlavePrivada := '12345678a';
+
 
       openSSL := TOpenSSL.Create;
       openSSL.AsignarLlavePrivada(rutaLlavePrivada,
@@ -127,27 +139,36 @@ begin
       WriteLn('Certificado y llave ... OK');
 
 
-      {$IFDEF FullDebugMode}
-        Writeln('FastMM4 Habilitado :)');
-      {$ENDIF}
-
       Writeln('Por favor escribe la version del CFDI que deseas generar (3.2 o 3.3):');
       ReadLn(queVersion);
       Writeln;
 
       Writeln('Creando instancia de PAC...');
+      // Configuramos al PAC con los datos para pruebas
+
       pac := TProveedorEcodex.Create;
-              // Configuramos al PAC con los datos para pruebas
       credencialesPAC.RFC            := 'VOC990129I26';
       credencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
-{      pac := TProveedorComercio.Create;
+
+
+{
+      pac := TProveedorComercio.Create;
       CredencialesPAC.RFC   := 'AAA010101AAA';
       CredencialesPAC.Clave := 'PWD';
+}
 
-{      pac := TProveedorFinkOk.Create;
+{
+      pac := TProveedorFinkOk.Create;
       CredencialesPAC.RFC   := 'TuUsuario';
       CredencialesPAC.Clave := 'TuPassword';
 }
+
+{
+      pac := TProveedorSolucionFactible.Create;
+      CredencialesPAC.RFC   := 'testing@solucionfactible.com';;
+      CredencialesPAC.Clave := 'timbrado.SF.16672';
+}
+
       // Inicializamos la variable de re-intentar en verdadero para intentar timbrar
       // cada vez que falle el servicio del PAC
       reintentar := True;
@@ -339,12 +360,22 @@ begin
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL);
 
-}// si el pac es finkok
+}
+
+// si el pac es finkok
 {       pac.Configurar(_URL_FINKOK_PRUEBAS,
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL);
 
 }
+
+// si el pac es Solucion Factible
+{
+       pac.Configurar(_URL_SOLUCIONFACTIBLE_PRUEBAS,
+                         credencialesPAC,
+                         _NUEMRO_TRANSACCION_INICIAL);
+}
+
 //     si el pac es ecodex
           if nuevaFactura.Version = '3.3' then
             pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
