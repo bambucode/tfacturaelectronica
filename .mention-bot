@@ -1,25 +1,26 @@
 {
-  "maxReviewers": 2, // Maximum  number of people to ping in the PR message, default is 3
-  "numFilesToCheck": 10, // Number of files to check against, default is 5
+  "maxReviewers": 2,
+  "numFilesToCheck": 10,
   "message": "Gracias por tu pull request @pullRequester, ! @reviewers, favor de revisarlo :)",
-             // custom message using @pullRequester and @reviewers
   "alwaysNotifyForPaths": [
-    {
-      
-    }
-  ], // users will always be mentioned based on file glob
+    {}
+  ],
   "fallbackNotifyForPaths": [
-    {
-     
-    }
-  ], // users will be mentioned based on file glob if no other user was found
-  "findPotentialReviewers": true, // mention-bot will try to find potential reviewers based on files history, if disabled, `alwaysNotifyForPaths` is used instead
-  "fileBlacklist": ["*.md"], // mention-bot will ignore any files that match these file globs
-  "userBlacklist": [], // users in this list will never be mentioned by mention-bot
-  "userBlacklistForPR": [], // PR made by users in this list will be ignored
-  "requiredOrgs": ["bambucode"], // mention-bot will only mention user who are a member of one of these organizations
-  "actions": ["opened"], // List of PR actions that mention-bot will listen to, default is "opened"
-  "skipAlreadyAssignedPR": false, // mention-bot will ignore already assigned PR's
-  "assignToReviewer": true, // mention-bot assigns the most appropriate reviewer for PR
-  "skipTitle": "" // mention-bot will ignore PR that includes text in the title
+    {}
+  ],
+  "findPotentialReviewers": true,
+  "fileBlacklist": [
+    "*.md"
+  ],
+  "userBlacklist": [],
+  "userBlacklistForPR": [],
+  "requiredOrgs": [
+    "bambucode"
+  ],
+  "actions": [
+    "opened"
+  ],
+  "skipAlreadyAssignedPR": false,
+  "assignToReviewer": true,
+  "skipTitle": ""
 }
