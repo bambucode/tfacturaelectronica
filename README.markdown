@@ -29,6 +29,9 @@ Por ejemplo la librería te permitirá llenar el atributo `Total` de la factura 
 Proveedores Autorizados de Certificación (PAC) Soportados por v2.0
 -------------
 * Ecodex - <http://www.ecodex.com.mx>
+* FinkOk - colaboración de @ptorres
+* ComercioDigital - colaboración de @ptorres
+* Solución Factible - colaboración de @ffaccinetto 
 
 Documentación Técnica
 -------------
