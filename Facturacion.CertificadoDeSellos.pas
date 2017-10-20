@@ -10,7 +10,12 @@ unit Facturacion.CertificadoDeSellos;
 
 interface
 
-uses System.SysUtils,
+uses 
+{$IF Compilerversion >= 22.0}
+	System.SysUtils,
+{$ELSE}
+	SysUtils,
+{$IFEND}
      OpenSSLUtils;
 
 type
