@@ -19,12 +19,20 @@ type
 
 implementation
 
-uses System.SysUtils,
-     System.Math,
-     {$IFDEF CODESITE}
-     CodeSiteLogging,
-     {$ENDIF}
-     Soap.XSBuiltIns;
+uses 
+{$IFDEF CODESITE}
+	CodeSiteLogging,
+{$ENDIF}
+{$IF Compilerversion >= 22.0}
+	System.SysUtils,
+    System.Math,
+    Soap.XSBuiltIns;
+{$ELSE}
+	SysUtils,
+    Math,
+	XSBuiltIns;
+{$IFEND}
+
 
 { TFacturacionHelper }
 

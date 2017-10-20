@@ -13,8 +13,14 @@ uses Facturacion.Comprobante,
      libeay32,
      OpenSSLUtils,
      LibEay32plus,
-     Winapi.Windows,
-     System.SysUtils;
+{$IF Compilerversion >= 22.0}
+	Winapi.Windows,
+    System.SysUtils;
+{$ELSE}
+	Windows,
+    SysUtils;
+{$IFEND}     
+     
 
 type
 

@@ -13,7 +13,12 @@ interface
 uses Facturacion.Comprobante,
      Facturacion.GeneradorCadenaOriginal,
      Facturacion.GeneradorSello,
+{$IF Compilerversion >= 22.0}
      System.SysUtils;
+{$ELSE}
+     SysUtils;
+{$IFEND}
+
 
 type
 
@@ -121,14 +126,21 @@ type
 
 implementation
 
-uses System.Classes,
-     Xml.XMLDoc,
-     Facturacion.ComprobanteV32,
-     Facturacion.ComprobanteV33,
-     {$IFDEF CODESITE}
-     CodeSiteLogging,
-     {$ENDIF}
-     Xml.XMLIntf;
+uses 
+{$IFDEF CODESITE}
+	CodeSiteLogging,
+{$ENDIF}
+{$IF Compilerversion >= 22.0}
+	System.Classes,
+    Xml.XMLDoc,
+    Xml.XMLIntf,
+{$ELSE}
+	Classes,
+    XMLDoc,
+    XMLIntf,
+{$IFEND}
+    Facturacion.ComprobanteV32,
+    Facturacion.ComprobanteV33;
 
 { TAdministradorFacturas }
 

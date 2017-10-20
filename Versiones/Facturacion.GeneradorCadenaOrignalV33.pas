@@ -11,7 +11,11 @@ unit Facturacion.GeneradorCadenaOrignalV33;
 interface
 
 uses  Facturacion.Comprobante,
+{$IF Compilerversion >= 22.0}
       System.SysUtils,
+{$ELSE}
+      SysUtils,
+{$IFEND}
       Facturacion.GeneradorCadenaOriginal;
 
 type

@@ -3,8 +3,13 @@ unit uPrin;
 interface
 
 uses
+{$IF Compilerversion >= 22.0}
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Xml.XMLIntf,
+{$ELSE}
+  Windows, Messages, SysUtils, Variants, Classes, Graphics,
+  Controls, Forms, Dialogs, StdCtrls, ExtCtrls, XMLIntf,
+{$IFEND}
   Facturacion.ComprobanteV33,
   Facturacion.ComprobanteV32,
   Facturacion.Comprobante,
@@ -24,7 +29,6 @@ uses
   Facturacion.CertificadoDeSellos,
   Facturacion.ImpuestosLocalesV1,
   Facturacion.Helper,
-  Xml.XMLIntf,
   Facturacion.ManejadorErroresComunesWebServices;
 
 type

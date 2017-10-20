@@ -10,7 +10,11 @@ unit Facturacion.ProveedorAutorizadoCertificacion;
 interface
 
 uses Facturacion.Comprobante,
-     System.SysUtils;
+{$IF Compilerversion >= 22.0}
+	System.SysUtils;
+{$ELSE}
+	SysUtils;
+{$IFEND}
 
 type
 
