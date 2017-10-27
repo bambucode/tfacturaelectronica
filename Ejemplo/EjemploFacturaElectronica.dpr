@@ -15,7 +15,7 @@ program EjemploFacturaElectronica;
 // Incluimos el archivo de recurso .RC que contiene los XSLTs para generar las cadenas originales
 {$R *.dres}
 
-// Â¿Se quiere soporte para el Debugger FASTMM?
+// ¿Se quiere soporte para el Debugger FASTMM?
 {$IFDEF FASTMM}
   {$INCLUDE FastMM4Options.inc}
 {$ENDIF}
@@ -33,8 +33,8 @@ uses
   Facturacion.OpenSSL in '..\Facturacion.OpenSSL.pas',
   Facturacion.GeneradorSelloV33 in '..\Versiones\Facturacion.GeneradorSelloV33.pas',
   FinkOkWsTimbrado in '..\PACs\FinkOK\FinkOkWsTimbrado.pas',
-  Facturacion.PAC.SolucionFactible in '..\PACs\SolucionFactible\Facturacion.PAC.SolucionFactible.pas',
-  SolucionFactibleWsTimbrado in '..\PACs\SolucionFactible\SolucionFactibleWsTimbrado.pas',
+  //Facturacion.PAC.SolucionFactible in '..\PACs\SolucionFactible\Facturacion.PAC.SolucionFactible.pas',
+  //SolucionFactibleWsTimbrado in '..\PACs\SolucionFactible\SolucionFactibleWsTimbrado.pas',
   Facturacion.PAC.Ecodex in '..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas',
   Facturacion.ProveedorAutorizadoCertificacion in '..\Facturacion.ProveedorAutorizadoCertificacion.pas',
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
@@ -109,18 +109,17 @@ begin
          Para realizar pruebas con Edicom, se requiere una cuenta valida registrada en el PAC
 }
 
-// El primer sello es para Ecodex
+// Si usas Ecodex, utiliza el siguiente certificado
 
       rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer';
       rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.key';
 
-//Este sello se usa Para finkOk
+//Si usas FinkOK, utiliza el siguiente certificado
 {
       rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_LAN7008173R5.cer';
       rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_LAN7008173R5.key';
 }
       claveLlavePrivada := '12345678a';
-
 
       openSSL := TOpenSSL.Create;
       openSSL.AsignarLlavePrivada(rutaLlavePrivada,
@@ -281,7 +280,7 @@ begin
               Descuento         := TFacturacionHelper.ComoMoneda(0);
               Moneda            := 'MXN'; // De catÃ¡logo
               TipoCambio        := '1';//TFacturacionHelper.ComoMoneda(1);
-              Total             := TFacturacionHelper.ComoMoneda(117);
+              Total             := TFacturacionHelper.ComoMoneda(116);
               TipoDeComprobante := 'I'; // De catÃ¡logo
               MetodoPago        := 'PUE';
               LugarExpedicion   := '76030';
@@ -291,7 +290,7 @@ begin
               Emisor.RegimenFiscal := '601'; // De catÃ¡logo
 
               Receptor.Rfc         := 'MTI0806042N7';
-              Receptor.Nombre      := 'Juan & JosÃ© & ''NiÃ±o'' & "NiÃ±a"';
+              Receptor.Nombre      := 'Juan & José & ''Niño'' & "Niña"';
               Receptor.UsoCFDI     := 'G01';
 
               concepto33 := Conceptos.Add;
@@ -337,10 +336,10 @@ begin
           trasladosImpuestosLocalesv1.TasadeTraslado   := '0.01';
           trasladosImpuestosLocalesv1.Importe          := '1.00';
 
-          nuevaFactura.AgregarComplemento(impuestoLocalv1,
-                                              'implocal',
-                                              'http://www.sat.gob.mx/implocal',
-                                              'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
+          //nuevaFactura.AgregarComplemento(impuestoLocalv1,
+          //                                    'implocal',
+          //                                    'http://www.sat.gob.mx/implocal',
+          //                                    'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
           {$ENDREGION}
 
           //admonFacturas.GuardarArchivo(nuevaFactura,
@@ -428,7 +427,7 @@ begin
       generadorCBB.GenerarImagenCBB(nuevaFactura,
                                     ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.jpg');
 
-      Writeln('GeneraciÃ³n de CFDI v' + nuevaFactura.Version + ' exitoso.');
+      Writeln('Generación de CFDI v' + nuevaFactura.Version + ' exitoso.');
       Writeln;
       Writeln('Presiona cualquier tecla para salir...');
       Readln;
