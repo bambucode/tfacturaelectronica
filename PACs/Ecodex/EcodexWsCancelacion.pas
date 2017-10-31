@@ -523,21 +523,21 @@ type
     function  CancelaOtros(const parameters: TEcodexSolicitudCancelaOtros): TEcodexRespuestaCancelaOtros; stdcall;
   end;
 
-  function GetEcodexWSCancelacion(UseWSDL: Boolean=System.False; Addr: string=''; HTTPRIO: THTTPRIO = nil): IEcodexServicioCancelacion;
-  function GetUltimoXMLEnviadoEcodexWsCancelacion: string;
-  function GetUltimoXMLRecibidoEcodexWsCancelacion: string;
+  function GetWsEcodexCancelacion(UseWSDL: Boolean=System.False; Addr: string='';
+      HTTPRIO: THTTPRIO = nil): IEcodexServicioCancelacion;
+  //function GetUltimoXMLEnviadoEcodexWsCancelacion: string;
+  //function GetUltimoXMLRecibidoEcodexWsCancelacion: string;
 
 implementation
 
-uses SysUtils, uWSHelper, EcodexWsComun;
+uses SysUtils, EcodexWsComun;
 
-var
-  wsHelper: TWSHelper;
 
-function GetEcodexWSCancelacion(UseWSDL: Boolean; Addr: string; HTTPRIO: THTTPRIO): IEcodexServicioCancelacion;
+function GetWsEcodexCancelacion(UseWSDL: Boolean=System.False; Addr: string='';
+    HTTPRIO: THTTPRIO = nil): IEcodexServicioCancelacion;
 const
-  defWSDL = 'https://servicios.ecodex.com.mx:4043/ServicioCancelacion.svc?wsdl';
-  defURL  = 'https://servicios.ecodex.com.mx:4043/ServicioCancelacion.svc';
+  defWSDL = 'https://pruebas.ecodex.com.mx:2045/ServicioCancelacion.svc?wsdl';
+  defURL  = 'https://pruebas.ecodex.com.mx:2045/ServicioCancelacion.svc';
   defSvc  = 'IEcodexServicioCancelacion';
   defPrt  = 'PuertoCancelacionSeguro';
 var
@@ -558,8 +558,8 @@ begin
 
   // Configuramos uso de UTF8 (Probablemente solo para Delphi 2010 y menores)
   //RIO.HTTPWebNode.UseUTF8InHeader := True;
-  RIO.OnBeforeExecute := wsHelper.BeforeExecute;
-  RIO.OnAfterExecute := wsHelper.AfterExecute;
+  //RIO.OnBeforeExecute := wsHelper.BeforeExecute;
+  //RIO.OnAfterExecute := wsHelper.AfterExecute;
 
   try
     Result := (RIO as IEcodexServicioCancelacion);
@@ -576,6 +576,7 @@ begin
   end;
 end;
 
+{
 function GetUltimoXMLEnviadoEcodexWsCancelacion: string;
 begin
   Result := '';
@@ -591,6 +592,7 @@ begin
   if wsHelper <> nil then
     Result := wsHelper.UltimoXMLRecibido;
 end;
+    }
 
 procedure TEcodexListaResultadoCancelacion2.SetResultadoCancelacion2Array(Index: Integer; const Item: TEcodexResultadoCancelacion2);
 begin
@@ -1288,8 +1290,8 @@ initialization
   RemClassRegistry.RegisterXSClass(TEcodexFallaSesion2, 'http://Ecodex.WS.Model/2011/CFDI', 'FallaSesion2', 'FallaSesion');
   RemClassRegistry.RegisterXSClass(TEcodexFallaServicio2, 'http://Ecodex.WS.Model/2011/CFDI', 'FallaServicio2', 'FallaServicio');
 
-  wsHelper := TWSHelper.Create;
+  //wsHelper := TWSHelper.Create;
 finalization
-  if Assigned(wsHelper) then
-    wsHelper.Free;
+  //if Assigned(wsHelper) then
+  //  wsHelper.Free;
 end.

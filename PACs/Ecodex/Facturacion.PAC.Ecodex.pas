@@ -15,7 +15,9 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
   EcodexWsComun,
   EcodexWsTimbrado,
   EcodexWsClientes,
+  EcodexWsCancelacion,
   PAC.Ecodex.ManejadorDeSesion,
+  System.Generics.Collections,
   System.SysUtils;
 
 type
@@ -27,6 +29,7 @@ type
     fManejadorDeSesion: TEcodexManejadorDeSesion;
     fwsClientesEcodex: IEcodexServicioClientes;
     fwsTimbradoEcodex: IEcodexServicioTimbrado;
+    fwsCancelacionEcodex: IEcodexServicioCancelacion;
     function ExtraerNodoTimbre(const aComprobanteXML: TEcodexComprobanteXML)
       : TCadenaUTF8;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
@@ -35,15 +38,22 @@ type
       const aCredencialesPAC: TFacturacionCredencialesPAC;
       const aTransaccionInicial: Int64);
     function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;
+    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
+    function CancelarDocumentos(const aUUIDS: TListadoUUID):
+        TListadoCancelacionUUID;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
-      const aTransaccion: Int64): TCadenaUTF8;
+                              const aTransaccion: Int64): TCadenaUTF8;
   end;
+
+const
+  _LONGITUD_UUID = 36;
 
 implementation
 
 uses Classes,
   xmldom,
   Facturacion.Tipos,
+  Soap.XSBuiltIns,
   XMLIntf,
 {$IFDEF CODESITE}
   CodeSiteLogging,
@@ -74,6 +84,8 @@ begin
     '/ServicioTimbrado.svc');
   fwsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService +
     '/ServicioClientes.svc');
+  fwsCancelacionEcodex := GetWsEcodexCancelacion(False, fDominioWebService +
+    '/ServicioCancelacion.svc');
 end;
 
 function TProveedorEcodex.ExtraerNodoTimbre(const aComprobanteXML
@@ -220,6 +232,13 @@ begin
 
     if (aExcepcion Is EEcodexFallaServicioException) then
     begin
+      case EEcodexFallaServicioException(aExcepcion).Numero of
+        29: raise EPACCancelacionFallidaCertificadoNoCargadoException.Create(EEcodexFallaServicioException(aExcepcion).Descripcion,
+                                                                             0,
+                                                                             EEcodexFallaServicioException(aExcepcion).Numero,
+                                                                             False);  // NO es reintentable
+      end;
+
       mensajeExcepcion := 'EFallaServicioException (' +
         IntToStr(EEcodexFallaServicioException(aExcepcion).Numero) + ') ' +
         EEcodexFallaServicioException(aExcepcion).Descripcion;
@@ -258,11 +277,11 @@ begin
     tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
 
     // 3. Asignamos el documento XML
-    solicitudTimbrado.ComprobanteXML := TEcodexComprobanteXML.Create;
+    solicitudTimbrado.ComprobanteXML          := TEcodexComprobanteXML.Create;
     solicitudTimbrado.ComprobanteXML.DatosXML := aComprobante.Xml;
-    solicitudTimbrado.RFC := fCredencialesPAC.RFC;
-    solicitudTimbrado.Token := tokenDeUsuario;
-    solicitudTimbrado.TransaccionID := aTransaccion;
+    solicitudTimbrado.RFC                     := fCredencialesPAC.RFC;
+    solicitudTimbrado.Token                   := tokenDeUsuario;
+    solicitudTimbrado.TransaccionID           := aTransaccion;
 
     try
       mensajeFalla := '';
@@ -281,6 +300,110 @@ begin
       solicitudTimbrado.Free;
   end;
 
+end;
+
+function TProveedorEcodex.CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
+var
+  arregloUUIDs: TListadoUUID;
+  resultadoCancelacion : TListadoCancelacionUUID;
+  solicitudCancelacion: TEcodexSolicitudCancelacion;
+  respuestaCancelacion: TEcodexRespuestaCancelacion;
+  tokenDeUsuario : String;
+begin
+  Assert(Length(aUUID) = _LONGITUD_UUID, 'La longitud del UUID debio de ser de ' + IntToStr(_LONGITUD_UUID));
+  tokenDeUsuario                     := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
+
+  solicitudCancelacion               := TEcodexSolicitudCancelacion.Create;
+  try
+    solicitudCancelacion.RFC           := fCredencialesPAC.RFC;
+    solicitudCancelacion.Token         := tokenDeUsuario;
+    solicitudCancelacion.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+    solicitudCancelacion.UUID          := aUUID;
+
+    try
+      respuestaCancelacion := fwsTimbradoEcodex.CancelaTimbrado(solicitudCancelacion);
+      Result := respuestaCancelacion.Cancelada;
+      respuestaCancelacion.Free;
+    except
+      On E: Exception do
+        ProcesarExcepcionDePAC(E);
+    end;
+  finally
+    solicitudCancelacion.Free;
+  end;
+end;
+
+function TProveedorEcodex.CancelarDocumentos(const aUUIDS: TListadoUUID):
+    TListadoCancelacionUUID;
+var
+  solicitudCancelacion: TEcodexSolicitudCancelaMultiple;
+  respuestaCancelacion: TEcodexRespuestaCancelaMultiple;
+  tokenDeUsuario: string;
+  mensajeFalla: string;
+  uuidPorCancelar, estado: String;
+  I: Integer;
+  arregloGuids : Array_Of_guid;
+const
+  // Ref: Pagina 15 de "Guia de integracion Ecodex".
+  _CADENA_CANCELADO = 'Cancelado';
+begin
+  Assert(fwsCancelacionEcodex <> nil, 'La instancia fwsCancelacionEcodex no debio ser nula');
+
+  if fwsTimbradoEcodex = nil then
+    raise EPACNoConfiguradoException.Create
+      ('No se ha configurado el PAC, favor de configurar con metodo Configurar');
+
+  // 1. Creamos la solicitud de timbrado
+  solicitudCancelacion := TEcodexSolicitudCancelaMultiple.Create;
+  Result               := TDictionary<String, Boolean>.Create;
+
+  try
+    // 2. Iniciamos una nueva sesion solicitando un nuevo token
+    tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
+
+    // 3. Asignamos los parametros de cancelacion
+    SetLength(arregloGuids, Length(aUUIDS));
+    for I := 0 to Length(aUUIDS) - 1 do
+    begin
+      uuidPorCancelar := aUUIDS[I];
+      arregloGuids[I] := uuidPorCancelar;
+    end;
+
+    solicitudCancelacion.TEcodexListaCancelar := TEcodexListaCancelar2.Create;
+    solicitudCancelacion.TEcodexListaCancelar.guid := arregloGuids;
+    solicitudCancelacion.RFC := TXSString.Create;
+    solicitudCancelacion.RFC.XSToNative(fCredencialesPAC.RFC);
+
+    solicitudCancelacion.Token := TXSString.Create;
+    solicitudCancelacion.Token.XSToNative(tokenDeUsuario);
+
+    solicitudCancelacion.TransaccionID             := fManejadorDeSesion.NumeroDeTransaccion;
+
+    try
+      mensajeFalla := '';
+
+      // 4. Realizamos la solicitud de cancelacion
+      respuestaCancelacion := fwsCancelacionEcodex.CancelaMultiple(solicitudCancelacion);
+
+      // Convertir el array que regresa Ecodex al dictionary que
+      // estamos regresando
+      for I := 0 to Length(respuestaCancelacion.Resultado.TEcodexResultadoCancelacion) - 1 do
+      begin
+        estado := respuestaCancelacion.Resultado.TEcodexResultadoCancelacion[I].Estatus.NativeToXS;
+        Result.Add(respuestaCancelacion.Resultado.TEcodexResultadoCancelacion[I].UUID,
+                   estado = _CADENA_CANCELADO);
+      end;
+
+
+      respuestaCancelacion.Free;
+    except
+      On E: Exception do
+        ProcesarExcepcionDePAC(E);
+    end;
+  finally
+    if Assigned(solicitudCancelacion) then
+      solicitudCancelacion.Free;
+  end;
 end;
 
 end.
