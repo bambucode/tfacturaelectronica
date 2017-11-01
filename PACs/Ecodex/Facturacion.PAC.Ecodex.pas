@@ -33,6 +33,7 @@ type
     function ExtraerNodoTimbre(const aComprobanteXML: TEcodexComprobanteXML)
       : TCadenaUTF8;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
+    procedure ProcesarFallasEspecificasDeEcodex(const aExcepcion: Exception);
   public
     procedure Configurar(const aDominioWebService: string;
       const aCredencialesPAC: TFacturacionCredencialesPAC;
@@ -179,8 +180,8 @@ begin
   mensajeExcepcion := aExcepcion.Message;
 
   if (aExcepcion Is EEcodexFallaValidacionException) Or
-    (aExcepcion Is EEcodexFallaServicioException) Or
-    (aExcepcion is EEcodexFallaSesionException) then
+     (aExcepcion Is EEcodexFallaServicioException) Or
+     (aExcepcion is EEcodexFallaSesionException) then
   begin
     if (aExcepcion Is EEcodexFallaValidacionException) then
     begin
@@ -225,21 +226,18 @@ begin
           raise ESATNoIdentificadoException.Create(mensajeExcepcion,
             numeroErrorSAT, False);
       else
-        raise ESATErrorGenericoException.Create('EFallaValidacionException (' +
+        raise ESATErrorGenericoException.Create('ESATErrorGenericoException (' +
           IntToStr(EEcodexFallaValidacionException(aExcepcion).Numero) + ') ' +
           mensajeExcepcion, numeroErrorSAT, False);
       end;
     end;
 
+
+    ProcesarFallasEspecificasDeEcodex(aExcepcion);
+
+
     if (aExcepcion Is EEcodexFallaServicioException) then
     begin
-      case EEcodexFallaServicioException(aExcepcion).Numero of
-        29: raise EPACCancelacionFallidaCertificadoNoCargadoException.Create(EEcodexFallaServicioException(aExcepcion).Descripcion,
-                                                                             0,
-                                                                             EEcodexFallaServicioException(aExcepcion).Numero,
-                                                                             False);  // NO es reintentable
-      end;
-
       mensajeExcepcion := 'EFallaServicioException (' +
         IntToStr(EEcodexFallaServicioException(aExcepcion).Numero) + ') ' +
         EEcodexFallaServicioException(aExcepcion).Descripcion;
@@ -441,6 +439,68 @@ begin
     if Assigned(solicitudCancelacion) then
       solicitudCancelacion.Free;
   end;
+end;
+
+procedure TProveedorEcodex.ProcesarFallasEspecificasDeEcodex(const aExcepcion:
+    Exception);
+var
+  mensajeExcepcion: String;
+const
+  _ERROR_ECODEX_PREVIAMENTE_TIMBRADO      = '(96)';
+  _ECODEX_ACUSE_NO_ENCONTRADO             = 'Acuse de cancelacion del documento no encontrado';
+  _ECODEX_ALTA_EMISOR_CORREO_USADO        = '(97)';
+  _ECODEX_ALTA_EMISOR_REPETIDO            = '(98)';
+  _ECODEX_ALTA_EMISOR_RFC_INVALIDO        = '(890)';
+  _ECODEX_ALTA_EMISOR_CORREO_INVALIDO     = '(891)';
+  _ECODEX_SERVICIO_NO_DISPONIBLE          = 'Servicio no disponible';
+  _ECODEX_VERSION_NO_SOPORTADA            = 'El driver no soporta esta version de cfdi';
+  _ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA = 'El emisor ya se encuentra dado de alta con un integrador';
+
+  _ECODEX_ERROR_OBTENIENDO_ACUSE          = 33;
+  _NO_ENCONTRADO = 0;
+  _ERR_SIN_CERTIFICADO_CARGADO = 29;
+  _ERR_FUERA_DE_SERVICIO = 22;
+  _ERR_SIN_FOLIOS_DISPONIBLES = 800;
+begin
+  mensajeExcepcion := aExcepcion.Message;
+
+
+  if AnsiPos(_ECODEX_VERSION_NO_SOPORTADA, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EPACTimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
+                                                              mensajeExcepcion, 0, 0, False);
+
+  {$REGION 'Excepciones de alta de emisores'}
+
+  // TBD: https://github.com/bambucode/eleventa/issues/1721
+ { if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_USADO, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EEcodexAltaEmisorCorreoUsadoException.Create('El correo asignado ya está en uso por otro emisor.', 0, 97, False);
+
+  if AnsiPos(_ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA, mensajeExcepcion) > 0 then
+    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta con un integrador.', 0, 98, False);
+
+  if AnsiPos(_ECODEX_ALTA_EMISOR_REPETIDO, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta.', 0, 98, False);
+
+  if AnsiPos(_ECODEX_ALTA_EMISOR_RFC_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EEcodexAltaEmisorRFCInvalidoException.Create('El RFC del emisor no es válido.', 0, 890, False);
+
+  if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EEcodexAltaEmisorCorreoInvalidoException.Create('El correo del emisor no es válido.', 0, 891, False);        }
+
+  {$ENDREGION}
+
+  if (aExcepcion Is EEcodexFallaServicioException) then
+  begin
+    case EEcodexFallaServicioException(aExcepcion).Numero of
+      _ERR_FUERA_DE_SERVICIO        : raise EPACServicioNoDisponibleException.Create(mensajeExcepcion, 0, _ERR_FUERA_DE_SERVICIO, True);
+      _ERR_SIN_CERTIFICADO_CARGADO  : raise EPACCancelacionFallidaCertificadoNoCargadoException.Create(EEcodexFallaServicioException(aExcepcion).Descripcion,
+                                                                           0,
+                                                                           EEcodexFallaServicioException(aExcepcion).Numero,
+                                                                           False);  // NO es reintentable, al menos inmediatamente
+      _ERR_SIN_FOLIOS_DISPONIBLES   : raise EPACTimbradoSinFoliosDisponiblesException.Create(mensajeExcepcion, 0, _ERR_SIN_FOLIOS_DISPONIBLES, True);
+    end;
+  end;
+
 end;
 
 end.
