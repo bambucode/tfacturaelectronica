@@ -1,4 +1,4 @@
-{*******************************************************}
+ï»¿{*******************************************************}
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
@@ -17,7 +17,7 @@ uses Facturacion.Comprobante,
 type
 
   TListadoUUID = Array of string;
-  // NOTA: Aqui se deberá cambiar el TDictionary por otro codigo para versiones de
+  // NOTA: Aqui se deberÃ¡ cambiar el TDictionary por otro codigo para versiones de
   // Delphi anteriores
   TListadoCancelacionUUID = TDictionary<String, Boolean>;
 
@@ -49,7 +49,7 @@ type
   {$REGION 'Documentation'}
   ///	<summary>
   ///	  Este tipo de excepcion se lanza cuando se detecta una falla con el
-  ///	  internet del usuario el cual es un problema de comunicación con el PAC.
+  ///	  internet del usuario el cual es un problema de comunicaciï¿½n con el PAC.
   ///	</summary>
   {$ENDREGION}
   EPACProblemaConInternetException = class(EPACException);
@@ -62,7 +62,7 @@ type
   ///	</summary>
   ///	<remarks>
   ///	  <note type="important">
-  ///	    Por defecto se establece que esta excepción es "re-intentable" para
+  ///	    Por defecto se establece que esta excepciï¿½n es "re-intentable" para
   ///	    indicarle al cliente que debe de re-intentar realizar el ultimo proceso
   ///	  </note>
   ///	</remarks>
@@ -82,6 +82,7 @@ type
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
                               const aTransaccion: Int64) : TCadenaUTF8;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
+    function ObtenerAcuseDeCancelacion(const aUUID: string): string;
   end;
 
 implementation

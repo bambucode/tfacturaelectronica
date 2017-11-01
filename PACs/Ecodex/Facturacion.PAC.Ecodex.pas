@@ -42,7 +42,8 @@ type
     function CancelarDocumentos(const aUUIDS: TListadoUUID):
         TListadoCancelacionUUID;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
-                              const aTransaccion: Int64): TCadenaUTF8;
+      const aTransaccion: Int64): TCadenaUTF8;
+    function ObtenerAcuseDeCancelacion(const aUUID: string): string;
   end;
 
 const
@@ -330,6 +331,42 @@ begin
     end;
   finally
     solicitudCancelacion.Free;
+  end;
+end;
+
+function TProveedorEcodex.ObtenerAcuseDeCancelacion(const aUUID: string):
+    string;
+var
+  tokenDeUsuario: String;
+  solicitudAcuse : TEcodexSolicitudAcuse;
+  respuestaAcuse : TEcodexRespuestaRecuperarAcuse;
+begin
+  Assert(Length(aUUID) = _LONGITUD_UUID, 'La longitud del UUID debio de ser de ' + IntToStr(_LONGITUD_UUID));
+  Result := '';
+
+  // 1. Creamos la solicitud de cancelacion
+  solicitudAcuse := TEcodexSolicitudAcuse.Create;
+
+  // 2. Iniciamos una nueva sesion solicitando un nuevo token
+  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+
+  try
+    try
+      solicitudAcuse.UUID          := aUUID;
+      solicitudAcuse.RFC           := fCredencialesPAC.RFC;
+      solicitudAcuse.Token         := tokenDeUsuario;
+      solicitudAcuse.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+
+      respuestaAcuse := fwsCancelacionEcodex.RecuperarAcuses(solicitudAcuse);
+      Result := respuestaAcuse.AcuseXML;
+      respuestaAcuse.Free;
+    except
+      On E:Exception do
+        ProcesarExcepcionDePAC(E);
+    end;
+  finally
+    if Assigned(solicitudAcuse) then
+      solicitudAcuse.Free;
   end;
 end;
 
