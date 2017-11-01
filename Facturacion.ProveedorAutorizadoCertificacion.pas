@@ -10,37 +10,31 @@ unit Facturacion.ProveedorAutorizadoCertificacion;
 interface
 
 uses Facturacion.Comprobante,
+     System.Generics.Collections,
+     Facturacion.Tipos,
      System.SysUtils;
 
 type
 
+  TListadoUUID = Array of string;
+  // NOTA: Aqui se deberá cambiar el TDictionary por otro codigo para versiones de
+  // Delphi anteriores
+  TListadoCancelacionUUID = TDictionary<String, Boolean>;
+
   EPACNoConfiguradoException = class(Exception);
 
-  {$REGION 'Documentation'}
-  ///	<summary>
-  ///	  <para>
-  ///	    Excepcion heredable que tiene la propiedad Reintentable para saber si
-  ///	    dicha falla es temporal y el programa cliente debe de re-intentar la
-  ///	    última petición.
-  ///	  </para>
-  ///	  <para>
-  ///	    Si su valor es Falso es debido a que la falla está del lado del cliente
-  ///	    y el PAC no puede procesar dicha petición (XML incorrecto, Sello mal
-  ///	    generado, etc.)
-  ///	  </para>
-  ///	</summary>
-  {$ENDREGION}
-  EPACException = class(Exception)
+  EPACException = class(ECFDIException)
   private
     fCodigoErrorSAT: Integer;
     fCodigoErrorPAC: Integer;
-    fReintentable : Boolean;
   public
-    constructor Create(const aMensajeExcepcion: String; const aCodigoErrorSAT:
-        Integer; const aCodigoErrorPAC: Integer; const aReintentable: Boolean);
+    constructor Create(const aMensajeExcepcion: String;
+                       const aCodigoErrorSAT: Integer;
+                       const aCodigoErrorPAC: Integer;
+                       const aReintentable: Boolean);
+
     property CodigoErrorSAT: Integer read fCodigoErrorSAT;
     property CodigoErrrorPAC: Integer read fCodigoErrorPAC;
-    property Reintentable : Boolean read fReintentable;
   end;
 
   EPACServicioNoDisponibleException = class(EPACException);
@@ -75,11 +69,16 @@ type
   {$ENDREGION}
   EPACErrorGenericoException = class(EPACException);
 
+
+  EPACCancelacionFallidaCertificadoNoCargadoException = class(EPACErrorGenericoException);
+
   IProveedorAutorizadoCertificacion = interface
     ['{BB3456F4-277A-46B7-B2BC-A430E35130E8}']
     procedure Configurar(const aDominioWebService: string;
                          const aCredencialesPAC: TFacturacionCredencialesPAC;
                          const aTransaccionInicial: Int64);
+    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
+    function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
                               const aTransaccion: Int64) : TCadenaUTF8;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
@@ -90,8 +89,7 @@ implementation
 constructor EPACException.Create(const aMensajeExcepcion: String; const
     aCodigoErrorSAT: Integer; const aCodigoErrorPAC : Integer; const aReintentable: Boolean);
 begin
-  inherited Create(aMensajeExcepcion);
-  fReintentable := aReintentable;
+  inherited Create(aMensajeExcepcion, aReintentable);
   fCodigoErrorSAT := aCodigoErrorSAT;
   fCodigoErrorPAC := aCodigoErrorPAC;
 end;

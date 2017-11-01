@@ -6,16 +6,36 @@ uses System.SysUtils;
 
 type
 
+  {$REGION 'Documentation'}
+  ///	<summary>
+  ///	  <para>
+  ///	    Excepcion heredable que tiene la propiedad Reintentable para saber si
+  ///	    dicha falla es temporal y el programa cliente debe de re-intentar la
+  ///	    última petición.
+  ///	  </para>
+  ///	  <para>
+  ///	    Si su valor es Falso es debido a que la falla está del lado del cliente
+  ///	    y el PAC no puede procesar dicha petición (XML incorrecto, Sello mal
+  ///	    generado, etc.)
+  ///	  </para>
+  ///	</summary>
+  {$ENDREGION}
+  ECFDIException = class(Exception)
+  protected
+    fReintentable : Boolean;
+  public
+    constructor Create(const aMensaje: string; const aReintentable: Boolean);
+    property Reintentable : Boolean read fReintentable default false;
+  end;
+
 {$REGION 'Excepciones de validacion de la matriz de validaciones de CFDI 3.3'}
-  ESATErrorGenericoException = class(Exception)
+  ESATErrorGenericoException = class(ECFDIException)
   private
     fCodigoError: Integer;
-    fReintentable: Boolean;
   public
     constructor Create(const aMensajeExcepcion: String;
       const aCodigoError: Integer; const aReintentable: Boolean);
     property CodigoError: Integer read fCodigoError;
-    property Reintentable: Boolean read fReintentable default false;
   end;
 
 
@@ -50,9 +70,14 @@ implementation
 constructor ESATErrorGenericoException.Create(const aMensajeExcepcion: String;
   const aCodigoError: Integer; const aReintentable: Boolean);
 begin
-  inherited Create(aMensajeExcepcion);
-  fReintentable := aReintentable;
+  inherited Create(aMensajeExcepcion, aReintentable);
   fCodigoError := aCodigoError;
+end;
+
+constructor ECFDIException.Create(const aMensaje: string; const aReintentable: Boolean);
+begin
+  inherited Create(aMensaje);
+  fReintentable := aReintentable;
 end;
 
 end.
