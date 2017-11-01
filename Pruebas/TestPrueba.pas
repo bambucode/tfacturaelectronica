@@ -63,7 +63,7 @@ begin
 
    // Asumimos que se va a ejecutar en subdirectorio Release\Win32 de la carpeta
    // donde se guarda el proyecto
-   fRutaFixtures:=fRutaEXE + '\fixtures\';
+   fRutaFixtures := fRutaEXE + 'fixtures\';
 end;
 
 function TTestPrueba.QuitarRetornos(sCad: WideString): WideString;
@@ -125,7 +125,7 @@ end;
 
 function TTestPrueba.leerContenidoDeFixture(sNombreFixture: String): WideString;
 begin
-  Result:=leerContenidoDeArchivo(fRutaFixtures + sNombreFixture);
+  Result := leerContenidoDeArchivo(fRutaFixtures + sNombreFixture);
 end;
 
 procedure TTestPrueba.guardarContenido(sContenido: Widestring; sArchivo: String);
