@@ -83,6 +83,7 @@ type
                               const aTransaccion: Int64) : TCadenaUTF8;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
     function ObtenerAcuseDeCancelacion(const aUUID: string): string;
+    function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string;
   end;
 
 implementation

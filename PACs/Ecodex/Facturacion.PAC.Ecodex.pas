@@ -25,6 +25,7 @@ type
   TProveedorEcodex = class(TInterfacedObject, IProveedorAutorizadoCertificacion)
   private
     fCredencialesPAC: TFacturacionCredencialesPAC;
+    fCredencialesIntegrador: TFacturacionCredencialesPAC;
     fDominioWebService: string;
     fManejadorDeSesion: TEcodexManejadorDeSesion;
     fwsClientesEcodex: IEcodexServicioClientes;
@@ -45,6 +46,7 @@ type
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
       const aTransaccion: Int64): TCadenaUTF8;
     function ObtenerAcuseDeCancelacion(const aUUID: string): string;
+    function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string;
   end;
 
 const
@@ -297,6 +299,75 @@ begin
   finally
     if Assigned(solicitudTimbrado) then
       solicitudTimbrado.Free;
+  end;
+
+end;
+
+function TProveedorEcodex.AgregarCliente(const aRFC, aRazonSocial, aCorreo:
+    String): string;
+var
+  nuevoEmisor : TEcodexNuevoEmisor;
+  solicitudRegistroCliente : TEcodexSolicitudRegistroCliente;
+  respuestaRegistroCliente: TEcodexRespuestaRegistro;
+  tokenDeAltaDeEmisores : String;
+const
+  // Segun documento "Guia de integracion con Ecodex_v2.0.1.pdf"
+  _CADENA_ALTA_EXITOSA = 'Activo';
+begin
+  Assert(fManejadorDeSesion <> nil, 'El manejador de sesion de Ecodex es nulo');
+  Assert(fWsClientesEcodex <> nil, 'La referencia al servicio de Ecodex de clientes fue nula');
+  Assert(fCredencialesIntegrador.RFC <> '', 'El RFC del integrador estuvo vacio');
+  Assert(aRFC <> '', 'El RFC del nuevo emisor estuvo vacio');
+  Assert(aRazonSocial <> '', 'La razon social del nuevo emisor estuvo vacia');
+
+  solicitudRegistroCliente := TEcodexSolicitudRegistroCliente.Create;
+  try
+    try
+      // Mandamos los dos IDs del integrador y el ID de alta de emisores
+      tokenDeAltaDeEmisores := fManejadorDeSesion.ObtenerNuevoTokenAltaEmisores(fCredencialesIntegrador.RFC,
+                                                                                fCredencialesPAC.DistribuidorID,
+                                                                                fCredencialesIntegrador.DistribuidorID);
+
+      // Creamos el objeto Emisor que enviaremos
+      nuevoEmisor := TEcodexNuevoEmisor.Create;
+      // Al convertir el RFC a mayusculas nos evitamos errores de validación del WebService de Ecodex
+      nuevoEmisor.RFC                        := UpperCase(aRFC);
+      nuevoEmisor.RazonSocial                := aRazonSocial;
+      // Al convertir el correo a minúsculas nos evitamos errores de validación del WebService de Ecodex
+      nuevoEmisor.CorreoElectronico          := LowerCase(aCorreo);
+
+      // Creamos la solicitud de registro de emisor
+      solicitudRegistroCliente.Token         := tokenDeAltaDeEmisores;
+      solicitudRegistroCliente.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+      solicitudRegistroCliente.Emisor        := nuevoEmisor;
+      solicitudRegistroCliente.RfcIntegrador := fCredencialesIntegrador.RFC;
+
+      // Mandamos registrar al emisor
+      respuestaRegistroCliente := fWsClientesEcodex.Registrar(solicitudRegistroCliente);
+
+      Assert(respuestaRegistroCliente.Respuesta <> nil, 'La respuesta de registro de emisor fue nula!');
+
+      {$IFDEF CODESITE}
+      CodeSite.Send('Respuesta registro emisor', respuestaRegistroCliente.Respuesta.Estatus);
+      CodeSite.Send('Clave certificado', respuestaRegistroCliente.Respuesta.ClaveCertificado);
+      {$ENDIF}
+
+      // Si fue exitosa regresamos el token para la alta de certificados
+      Result := respuestaRegistroCliente.Respuesta.ClaveCertificado;
+      respuestaRegistroCliente.Free;
+    except
+      // Si ocurrio cualquier error procesamos la excepcion
+      On E:Exception do
+        if Not (E Is EPACException) then
+          ProcesarExcepcionDePAC(E)
+        else
+          raise;
+    end;
+  finally
+    //fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsClientes;
+    //fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsClientes;
+    if Assigned(solicitudRegistroCliente) then
+      solicitudRegistroCliente.Free;
   end;
 
 end;
