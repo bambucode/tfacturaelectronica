@@ -36,9 +36,9 @@ type
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
     procedure ProcesarFallasEspecificasDeEcodex(const aExcepcion: Exception);
   public
-    procedure Configurar(const aDominioWebService: string;
-      const aCredencialesPAC: TFacturacionCredencialesPAC;
-      const aTransaccionInicial: Int64);
+    procedure Configurar(const aDominioWebService: string; const aCredencialesPAC,
+        aCredencialesIntegrador: TFacturacionCredencialesPAC; const
+        aTransaccionInicial: Int64);
     function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;
     function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
     function CancelarDocumentos(const aUUIDS: TListadoUUID):
@@ -72,12 +72,13 @@ uses Classes,
 
 { TProveedorEcodex }
 
-procedure TProveedorEcodex.Configurar(const aDominioWebService: string;
-  const aCredencialesPAC: TFacturacionCredencialesPAC;
-  const aTransaccionInicial: Int64);
+procedure TProveedorEcodex.Configurar(const aDominioWebService: string; const
+    aCredencialesPAC, aCredencialesIntegrador: TFacturacionCredencialesPAC;
+    const aTransaccionInicial: Int64);
 begin
-  fDominioWebService := aDominioWebService;
-  fCredencialesPAC := aCredencialesPAC;
+  fDominioWebService      := aDominioWebService;
+  fCredencialesPAC        := aCredencialesPAC;
+  fCredencialesIntegrador := aCredencialesIntegrador;
 
   fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService,
     aTransaccionInicial);
@@ -193,6 +194,11 @@ begin
       numeroErrorSAT := EEcodexFallaValidacionException(aExcepcion).Numero;
 
       case numeroErrorSAT of
+        0..32999:
+        begin
+          // Estos son errores que no son del SAT, asumimos son del PAC:
+          ProcesarFallasEspecificasDeEcodex(aExcepcion);
+        end;
         // Errores técnicos donde la librería no creo bien el XML
         33101, 33102, 33105, 33106, 33111, 33116, 33126, 33127, 33128,
           33139, 33143, 33150:
@@ -528,10 +534,14 @@ const
   _ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA = 'El emisor ya se encuentra dado de alta con un integrador';
 
   _ECODEX_ERROR_OBTENIENDO_ACUSE          = 33;
+
   _NO_ENCONTRADO = 0;
   _ERR_SIN_CERTIFICADO_CARGADO = 29;
   _ERR_FUERA_DE_SERVICIO = 22;
   _ERR_SIN_FOLIOS_DISPONIBLES = 800;
+
+  // Errores exclusivos de la alta
+  _ERR_EMISOR_EXISTENTE                   = 98;
 begin
   mensajeExcepcion := aExcepcion.Message;
 
@@ -541,6 +551,13 @@ begin
                                                               mensajeExcepcion, 0, 0, False);
 
   {$REGION 'Excepciones de alta de emisores'}
+
+  if (aExcepcion Is EEcodexFallaValidacionException) then
+  begin
+    case EEcodexFallaValidacionException(aExcepcion).Numero of
+      _ERR_EMISOR_EXISTENTE : raise EPACEmisorYaExistenteException.Create(mensajeExcepcion, 0, _ERR_EMISOR_EXISTENTE, True);
+    end;
+  end;
 
   // TBD: https://github.com/bambucode/eleventa/issues/1721
  { if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_USADO, mensajeExcepcion) > _NO_ENCONTRADO then

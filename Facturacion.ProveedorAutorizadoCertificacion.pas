@@ -72,11 +72,13 @@ type
 
   EPACCancelacionFallidaCertificadoNoCargadoException = class(EPACErrorGenericoException);
 
+  EPACEmisorYaExistenteException  = class(EPACErrorGenericoException);
+
   IProveedorAutorizadoCertificacion = interface
     ['{BB3456F4-277A-46B7-B2BC-A430E35130E8}']
-    procedure Configurar(const aDominioWebService: string;
-                         const aCredencialesPAC: TFacturacionCredencialesPAC;
-                         const aTransaccionInicial: Int64);
+    procedure Configurar(const aDominioWebService: string; const aCredencialesPAC,
+        aCredencialesIntegrador: TFacturacionCredencialesPAC; const
+        aTransaccionInicial: Int64);
     function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
