@@ -73,6 +73,7 @@ type
   EPACCancelacionFallidaCertificadoNoCargadoException = class(EPACErrorGenericoException);
 
   EPACEmisorYaExistenteException  = class(EPACErrorGenericoException);
+  EPACTimbradoPreviamenteException = class(EPACErrorGenericoException);
 
   IProveedorAutorizadoCertificacion = interface
     ['{BB3456F4-277A-46B7-B2BC-A430E35130E8}']
@@ -86,6 +87,7 @@ type
     function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
     function ObtenerAcuseDeCancelacion(const aUUID: string): string;
     function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string;
+    function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8;
   end;
 
 implementation

@@ -35,6 +35,8 @@ type
       : TCadenaUTF8;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
     procedure ProcesarFallasEspecificasDeEcodex(const aExcepcion: Exception);
+    function TimbrarDocumentoPrimeraVez(const aComprobante : IComprobanteFiscal;
+                                        const aTransaccion: Int64): TCadenaUTF8;
   public
     procedure Configurar(const aDominioWebService: string; const aCredencialesPAC,
         aCredencialesIntegrador: TFacturacionCredencialesPAC; const
@@ -43,10 +45,11 @@ type
     function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
     function CancelarDocumentos(const aUUIDS: TListadoUUID):
         TListadoCancelacionUUID;
-    function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
-      const aTransaccion: Int64): TCadenaUTF8;
+    function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
+        aIdTransaccionAUsar: Int64): TCadenaUTF8;
     function ObtenerAcuseDeCancelacion(const aUUID: string): string;
     function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string;
+    function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8;
   end;
 
 const
@@ -111,6 +114,7 @@ begin
   Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
   Assert(Result <> '', 'El XML del timbre estuvo vacio');
 end;
+
 
 function TProveedorEcodex.ObtenerSaldoTimbresDeCliente
   (const aRFC: String): Integer;
@@ -264,7 +268,7 @@ begin
   end;
 end;
 
-function TProveedorEcodex.TimbrarDocumento(const aComprobante
+function TProveedorEcodex.TimbrarDocumentoPrimeraVez(const aComprobante
   : IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8;
 var
   solicitudTimbrado: TSolicitudTimbradoEcodex;
@@ -307,6 +311,92 @@ begin
       solicitudTimbrado.Free;
   end;
 
+end;
+
+function TProveedorEcodex.TimbrarDocumento(const aComprobante: IComprobanteFiscal; const aIdTransaccionAUsar: Int64): TCadenaUTF8;
+var
+  documentoTimbradoPreviamente : Boolean;
+const
+  _ECODEX_DOCUMENTO_TIMBRADO_NO_ENCONTRADO = 'EFallaValidacionException (505)';
+begin
+  documentoTimbradoPreviamente := False;
+
+  try
+    try
+      Result := TimbrarDocumentoPrimeraVez(aComprobante, aIdTransaccionAUsar);
+    except
+      // Si es una falla de timbrado previo, la evitamos lanzar, cualquier otra falla la re-lanzamos
+      On E:EPACTimbradoPreviamenteException do
+        documentoTimbradoPreviamente := True
+      else
+        raise;
+    end;
+  finally
+    //fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+    //fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
+  end;
+
+  try
+    // Si hubo una falla porque ya habiamos timbrado el documento previamente, tratamos de obtener
+    // el timbre previo
+    if documentoTimbradoPreviamente then
+    begin
+      try
+        Result := ObtenerTimbrePrevio(aIdTransaccionAUsar);
+      except
+        On E:Exception do
+        begin
+          // Como fallamos al obtener el timbre previo re-lanzamos la excepcion de timbrado previamente
+          if AnsiPos(_ECODEX_DOCUMENTO_TIMBRADO_NO_ENCONTRADO, E.Message) > 0 then
+             raise EPACTimbradoPreviamenteException.Create(E.Message, 0, 505, False)
+          else
+            raise;
+        end;
+      end;
+    end;
+  finally
+    //fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+    //fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
+  end;
+end;
+
+function TProveedorEcodex.ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8;
+var
+  solicitudObtenerTimbre: TEcodexSolicitudObtenerTimbrado;
+  respuestaObtenerTimbre: TEcodexRespuestaObtenerTimbrado;
+  tokenDeUsuario: string;
+begin
+  Assert(fWsTimbradoEcodex <> nil, 'La instancia fWsTimbradoEcodex no debio ser nula');
+  // 1. Creamos la solicitud de obtener timbrado
+  solicitudObtenerTimbre := TEcodexSolicitudObtenerTimbrado.Create;
+
+  // 2. Generamos un nuevo token para esta peticion
+  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+
+  try
+    //4. Asignamos los datos de la solicitud usando el ultimo token y transaccion usada
+    solicitudObtenerTimbre.TransaccionOriginal := aIdTransaccionOriginal;
+    solicitudObtenerTimbre.RFC                 := fCredencialesPAC.RFC;
+    solicitudObtenerTimbre.Token               := tokenDeUsuario;
+    solicitudObtenerTimbre.TransaccionID       := fManejadorDeSesion.NumeroDeTransaccion;
+
+
+    try
+      // 5. Realizamos la solicitud de timbre previo
+      respuestaObtenerTimbre := fWsTimbradoEcodex.ObtenerTimbrado(solicitudObtenerTimbre);
+
+      // 5. Extraemos las propiedades del timbre de la respuesta del WebService
+      Result := ExtraerNodoTimbre(respuestaObtenerTimbre.ComprobanteXML);
+
+      respuestaObtenerTimbre.Free;
+    except
+      On E:Exception do
+        ProcesarExcepcionDePAC(E);
+    end;
+  finally
+    if Assigned(solicitudObtenerTimbre) then
+      solicitudObtenerTimbre.Free;
+  end;
 end;
 
 function TProveedorEcodex.AgregarCliente(const aRFC, aRazonSocial, aCorreo:
@@ -523,7 +613,6 @@ procedure TProveedorEcodex.ProcesarFallasEspecificasDeEcodex(const aExcepcion:
 var
   mensajeExcepcion: String;
 const
-  _ERROR_ECODEX_PREVIAMENTE_TIMBRADO      = '(96)';
   _ECODEX_ACUSE_NO_ENCONTRADO             = 'Acuse de cancelacion del documento no encontrado';
   _ECODEX_ALTA_EMISOR_CORREO_USADO        = '(97)';
   _ECODEX_ALTA_EMISOR_REPETIDO            = '(98)';
@@ -542,6 +631,7 @@ const
 
   // Errores exclusivos de la alta
   _ERR_EMISOR_EXISTENTE                   = 98;
+  _ERR_TIMBRADO_PREVIAMENTE               = 96;
 begin
   mensajeExcepcion := aExcepcion.Message;
 
@@ -556,6 +646,7 @@ begin
   begin
     case EEcodexFallaValidacionException(aExcepcion).Numero of
       _ERR_EMISOR_EXISTENTE : raise EPACEmisorYaExistenteException.Create(mensajeExcepcion, 0, _ERR_EMISOR_EXISTENTE, True);
+       _ERR_TIMBRADO_PREVIAMENTE : raise EPACTimbradoPreviamenteException.Create(mensajeExcepcion, 0, _ERR_TIMBRADO_PREVIAMENTE, True);
     end;
   end;
 
