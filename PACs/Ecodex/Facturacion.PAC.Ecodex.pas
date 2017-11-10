@@ -632,9 +632,9 @@ const
   // Errores exclusivos de la alta
   _ERR_EMISOR_EXISTENTE                   = 98;
   _ERR_TIMBRADO_PREVIAMENTE               = 96;
+  _ERR_UUID_NO_ENCONTRADO                 = 505;
 begin
   mensajeExcepcion := aExcepcion.Message;
-
 
   if AnsiPos(_ECODEX_VERSION_NO_SOPORTADA, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EPACTimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
@@ -646,7 +646,8 @@ begin
   begin
     case EEcodexFallaValidacionException(aExcepcion).Numero of
       _ERR_EMISOR_EXISTENTE : raise EPACEmisorYaExistenteException.Create(mensajeExcepcion, 0, _ERR_EMISOR_EXISTENTE, True);
-       _ERR_TIMBRADO_PREVIAMENTE : raise EPACTimbradoPreviamenteException.Create(mensajeExcepcion, 0, _ERR_TIMBRADO_PREVIAMENTE, True);
+      _ERR_TIMBRADO_PREVIAMENTE : raise EPACTimbradoPreviamenteException.Create(mensajeExcepcion, 0, _ERR_TIMBRADO_PREVIAMENTE, True);
+      _ERR_UUID_NO_ENCONTRADO       : raise EPACDocumentoNoEncontradoException.Create(mensajeExcepcion, 0, _ERR_UUID_NO_ENCONTRADO, True);
     end;
   end;
 

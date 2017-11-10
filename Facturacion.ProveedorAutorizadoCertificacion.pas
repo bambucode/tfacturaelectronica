@@ -69,7 +69,7 @@ type
   {$ENDREGION}
   EPACErrorGenericoException = class(EPACException);
 
-
+  EPACDocumentoNoEncontradoException = class(EPACException);
   EPACCancelacionFallidaCertificadoNoCargadoException = class(EPACErrorGenericoException);
 
   EPACEmisorYaExistenteException  = class(EPACErrorGenericoException);
