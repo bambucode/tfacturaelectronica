@@ -38,6 +38,7 @@ type
     function TimbrarDocumentoPrimeraVez(const aComprobante : IComprobanteFiscal;
                                         const aTransaccion: Int64): TCadenaUTF8;
   public
+    procedure AfterConstruction; override;
     procedure Configurar(const aDominioWebService: string; const aCredencialesPAC,
         aCredencialesIntegrador: TFacturacionCredencialesPAC; const
         aTransaccionInicial: Int64);
@@ -73,12 +74,21 @@ uses Classes,
 {$IFEND}
   XMLDoc;
 
+procedure TProveedorEcodex.AfterConstruction;
+begin
+  inherited;
+  {$IFDEF CODESITE}
+  CodeSite.Send('Se creo instancia de PAC Ecodex');
+  {$ENDIF}
+end;
+
 { TProveedorEcodex }
 
 procedure TProveedorEcodex.Configurar(const aDominioWebService: string; const
     aCredencialesPAC, aCredencialesIntegrador: TFacturacionCredencialesPAC;
     const aTransaccionInicial: Int64);
 begin
+  Assert(aDominioWebService <> '', 'La instancia aDominioWebService no debio ser vacia');
   fDominioWebService      := aDominioWebService;
   fCredencialesPAC        := aCredencialesPAC;
   fCredencialesIntegrador := aCredencialesIntegrador;
@@ -124,6 +134,7 @@ var
   tokenDeUsuario: string;
   I: Integer;
 begin
+  Assert(fDominioWebService <> '', 'EL dominio no puede estar vacio');
   Assert(Trim(aRFC) <> '', 'El RFC para la solicitud de saldo fue vacio');
   Assert(fManejadorDeSesion <> nil,
     'La instancia fManejadorDeSesion no debio ser nula');
