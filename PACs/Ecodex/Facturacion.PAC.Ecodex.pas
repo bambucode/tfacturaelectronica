@@ -637,7 +637,8 @@ const
 
   _NO_ENCONTRADO = 0;
   _ERR_SIN_CERTIFICADO_CARGADO = 29;
-  _ERR_FUERA_DE_SERVICIO = 22;
+  _ERR_FUERA_DE_SERVICIO2 = 18;
+  _ERR_FUERA_DE_SERVICIO  = 22;
   _ERR_SIN_FOLIOS_DISPONIBLES = 800;
 
   // Errores exclusivos de la alta
@@ -651,14 +652,13 @@ begin
     raise EPACTimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
                                                               mensajeExcepcion, 0, 0, False);
 
-  {$REGION 'Excepciones de alta de emisores'}
 
   if (aExcepcion Is EEcodexFallaValidacionException) then
   begin
     case EEcodexFallaValidacionException(aExcepcion).Numero of
-      _ERR_EMISOR_EXISTENTE : raise EPACEmisorYaExistenteException.Create(mensajeExcepcion, 0, _ERR_EMISOR_EXISTENTE, True);
+      _ERR_EMISOR_EXISTENTE     : raise EPACEmisorYaExistenteException.Create(mensajeExcepcion, 0, _ERR_EMISOR_EXISTENTE, True);
       _ERR_TIMBRADO_PREVIAMENTE : raise EPACTimbradoPreviamenteException.Create(mensajeExcepcion, 0, _ERR_TIMBRADO_PREVIAMENTE, True);
-      _ERR_UUID_NO_ENCONTRADO       : raise EPACDocumentoNoEncontradoException.Create(mensajeExcepcion, 0, _ERR_UUID_NO_ENCONTRADO, True);
+      _ERR_UUID_NO_ENCONTRADO   : raise EPACDocumentoNoEncontradoException.Create(mensajeExcepcion, 0, _ERR_UUID_NO_ENCONTRADO, True);
     end;
   end;
 
@@ -678,12 +678,12 @@ begin
   if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EEcodexAltaEmisorCorreoInvalidoException.Create('El correo del emisor no es válido.', 0, 891, False);        }
 
-  {$ENDREGION}
 
   if (aExcepcion Is EEcodexFallaServicioException) then
   begin
     case EEcodexFallaServicioException(aExcepcion).Numero of
-      _ERR_FUERA_DE_SERVICIO        : raise EPACServicioNoDisponibleException.Create(mensajeExcepcion, 0, _ERR_FUERA_DE_SERVICIO, True);
+      _ERR_FUERA_DE_SERVICIO, _ERR_FUERA_DE_SERVICIO2
+                                    : raise EPACServicioNoDisponibleException.Create(mensajeExcepcion, 0, _ERR_FUERA_DE_SERVICIO, True);
       _ERR_SIN_CERTIFICADO_CARGADO  : raise EPACCancelacionFallidaCertificadoNoCargadoException.Create(EEcodexFallaServicioException(aExcepcion).Descripcion,
                                                                            0,
                                                                            EEcodexFallaServicioException(aExcepcion).Numero,
