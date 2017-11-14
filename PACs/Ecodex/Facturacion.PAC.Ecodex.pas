@@ -654,6 +654,7 @@ const
   _ERR_EMISOR_EXISTENTE                   = 98;
   _ERR_TIMBRADO_PREVIAMENTE               = 96;
   _ERR_UUID_NO_ENCONTRADO                 = 505;
+  _ERR_XML_MAL_FORMADO                    = 301;
 begin
   mensajeExcepcion := aExcepcion.Message;
 
@@ -668,6 +669,7 @@ begin
       _ERR_EMISOR_EXISTENTE     : raise EPACEmisorYaExistenteException.Create(mensajeExcepcion, 0, _ERR_EMISOR_EXISTENTE, True);
       _ERR_TIMBRADO_PREVIAMENTE : raise EPACTimbradoPreviamenteException.Create(mensajeExcepcion, 0, _ERR_TIMBRADO_PREVIAMENTE, True);
       _ERR_UUID_NO_ENCONTRADO   : raise EPACDocumentoNoEncontradoException.Create(mensajeExcepcion, 0, _ERR_UUID_NO_ENCONTRADO, True);
+      _ERR_XML_MAL_FORMADO      : raise EPACXMLMalFormadoException.Create(mensajeExcepcion, 0, _ERR_XML_MAL_FORMADO, False);
     end;
   end;
 

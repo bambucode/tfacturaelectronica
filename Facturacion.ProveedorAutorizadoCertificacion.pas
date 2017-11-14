@@ -37,6 +37,7 @@ type
     property CodigoErrrorPAC: Integer read fCodigoErrorPAC;
   end;
 
+  EPACXMLMalFormadoException  = class(EPACException);
   EPACServicioNoDisponibleException = class(EPACException);
   EPACCredencialesIncorrectasException = class(EPACException);
   EPACEmisorNoInscritoException = class(EPACException);
