@@ -37,6 +37,7 @@ type
     property CodigoErrrorPAC: Integer read fCodigoErrorPAC;
   end;
 
+  EPACXMLMalFormadoException  = class(EPACException);
   EPACServicioNoDisponibleException = class(EPACException);
   EPACCredencialesIncorrectasException = class(EPACException);
   EPACEmisorNoInscritoException = class(EPACException);
@@ -69,20 +70,25 @@ type
   {$ENDREGION}
   EPACErrorGenericoException = class(EPACException);
 
-
+  EPACDocumentoNoEncontradoException = class(EPACException);
   EPACCancelacionFallidaCertificadoNoCargadoException = class(EPACErrorGenericoException);
+
+  EPACEmisorYaExistenteException  = class(EPACErrorGenericoException);
+  EPACTimbradoPreviamenteException = class(EPACErrorGenericoException);
 
   IProveedorAutorizadoCertificacion = interface
     ['{BB3456F4-277A-46B7-B2BC-A430E35130E8}']
-    procedure Configurar(const aDominioWebService: string;
-                         const aCredencialesPAC: TFacturacionCredencialesPAC;
-                         const aTransaccionInicial: Int64);
+    procedure Configurar(const aDominioWebService: string; const aCredencialesPAC,
+        aCredencialesIntegrador: TFacturacionCredencialesPAC; const
+        aTransaccionInicial: Int64);
     function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
                               const aTransaccion: Int64) : TCadenaUTF8;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
     function ObtenerAcuseDeCancelacion(const aUUID: string): string;
+    function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string;
+    function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8;
   end;
 
 implementation

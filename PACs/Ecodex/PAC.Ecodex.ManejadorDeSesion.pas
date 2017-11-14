@@ -48,6 +48,7 @@ uses System.Hash,
 constructor TEcodexManejadorDeSesion.Create(const aDominioWebService: String;
     const aIdTransaccionInicial: Integer);
 begin
+  Assert(aDominioWebService <> '', 'La instancia aDominioWebService no debio ser vacia');
   fDominioWebService := aDominioWebService;
   // Establecemos el numero de transaccion con que comenzaremos para que sea un consecutivo
   fNumeroTransaccion := aIdTransaccionInicial;
@@ -80,13 +81,17 @@ var
   respuestaSolicitudDeToken: TEcodexRespuestaObtenerToken;
 begin
   Assert(fCredenciales.RFC <> '', 'Las credenciales del PAC no fueron asignadas');
-  {$IFDEF CODESITE} CodeSite.EnterMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
+  {$IFDEF CODESITE}
+  CodeSite.EnterMethod('ObtenerNuevoTokenDeServicio');
+  CodeSite.Send('Usando servidor: ' + fDominioWebService);
+  {$ENDIF}
   nuevaSolicitudDeToken := TEcodexSolicitudDeToken.Create;
   try
     nuevaSolicitudDeToken.RFC := aRFC;
     nuevaSolicitudDeToken.TransaccionID := fNumeroTransaccion;
 
     try
+      respuestaSolicitudDeToken := nil;
       respuestaSolicitudDeToken := wsSeguridad.ObtenerToken(nuevaSolicitudDeToken);
       {$IFDEF CODESITE} CodeSite.Send('Token de servicio obtenido', respuestaSolicitudDeToken.Token); {$ENDIF}
       Result := respuestaSolicitudDeToken.Token;
@@ -95,7 +100,12 @@ begin
        ProcesarFallaEcodex(E);
     end;
   finally
-    nuevaSolicitudDeToken.Free;
+    if Assigned(nuevaSolicitudDeToken) then
+      FreeAndNil(nuevaSolicitudDeToken);
+
+    if Assigned(respuestaSolicitudDeToken) then
+      FreeAndNil(respuestaSolicitudDeToken);
+
     {$IFDEF CODESITE} CodeSite.ExitMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
   end;
 end;

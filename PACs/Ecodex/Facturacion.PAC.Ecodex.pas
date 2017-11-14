@@ -25,6 +25,7 @@ type
   TProveedorEcodex = class(TInterfacedObject, IProveedorAutorizadoCertificacion)
   private
     fCredencialesPAC: TFacturacionCredencialesPAC;
+    fCredencialesIntegrador: TFacturacionCredencialesPAC;
     fDominioWebService: string;
     fManejadorDeSesion: TEcodexManejadorDeSesion;
     fwsClientesEcodex: IEcodexServicioClientes;
@@ -33,17 +34,24 @@ type
     function ExtraerNodoTimbre(const aComprobanteXML: TEcodexComprobanteXML)
       : TCadenaUTF8;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
+    procedure ProcesarFallasEspecificasDeEcodex(const aExcepcion: Exception);
+    function TimbrarDocumentoPrimeraVez(const aComprobante : IComprobanteFiscal;
+                                        const aTransaccion: Int64): TCadenaUTF8;
   public
-    procedure Configurar(const aDominioWebService: string;
-      const aCredencialesPAC: TFacturacionCredencialesPAC;
-      const aTransaccionInicial: Int64);
+    destructor Destroy; override;
+    procedure AfterConstruction; override;
+    procedure Configurar(const aDominioWebService: string; const aCredencialesPAC,
+        aCredencialesIntegrador: TFacturacionCredencialesPAC; const
+        aTransaccionInicial: Int64);
     function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;
     function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
     function CancelarDocumentos(const aUUIDS: TListadoUUID):
         TListadoCancelacionUUID;
-    function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
-      const aTransaccion: Int64): TCadenaUTF8;
+    function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
+        aIdTransaccionAUsar: Int64): TCadenaUTF8;
     function ObtenerAcuseDeCancelacion(const aUUID: string): string;
+    function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string;
+    function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8;
   end;
 
 const
@@ -67,14 +75,32 @@ uses Classes,
 {$IFEND}
   XMLDoc;
 
+destructor TProveedorEcodex.Destroy;
+begin
+  if Assigned(fManejadorDeSesion) then
+    FreeAndNil(fManejadorDeSesion);
+
+  inherited;
+end;
+
+procedure TProveedorEcodex.AfterConstruction;
+begin
+  inherited;
+  {$IFDEF CODESITE}
+  CodeSite.Send('Se creo instancia de PAC Ecodex');
+  {$ENDIF}
+end;
+
 { TProveedorEcodex }
 
-procedure TProveedorEcodex.Configurar(const aDominioWebService: string;
-  const aCredencialesPAC: TFacturacionCredencialesPAC;
-  const aTransaccionInicial: Int64);
+procedure TProveedorEcodex.Configurar(const aDominioWebService: string; const
+    aCredencialesPAC, aCredencialesIntegrador: TFacturacionCredencialesPAC;
+    const aTransaccionInicial: Int64);
 begin
-  fDominioWebService := aDominioWebService;
-  fCredencialesPAC := aCredencialesPAC;
+  Assert(aDominioWebService <> '', 'La instancia aDominioWebService no debio ser vacia');
+  fDominioWebService      := aDominioWebService;
+  fCredencialesPAC        := aCredencialesPAC;
+  fCredencialesIntegrador := aCredencialesIntegrador;
 
   fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService,
     aTransaccionInicial);
@@ -108,6 +134,7 @@ begin
   Assert(Result <> '', 'El XML del timbre estuvo vacio');
 end;
 
+
 function TProveedorEcodex.ObtenerSaldoTimbresDeCliente
   (const aRFC: String): Integer;
 var
@@ -116,6 +143,7 @@ var
   tokenDeUsuario: string;
   I: Integer;
 begin
+  Assert(fDominioWebService <> '', 'EL dominio no puede estar vacio');
   Assert(Trim(aRFC) <> '', 'El RFC para la solicitud de saldo fue vacio');
   Assert(fManejadorDeSesion <> nil,
     'La instancia fManejadorDeSesion no debio ser nula');
@@ -179,8 +207,8 @@ begin
   mensajeExcepcion := aExcepcion.Message;
 
   if (aExcepcion Is EEcodexFallaValidacionException) Or
-    (aExcepcion Is EEcodexFallaServicioException) Or
-    (aExcepcion is EEcodexFallaSesionException) then
+     (aExcepcion Is EEcodexFallaServicioException) Or
+     (aExcepcion is EEcodexFallaSesionException) then
   begin
     if (aExcepcion Is EEcodexFallaValidacionException) then
     begin
@@ -190,6 +218,11 @@ begin
       numeroErrorSAT := EEcodexFallaValidacionException(aExcepcion).Numero;
 
       case numeroErrorSAT of
+        0..32999:
+        begin
+          // Estos son errores que no son del SAT, asumimos son del PAC:
+          ProcesarFallasEspecificasDeEcodex(aExcepcion);
+        end;
         // Errores técnicos donde la librería no creo bien el XML
         33101, 33102, 33105, 33106, 33111, 33116, 33126, 33127, 33128,
           33139, 33143, 33150:
@@ -225,21 +258,18 @@ begin
           raise ESATNoIdentificadoException.Create(mensajeExcepcion,
             numeroErrorSAT, False);
       else
-        raise ESATErrorGenericoException.Create('EFallaValidacionException (' +
+        raise ESATErrorGenericoException.Create('ESATErrorGenericoException (' +
           IntToStr(EEcodexFallaValidacionException(aExcepcion).Numero) + ') ' +
           mensajeExcepcion, numeroErrorSAT, False);
       end;
     end;
 
+
+    ProcesarFallasEspecificasDeEcodex(aExcepcion);
+
+
     if (aExcepcion Is EEcodexFallaServicioException) then
     begin
-      case EEcodexFallaServicioException(aExcepcion).Numero of
-        29: raise EPACCancelacionFallidaCertificadoNoCargadoException.Create(EEcodexFallaServicioException(aExcepcion).Descripcion,
-                                                                             0,
-                                                                             EEcodexFallaServicioException(aExcepcion).Numero,
-                                                                             False);  // NO es reintentable
-      end;
-
       mensajeExcepcion := 'EFallaServicioException (' +
         IntToStr(EEcodexFallaServicioException(aExcepcion).Numero) + ') ' +
         EEcodexFallaServicioException(aExcepcion).Descripcion;
@@ -258,7 +288,7 @@ begin
   end;
 end;
 
-function TProveedorEcodex.TimbrarDocumento(const aComprobante
+function TProveedorEcodex.TimbrarDocumentoPrimeraVez(const aComprobante
   : IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8;
 var
   solicitudTimbrado: TSolicitudTimbradoEcodex;
@@ -299,6 +329,161 @@ begin
   finally
     if Assigned(solicitudTimbrado) then
       solicitudTimbrado.Free;
+  end;
+
+end;
+
+function TProveedorEcodex.TimbrarDocumento(const aComprobante: IComprobanteFiscal; const aIdTransaccionAUsar: Int64): TCadenaUTF8;
+var
+  documentoTimbradoPreviamente : Boolean;
+const
+  _ECODEX_DOCUMENTO_TIMBRADO_NO_ENCONTRADO = 'EFallaValidacionException (505)';
+begin
+  documentoTimbradoPreviamente := False;
+
+  try
+    try
+      Result := TimbrarDocumentoPrimeraVez(aComprobante, aIdTransaccionAUsar);
+    except
+      // Si es una falla de timbrado previo, la evitamos lanzar, cualquier otra falla la re-lanzamos
+      On E:EPACTimbradoPreviamenteException do
+        documentoTimbradoPreviamente := True
+      else
+        raise;
+    end;
+  finally
+    //fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+    //fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
+  end;
+
+  try
+    // Si hubo una falla porque ya habiamos timbrado el documento previamente, tratamos de obtener
+    // el timbre previo
+    if documentoTimbradoPreviamente then
+    begin
+      try
+        Result := ObtenerTimbrePrevio(aIdTransaccionAUsar);
+      except
+        On E:Exception do
+        begin
+          // Como fallamos al obtener el timbre previo re-lanzamos la excepcion de timbrado previamente
+          if AnsiPos(_ECODEX_DOCUMENTO_TIMBRADO_NO_ENCONTRADO, E.Message) > 0 then
+             raise EPACTimbradoPreviamenteException.Create(E.Message, 0, 505, False)
+          else
+            raise;
+        end;
+      end;
+    end;
+  finally
+    //fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+    //fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
+  end;
+end;
+
+function TProveedorEcodex.ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8;
+var
+  solicitudObtenerTimbre: TEcodexSolicitudObtenerTimbrado;
+  respuestaObtenerTimbre: TEcodexRespuestaObtenerTimbrado;
+  tokenDeUsuario: string;
+begin
+  Assert(fWsTimbradoEcodex <> nil, 'La instancia fWsTimbradoEcodex no debio ser nula');
+  // 1. Creamos la solicitud de obtener timbrado
+  solicitudObtenerTimbre := TEcodexSolicitudObtenerTimbrado.Create;
+
+  // 2. Generamos un nuevo token para esta peticion
+  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+
+  try
+    //4. Asignamos los datos de la solicitud usando el ultimo token y transaccion usada
+    solicitudObtenerTimbre.TransaccionOriginal := aIdTransaccionOriginal;
+    solicitudObtenerTimbre.RFC                 := fCredencialesPAC.RFC;
+    solicitudObtenerTimbre.Token               := tokenDeUsuario;
+    solicitudObtenerTimbre.TransaccionID       := fManejadorDeSesion.NumeroDeTransaccion;
+
+
+    try
+      // 5. Realizamos la solicitud de timbre previo
+      respuestaObtenerTimbre := fWsTimbradoEcodex.ObtenerTimbrado(solicitudObtenerTimbre);
+
+      // 5. Extraemos las propiedades del timbre de la respuesta del WebService
+      Result := ExtraerNodoTimbre(respuestaObtenerTimbre.ComprobanteXML);
+
+      respuestaObtenerTimbre.Free;
+    except
+      On E:Exception do
+        ProcesarExcepcionDePAC(E);
+    end;
+  finally
+    if Assigned(solicitudObtenerTimbre) then
+      solicitudObtenerTimbre.Free;
+  end;
+end;
+
+function TProveedorEcodex.AgregarCliente(const aRFC, aRazonSocial, aCorreo:
+    String): string;
+var
+  nuevoEmisor : TEcodexNuevoEmisor;
+  solicitudRegistroCliente : TEcodexSolicitudRegistroCliente;
+  respuestaRegistroCliente: TEcodexRespuestaRegistro;
+  tokenDeAltaDeEmisores : String;
+const
+  // Segun documento "Guia de integracion con Ecodex_v2.0.1.pdf"
+  _CADENA_ALTA_EXITOSA = 'Activo';
+begin
+  Assert(fManejadorDeSesion <> nil, 'El manejador de sesion de Ecodex es nulo');
+  Assert(fWsClientesEcodex <> nil, 'La referencia al servicio de Ecodex de clientes fue nula');
+  Assert(fCredencialesIntegrador.RFC <> '', 'El RFC del integrador estuvo vacio');
+  Assert(aRFC <> '', 'El RFC del nuevo emisor estuvo vacio');
+  Assert(aRazonSocial <> '', 'La razon social del nuevo emisor estuvo vacia');
+
+  solicitudRegistroCliente := TEcodexSolicitudRegistroCliente.Create;
+  try
+    try
+      // Mandamos los dos IDs del integrador y el ID de alta de emisores
+      tokenDeAltaDeEmisores := fManejadorDeSesion.ObtenerNuevoTokenAltaEmisores(fCredencialesIntegrador.RFC,
+                                                                                fCredencialesPAC.DistribuidorID,
+                                                                                fCredencialesIntegrador.DistribuidorID);
+
+      // Creamos el objeto Emisor que enviaremos
+      nuevoEmisor := TEcodexNuevoEmisor.Create;
+      // Al convertir el RFC a mayusculas nos evitamos errores de validación del WebService de Ecodex
+      nuevoEmisor.RFC                        := UpperCase(aRFC);
+      nuevoEmisor.RazonSocial                := aRazonSocial;
+      // Al convertir el correo a minúsculas nos evitamos errores de validación del WebService de Ecodex
+      nuevoEmisor.CorreoElectronico          := LowerCase(aCorreo);
+
+      // Creamos la solicitud de registro de emisor
+      solicitudRegistroCliente.Token         := tokenDeAltaDeEmisores;
+      solicitudRegistroCliente.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+      solicitudRegistroCliente.Emisor        := nuevoEmisor;
+      solicitudRegistroCliente.RfcIntegrador := fCredencialesIntegrador.RFC;
+
+      // Mandamos registrar al emisor
+      respuestaRegistroCliente := fWsClientesEcodex.Registrar(solicitudRegistroCliente);
+
+      Assert(respuestaRegistroCliente.Respuesta <> nil, 'La respuesta de registro de emisor fue nula!');
+
+      {$IFDEF CODESITE}
+      CodeSite.Send('Respuesta registro emisor', respuestaRegistroCliente.Respuesta.Estatus);
+      CodeSite.Send('Clave certificado', respuestaRegistroCliente.Respuesta.ClaveCertificado);
+      {$ENDIF}
+
+      // Si fue exitosa regresamos el token para la alta de certificados
+      Result := respuestaRegistroCliente.Respuesta.ClaveCertificado;
+      respuestaRegistroCliente.Free;
+    except
+      // Si ocurrio cualquier error procesamos la excepcion
+      On E:Exception do
+        if Not (E Is EPACException) then
+          ProcesarExcepcionDePAC(E)
+        else
+          raise;
+    end;
+  finally
+    //fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsClientes;
+    //fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsClientes;
+    if Assigned(solicitudRegistroCliente) then
+      solicitudRegistroCliente.Free;
   end;
 
 end;
@@ -441,6 +626,83 @@ begin
     if Assigned(solicitudCancelacion) then
       solicitudCancelacion.Free;
   end;
+end;
+
+procedure TProveedorEcodex.ProcesarFallasEspecificasDeEcodex(const aExcepcion:
+    Exception);
+var
+  mensajeExcepcion: String;
+const
+  _ECODEX_ACUSE_NO_ENCONTRADO             = 'Acuse de cancelacion del documento no encontrado';
+  _ECODEX_ALTA_EMISOR_CORREO_USADO        = '(97)';
+  _ECODEX_ALTA_EMISOR_REPETIDO            = '(98)';
+  _ECODEX_ALTA_EMISOR_RFC_INVALIDO        = '(890)';
+  _ECODEX_ALTA_EMISOR_CORREO_INVALIDO     = '(891)';
+  _ECODEX_SERVICIO_NO_DISPONIBLE          = 'Servicio no disponible';
+  _ECODEX_VERSION_NO_SOPORTADA            = 'El driver no soporta esta version de cfdi';
+  _ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA = 'El emisor ya se encuentra dado de alta con un integrador';
+
+  _ECODEX_ERROR_OBTENIENDO_ACUSE          = 33;
+
+  _NO_ENCONTRADO = 0;
+  _ERR_SIN_CERTIFICADO_CARGADO = 29;
+  _ERR_FUERA_DE_SERVICIO2 = 18;
+  _ERR_FUERA_DE_SERVICIO  = 22;
+  _ERR_SIN_FOLIOS_DISPONIBLES = 800;
+
+  // Errores exclusivos de la alta
+  _ERR_EMISOR_EXISTENTE                   = 98;
+  _ERR_TIMBRADO_PREVIAMENTE               = 96;
+  _ERR_UUID_NO_ENCONTRADO                 = 505;
+  _ERR_XML_MAL_FORMADO                    = 301;
+begin
+  mensajeExcepcion := aExcepcion.Message;
+
+  if AnsiPos(_ECODEX_VERSION_NO_SOPORTADA, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EPACTimbradoVersionNoSoportadaPorPACException.Create('Esta version de CFDI no es soportada por ECODEX:' +
+                                                              mensajeExcepcion, 0, 0, False);
+
+
+  if (aExcepcion Is EEcodexFallaValidacionException) then
+  begin
+    case EEcodexFallaValidacionException(aExcepcion).Numero of
+      _ERR_EMISOR_EXISTENTE     : raise EPACEmisorYaExistenteException.Create(mensajeExcepcion, 0, _ERR_EMISOR_EXISTENTE, True);
+      _ERR_TIMBRADO_PREVIAMENTE : raise EPACTimbradoPreviamenteException.Create(mensajeExcepcion, 0, _ERR_TIMBRADO_PREVIAMENTE, True);
+      _ERR_UUID_NO_ENCONTRADO   : raise EPACDocumentoNoEncontradoException.Create(mensajeExcepcion, 0, _ERR_UUID_NO_ENCONTRADO, True);
+      _ERR_XML_MAL_FORMADO      : raise EPACXMLMalFormadoException.Create(mensajeExcepcion, 0, _ERR_XML_MAL_FORMADO, False);
+    end;
+  end;
+
+  // TBD: https://github.com/bambucode/eleventa/issues/1721
+ { if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_USADO, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EEcodexAltaEmisorCorreoUsadoException.Create('El correo asignado ya está en uso por otro emisor.', 0, 97, False);
+
+  if AnsiPos(_ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA, mensajeExcepcion) > 0 then
+    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta con un integrador.', 0, 98, False);
+
+  if AnsiPos(_ECODEX_ALTA_EMISOR_REPETIDO, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta.', 0, 98, False);
+
+  if AnsiPos(_ECODEX_ALTA_EMISOR_RFC_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EEcodexAltaEmisorRFCInvalidoException.Create('El RFC del emisor no es válido.', 0, 890, False);
+
+  if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EEcodexAltaEmisorCorreoInvalidoException.Create('El correo del emisor no es válido.', 0, 891, False);        }
+
+
+  if (aExcepcion Is EEcodexFallaServicioException) then
+  begin
+    case EEcodexFallaServicioException(aExcepcion).Numero of
+      _ERR_FUERA_DE_SERVICIO, _ERR_FUERA_DE_SERVICIO2
+                                    : raise EPACServicioNoDisponibleException.Create(mensajeExcepcion, 0, _ERR_FUERA_DE_SERVICIO, True);
+      _ERR_SIN_CERTIFICADO_CARGADO  : raise EPACCancelacionFallidaCertificadoNoCargadoException.Create(EEcodexFallaServicioException(aExcepcion).Descripcion,
+                                                                           0,
+                                                                           EEcodexFallaServicioException(aExcepcion).Numero,
+                                                                           False);  // NO es reintentable, al menos inmediatamente
+      _ERR_SIN_FOLIOS_DISPONIBLES   : raise EPACTimbradoSinFoliosDisponiblesException.Create(mensajeExcepcion, 0, _ERR_SIN_FOLIOS_DISPONIBLES, True);
+    end;
+  end;
+
 end;
 
 end.

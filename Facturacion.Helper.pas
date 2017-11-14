@@ -85,15 +85,15 @@ begin
   // http://www.sat.gob.mx/informacion_fiscal/factura_electronica/Documents/cfdv33.pdf
 
   // Calculamos el limite inferior de acuerdo al Anexo 20
-  limiteInferior := (aCantidad - IntPower(_BASE, _NUMERO_DECIMALES_MXN * -1)/2) *
-                    (aValorUnitario - IntPower(_BASE,_NUMERO_DECIMALES_MXN * -1)/2);
+  limiteInferior := (aCantidad - RoundTo(IntPower(_BASE, _NUMERO_DECIMALES_MXN * -1)/2, -2)) *
+                    (aValorUnitario - RoundTo(IntPower(_BASE,_NUMERO_DECIMALES_MXN * -1)/2, -2));
 
   // Establecemos el tipo de redondeo a truncado a dos decimales para el limite inferior
   limiteInferior := Trunc(limiteInferior * 100) / 100;
 
   // Calculamos el limite superior de acuerdo al Anexo 20
-  limiteSuperior := (aCantidad + IntPower(_BASE, -1 * _NUMERO_DECIMALES_MXN)/2 - IntPower(_BASE,-12)) *
-                    (aValorUnitario + IntPower(_BASE,_NUMERO_DECIMALES_MXN * -1)/2 - IntPower(_BASE,-12));
+  limiteSuperior := (aCantidad + RoundTo(IntPower(_BASE, -1 * _NUMERO_DECIMALES_MXN)/2, -2) - IntPower(_BASE,-12)) *
+                    (aValorUnitario + RoundTo(IntPower(_BASE,_NUMERO_DECIMALES_MXN * -1)/2, -2) - IntPower(_BASE,-12));
 
   // Para el limite superior, redondeamos "hacia arriba"
   limiteSuperior := Ceil(limiteSuperior * 100) / 100;
