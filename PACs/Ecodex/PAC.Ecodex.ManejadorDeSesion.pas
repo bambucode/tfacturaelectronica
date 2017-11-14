@@ -91,6 +91,7 @@ begin
     nuevaSolicitudDeToken.TransaccionID := fNumeroTransaccion;
 
     try
+      respuestaSolicitudDeToken := nil;
       respuestaSolicitudDeToken := wsSeguridad.ObtenerToken(nuevaSolicitudDeToken);
       {$IFDEF CODESITE} CodeSite.Send('Token de servicio obtenido', respuestaSolicitudDeToken.Token); {$ENDIF}
       Result := respuestaSolicitudDeToken.Token;
@@ -99,7 +100,12 @@ begin
        ProcesarFallaEcodex(E);
     end;
   finally
-    nuevaSolicitudDeToken.Free;
+    if Assigned(nuevaSolicitudDeToken) then
+      FreeAndNil(nuevaSolicitudDeToken);
+
+    if Assigned(respuestaSolicitudDeToken) then
+      FreeAndNil(respuestaSolicitudDeToken);
+
     {$IFDEF CODESITE} CodeSite.ExitMethod('ObtenerNuevoTokenDeServicio'); {$ENDIF}
   end;
 end;

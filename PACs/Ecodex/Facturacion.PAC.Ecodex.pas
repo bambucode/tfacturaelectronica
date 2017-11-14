@@ -38,6 +38,7 @@ type
     function TimbrarDocumentoPrimeraVez(const aComprobante : IComprobanteFiscal;
                                         const aTransaccion: Int64): TCadenaUTF8;
   public
+    destructor Destroy; override;
     procedure AfterConstruction; override;
     procedure Configurar(const aDominioWebService: string; const aCredencialesPAC,
         aCredencialesIntegrador: TFacturacionCredencialesPAC; const
@@ -73,6 +74,14 @@ uses Classes,
   Msxmldom,
 {$IFEND}
   XMLDoc;
+
+destructor TProveedorEcodex.Destroy;
+begin
+  if Assigned(fManejadorDeSesion) then
+    FreeAndNil(fManejadorDeSesion);
+
+  inherited;
+end;
 
 procedure TProveedorEcodex.AfterConstruction;
 begin
