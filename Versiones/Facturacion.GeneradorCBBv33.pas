@@ -28,12 +28,12 @@ implementation
 procedure TGeneradorCBBv33.AfterConstruction;
 begin
   inherited;
-  fGeneradorQR := TGeneradorQR.Create;
+
 end;
 
 destructor TGeneradorCBBv33.Destroy;
 begin
-  fGeneradorQR.Free;
+
 
   inherited;
 end;
@@ -44,6 +44,7 @@ var
   cadenaParaCBB, uuid, selloParcial : string;
   totalComprobante : Currency;
   facturaV33 : IComprobanteFiscalV33;
+  I: Integer;
 const
   _FORMATO_CBB = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx&id=%s&re=%s&rr=%s&tt=%s&fe=%s';
 begin
@@ -68,7 +69,12 @@ begin
                            FloatToStrF(totalComprobante, ffFixed, 17, 6),
                            selloParcial]);
 
-  fGeneradorQR.GenerarQRCode(cadenaParaCBB, aRutaAGuardar);
+  try
+    fGeneradorQR := TGeneradorQR.Create;
+    fGeneradorQR.GenerarQRCode(cadenaParaCBB, aRutaAGuardar);
+  finally
+    fGeneradorQR.Free;
+  end;
 end;
 
 end.
