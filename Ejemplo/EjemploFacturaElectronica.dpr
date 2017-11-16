@@ -33,8 +33,6 @@ uses
   Facturacion.OpenSSL in '..\Facturacion.OpenSSL.pas',
   Facturacion.GeneradorSelloV33 in '..\Versiones\Facturacion.GeneradorSelloV33.pas',
   FinkOkWsTimbrado in '..\PACs\FinkOK\FinkOkWsTimbrado.pas',
-  Facturacion.PAC.SolucionFactible in '..\PACs\SolucionFactible\Facturacion.PAC.SolucionFactible.pas',
-  SolucionFactibleWsTimbrado in '..\PACs\SolucionFactible\SolucionFactibleWsTimbrado.pas',
   Facturacion.PAC.Ecodex in '..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas',
   Facturacion.ProveedorAutorizadoCertificacion in '..\Facturacion.ProveedorAutorizadoCertificacion.pas',
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
@@ -56,40 +54,42 @@ uses
   Facturacion.GeneradorSelloV32 in '..\Versiones\Facturacion.GeneradorSelloV32.pas',
   Facturacion.GeneradorCBBv32 in '..\Versiones\Facturacion.GeneradorCBBv32.pas',
   Facturacion.Tipos in '..\Facturacion.Tipos.pas',
-  Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas';
+  Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas',
+  EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas';
 
 var
-  nuevaFactura : IComprobanteFiscal;
+  nuevaFactura                                                    : IComprobanteFiscal;
 
   // Instancias especificas para V32
-  facturaCFDIv32: IComprobanteFiscalV32;
-  regimen32 : IComprobanteFiscalV32_Emisor_RegimenFiscal;
-  concepto32: IComprobanteFiscalV32_Conceptos_Concepto;
-  iva32: IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
+  facturaCFDIv32                                                  : IComprobanteFiscalV32;
+  regimen32                                                       : IComprobanteFiscalV32_Emisor_RegimenFiscal;
+  concepto32                                                      : IComprobanteFiscalV32_Conceptos_Concepto;
+  iva32                                                           : IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 
   // Instancias especificas para V33
-  facturaCFDIv33 : IComprobanteFiscalV33;
-  concepto33 : IComprobanteFiscalV33_Conceptos_Concepto;
-  iva33 : IComprobanteFiscalV33_Conceptos_Concepto_Impuestos_Traslados_Traslado;
-  totalIVA33 : IComprobanteFiscalV33_Impuestos_Traslados_Traslado;
+  facturaCFDIv33                                                  : IComprobanteFiscalV33;
+  concepto33                                                      : IComprobanteFiscalV33_Conceptos_Concepto;
+  iva33                                                           : IComprobanteFiscalV33_Conceptos_Concepto_Impuestos_Traslados_Traslado;
+  totalIVA33                                                      : IComprobanteFiscalV33_Impuestos_Traslados_Traslado;
 
   // Instancia de impuestos locales v1.0 (compatible con CFDI 3.2 y 3.3)
-  impuestoLocalV1: IImpuestosLocalesV1;
-  trasladosImpuestosLocalesV1: IImpuestosLocalesV1_TrasladosLocales;
+  impuestoLocalV1                                                 : IImpuestosLocalesV1;
+  trasladosImpuestosLocalesV1                                     : IImpuestosLocalesV1_TrasladosLocales;
 
   // Instancias comunes independientes de la version
-  admonFacturas: IAdministradorFacturas;
-  generadorCadena : IGeneradorCadenaOriginal;
-  generadorSello : IGeneradorSello;
-  openSSL : IOpenSSL;
-  xmlTimbre : TCadenaUTF8;
-  pac: IProveedorAutorizadoCertificacion;
-  certificadoSellos: ICertificadoDeSellos;
-  credencialesPAC : TFacturacionCredencialesPAC;
-  generadorCBB: IGeneradorCBB;
+  admonFacturas                                                   : IAdministradorFacturas;
+  generadorCadena                                                 : IGeneradorCadenaOriginal;
+  generadorSello                                                  : IGeneradorSello;
+  openSSL                                                         : IOpenSSL;
+  xmlTimbre                                                       : TCadenaUTF8;
+  pac                                                             : IProveedorAutorizadoCertificacion;
+  certificadoSellos                                               : ICertificadoDeSellos;
+  credencialesPAC                                                 : TFacturacionCredencialesPAC;
+  credencialesIntegrador                                          : TFacturacionCredencialesPAC;
+  generadorCBB                                                    : IGeneradorCBB;
 
   queVersion, rutaCertificado, rutaLlavePrivada, claveLlavePrivada: string;
-  reintentar: Boolean;
+  reintentar                                                      : Boolean;
 const
   _URL_ECODEX_PRUEBAS_V32        = 'https://pruebas.ecodex.com.mx:2045';
   _URL_ECODEX_PRUEBAS_V33        = 'https://wsdev.ecodex.com.mx:2045';
@@ -147,9 +147,11 @@ begin
       // Configuramos al PAC con los datos para pruebas
 
       pac := TProveedorEcodex.Create;
-      credencialesPAC.RFC            := 'VOC990129I26';
-      credencialesPAC.DistribuidorID := '2b3a8764-d586-4543-9b7e-82834443f219';
+      credencialesPAC.RFC                   := 'VOC990129I26';
+      credencialesPAC.DistribuidorID        := '2b3a8764-d586-4543-9b7e-82834443f219';
 
+      credencialesIntegrador.RFC            := 'BBB010101001';
+      credencialesIntegrador.DistribuidorID := 'DF627BC3-A872-4806-BF37-DBD040CBAC7C';
 
 {
       pac := TProveedorComercio.Create;
@@ -222,7 +224,7 @@ begin
               regimen32.Regimen := 'Regimen General de Ley';
 
               Receptor.Rfc  := 'MTI0806042N7';
-              Receptor.Nombre := 'Juan & Jos√© & ''Ni√±o'' & "Ni√±a" S.A. de C.V.';
+              Receptor.Nombre := 'Juan & JosÈ & ''NiÒo'' & "NiÒa" S.A. de C.V.';
               Receptor.Domicilio.Calle := 'Mi Calle';
               Receptor.Domicilio.NoExterior := '120';
               Receptor.Domicilio.Colonia := 'Centro';
@@ -288,11 +290,16 @@ begin
 
               Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
               Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
-              Emisor.RegimenFiscal := '601'; // De cat√°logo
+              Emisor.RegimenFiscal := '601'; // De cat·logo
 
-              Receptor.Rfc         := 'MTI0806042N7';
-              Receptor.Nombre      := 'Juan & Jos√© & ''Ni√±o'' & "Ni√±a"';
-              Receptor.UsoCFDI     := 'G01';
+              //Receptor.Rfc              := 'MTI0806042N7';
+              Receptor.Rfc              := 'XEXX010101000';
+              Receptor.Nombre           := 'Juan & JosÈ & ''NiÒo'' & "NiÒa"';
+              Receptor.UsoCFDI          := 'G01';
+
+              Receptor.ResidenciaFiscal := 'USA'; // De cat√°logo
+              // Solo para cliente extranjero
+              Receptor.NumRegIdTrib     := '123456789'; // "formatoDeRegistroDeIdentidadTributaria": "[0-9]{9}",
 
               concepto33 := Conceptos.Add;
               concepto33.ClaveProdServ    := '52161529';  // De cat√°logo
@@ -338,9 +345,9 @@ begin
           trasladosImpuestosLocalesv1.Importe          := '1.00';
 
           nuevaFactura.AgregarComplemento(impuestoLocalv1,
-                                              'implocal',
-                                              'http://www.sat.gob.mx/implocal',
-                                              'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
+                                          'implocal',
+                                          'http://www.sat.gob.mx/implocal',
+                                          'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
           {$ENDREGION}
 
           //admonFacturas.GuardarArchivo(nuevaFactura,
@@ -384,10 +391,12 @@ begin
           if nuevaFactura.Version = '3.3' then
             pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
                          credencialesPAC,
+                         credencialesIntegrador,
                          _NUEMRO_TRANSACCION_INICIAL)
           else
             pac.Configurar(_URL_ECODEX_PRUEBAS_V32,
                            credencialesPAC,
+                           credencialesIntegrador,
                            _NUEMRO_TRANSACCION_INICIAL);
 
           // 4. La mandamos timbrar
