@@ -224,7 +224,7 @@ begin
               regimen32.Regimen := 'Regimen General de Ley';
 
               Receptor.Rfc  := 'MTI0806042N7';
-              Receptor.Nombre := 'Juan & Jos√© & ''Ni√±o'' & "Ni√±a" S.A. de C.V.';
+              Receptor.Nombre := 'Juan & JosÈ & ''NiÒo'' & "NiÒa" S.A. de C.V.';
               Receptor.Domicilio.Calle := 'Mi Calle';
               Receptor.Domicilio.NoExterior := '120';
               Receptor.Domicilio.Colonia := 'Centro';
@@ -294,7 +294,7 @@ begin
 
               //Receptor.Rfc              := 'MTI0806042N7';
               Receptor.Rfc              := 'XEXX010101000';
-              Receptor.Nombre           := 'Juan & Jos√© & ''Ni√±o'' & "Ni√±a"';
+              Receptor.Nombre           := 'Juan & JosÈ & ''NiÒo'' & "NiÒa"';
               Receptor.UsoCFDI          := 'G01';
 
               Receptor.ResidenciaFiscal := 'USA'; // De cat√°logo
