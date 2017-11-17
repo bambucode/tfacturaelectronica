@@ -58,7 +58,10 @@ class function TFacturacionHelper.ComoMoneda(const aValor: Currency; const
     aNumeroDecimales: Integer = 2): string;
 begin
   // NOTA: Esta moneda es para el XML, NO debe llevar simbolo de moneda
-  Result := CurrToStrF(aValor, ffFixed, aNumeroDecimales);
+  if Frac(aValor) = 0 then
+    Result := CurrToStrF(aValor, ffFixed, 0)
+  else
+    Result := CurrToStrF(aValor, ffFixed, aNumeroDecimales);
 end;
 
 class function TFacturacionHelper.DesdeFechaISO8601(
