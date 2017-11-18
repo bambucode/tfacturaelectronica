@@ -6,13 +6,14 @@ uses System.SysUtils,
      Facturacion.Comprobante,
      Facturacion.GeneradorCBB,
      Facturacion.ComprobanteV33,
+     Facturacion.GeneradorQRQuricol,
      Facturacion.GeneradorQR;
 
 type
 
   TGeneradorCBBv33 = class(TInterfacedObject, IGeneradorCBB)
   private
-    fGeneradorQR: TGeneradorQR;
+    fGeneradorQR: TGeneradorQRQuricol;
   public
     destructor Destroy; override;
     procedure AfterConstruction; override;
@@ -70,7 +71,7 @@ begin
                            selloParcial]);
 
   try
-    fGeneradorQR := TGeneradorQR.Create;
+    fGeneradorQR := TGeneradorQRQuricol.Create;
     fGeneradorQR.GenerarQRCode(cadenaParaCBB, aRutaAGuardar);
   finally
     fGeneradorQR.Free;
