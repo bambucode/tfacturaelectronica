@@ -5,14 +5,22 @@ interface
 uses System.SysUtils,
      Facturacion.Comprobante,
      Facturacion.GeneradorCBB,
-     Facturacion.ComprobanteV33,
-     Facturacion.GeneradorQR;
+     {$IFDEF GENERACION_CBB_NATIVA}
+     Facturacion.GeneradorQR,
+     {$ELSE}
+     Facturacion.GeneradorQRQuricol,
+     {$ENDIF}
+     Facturacion.ComprobanteV33;
 
 type
 
   TGeneradorCBBv33 = class(TInterfacedObject, IGeneradorCBB)
   private
-    fGeneradorQR: TGeneradorQR;
+   {$IFDEF GENERACION_CBB_NATIVA}
+   fGeneradorQR: TGeneradorQR;
+   {$ELSE}
+   fGeneradorQR: TGeneradorQRQuricol;
+   {$ENDIF}
   public
     destructor Destroy; override;
     procedure AfterConstruction; override;
@@ -70,7 +78,11 @@ begin
                            selloParcial]);
 
   try
+    {$IFDEF GENERACION_CBB_NATIVA}
     fGeneradorQR := TGeneradorQR.Create;
+    {$ELSE}
+    fGeneradorQR := TGeneradorQRQuricol.Create;
+    {$ENDIF}
     fGeneradorQR.GenerarQRCode(cadenaParaCBB, aRutaAGuardar);
   finally
     fGeneradorQR.Free;

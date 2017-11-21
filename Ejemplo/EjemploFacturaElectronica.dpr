@@ -55,7 +55,8 @@ uses
   Facturacion.GeneradorCBBv32 in '..\Versiones\Facturacion.GeneradorCBBv32.pas',
   Facturacion.Tipos in '..\Facturacion.Tipos.pas',
   Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas',
-  EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas';
+  EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas',
+  Facturacion.GeneradorQRQuricol in '..\Facturacion.GeneradorQRQuricol.pas';
 
 var
   nuevaFactura                                                    : IComprobanteFiscal;
