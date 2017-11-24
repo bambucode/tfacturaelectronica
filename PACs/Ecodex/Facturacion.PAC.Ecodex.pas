@@ -165,7 +165,7 @@ begin
 
     try
       respuestaEdoCuenta := fwsClientesEcodex.EstatusCuenta(solicitudEdoCuenta);
-{$IFDEF CODESITE}
+      {$IFDEF CODESITE}
       CodeSite.Send('Codigo', respuestaEdoCuenta.Estatus.Codigo);
       CodeSite.Send('Descripcion', respuestaEdoCuenta.Estatus.Descripcion);
       CodeSite.Send('Fecha de Inicio', respuestaEdoCuenta.Estatus.FechaInicio);
@@ -182,7 +182,7 @@ begin
         CodeSite.Send('Certificado cargado Num. ' + IntToStr(I),
           respuestaEdoCuenta.Estatus.Certificados[I]);
       end;
-{$ENDIF}
+      {$ENDIF}
       // 3. Regresamos los timbres disponibles y no los asignados
       Result := respuestaEdoCuenta.Estatus.TimbresDisponibles;
     except
@@ -264,9 +264,7 @@ begin
       end;
     end;
 
-
     ProcesarFallasEspecificasDeEcodex(aExcepcion);
-
 
     if (aExcepcion Is EEcodexFallaServicioException) then
     begin
@@ -645,17 +643,18 @@ const
 
   _ECODEX_ERROR_OBTENIENDO_ACUSE          = 33;
 
-  _NO_ENCONTRADO = 0;
-  _ERR_SIN_CERTIFICADO_CARGADO = 29;
-  _ERR_FUERA_DE_SERVICIO2 = 18;
-  _ERR_FUERA_DE_SERVICIO  = 22;
-  _ERR_SIN_FOLIOS_DISPONIBLES = 800;
+  _NO_ENCONTRADO                          = 0;
+  _ERR_SIN_CERTIFICADO_CARGADO            = 29;
+  _ERR_FUERA_DE_SERVICIO2                 = 18;
+  _ERR_FUERA_DE_SERVICIO                  = 22;
+  _ERR_SIN_FOLIOS_DISPONIBLES             = 800;
 
   // Errores exclusivos de la alta
   _ERR_EMISOR_EXISTENTE                   = 98;
   _ERR_TIMBRADO_PREVIAMENTE               = 96;
-  _ERR_UUID_NO_ENCONTRADO                 = 505;
   _ERR_XML_MAL_FORMADO                    = 301;
+  _ERR_FECHA_INVALIDA                     = 401;
+  _ERR_UUID_NO_ENCONTRADO                 = 505;
 begin
   mensajeExcepcion := aExcepcion.Message;
 
@@ -671,6 +670,7 @@ begin
       _ERR_TIMBRADO_PREVIAMENTE : raise EPACTimbradoPreviamenteException.Create(mensajeExcepcion, 0, _ERR_TIMBRADO_PREVIAMENTE, True);
       _ERR_UUID_NO_ENCONTRADO   : raise EPACDocumentoNoEncontradoException.Create(mensajeExcepcion, 0, _ERR_UUID_NO_ENCONTRADO, True);
       _ERR_XML_MAL_FORMADO      : raise EPACXMLMalFormadoException.Create(mensajeExcepcion, 0, _ERR_XML_MAL_FORMADO, False);
+      _ERR_FECHA_INVALIDA       : raise EPACFechaInvalida.Create(mensajeExcepcion, 0, _ERR_FECHA_INVALIDA, False);
     end;
   end;
 
@@ -703,7 +703,7 @@ begin
                                                                            0,
                                                                            EEcodexFallaServicioException(aExcepcion).Numero,
                                                                            False);  // NO es reintentable, al menos inmediatamente
-      _ERR_SIN_FOLIOS_DISPONIBLES   : raise EPACTimbradoSinFoliosDisponiblesException.Create(mensajeExcepcion, 0, _ERR_SIN_FOLIOS_DISPONIBLES, True);
+      _ERR_SIN_FOLIOS_DISPONIBLES   : raise EPACTimbradoSinFoliosDisponiblesException.Create(mensajeExcepcion, 0, _ERR_SIN_FOLIOS_DISPONIBLES, False);
     end;
   end;
 

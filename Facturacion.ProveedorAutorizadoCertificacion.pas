@@ -49,6 +49,12 @@ type
   EPACNoSePudoObtenerAcuseException = class(EPACException);
   {$REGION 'Documentation'}
   ///	<summary>
+  ///	  Este error es lanzado cuando la fecha de sellado es mayor a la fecha de la ciudad de mexico, ej. clientes en Cancun
+  ///	</summary>
+  {$ENDREGION}
+  EPACFechaInvalida = class(EPACException);
+  {$REGION 'Documentation'}
+  ///	<summary>
   ///	  Este tipo de excepcion se lanza cuando se detecta una falla con el
   ///	  internet del usuario el cual es un problema de comunicaci�n con el PAC.
   ///	</summary>

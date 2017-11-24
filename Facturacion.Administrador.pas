@@ -156,7 +156,7 @@ begin
   Assert(aGeneradorSello <> nil, 'La instancia aGeneradorSello no debio ser nula');
 
   // 1. Intentamos obtener la cadena Original del comprobante
-  cadenaOriginal := aGeneradorCadenaOriginal.obtenerCadenaOriginal(aComprobante);
+  cadenaOriginal := aGeneradorCadenaOriginal.ObtenerCadenaOriginal(aComprobante);
 
   // Si tenemos asignado el evento de notificacion de cadena original, lo lanzamos...
   if Assigned(fOnCadenaOriginalGenerada) then

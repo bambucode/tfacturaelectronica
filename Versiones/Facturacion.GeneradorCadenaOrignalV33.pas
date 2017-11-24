@@ -18,8 +18,8 @@ type
 
   TGeneradorCadenaOriginalV33 = class(TInterfacedObject, IGeneradorCadenaOriginal)
   public
-    function obtenerCadenaOriginal(const aComprobante: IComprobanteFiscal) : TCadenaUTF8;
-    function obtenerCadenaOriginalDeTimbre(const aComprobante: IComprobanteFiscal) : TCadenaUTF8;
+    function ObtenerCadenaOriginal(const aComprobante: IComprobanteFiscal) : TCadenaUTF8;
+    function ObtenerCadenaOriginalDeTimbre(const aComprobante: IComprobanteFiscal) : TCadenaUTF8;
   end;
 
 implementation
@@ -33,7 +33,7 @@ const
 
 { TGeneradorCadenaOriginalV33 }
 
-function TGeneradorCadenaOriginalV33.obtenerCadenaOriginal(const aComprobante: IComprobanteFiscal): TCadenaUTF8;
+function TGeneradorCadenaOriginalV33.ObtenerCadenaOriginal(const aComprobante: IComprobanteFiscal): TCadenaUTF8;
 var
   contenidoXMLComprobante: TCadenaUTF8;
   contenidoXSLTCadenaOriginal: TCadenaUTF8;
@@ -45,7 +45,7 @@ begin
   transformador := TTransformadorDeXML.Create;
   try
     contenidoXMLComprobante := aComprobante.XML;
-    contenidoXSLTCadenaOriginal := transformador.obtenerXSLTDeRecurso(_NOMBRE_RECURSO_CADENA_ORIGINAL);
+    contenidoXSLTCadenaOriginal := transformador.ObtenerXSLTDeRecurso(_NOMBRE_RECURSO_CADENA_ORIGINAL);
     // Obtenemos la Cadena originak del CFDI 3.3 usando el archivo XSLT proveido por el SAT
     Result := UTF8Encode('|' + transformador.TransformarXML(contenidoXMLComprobante, contenidoXSLTCadenaOriginal) + '||');
   finally
@@ -53,7 +53,7 @@ begin
   end;
 end;
 
-function TGeneradorCadenaOriginalV33.obtenerCadenaOriginalDeTimbre(const aComprobante: IComprobanteFiscal): TCadenaUTF8;
+function TGeneradorCadenaOriginalV33.ObtenerCadenaOriginalDeTimbre(const aComprobante: IComprobanteFiscal): TCadenaUTF8;
 var
   contenidoXMLComprobante: TCadenaUTF8;
   contenidoXSLTCadenaOriginal: TCadenaUTF8;
