@@ -7,6 +7,8 @@ uses Facturacion.Comprobante;
 type
 
   TFacturacionHelper = class
+    class procedure CorregirConfiguracionRegionalLocal;
+    class procedure RegresarConfiguracionRegionalLocal;
     class function ComoFechaISO8601(const aFecha: TDateTime): string;
     class function DesdeFechaISO8601(const aCadenaFecha: String): TDateTime;
     class function ComoMoneda(const aValor: Currency; const aNumeroDecimales:
@@ -15,7 +17,16 @@ type
     class procedure AgregarSchemaLocation(const aComprobante: IComprobanteFiscal; const aCadena: String);
     class function VerificarImporteEnRangoDeRedondeo(const aCantidad: Double; const
         aValorUnitario, aImporte: Currency): Boolean;
+    class function ComoTasa(const aPorcentaje: Double): String;
+    class function DesdeTasa(const aTasa: String): Double;
   end;
+
+var
+  separadorDecimalAnterior: Char;
+
+const
+  _PUNTO_DECIMAL = '.';
+  _COMA_DECIMAL  = ',';
 
 implementation
 
@@ -26,7 +37,24 @@ uses System.SysUtils,
      {$ENDIF}
      Soap.XSBuiltIns;
 
+var
+  formatSettingsLocal : TFormatSettings;
+
 { TFacturacionHelper }
+
+class procedure TFacturacionHelper.CorregirConfiguracionRegionalLocal;
+begin
+  // Debido a que si el usuario en la PC tiene una configuración regional incorrecta
+  // los XMLs se generan con montos y cantidades inválidas
+  separadorDecimalAnterior := formatSettingsLocal.DecimalSeparator;
+  // Indicamos que el separador Decimal será el punto
+  formatSettingsLocal.DecimalSeparator := _PUNTO_DECIMAL;
+end;
+
+class procedure TFacturacionHelper.RegresarConfiguracionRegionalLocal;
+begin
+  formatSettingsLocal.DecimalSeparator := separadorDecimalAnterior;
+end;
 
 // "Se expresa en la forma aaaa-mm-ddThh:mm:ss, de acuerdo con la especificación ISO 8601"
 class procedure TFacturacionHelper.AgregarSchemaLocation(
@@ -45,7 +73,32 @@ begin
   // Anexo 20:
   // "En este campo se debe registrar la cantidad de bienes o servicios que
   // correspondan a cada concepto, puede contener de cero hasta seis decimales."
-  Result := FormatFloat('0.####', aValor); //FloatToStrF(aValor, ffFixed, 20, 4);
+  try
+     CorregirConfiguracionRegionalLocal;
+     Result := FormatFloat('0.####', aValor); //FloatToStrF(aValor, ffFixed, 20, 4);
+   finally
+     RegresarConfiguracionRegionalLocal;
+   end;
+end;
+
+class function TFacturacionHelper.ComoTasa(const aPorcentaje: Double): String;
+begin
+  try
+     CorregirConfiguracionRegionalLocal;
+     Result := Format('%1.6f', [aPorcentaje / 100]);
+  finally
+     RegresarConfiguracionRegionalLocal;
+  end;
+end;
+
+class function TFacturacionHelper.DesdeTasa(const aTasa: String): Double;
+begin
+   try
+     CorregirConfiguracionRegionalLocal;
+     Result := (StrToFloat(aTasa) * 100);
+  finally
+     RegresarConfiguracionRegionalLocal;
+  end;
 end;
 
 class function TFacturacionHelper.ComoFechaISO8601(const aFecha: TDateTime):
@@ -58,10 +111,15 @@ class function TFacturacionHelper.ComoMoneda(const aValor: Currency; const
     aNumeroDecimales: Integer = 2): string;
 begin
   // NOTA: Esta moneda es para el XML, NO debe llevar simbolo de moneda
-  if Frac(aValor) = 0 then
-    Result := CurrToStrF(aValor, ffFixed, 0)
-  else
-    Result := CurrToStrF(aValor, ffFixed, aNumeroDecimales);
+  try
+    CorregirConfiguracionRegionalLocal;
+    if Frac(aValor) = 0 then
+      Result := CurrToStrF(aValor, ffFixed, 0)
+    else
+      Result := CurrToStrF(aValor, ffFixed, aNumeroDecimales);
+   finally
+      RegresarConfiguracionRegionalLocal;
+   end;
 end;
 
 class function TFacturacionHelper.DesdeFechaISO8601(
