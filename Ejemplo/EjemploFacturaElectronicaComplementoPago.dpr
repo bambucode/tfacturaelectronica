@@ -54,7 +54,8 @@ uses
   Facturacion.GeneradorCBBv32 in '..\Versiones\Facturacion.GeneradorCBBv32.pas',
   Facturacion.Tipos in '..\Facturacion.Tipos.pas',
   Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas',
-  Facturacion.ComplementoPagoV1 in '..\Versiones\Facturacion.ComplementoPagoV1.pas';
+  Facturacion.ComplementoPagoV1 in '..\Versiones\Facturacion.ComplementoPagoV1.pas',
+  EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas';
 
 var
   nuevaFactura : IComprobanteFiscal;
@@ -201,26 +202,26 @@ begin
               pagoComplementPagoV1.FormaDePagoP     := '02';
               pagoComplementPagoV1.MonedaP          := 'MXN';
               //pagoComplementPagoV1.TipoCambioP      := '1.00';  // Ecodex no valida la inclusion de TipoCambioP
-              pagoComplementPagoV1.Monto            := '1850.00';
+              pagoComplementPagoV1.Monto            := '100.00';
               pagoComplementPagoV1.NumOperacion     := '323232';
-              pagoComplementPagoV1.RfcEmisorCtaOrd  := 'BBA940707IE1';
-              pagoComplementPagoV1.CtaOrdenante     := '12345678901';
-              pagoComplementPagoV1.RfcEmisorCtaBen  := 'BBA830831LJ2';
-              pagoComplementPagoV1.CtaBeneficiario  := '123456789012345678';
+              //pagoComplementPagoV1.RfcEmisorCtaOrd  := 'BBA940707IE1';
+              //pagoComplementPagoV1.CtaOrdenante     := '12345678901';
+              //pagoComplementPagoV1.RfcEmisorCtaBen  := 'BBA830831LJ2';
+              //pagoComplementPagoV1.CtaBeneficiario  := '123456789012345678';
 
               doctoRelacionadoListV1                   := pagoComplementPagoV1.DoctoRelacionado;
               doctoRelacionadoComplementoPagoV1        := doctoRelacionadoListV1.Add;
 
-              doctoRelacionadoComplementoPagoV1.IdDocumento        := 'D72829D8-ADCD-4457-935F-B7168A488850';
+              doctoRelacionadoComplementoPagoV1.IdDocumento        := 'D72829D8-ADCD-4457-935F-B7168A488851';
               doctoRelacionadoComplementoPagoV1.Serie              := 'A';
-              doctoRelacionadoComplementoPagoV1.Folio              := '23245';
-              doctoRelacionadoComplementoPagoV1.MonedaDR           := 'USD';
-              doctoRelacionadoComplementoPagoV1.TipoCambioDR       := '0.05';
+              doctoRelacionadoComplementoPagoV1.Folio              := '1';
+              doctoRelacionadoComplementoPagoV1.MonedaDR           := 'MXN';
+              //doctoRelacionadoComplementoPagoV1.TipoCambioDR       := '0.05';
               doctoRelacionadoComplementoPagoV1.MetodoDePagoDR     := 'PPD';
-              doctoRelacionadoComplementoPagoV1.NumParcialidad     := 5;
-              doctoRelacionadoComplementoPagoV1.ImpSaldoAnt        := '8208.00';
+              doctoRelacionadoComplementoPagoV1.NumParcialidad     := 1;
+              doctoRelacionadoComplementoPagoV1.ImpSaldoAnt        := '1000.00';  //ImpPagado + impSaldoInsoluto
               doctoRelacionadoComplementoPagoV1.ImpPagado          := '100.00';
-              doctoRelacionadoComplementoPagoV1.ImpSaldoInsoluto   := '8108.00';
+              doctoRelacionadoComplementoPagoV1.ImpSaldoInsoluto   := '900.00';
 
               nuevaFactura.AgregarComplemento(complementoPagoV1,
                                               'pago10',
@@ -230,7 +231,7 @@ begin
 
               // Agregamos el impuesto local el cual se maneja de forma especial
               {$REGION 'Impuestos locales'}
-              impuestoLocalv1 := NewImpuestosLocalesV1;
+              {impuestoLocalv1 := NewImpuestosLocalesV1;
               impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
               impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
               trasladosImpuestosLocalesv1 := impuestoLocalv1.TrasladosLocales.Add;
@@ -241,7 +242,7 @@ begin
               nuevaFactura.AgregarComplemento(impuestoLocalv1,
                                               'implocal',
                                               'http://www.sat.gob.mx/implocal',
-                                              'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
+                                              'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd'); }
               {$ENDREGION}
             end;
             {$ENDREGION}
@@ -263,6 +264,7 @@ begin
 
           // Dependiendo de la version usamos diferente servidor de pruebas
           pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
+                         credencialesPAC,
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL);
 
