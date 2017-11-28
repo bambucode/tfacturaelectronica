@@ -345,8 +345,12 @@ begin
     except
       // Si es una falla de timbrado previo, la evitamos lanzar, cualquier otra falla la re-lanzamos
       On E:EPACTimbradoPreviamenteException do
-        documentoTimbradoPreviamente := True
-      else
+      begin
+        {$IFDEF CODESITE}
+        CodeSite.SendWarning('Se detectó documento timbrado previamente, obteniendo timbre previo...');
+        {$ENDIF}
+        documentoTimbradoPreviamente := True;
+      end else
         raise;
     end;
   finally
