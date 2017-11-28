@@ -20,10 +20,13 @@ type
     class function ComoTasa(const aPorcentaje: Double): String;
     class function DesdeTasa(const aTasa: String): Double;
     class function ComoTasaImpuestoLocal(const aPorcentaje: Double): String;
+    class procedure ReemplazarComaSiActuaComoPuntoDecimal(var aCadenaCatidad: String);
+    class function DesdeMoneda(aMoneda: String): Currency;
   end;
 
 var
   separadorDecimalAnterior: Char;
+  separadorDeMiles: Char;
 
 const
   _PUNTO_DECIMAL = '.';
@@ -48,13 +51,16 @@ begin
   // Debido a que si el usuario en la PC tiene una configuración regional incorrecta
   // los XMLs se generan con montos y cantidades inválidas
   separadorDecimalAnterior := formatSettingsLocal.DecimalSeparator;
+  separadorDeMiles         := formatSettingsLocal.ThousandSeparator;
   // Indicamos que el separador Decimal será el punto
-  formatSettingsLocal.DecimalSeparator := _PUNTO_DECIMAL;
+  formatSettingsLocal.DecimalSeparator  := _PUNTO_DECIMAL;
+  //formatSettingsLocal.ThousandSeparator := _COMA_DECIMAL;
 end;
 
 class procedure TFacturacionHelper.RegresarConfiguracionRegionalLocal;
 begin
-  formatSettingsLocal.DecimalSeparator := separadorDecimalAnterior;
+  formatSettingsLocal.DecimalSeparator  := separadorDecimalAnterior;
+  formatSettingsLocal.ThousandSeparator := separadorDeMiles;
 end;
 
 // "Se expresa en la forma aaaa-mm-ddThh:mm:ss, de acuerdo con la especificación ISO 8601"
@@ -76,7 +82,7 @@ begin
   // correspondan a cada concepto, puede contener de cero hasta seis decimales."
   try
      CorregirConfiguracionRegionalLocal;
-     Result := FormatFloat('0.####', aValor); //FloatToStrF(aValor, ffFixed, 20, 4);
+     Result := FormatFloat('0.####', aValor, formatSettingsLocal); //FloatToStrF(aValor, ffFixed, 20, 4);
    finally
      RegresarConfiguracionRegionalLocal;
    end;
@@ -86,7 +92,7 @@ class function TFacturacionHelper.ComoTasa(const aPorcentaje: Double): String;
 begin
   try
      CorregirConfiguracionRegionalLocal;
-     Result := Format('%1.6f', [aPorcentaje / 100]);
+     Result := Format('%1.6f', [aPorcentaje / 100], formatSettingsLocal);
   finally
      RegresarConfiguracionRegionalLocal;
   end;
@@ -96,7 +102,7 @@ class function TFacturacionHelper.ComoTasaImpuestoLocal(const aPorcentaje: Doubl
 begin
   try
      CorregirConfiguracionRegionalLocal;
-     Result := Format('%1.2f', [aPorcentaje]);
+     Result := Format('%1.2f', [aPorcentaje], formatSettingsLocal);
   finally
      RegresarConfiguracionRegionalLocal;
   end;
@@ -106,7 +112,27 @@ class function TFacturacionHelper.DesdeTasa(const aTasa: String): Double;
 begin
    try
      CorregirConfiguracionRegionalLocal;
-     Result := (StrToFloat(aTasa) * 100);
+     Result := (StrToFloat(aTasa, formatSettingsLocal) * 100);
+  finally
+     RegresarConfiguracionRegionalLocal;
+  end;
+end;
+
+class procedure TFacturacionHelper.ReemplazarComaSiActuaComoPuntoDecimal(var aCadenaCatidad: String);
+begin
+  // Reemplazamos cualquier coma por el simbolo de punto
+  aCadenaCatidad := StringReplace(aCadenaCatidad,
+                                  _COMA_DECIMAL,
+                                  _PUNTO_DECIMAL,
+                                  [rfReplaceAll]);
+end;
+
+class function TFacturacionHelper.DesdeMoneda(aMoneda: String): Currency;
+begin
+  try
+     CorregirConfiguracionRegionalLocal;
+     ReemplazarComaSiActuaComoPuntoDecimal(aMoneda);
+     Result := StrToCurr(aMoneda, formatSettingsLocal);
   finally
      RegresarConfiguracionRegionalLocal;
   end;
@@ -125,9 +151,9 @@ begin
   try
     CorregirConfiguracionRegionalLocal;
     if Frac(aValor) = 0 then
-      Result := CurrToStrF(aValor, ffFixed, 0)
+      Result := CurrToStrF(aValor, ffFixed, 0, formatSettingsLocal)
     else
-      Result := CurrToStrF(aValor, ffFixed, aNumeroDecimales);
+      Result := CurrToStrF(aValor, ffFixed, aNumeroDecimales, formatSettingsLocal);
    finally
       RegresarConfiguracionRegionalLocal;
    end;
@@ -174,4 +200,6 @@ begin
   Result := System.Math.InRange(aImporte, limiteInferior, limiteSuperior);
 end;
 
+initialization
+  formatSettingsLocal := TFormatSettings.Create;
 end.
