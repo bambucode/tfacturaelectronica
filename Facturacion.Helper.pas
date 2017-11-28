@@ -19,6 +19,7 @@ type
         aValorUnitario, aImporte: Currency): Boolean;
     class function ComoTasa(const aPorcentaje: Double): String;
     class function DesdeTasa(const aTasa: String): Double;
+    class function ComoTasaImpuestoLocal(const aPorcentaje: Double): String;
   end;
 
 var
@@ -86,6 +87,16 @@ begin
   try
      CorregirConfiguracionRegionalLocal;
      Result := Format('%1.6f', [aPorcentaje / 100]);
+  finally
+     RegresarConfiguracionRegionalLocal;
+  end;
+end;
+
+class function TFacturacionHelper.ComoTasaImpuestoLocal(const aPorcentaje: Double): String;
+begin
+  try
+     CorregirConfiguracionRegionalLocal;
+     Result := Format('%1.2f', [aPorcentaje]);
   finally
      RegresarConfiguracionRegionalLocal;
   end;
