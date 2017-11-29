@@ -22,6 +22,7 @@ type
     class function ComoTasaImpuestoLocal(const aPorcentaje: Double): String;
     class procedure ReemplazarComaSiActuaComoPuntoDecimal(var aCadenaCatidad: String);
     class function DesdeMoneda(aMoneda: String): Currency;
+    class function DesdeCantidad(const aCantidad: String): Double;
   end;
 
 var
@@ -113,6 +114,16 @@ begin
    try
      CorregirConfiguracionRegionalLocal;
      Result := (StrToFloat(aTasa, formatSettingsLocal) * 100);
+  finally
+     RegresarConfiguracionRegionalLocal;
+  end;
+end;
+
+class function TFacturacionHelper.DesdeCantidad(const aCantidad: String): Double;
+begin
+   try
+     CorregirConfiguracionRegionalLocal;
+     Result := (StrToFloat(aCantidad, formatSettingsLocal));
   finally
      RegresarConfiguracionRegionalLocal;
   end;
