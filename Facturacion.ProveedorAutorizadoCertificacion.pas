@@ -69,7 +69,7 @@ type
   ///	</summary>
   ///	<remarks>
   ///	  <note type="important">
-  ///	    Por defecto se establece que esta excepci�n es "re-intentable" para
+  ///	    Por defecto se establece que esta excepcion es "re-intentable" para
   ///	    indicarle al cliente que debe de re-intentar realizar el ultimo proceso
   ///	  </note>
   ///	</remarks>
@@ -79,6 +79,7 @@ type
   EPACDocumentoNoEncontradoException = class(EPACException);
   EPACCancelacionFallidaCertificadoNoCargadoException = class(EPACErrorGenericoException);
 
+  EPACCorreoUsadoPreviamenteException = class(EPACErrorGenericoException);
   EPACEmisorYaExistenteException  = class(EPACErrorGenericoException);
   EPACTimbradoPreviamenteException = class(EPACErrorGenericoException);
 

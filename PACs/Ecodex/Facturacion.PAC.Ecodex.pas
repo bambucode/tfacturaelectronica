@@ -212,10 +212,9 @@ begin
   begin
     if (aExcepcion Is EEcodexFallaValidacionException) then
     begin
-      mensajeExcepcion := EEcodexFallaValidacionException(aExcepcion)
-        .Descripcion;
+      mensajeExcepcion := EEcodexFallaValidacionException(aExcepcion).Descripcion;
 
-      numeroErrorSAT := EEcodexFallaValidacionException(aExcepcion).Numero;
+      numeroErrorSAT   := EEcodexFallaValidacionException(aExcepcion).Numero;
 
       case numeroErrorSAT of
         0..32999:
@@ -654,8 +653,9 @@ const
   _ERR_SIN_FOLIOS_DISPONIBLES             = 800;
 
   // Errores exclusivos de la alta
-  _ERR_EMISOR_EXISTENTE                   = 98;
   _ERR_TIMBRADO_PREVIAMENTE               = 96;
+  _ERR_CORREO_USADO_PREVIAMENTE           = 97;
+  _ERR_EMISOR_EXISTENTE                   = 98;
   _ERR_XML_MAL_FORMADO                    = 301;
   _ERR_FECHA_INVALIDA                     = 401;
   _ERR_UUID_NO_ENCONTRADO                 = 505;
@@ -670,11 +670,12 @@ begin
   if (aExcepcion Is EEcodexFallaValidacionException) then
   begin
     case EEcodexFallaValidacionException(aExcepcion).Numero of
-      _ERR_EMISOR_EXISTENTE     : raise EPACEmisorYaExistenteException.Create(mensajeExcepcion, 0, _ERR_EMISOR_EXISTENTE, True);
-      _ERR_TIMBRADO_PREVIAMENTE : raise EPACTimbradoPreviamenteException.Create(mensajeExcepcion, 0, _ERR_TIMBRADO_PREVIAMENTE, True);
-      _ERR_UUID_NO_ENCONTRADO   : raise EPACDocumentoNoEncontradoException.Create(mensajeExcepcion, 0, _ERR_UUID_NO_ENCONTRADO, True);
-      _ERR_XML_MAL_FORMADO      : raise EPACXMLMalFormadoException.Create(mensajeExcepcion, 0, _ERR_XML_MAL_FORMADO, False);
-      _ERR_FECHA_INVALIDA       : raise EPACFechaInvalida.Create(mensajeExcepcion, 0, _ERR_FECHA_INVALIDA, False);
+      _ERR_CORREO_USADO_PREVIAMENTE : raise EPACCorreoUsadoPreviamenteException.Create(mensajeExcepcion, 0, _ERR_CORREO_USADO_PREVIAMENTE, False);
+      _ERR_EMISOR_EXISTENTE         : raise EPACEmisorYaExistenteException.Create(mensajeExcepcion, 0, _ERR_EMISOR_EXISTENTE, True);
+      _ERR_TIMBRADO_PREVIAMENTE     : raise EPACTimbradoPreviamenteException.Create(mensajeExcepcion, 0, _ERR_TIMBRADO_PREVIAMENTE, True);
+      _ERR_UUID_NO_ENCONTRADO       : raise EPACDocumentoNoEncontradoException.Create(mensajeExcepcion, 0, _ERR_UUID_NO_ENCONTRADO, True);
+      _ERR_XML_MAL_FORMADO          : raise EPACXMLMalFormadoException.Create(mensajeExcepcion, 0, _ERR_XML_MAL_FORMADO, False);
+      _ERR_FECHA_INVALIDA           : raise EPACFechaInvalida.Create(mensajeExcepcion, 0, _ERR_FECHA_INVALIDA, False);
     end;
   end;
 
