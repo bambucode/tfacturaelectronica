@@ -31,6 +31,8 @@ type
 
 implementation
 
+uses Facturacion.Helper;
+
 { TGeneradorCBBv33 }
 
 procedure TGeneradorCBBv33.AfterConstruction;
@@ -66,7 +68,7 @@ begin
                        8);
 
   uuid := facturaV33.Complemento.TimbreFiscalDigital.UUID;
-  totalComprobante := StrToCurr(facturaV33.Total);
+  totalComprobante := TFacturacionHelper.DesdeMoneda(facturaV33.Total);
 
   cadenaParaCBB := Format(_FORMATO_CBB,
                           [uuid,
@@ -74,7 +76,7 @@ begin
                            facturaV33.Receptor.RFC,
                            // Total del comprobante máximo a 25 posiciones (18 para los enteros, 1 para carácter “.”, 6 para los decimales),
                            // se deben omitir los ceros no significativos, precedido por el texto “&tt=”
-                           FloatToStrF(totalComprobante, ffFixed, 17, 6),
+                           FloatToStrF(totalComprobante, ffFixed, 17, 6, Facturacion.Helper.formatSettingsLocal),
                            selloParcial]);
 
   try

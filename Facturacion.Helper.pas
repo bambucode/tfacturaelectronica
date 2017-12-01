@@ -2,7 +2,8 @@ unit Facturacion.Helper;
 
 interface
 
-uses Facturacion.Comprobante;
+uses Facturacion.Comprobante,
+     System.SysUtils;
 
 type
 
@@ -28,6 +29,7 @@ type
 var
   separadorDecimalAnterior: Char;
   separadorDeMiles: Char;
+  formatSettingsLocal : TFormatSettings;
 
 const
   _PUNTO_DECIMAL = '.';
@@ -35,15 +37,11 @@ const
 
 implementation
 
-uses System.SysUtils,
-     System.Math,
+uses System.Math,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
      Soap.XSBuiltIns;
-
-var
-  formatSettingsLocal : TFormatSettings;
 
 { TFacturacionHelper }
 
