@@ -159,7 +159,7 @@ begin
   // NOTA: Esta moneda es para el XML, NO debe llevar simbolo de moneda
   try
     CorregirConfiguracionRegionalLocal;
-    if Frac(aValor) = 0 then
+    if (Frac(aValor) = 0) And (aValor = 0) then
       Result := CurrToStrF(aValor, ffFixed, 0, formatSettingsLocal)
     else
       Result := CurrToStrF(aValor, ffFixed, aNumeroDecimales, formatSettingsLocal);
