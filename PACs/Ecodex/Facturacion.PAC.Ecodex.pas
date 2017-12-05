@@ -643,6 +643,7 @@ const
   _ECODEX_VERSION_NO_SOPORTADA            = 'El driver no soporta esta version de cfdi';
   _ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA = 'El emisor ya se encuentra dado de alta con un integrador';
   _ECODEX_SIN_FOLIOS                      = 'El contribuyente aun no tiene folios asignados';
+  _ECODEX_DOCUMENTO_CANCELAR_NO_ENCONTRADO= 'NO SE ENCONTRO ALGUN DOCUMENTO A CANCELAR';
 
   _ECODEX_ERROR_OBTENIENDO_ACUSE          = 33;
 
@@ -681,6 +682,10 @@ begin
 
   if AnsiPos(_ECODEX_SIN_FOLIOS, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EPACTimbradoSinFoliosDisponiblesException.Create(_ECODEX_SIN_FOLIOS, 0, EEcodexFallaValidacionException(aExcepcion).Numero, False);
+
+  if AnsiPos(_ECODEX_DOCUMENTO_CANCELAR_NO_ENCONTRADO, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise PACCancelacionFallidaDocumentoNoEncontradoException.Create(_ECODEX_DOCUMENTO_CANCELAR_NO_ENCONTRADO, 0,
+                                                                     EEcodexFallaValidacionException(aExcepcion).Numero, False);
 
   // TBD: https://github.com/bambucode/eleventa/issues/1721
  { if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_USADO, mensajeExcepcion) > _NO_ENCONTRADO then
