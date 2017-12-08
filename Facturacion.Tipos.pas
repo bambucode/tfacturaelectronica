@@ -52,6 +52,8 @@ type
   // Los errores de "configuracion" donde algun dato del emisor está mal segun el SAT
   ESATDatoEmisorIncorrectoException       = class(ESATErrorGenericoException);
   ESATDatoReceptorIncorrectoException     = class(ESATErrorGenericoException);
+  // El porcentaje del impuesto tiene un valor fuera del catalogo de tasas c_TasaOCuota.json
+  ESAImpuestoTasaIncorrectaException      = class(ESATErrorGenericoException);
   // Cuando algun valor de un campo de catalogo no existió en el mismo
   ESATValorNoEnCatalogoException          = class(ESATErrorGenericoException);
   // Existió un error arimético en el XML
