@@ -12,15 +12,14 @@ type
     class procedure RegresarConfiguracionRegionalLocal;
     class function ComoFechaISO8601(const aFecha: TDateTime): string;
     class function DesdeFechaISO8601(const aCadenaFecha: String): TDateTime;
-    class function ComoMoneda(const aValor: Currency; const aNumeroDecimales:
-        Integer = 2): string;
+    class function ComoMoneda(const aValor: Currency; const aNumeroDecimales: Integer = 2): string;
     class function ComoCantidad(const aValor: Double) : string;
     class procedure AgregarSchemaLocation(const aComprobante: IComprobanteFiscal; const aCadena: String);
-    class function VerificarImporteEnRangoDeRedondeo(const aCantidad: Double; const
-        aValorUnitario, aImporte: Currency): Boolean;
+    class function VerificarImporteEnRangoDeRedondeo(const aCantidad: Double; const aValorUnitario, aImporte: Currency): Boolean;
     class function ComoTasa(const aPorcentaje: Double): String;
     class function DesdeTasa(const aTasa: String): Double;
     class function ComoTasaImpuestoLocal(const aPorcentaje: Double): String;
+    class function ComoPorcentaje(const aPorcentaje: Double): String;
     class procedure ReemplazarComaSiActuaComoPuntoDecimal(var aCadenaCatidad: String);
     class function DesdeMoneda(aMoneda: String): Currency;
     class function DesdeCantidad(const aCantidad: String): Double;
@@ -80,50 +79,60 @@ begin
   // "En este campo se debe registrar la cantidad de bienes o servicios que
   // correspondan a cada concepto, puede contener de cero hasta seis decimales."
   try
-     CorregirConfiguracionRegionalLocal;
-     Result := FormatFloat('0.####', aValor, formatSettingsLocal); //FloatToStrF(aValor, ffFixed, 20, 4);
-   finally
-     RegresarConfiguracionRegionalLocal;
-   end;
+    CorregirConfiguracionRegionalLocal;
+    Result := FormatFloat('0.####', aValor, formatSettingsLocal); //FloatToStrF(aValor, ffFixed, 20, 4);
+  finally
+    RegresarConfiguracionRegionalLocal;
+  end;
 end;
 
 class function TFacturacionHelper.ComoTasa(const aPorcentaje: Double): String;
 begin
   try
-     CorregirConfiguracionRegionalLocal;
-     Result := Format('%1.6f', [aPorcentaje / 100], formatSettingsLocal);
+    CorregirConfiguracionRegionalLocal;
+    Result := Format('%1.6f', [aPorcentaje / 100], formatSettingsLocal);
   finally
-     RegresarConfiguracionRegionalLocal;
+    RegresarConfiguracionRegionalLocal;
   end;
 end;
 
 class function TFacturacionHelper.ComoTasaImpuestoLocal(const aPorcentaje: Double): String;
 begin
   try
-     CorregirConfiguracionRegionalLocal;
-     Result := Format('%1.2f', [aPorcentaje], formatSettingsLocal);
+    CorregirConfiguracionRegionalLocal;
+    Result := Format('%1.2f', [aPorcentaje], formatSettingsLocal);
   finally
-     RegresarConfiguracionRegionalLocal;
+    RegresarConfiguracionRegionalLocal;
+  end;
+end;
+
+class function TFacturacionHelper.ComoPorcentaje(const aPorcentaje: Double): String;
+begin
+  try
+    CorregirConfiguracionRegionalLocal;
+    Result := Format('%1.2f', [aPorcentaje], formatSettingsLocal);
+  finally
+    RegresarConfiguracionRegionalLocal;
   end;
 end;
 
 class function TFacturacionHelper.DesdeTasa(const aTasa: String): Double;
 begin
-   try
-     CorregirConfiguracionRegionalLocal;
-     Result := (StrToFloat(aTasa, formatSettingsLocal) * 100);
+  try
+    CorregirConfiguracionRegionalLocal;
+    Result := (StrToFloat(aTasa, formatSettingsLocal) * 100);
   finally
-     RegresarConfiguracionRegionalLocal;
+    RegresarConfiguracionRegionalLocal;
   end;
 end;
 
 class function TFacturacionHelper.DesdeCantidad(const aCantidad: String): Double;
 begin
-   try
-     CorregirConfiguracionRegionalLocal;
-     Result := (StrToFloat(aCantidad, formatSettingsLocal));
+  try
+    CorregirConfiguracionRegionalLocal;
+    Result := (StrToFloat(aCantidad, formatSettingsLocal));
   finally
-     RegresarConfiguracionRegionalLocal;
+    RegresarConfiguracionRegionalLocal;
   end;
 end;
 
@@ -139,16 +148,15 @@ end;
 class function TFacturacionHelper.DesdeMoneda(aMoneda: String): Currency;
 begin
   try
-     CorregirConfiguracionRegionalLocal;
-     ReemplazarComaSiActuaComoPuntoDecimal(aMoneda);
-     Result := StrToCurr(aMoneda, formatSettingsLocal);
+    CorregirConfiguracionRegionalLocal;
+    ReemplazarComaSiActuaComoPuntoDecimal(aMoneda);
+    Result := StrToCurr(aMoneda, formatSettingsLocal);
   finally
-     RegresarConfiguracionRegionalLocal;
+    RegresarConfiguracionRegionalLocal;
   end;
 end;
 
-class function TFacturacionHelper.ComoFechaISO8601(const aFecha: TDateTime):
-    string;
+class function TFacturacionHelper.ComoFechaISO8601(const aFecha: TDateTime): string;
 begin
   Result := FormatDateTime('yyyy-mm-dd', aFecha) + 'T' + FormatDateTime('hh:nn:ss', aFecha);
 end;
@@ -163,9 +171,9 @@ begin
       Result := CurrToStrF(aValor, ffFixed, 0, formatSettingsLocal)
     else
       Result := CurrToStrF(aValor, ffFixed, aNumeroDecimales, formatSettingsLocal);
-   finally
-      RegresarConfiguracionRegionalLocal;
-   end;
+  finally
+    RegresarConfiguracionRegionalLocal;
+  end;
 end;
 
 class function TFacturacionHelper.DesdeFechaISO8601(
