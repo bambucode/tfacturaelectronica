@@ -230,7 +230,7 @@ begin
 
         // Algun valor que debía venir de un catálogo no fue correcto
         33104, 33112, 33120, 33121, 33125, 33130, 33136, 33140, 33142, 33145,
-          33155, 33156, 33164, 33165, 33172, 33185:
+          33156, 33164, 33165, 33172, 33185:
           raise ESATValorNoEnCatalogoException.Create(mensajeExcepcion,
             numeroErrorSAT, False);
 
@@ -244,7 +244,7 @@ begin
           raise ESATDatoReceptorIncorrectoException.Create(mensajeExcepcion,
             numeroErrorSAT, False);
 
-        33159: raise ESAImpuestoTasaIncorrectaException.Create(mensajeExcepcion, numeroErrorSAT, False);
+        33155, 33159: raise ESAImpuestoTasaIncorrectaException.Create(mensajeExcepcion, numeroErrorSAT, False);
 
         // Errores de validacion, reglas de negocio, etc.
         33107, 33108, 33109, 33110, 33113, 33114, 33115, 33118, 33122, 33123,
