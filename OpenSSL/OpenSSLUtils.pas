@@ -166,7 +166,8 @@ function GetErrorMessage: string;
 
 implementation
 
-uses DateUtils, LibEay32Plus;
+uses DateUtils,
+     LibEay32Plus;
 
 constructor EOpenSSL.Create(Msg: string);
 begin
@@ -337,12 +338,21 @@ if fCertificate<>nil then
   X509_free(fCertificate);
 end;
 
+
 function TX509Certificate.getDN(pDn: pX509_NAME): String;
 var
-  buffer: array [0..1023] of Caracter;
+  buffer: array [0..1023] of PAnsiChar;  // Caracter
+  res : String;
 begin
-X509_NAME_oneline(pDn, @buffer, SizeOf(buffer));
-result := StrPas( pansichar( @buffer) );
+  X509_NAME_oneline(pDn, @buffer, SizeOf(buffer));
+  Res := (StrPas( pansichar( @buffer)));
+
+  // TEMP: Reemplazar entidades escapadas de UTF8 a su valor original
+  Res := StringReplace(Res, '\xD1',     'Ñ', [rfReplaceAll]);
+  Res := StringReplace(Res, '\xC3\xB3', 'ó', [rfReplaceAll]);
+  Res := StringReplace(Res, '\xC3\xA9', 'é', [rfReplaceAll]);
+
+  Result := Res;
 end;
 
 // Extract a ASN1 time

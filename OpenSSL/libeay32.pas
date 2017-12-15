@@ -1164,8 +1164,8 @@ function DSA_generate_parameters(bits: integer; seed: pointer;
 function DSA_generate_key(A: pDSA): integer; cdecl;
 
 // X.509 names (DN)
-function X509_NAME_oneline(A: pX509_NAME; buf: PChar; size: integer)
-  : PChar; cdecl;
+function X509_NAME_oneline(A: pX509_NAME; buf: PCharacter; size: integer)
+  : PCharacter; cdecl;
 function X509_NAME_new: pX509_NAME; cdecl;
 procedure X509_NAME_free(x: pX509_NAME)cdecl;
 function X509_NAME_add_entry_by_txt(name: pX509_NAME; field: PChar;

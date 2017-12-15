@@ -118,7 +118,6 @@ begin
     fVigenteDesde  := fx509Certificado.NotAfter;
     fVigenteHasta  := fx509Certificado.NotBefore;
     fNoCertificado := fx509Certificado.SerialNumber;
-
     fSubjectCertificado := fx509Certificado.Subject;
   except
      // Pasamos la excepcion tal y como esta
