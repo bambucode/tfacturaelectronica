@@ -246,9 +246,11 @@ begin
 
         33155, 33159: raise ESAImpuestoTasaIncorrectaException.Create(mensajeExcepcion, numeroErrorSAT, False);
 
+        33141: raise EUsoCFDIIncorrectoException.Create(mensajeExcepcion, numeroErrorSAT, False);
+
         // Errores de validacion, reglas de negocio, etc.
         33107, 33108, 33109, 33110, 33113, 33114, 33115, 33118, 33122, 33123,
-          33124, 33137, 33138, 33141, 33144, 33147, 33149, 33152, 33154,
+          33124, 33137, 33138, 33144, 33147, 33149, 33152, 33154,
           33157, 33158, 33161, 33166, 33167, 33169, 33170, 33171, 33174,
           33176, 33177, 33178, 33103, 33179, 33180, 33181, 33182, 33183, 33184,
           33186, 33187, 33189, 33190, 33192, 33193, 33195:

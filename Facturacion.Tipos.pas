@@ -28,7 +28,7 @@ type
     property Reintentable : Boolean read fReintentable default false;
   end;
 
-{$REGION 'Excepciones de validacion de la matriz de validaciones de CFDI 3.3'}
+  {$REGION 'Excepciones de validacion de la matriz de validaciones de CFDI 3.3'}
   ESATErrorGenericoException = class(ECFDIException)
   private
     fCodigoError: Integer;
@@ -56,12 +56,13 @@ type
   ESAImpuestoTasaIncorrectaException      = class(ESATErrorGenericoException);
   // Cuando algun valor de un campo de catalogo no existió en el mismo
   ESATValorNoEnCatalogoException          = class(ESATErrorGenericoException);
+  // El uso de cfdi no es valido para el receptor
+  EUsoCFDIIncorrectoException             = class(ESATErrorGenericoException);
   // Existió un error arimético en el XML
   ESATProblemaDeLlenadoException          = class(ESATErrorGenericoException);
   ESATCampoConfirmacionRequeridoException = class(ESATErrorGenericoException);
   ESATNoIdentificadoException             = class(ESATErrorGenericoException); // CFDI33196
-
-{$ENDREGION}
+  {$ENDREGION}
 
 const
   _RFC_VENTA_PUBLICO_EN_GENERAL = 'XAXX010101000';
