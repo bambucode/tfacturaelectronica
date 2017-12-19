@@ -67,7 +67,7 @@ type
 const
   _RFC_VENTA_PUBLICO_EN_GENERAL         = 'XAXX010101000';
   _RFC_VENTA_EXTRANJEROS                = 'XEXX010101000';
-  _NOMBRE_CONTRIBUYENTE_PUBLICO_GENERAL = 'P%blico en General';
+  _NOMBRE_CONTRIBUYENTE_PUBLICO_GENERAL = 'Público en General';
   _NOMBRE_CONTRIBUYENTE_EXTRANJERO      = 'Venta al extranjero';
 
 implementation
