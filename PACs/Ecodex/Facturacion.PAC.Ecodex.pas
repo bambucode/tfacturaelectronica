@@ -687,6 +687,9 @@ begin
   if AnsiPos(_ECODEX_SIN_FOLIOS, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EPACTimbradoSinFoliosDisponiblesException.Create(_ECODEX_SIN_FOLIOS, 0, EEcodexFallaValidacionException(aExcepcion).Numero, False);
 
+  if AnsiPos(_ECODEX_ACUSE_NO_ENCONTRADO, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EPACAcuseNoEncontradoException.Create(_ECODEX_ACUSE_NO_ENCONTRADO, 0, EEcodexFallaValidacionException(aExcepcion).Numero, False);
+
   if AnsiPos(_ECODEX_DOCUMENTO_CANCELAR_NO_ENCONTRADO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise PACCancelacionFallidaDocumentoNoEncontradoException.Create(_ECODEX_DOCUMENTO_CANCELAR_NO_ENCONTRADO, 0,
                                                                      EEcodexFallaValidacionException(aExcepcion).Numero, False);

@@ -46,6 +46,7 @@ type
   EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
   EPACTimbradoSinFoliosDisponiblesException = class(EPACException);
   EPACCAnceladoSinCertificadosException = class(EPACException);
+  EPACAcuseNoEncontradoException    = class(EPACException);
   EPACNoSePudoObtenerAcuseException = class(EPACException);
   {$REGION 'Documentation'}
   ///	<summary>
