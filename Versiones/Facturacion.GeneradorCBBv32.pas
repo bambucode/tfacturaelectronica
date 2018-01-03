@@ -45,7 +45,7 @@ var
   totalComprobante : Currency;
   facturaV32 : IComprobanteFiscalV32;
 const
-  _FORMATO_CBB = 'https://verificacfdi.facturaelectronica.sat.gob.mx/default.aspx&id=%s&re=%s&rr=%s&tt=%s&fe=%s';
+  _FORMATO_CBB = '?re=%s&rr=%s&tt=%s&id=%s';
 begin
   if Not Supports(aComprobante, IComprobanteFiscalV32, facturaV32) then
     raise Exception.Create('Se intentó generar un CBB de CFDI 3.2 de un comprobante que no es de dicha versión');
@@ -56,7 +56,7 @@ begin
 
   // 1. Definimos la cadena con la que vamos a generar el CBB segun la especificacion del SAT
   // segun el rubro II.E del Anexo 20
-  cadenaParaCBB := Format('?re=%s&rr=%s&tt=%s&id=%s',
+  cadenaParaCBB := Format(_FORMATO_CBB,
                           [facturaV32.Emisor.RFC,
                            facturaV32.Receptor.RFC,
                            FloatToStrF(totalComprobante, ffFixed, 17, 6),
