@@ -88,7 +88,7 @@ type
     //property   ResultadoCancelacion2Array[Index: Integer]: TEcodexResultadoCancelacion2 read GetResultadoCancelacion2Array write SetResultadoCancelacion2Array; default;
     property   Len: Integer read GetResultadoCancelacion2ArrayLength write SetResultadoCancelacion2ArrayLength;
   published
-    property TEcodexResultadoCancelacion: Array_Of_TEcodexResultadoCancelacion  Index (IS_OPTN or IS_UNBD or IS_NLBL) read GetResultadoCancelacion write SetResultadoCancelacion stored ResultadoCancelacion_Specified;
+    property ResultadoCancelacion: Array_Of_TEcodexResultadoCancelacion  Index (IS_OPTN or IS_UNBD or IS_NLBL) read GetResultadoCancelacion write SetResultadoCancelacion stored ResultadoCancelacion_Specified;
   end;
 
 
@@ -386,7 +386,7 @@ type
   public
     constructor Create; override;
   published
-    property TEcodexListaCancelar: TEcodexListaCancelar2  Index (IS_OPTN or IS_NLBL) read GetListaCancelar write SetListaCancelar stored ListaCancelar_Specified;
+    property ListaCancelar: TEcodexListaCancelar2  Index (IS_OPTN or IS_NLBL) read GetListaCancelar write SetListaCancelar stored ListaCancelar_Specified;
     property RFC:           TXSString       Index (IS_OPTN or IS_NLBL) read GetRFC write SetRFC stored RFC_Specified;
     property Token:         TXSString       Index (IS_OPTN or IS_NLBL) read GetToken write SetToken stored Token_Specified;
     property TransaccionID: Int64           Index (IS_OPTN) read GetTransaccionID write SetTransaccionID stored TransaccionID_Specified;

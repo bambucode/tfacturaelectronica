@@ -40,9 +40,9 @@ type
   public
     destructor Destroy; override;
     procedure AfterConstruction; override;
-    procedure Configurar(const aDominioWebService: string; const aCredencialesPAC,
-        aCredencialesIntegrador: TFacturacionCredencialesPAC; const
-        aTransaccionInicial: Int64);
+    procedure Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
+        const aCredencialesPAC, aCredencialesIntegrador:
+        TFacturacionCredencialesPAC; const aTransaccionInicial: Int64);
     function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;
     function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
     function CancelarDocumentos(const aUUIDS: TListadoUUID):
@@ -93,12 +93,12 @@ end;
 
 { TProveedorEcodex }
 
-procedure TProveedorEcodex.Configurar(const aDominioWebService: string; const
-    aCredencialesPAC, aCredencialesIntegrador: TFacturacionCredencialesPAC;
-    const aTransaccionInicial: Int64);
+procedure TProveedorEcodex.Configurar(const aWsTimbrado, aWsClientes,
+    aWsCancelacion: string; const aCredencialesPAC, aCredencialesIntegrador:
+    TFacturacionCredencialesPAC; const aTransaccionInicial: Int64);
 begin
-  Assert(aDominioWebService <> '', 'La instancia aDominioWebService no debio ser vacia');
-  fDominioWebService      := aDominioWebService;
+  Assert(aWsTimbrado <> '', 'La instancia aWsTimbrado no debio ser vacia');
+  fDominioWebService      := aWsTimbrado;
   fCredencialesPAC        := aCredencialesPAC;
   fCredencialesIntegrador := aCredencialesIntegrador;
 
@@ -107,11 +107,11 @@ begin
   fManejadorDeSesion.AsignarCredenciales(fCredencialesPAC);
 
   // Incializamos las instancias de los WebServices
-  fwsTimbradoEcodex := GetWsEcodexTimbrado(False, fDominioWebService +
+  fwsTimbradoEcodex := GetWsEcodexTimbrado(False, aWsTimbrado +
     '/ServicioTimbrado.svc');
-  fwsClientesEcodex := GetWsEcodexClientes(False, fDominioWebService +
+  fwsClientesEcodex := GetWsEcodexClientes(False, aWsClientes +
     '/ServicioClientes.svc');
-  fwsCancelacionEcodex := GetWsEcodexCancelacion(False, fDominioWebService +
+  fwsCancelacionEcodex := GetWsEcodexCancelacion(False, aWsCancelacion +
     '/ServicioCancelacion.svc');
 end;
 
@@ -504,24 +504,10 @@ begin
   Assert(Length(aUUID) = _LONGITUD_UUID, 'La longitud del UUID debio de ser de ' + IntToStr(_LONGITUD_UUID));
   tokenDeUsuario                     := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
 
-  solicitudCancelacion               := TEcodexSolicitudCancelacion.Create;
-  try
-    solicitudCancelacion.RFC           := fCredencialesPAC.RFC;
-    solicitudCancelacion.Token         := tokenDeUsuario;
-    solicitudCancelacion.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
-    solicitudCancelacion.UUID          := aUUID;
-
-    try
-      respuestaCancelacion := fwsTimbradoEcodex.CancelaTimbrado(solicitudCancelacion);
-      Result := respuestaCancelacion.Cancelada;
-      respuestaCancelacion.Free;
-    except
-      On E: Exception do
-        ProcesarExcepcionDePAC(E);
-    end;
-  finally
-    solicitudCancelacion.Free;
-  end;
+  SetLength(arregloUUIDs, 1);
+  arregloUUIDs[0] := aUUID;
+  resultadoCancelacion := Self.CancelarDocumentos(arregloUUIDs);
+  Result := resultadoCancelacion.Items[aUUID];
 end;
 
 function TProveedorEcodex.ObtenerAcuseDeCancelacion(const aUUID: string):
@@ -592,12 +578,12 @@ begin
     SetLength(arregloGuids, Length(aUUIDS));
     for I := 0 to Length(aUUIDS) - 1 do
     begin
-      uuidPorCancelar := aUUIDS[I];
+      uuidPorCancelar := Uppercase(aUUIDS[I]);
       arregloGuids[I] := uuidPorCancelar;
     end;
 
-    solicitudCancelacion.TEcodexListaCancelar := TEcodexListaCancelar2.Create;
-    solicitudCancelacion.TEcodexListaCancelar.guid := arregloGuids;
+    solicitudCancelacion.ListaCancelar := TEcodexListaCancelar2.Create;
+    solicitudCancelacion.ListaCancelar.guid := arregloGuids;
     solicitudCancelacion.RFC := TXSString.Create;
     solicitudCancelacion.RFC.XSToNative(fCredencialesPAC.RFC);
 
@@ -614,10 +600,10 @@ begin
 
       // Convertir el array que regresa Ecodex al dictionary que
       // estamos regresando
-      for I := 0 to Length(respuestaCancelacion.Resultado.TEcodexResultadoCancelacion) - 1 do
+      for I := 0 to Length(respuestaCancelacion.Resultado.ResultadoCancelacion) - 1 do
       begin
-        estado := respuestaCancelacion.Resultado.TEcodexResultadoCancelacion[I].Estatus.NativeToXS;
-        Result.Add(respuestaCancelacion.Resultado.TEcodexResultadoCancelacion[I].UUID,
+        estado := respuestaCancelacion.Resultado.ResultadoCancelacion[I].Estatus.NativeToXS;
+        Result.Add(Uppercase(respuestaCancelacion.Resultado.ResultadoCancelacion[I].UUID),
                    estado = _CADENA_CANCELADO);
       end;
 
