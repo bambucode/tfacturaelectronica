@@ -49,6 +49,7 @@ type
   // serán heredados de la siguiente excepcion. Estos errores deberán ser corregidos
   // en la librería directamente
   ESATErrorTecnicoXMLException            = class(ESATErrorGenericoException);
+  ESATErrorEnCertificadoException         = class(ESATErrorGenericoException);
   // Los errores de "configuracion" donde algun dato del emisor está mal segun el SAT
   ESATDatoEmisorIncorrectoException       = class(ESATErrorGenericoException);
   ESATDatoReceptorIncorrectoException     = class(ESATErrorGenericoException);

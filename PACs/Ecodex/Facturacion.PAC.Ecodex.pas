@@ -223,10 +223,13 @@ begin
           ProcesarFallasEspecificasDeEcodex(aExcepcion);
         end;
         // Errores técnicos donde la librería no creo bien el XML
-        33101, 33102, 33105, 33106, 33111, 33116, 33126, 33127, 33128,
+        33101, 33102, 33106, 33111, 33116, 33126, 33127, 33128,
           33139, 33143, 33150:
           raise ESATErrorTecnicoXMLException.Create(mensajeExcepcion,
             numeroErrorSAT, False);
+
+        33105:
+          raise ESATErrorEnCertificadoException(mensajeExcepcion, numeroErrorSAT, False);
 
         // Algun valor que debía venir de un catálogo no fue correcto
         33104, 33112, 33120, 33121, 33125, 33130, 33136, 33140, 33142, 33145,
