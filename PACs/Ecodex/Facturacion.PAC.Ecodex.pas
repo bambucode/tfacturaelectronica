@@ -229,7 +229,7 @@ begin
             numeroErrorSAT, False);
 
         33105:
-          raise ESATErrorEnCertificadoException(mensajeExcepcion, numeroErrorSAT, False);
+          raise ESATErrorEnCertificadoException.Create(mensajeExcepcion, numeroErrorSAT, False);
 
         // Algun valor que debía venir de un catálogo no fue correcto
         33104, 33112, 33120, 33121, 33125, 33130, 33136, 33140, 33142, 33145,
