@@ -8,21 +8,23 @@ uses Facturacion.Comprobante,
 type
 
   TFacturacionHelper = class
+    class function ComoCantidad(const aValor: Double) : string;
+    class function ComoMoneda(const aValor: Currency; const aNumeroDecimales: Integer = 2): string;
+    class function ComoFechaISO8601(const aFecha: TDateTime): string;
+    class function ComoTasa(const aPorcentaje: Double): String;
+    class function ComoPorcentaje(const aPorcentaje: Double): String;
+    class function ComoTasaImpuestoLocal(const aPorcentaje: Double): String;
+    class function DesdeCantidad(const aCantidad: String): Double;
+    class function DesdeFechaISO8601(const aCadenaFecha: String): TDateTime;
+    class function DesdeMoneda(aMoneda: String): Currency;
+    class function DesdeTasa(const aTasa: String): Double;
+    class function LimpiarCaracteresInvalidos(const aCadena: string): string;
+    class function VerificarImporteEnRangoDeRedondeo(const aCantidad: Double; const aValorUnitario, aImporte: Currency): Boolean;
+
+    class procedure AgregarSchemaLocation(const aComprobante: IComprobanteFiscal; const aCadena: String);
     class procedure CorregirConfiguracionRegionalLocal;
     class procedure RegresarConfiguracionRegionalLocal;
-    class function ComoFechaISO8601(const aFecha: TDateTime): string;
-    class function DesdeFechaISO8601(const aCadenaFecha: String): TDateTime;
-    class function ComoMoneda(const aValor: Currency; const aNumeroDecimales: Integer = 2): string;
-    class function ComoCantidad(const aValor: Double) : string;
-    class procedure AgregarSchemaLocation(const aComprobante: IComprobanteFiscal; const aCadena: String);
-    class function VerificarImporteEnRangoDeRedondeo(const aCantidad: Double; const aValorUnitario, aImporte: Currency): Boolean;
-    class function ComoTasa(const aPorcentaje: Double): String;
-    class function DesdeTasa(const aTasa: String): Double;
-    class function ComoTasaImpuestoLocal(const aPorcentaje: Double): String;
-    class function ComoPorcentaje(const aPorcentaje: Double): String;
     class procedure ReemplazarComaSiActuaComoPuntoDecimal(var aCadenaCatidad: String);
-    class function DesdeMoneda(aMoneda: String): Currency;
-    class function DesdeCantidad(const aCantidad: String): Double;
   end;
 
 var
@@ -36,11 +38,12 @@ const
 
 implementation
 
-uses System.Math,
-     {$IFDEF CODESITE}
-     CodeSiteLogging,
-     {$ENDIF}
-     Soap.XSBuiltIns;
+uses
+  System.Math,
+  {$IFDEF CODESITE}
+  CodeSiteLogging,
+  {$ENDIF}
+  Soap.XSBuiltIns;
 
 { TFacturacionHelper }
 
@@ -124,6 +127,12 @@ begin
   finally
     RegresarConfiguracionRegionalLocal;
   end;
+end;
+
+class function TFacturacionHelper.LimpiarCaracteresInvalidos(
+  const aCadena: string): string;
+begin
+  Result := StringReplace(aCadena, '|', '',[rfReplaceAll, rfIgnoreCase]);
 end;
 
 class function TFacturacionHelper.DesdeCantidad(const aCantidad: String): Double;
