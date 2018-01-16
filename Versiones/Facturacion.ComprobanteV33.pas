@@ -15,6 +15,7 @@ interface
 
 uses xmldom, XMLDoc, XMLIntf,
      Facturacion.Comprobante,
+     Facturacion.Tipos,
      Facturacion.TimbreFiscalDigitalV33;
 
 type
@@ -336,14 +337,8 @@ type
     { Property Accessors }
     function Get_Numero: UnicodeString;
     procedure Set_Numero(Value: UnicodeString);
-    function Get_Fecha: UnicodeString;
-    procedure Set_Fecha(Value: UnicodeString);
-    function Get_Aduana: UnicodeString;
-    procedure Set_Aduana(Value: UnicodeString);
     { Methods & Properties }
     property Numero: UnicodeString read Get_Numero write Set_Numero;
-    property Fecha: UnicodeString read Get_Fecha write Set_Fecha;
-    property Aduana: UnicodeString read Get_Aduana write Set_Aduana;
   end;
 
 { IComprobanteFiscalV33_Conceptos_Concepto_InformacionAduaneraList }
@@ -424,7 +419,6 @@ type
 
   IComprobanteFiscalV33_Conceptos_Concepto_Parte_InformacionAduanera = interface(IXMLNode)
     ['{E5B59B2E-DAF2-4FE0-97FB-79BB357906E6}']
-    { Property Accessors }
     { Property Accessors }
     function Get_Numero: UnicodeString;
     procedure Set_Numero(Value: UnicodeString);
@@ -783,10 +777,6 @@ type
     { IComprobanteFiscalV33_Conceptos_Concepto_InformacionAduanera }
     function Get_Numero: UnicodeString;
     procedure Set_Numero(Value: UnicodeString);
-    function Get_Fecha: UnicodeString;
-    procedure Set_Fecha(Value: UnicodeString);
-    function Get_Aduana: UnicodeString;
-    procedure Set_Aduana(Value: UnicodeString);
   end;
 
 { TComprobanteFiscalV33_Conceptos_Concepto_InformacionAduaneraList }
@@ -860,10 +850,6 @@ type
     { IComprobanteFiscalV33_Conceptos_Concepto_Parte_InformacionAduanera }
     function Get_Numero: UnicodeString;
     procedure Set_Numero(Value: UnicodeString);
-    function Get_Fecha: UnicodeString;
-    procedure Set_Fecha(Value: UnicodeString);
-    function Get_Aduana: UnicodeString;
-    procedure Set_Aduana(Value: UnicodeString);
   end;
 
 { TComprobanteFiscalV33_Impuestos }
@@ -962,7 +948,7 @@ const
 
 implementation
 
-uses System.SysUtils,
+uses SysUtils,
      Facturacion.Helper;
 
 const
@@ -1752,36 +1738,17 @@ begin
   SetAttribute('Importe', Value);
 end;
 
+{ TComprobanteFiscalV33_Conceptos_Concepto_InformacionAduanera }
+
 function TComprobanteFiscalV33_Conceptos_Concepto_InformacionAduanera.Get_Numero: UnicodeString;
 begin
-  Result := AttributeNodes['Numero'].Text;
+  Result := AttributeNodes['NumeroPedimento'].Text;
 end;
 
 procedure TComprobanteFiscalV33_Conceptos_Concepto_InformacionAduanera.Set_Numero(Value: UnicodeString);
 begin
-  SetAttribute('Numero', Value);
+  SetAttribute('NumeroPedimento', Value);
 end;
-
-function TComprobanteFiscalV33_Conceptos_Concepto_InformacionAduanera.Get_Fecha: UnicodeString;
-begin
-  Result := AttributeNodes['Fecha'].Text;
-end;
-
-procedure TComprobanteFiscalV33_Conceptos_Concepto_InformacionAduanera.Set_Fecha(Value: UnicodeString);
-begin
-  SetAttribute('Fecha', Value);
-end;
-
-function TComprobanteFiscalV33_Conceptos_Concepto_InformacionAduanera.Get_Aduana: UnicodeString;
-begin
-  Result := AttributeNodes['Aduana'].Text;
-end;
-
-procedure TComprobanteFiscalV33_Conceptos_Concepto_InformacionAduanera.Set_Aduana(Value: UnicodeString);
-begin
-  SetAttribute('Aduana', Value);
-end;
-
 
 { TComprobanteFiscalV33_Conceptos_Concepto_InformacionAduaneraList }
 
@@ -1930,32 +1897,12 @@ end;
 
 function TComprobanteFiscalV33_Conceptos_Concepto_Parte_InformacionAduanera.Get_Numero: UnicodeString;
 begin
-  Result := AttributeNodes['Numero'].Text;
+  Result := AttributeNodes['NumeroPedimento'].Text;
 end;
 
 procedure TComprobanteFiscalV33_Conceptos_Concepto_Parte_InformacionAduanera.Set_Numero(Value: UnicodeString);
 begin
-  SetAttribute('Numero', Value);
-end;
-
-function TComprobanteFiscalV33_Conceptos_Concepto_Parte_InformacionAduanera.Get_Fecha: UnicodeString;
-begin
-  Result := AttributeNodes['Fecha'].Text;
-end;
-
-procedure TComprobanteFiscalV33_Conceptos_Concepto_Parte_InformacionAduanera.Set_Fecha(Value: UnicodeString);
-begin
-  SetAttribute('Fecha', Value);
-end;
-
-function TComprobanteFiscalV33_Conceptos_Concepto_Parte_InformacionAduanera.Get_Aduana: UnicodeString;
-begin
-  Result := AttributeNodes['Aduana'].Text;
-end;
-
-procedure TComprobanteFiscalV33_Conceptos_Concepto_Parte_InformacionAduanera.Set_Aduana(Value: UnicodeString);
-begin
-  SetAttribute('Aduana', Value);
+  SetAttribute('NumeroPedimento', Value);
 end;
 
 { TComprobanteFiscalV33_Impuestos }
