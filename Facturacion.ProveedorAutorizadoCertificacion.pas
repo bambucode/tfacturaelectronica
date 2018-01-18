@@ -37,17 +37,18 @@ type
     property CodigoErrrorPAC: Integer read fCodigoErrorPAC;
   end;
 
-  EPACXMLMalFormadoException  = class(EPACException);
-  EPACServicioNoDisponibleException = class(EPACException);
-  EPACCredencialesIncorrectasException = class(EPACException);
-  EPACEmisorNoInscritoException = class(EPACException);
-  EPACErrorGenericoDeAccesoException = class(EPACException);
-  EPACTimbradoRFCNoCorrespondeException = class(EPACException);
+  EPACXMLMalFormadoException                    = class(EPACException);
+  EPACServicioNoDisponibleException             = class(EPACException);
+  EPACCredencialesIncorrectasException          = class(EPACException);
+  EPACEmisorNoInscritoException                 = class(EPACException);
+  EPACErrorGenericoDeAccesoException            = class(EPACException);
+  EPACLCOFueraDeLinea                           = class(EPACException);
+  EPACTimbradoRFCNoCorrespondeException         = class(EPACException);
   EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
-  EPACTimbradoSinFoliosDisponiblesException = class(EPACException);
-  EPACCAnceladoSinCertificadosException = class(EPACException);
-  EPACAcuseNoEncontradoException    = class(EPACException);
-  EPACNoSePudoObtenerAcuseException = class(EPACException);
+  EPACTimbradoSinFoliosDisponiblesException     = class(EPACException);
+  EPACCAnceladoSinCertificadosException         = class(EPACException);
+  EPACAcuseNoEncontradoException                = class(EPACException);
+  EPACNoSePudoObtenerAcuseException             = class(EPACException);
   {$REGION 'Documentation'}
   ///	<summary>
   ///	  Este error es lanzado cuando la fecha de sellado es mayor a la fecha de la ciudad de mexico, ej. clientes en Cancun
