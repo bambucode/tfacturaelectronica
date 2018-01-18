@@ -645,6 +645,7 @@ const
   _ERR_FUERA_DE_SERVICIO2                 = 18;
   _ERR_FUERA_DE_SERVICIO                  = 22;
   _ERR_SIN_FOLIOS_DISPONIBLES             = 800;
+  _ERR_LCO_FUERA_DE_LINEA                 = 1000;
 
   // Errores exclusivos de la alta
   _ERR_TIMBRADO_PREVIAMENTE               = 96;
@@ -670,6 +671,7 @@ begin
       _ERR_UUID_NO_ENCONTRADO       : raise EPACDocumentoNoEncontradoException.Create(mensajeExcepcion, 0, _ERR_UUID_NO_ENCONTRADO, True);
       _ERR_XML_MAL_FORMADO          : raise EPACXMLMalFormadoException.Create(mensajeExcepcion, 0, _ERR_XML_MAL_FORMADO, False);
       _ERR_FECHA_INVALIDA           : raise EPACFechaInvalida.Create(mensajeExcepcion, 0, _ERR_FECHA_INVALIDA, False);
+      _ERR_LCO_FUERA_DE_LINEA       : raise EPACLCOFueraDeLinea.Create(mensajeExcepcion, 0, _ERR_LCO_FUERA_DE_LINEA, False);
     end;
   end;
 
