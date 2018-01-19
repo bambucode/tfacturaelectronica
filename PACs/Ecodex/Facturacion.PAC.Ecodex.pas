@@ -37,7 +37,7 @@ type
     procedure ProcesarFallasEspecificasDeEcodex(const aExcepcion: Exception);
     function TimbrarDocumentoPrimeraVez(const aComprobante : IComprobanteFiscal;
                                         const aTransaccion: Int64): TCadenaUTF8; overload;
-    function TimbrarDocumentoPrimeraVez(const aXML : string;
+    function TimbrarDocumentoPrimeraVez(const aXML : TCadenaUTF8;
                                         const aTransaccion: Int64): TCadenaUTF8; overload;
   public
     destructor Destroy; override;
@@ -51,7 +51,7 @@ type
         TListadoCancelacionUUID;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
         aIdTransaccionAUsar: Int64): TCadenaUTF8; overload;
-    function TimbrarDocumento(const aXML : string; const aIdTransaccionAUsar : Int64): TCadenaUTF8; overload;
+    function TimbrarDocumento(const aXML : TCadenaUTF8; const aIdTransaccionAUsar : Int64): TCadenaUTF8; overload;
     function ObtenerAcuseDeCancelacion(const aUUID: string): string;
     function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string;
     function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8;
@@ -340,7 +340,7 @@ begin
 
 end;
 
-function TProveedorEcodex.TimbrarDocumentoPrimeraVez(const aXML : string;
+function TProveedorEcodex.TimbrarDocumentoPrimeraVez(const aXML : TCadenaUTF8;
                                     const aTransaccion: Int64): TCadenaUTF8;
 var
   solicitudTimbrado: TSolicitudTimbradoEcodex;
