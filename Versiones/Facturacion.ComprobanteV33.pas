@@ -1004,8 +1004,9 @@ begin
 
   // Agregamos el XSD del TFD
   schemaLocation := Self.AttributeNodes.FindNode(_NODO_SL).Text;
-  Self.SetAttribute(_NODO_SL, 'http://www.sat.gob.mx/TimbreFiscalDigital' +
-                             ' http://www.sat.gob.mx/sitio_internet/cfd/timbrefiscaldigital/TimbreFiscalDigitalv11.xsd');
+  Self.SetAttribute(_NODO_SL, schemaLocation +
+                              ' http://www.sat.gob.mx/TimbreFiscalDigital' +
+                              ' http://www.sat.gob.mx/sitio_internet/cfd/timbrefiscaldigital/TimbreFiscalDigitalv11.xsd');
 end;
 
 procedure TComprobanteFiscalV33.AgregarComplemento(aNodoAAgregar: IXMLNode;
