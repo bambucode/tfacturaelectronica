@@ -36,7 +36,9 @@ type
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
     procedure ProcesarFallasEspecificasDeEcodex(const aExcepcion: Exception);
     function TimbrarDocumentoPrimeraVez(const aComprobante : IComprobanteFiscal;
-                                        const aTransaccion: Int64): TCadenaUTF8;
+                                        const aTransaccion: Int64): TCadenaUTF8; overload;
+    function TimbrarDocumentoPrimeraVez(const aXML : TCadenaUTF8;
+                                        const aTransaccion: Int64): TCadenaUTF8; overload;
   public
     destructor Destroy; override;
     procedure AfterConstruction; override;
@@ -48,7 +50,8 @@ type
     function CancelarDocumentos(const aUUIDS: TListadoUUID):
         TListadoCancelacionUUID;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
-        aIdTransaccionAUsar: Int64): TCadenaUTF8;
+        aIdTransaccionAUsar: Int64): TCadenaUTF8; overload;
+    function TimbrarDocumento(const aXML : TCadenaUTF8; const aIdTransaccionAUsar : Int64): TCadenaUTF8; overload;
     function ObtenerAcuseDeCancelacion(const aUUID: string): string;
     function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string;
     function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8;
@@ -337,6 +340,51 @@ begin
 
 end;
 
+function TProveedorEcodex.TimbrarDocumentoPrimeraVez(const aXML : TCadenaUTF8;
+                                    const aTransaccion: Int64): TCadenaUTF8;
+var
+  solicitudTimbrado: TSolicitudTimbradoEcodex;
+  respuestaTimbrado: TEcodexRespuestaTimbrado;
+  tokenDeUsuario: string;
+  mensajeFalla: string;
+begin
+  if fwsTimbradoEcodex = nil then
+    raise EPACNoConfiguradoException.Create
+      ('No se ha configurado el PAC, favor de configurar con metodo Configurar');
+
+  // 1. Creamos la solicitud de timbrado
+  solicitudTimbrado := TSolicitudTimbradoEcodex.Create;
+
+  try
+    // 2. Iniciamos una nueva sesion solicitando un nuevo token
+    tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
+
+    // 3. Asignamos el documento XML
+    solicitudTimbrado.ComprobanteXML          := TEcodexComprobanteXML.Create;
+    solicitudTimbrado.ComprobanteXML.DatosXML := aXml;
+    solicitudTimbrado.RFC                     := fCredencialesPAC.RFC;
+    solicitudTimbrado.Token                   := tokenDeUsuario;
+    solicitudTimbrado.TransaccionID           := aTransaccion;
+
+    try
+      mensajeFalla := '';
+
+      // 4. Realizamos la solicitud de timbrado
+      respuestaTimbrado := fwsTimbradoEcodex.TimbraXML(solicitudTimbrado);
+
+      Result := ExtraerNodoTimbre(respuestaTimbrado.ComprobanteXML);
+      respuestaTimbrado.Free;
+    except
+      On E: Exception do
+        ProcesarExcepcionDePAC(E);
+    end;
+  finally
+    if Assigned(solicitudTimbrado) then
+      solicitudTimbrado.Free;
+  end;
+
+end;
+
 function TProveedorEcodex.TimbrarDocumento(const aComprobante: IComprobanteFiscal; const aIdTransaccionAUsar: Int64): TCadenaUTF8;
 var
   documentoTimbradoPreviamente : Boolean;
@@ -386,6 +434,59 @@ begin
     //fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
     //fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
   end;
+end;
+
+
+function TProveedorEcodex.TimbrarDocumento(const aXML : string; const aIdTransaccionAUsar : Int64): TCadenaUTF8;
+var
+  documentoTimbradoPreviamente : Boolean;
+const
+  _ECODEX_DOCUMENTO_TIMBRADO_NO_ENCONTRADO = 'EFallaValidacionException (505)';
+begin
+  documentoTimbradoPreviamente := False;
+
+  try
+    try
+      Result := TimbrarDocumentoPrimeraVez(aXML, aIdTransaccionAUsar);
+    except
+      // Si es una falla de timbrado previo, la evitamos lanzar, cualquier otra falla la re-lanzamos
+      On E:EPACTimbradoPreviamenteException do
+      begin
+        {$IFDEF CODESITE}
+        CodeSite.SendWarning('Se detectó documento timbrado previamente, obteniendo timbre previo...');
+        {$ENDIF}
+        documentoTimbradoPreviamente := True;
+      end else
+        raise;
+    end;
+  finally
+    //fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+    //fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
+  end;
+
+  try
+    // Si hubo una falla porque ya habiamos timbrado el documento previamente, tratamos de obtener
+    // el timbre previo
+    if documentoTimbradoPreviamente then
+    begin
+      try
+        Result := ObtenerTimbrePrevio(aIdTransaccionAUsar);
+      except
+        On E:Exception do
+        begin
+          // Como fallamos al obtener el timbre previo re-lanzamos la excepcion de timbrado previamente
+          if AnsiPos(_ECODEX_DOCUMENTO_TIMBRADO_NO_ENCONTRADO, E.Message) > 0 then
+             raise EPACTimbradoPreviamenteException.Create(E.Message, 0, 505, False)
+          else
+            raise;
+        end;
+      end;
+    end;
+  finally
+    //fUltimoXMLEnviado := GetUltimoXMLEnviadoEcodexWsTimbrado;
+    //fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsTimbrado;
+  end;
+
 end;
 
 function TProveedorEcodex.ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8;
