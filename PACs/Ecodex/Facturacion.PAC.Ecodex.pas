@@ -437,7 +437,7 @@ begin
 end;
 
 
-function TProveedorEcodex.TimbrarDocumento(const aXML : string; const aIdTransaccionAUsar : Int64): TCadenaUTF8;
+function TProveedorEcodex.TimbrarDocumento(const aXML : TCadenaUTF8; const aIdTransaccionAUsar : Int64): TCadenaUTF8;
 var
   documentoTimbradoPreviamente : Boolean;
 const
