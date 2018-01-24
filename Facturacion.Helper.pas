@@ -40,6 +40,7 @@ implementation
 
 uses
   System.Math,
+  System.StrUtils,
   {$IFDEF CODESITE}
   CodeSiteLogging,
   {$ENDIF}
@@ -167,7 +168,7 @@ end;
 
 class function TFacturacionHelper.ComoFechaISO8601(const aFecha: TDateTime): string;
 begin
-  Result := FormatDateTime('yyyy-mm-dd', aFecha) + 'T' + FormatDateTime('hh:nn:ss', aFecha);
+  Result := AnsiReplaceStr(FormatDateTime('yyyy-mm-dd', aFecha) + 'T' + FormatDateTime('hh:nn:ss', aFecha), FormatSettings.TimeSeparator, ':');
 end;
 
 class function TFacturacionHelper.ComoMoneda(const aValor: Currency; const
