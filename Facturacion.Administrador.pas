@@ -175,15 +175,12 @@ end;
 
 procedure TAdministradorFacturas.GuardarArchivo(const aComprobante: IComprobanteFiscal;
                                                  const aArchivoDestino: TFileName);
-var
-  Writer: TStreamWriter;
 begin
-  Writer := TStreamWriter.Create(aArchivoDestino, false, TEncoding.UTF8);
-  try
-    Writer.Write(aComprobante.XML);
-  finally
-    Writer.Free();
-  end;
+  Assert(aComprobante <> nil, 'La instancia aComprobante no debio ser nula');
+  Assert(aComprobante.OwnerDocument <> nil, 'La instancia aComprobante.OwnerDocument no debio ser nula');
+
+  // El método "SaveToFile" forza a que se incluya la declaracion del XML: <?xml ...
+  aComprobante.OwnerDocument.SaveToFile(aArchivoDestino);
 end;
 
 function TAdministradorFacturas.LeerDesdeArchivo(const aRutaComprobante: TFileName): IComprobanteFiscal;
@@ -208,9 +205,6 @@ begin
 
   // Pasamos el XML para poder usarlo en la clase
   documentoXML.XML.Text := aContenidoXML;
-  documentoXML.Active:=True;
-  documentoXML.Version:='1.0';
-  documentoXML.Encoding:='UTF-8';
 
   // Checamos la version del CFDI y dependiendo de ello, usamos el método
   // de lectura correcto
