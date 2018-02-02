@@ -958,8 +958,6 @@ const
 { Global Functions }
 
 procedure establecerAtributosDeCFDI(comprobante: IComprobanteFiscalV33);
-//var
-//  documentoBase: IXMLDocument;
 begin
   // Agregamos la auto identacion
   comprobante.OwnerDocument.Options := [doNodeAutoCreate, doAttrNull, doAutoPrefix, doNamespaceDecl, doNodeAutoIndent];

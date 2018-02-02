@@ -391,11 +391,15 @@ begin
 //     si el pac es ecodex
           if nuevaFactura.Version = '3.3' then
             pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
+                           _URL_ECODEX_PRUEBAS_V33,
+                           _URL_ECODEX_PRUEBAS_V33,
                          credencialesPAC,
                          credencialesIntegrador,
                          _NUEMRO_TRANSACCION_INICIAL)
           else
             pac.Configurar(_URL_ECODEX_PRUEBAS_V32,
+                           _URL_ECODEX_PRUEBAS_V32,
+                           _URL_ECODEX_PRUEBAS_V32,
                            credencialesPAC,
                            credencialesIntegrador,
                            _NUEMRO_TRANSACCION_INICIAL);
