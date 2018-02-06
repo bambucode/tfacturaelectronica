@@ -206,6 +206,11 @@ const
   _NUMERO_DECIMALES_MXN = 2;
   _BASE = 10;
 begin
+  if aCantidad <= 0 then
+  begin
+    Result := True;
+    exit;
+  end;
   // Ref: http://www.fiscalia.com/publicaciones/10414
   // http://www.sat.gob.mx/informacion_fiscal/factura_electronica/Documents/cfdv33.pdf
 
