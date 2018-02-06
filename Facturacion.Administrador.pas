@@ -39,14 +39,14 @@ type
     function GetOnCadenaOriginalGenerada: TOnCadenaOriginalGeneradaEvent;
     function GetOnSelloGenerado: TOnSelloGeneradoEvent;
     /// <summary>
-    ///   Se encarga de crear una nueva instancia del CFDI seg˙n el par·metro
-    ///   versiÛn especificado
+    ///   Se encarga de crear una nueva instancia del CFDI seg√∫n el par√°metro
+    ///   versi√≥n especificado
     /// </summary>
     /// <param name="aVersion">
-    ///   VersiÛn del CFDI, ejem: 3.3
+    ///   Versi√≥n del CFDI, ejem: 3.3
     /// </param>
     /// <exception cref="EVersionDeCFDINoSoportadaException">
-    ///   Excepcion lazanda cuando la versiÛn especificada no est· soportada o
+    ///   Excepcion lazanda cuando la versi√≥n especificada no est√° soportada o
     ///   implementada.
     /// </exception>
     function Nueva(const aVersion: String) : IComprobanteFiscal;
@@ -58,25 +58,25 @@ type
     ///   Instancia del CFDI a sellar
     /// </param>
     /// <param name="aGeneradorCadenaOriginal">
-    ///   Instancia del generador de la cadena original, debe ser especfÌco
-    ///   para la versiÛn del CFDI
+    ///   Instancia del generador de la cadena original, debe ser especf√≠co
+    ///   para la versi√≥n del CFDI
     /// </param>
     /// <param name="aGeneradorSello">
-    ///   Sellador del comprobante, debe ser especÌfico para la versiÛn del
+    ///   Sellador del comprobante, debe ser espec√≠fico para la versi√≥n del
     ///   CFDI
     /// </param>
     procedure Sellar(const aComprobante: IComprobanteFiscal; const
         aGeneradorCadenaOriginal: IGeneradorCadenaOriginal; const aGeneradorSello:
         IGeneradorSello);
     /// <summary>
-    ///   MÈtodo encargado de guardar el CFDI como archivo XML con su encoding
+    ///   M√©todo encargado de guardar el CFDI como archivo XML con su encoding
     ///   respectivo en UTF8.
     /// </summary>
     /// <param name="aComprobante">
     ///   Instancia del comprobante
     /// </param>
     /// <param name="aArchivoDestino">
-    ///   Ruta completa con nombre incluido del archivo XML donde se guardar·
+    ///   Ruta completa con nombre incluido del archivo XML donde se guardar√°
     ///   el comprobante
     /// </param>
     procedure GuardarArchivo(const aComprobante: IComprobanteFiscal;
@@ -95,7 +95,7 @@ type
 
 
 
-  // ImplementaciÛn de la instancia
+  // Implementaci√≥n de la instancia
   TAdministradorFacturas = class(TInterfacedObject, IAdministradorFacturas)
   private
     fOnCadenaOriginalGenerada: TOnCadenaOriginalGeneradaEvent;
@@ -143,7 +143,7 @@ begin
     Result := NewComprobanteFiscalV33;
 
   if Result = nil then
-    raise EVersionDeCFDINoSoportadaException.Create('La versiÛn solicitada : ' + aVersion + ', no tiene implementaciÛn actual');
+    raise EVersionDeCFDINoSoportadaException.Create('La versi√≥n solicitada : ' + aVersion + ', no tiene implementaci√≥n actual');
 end;
 
 procedure TAdministradorFacturas.Sellar(const aComprobante: IComprobanteFiscal;
@@ -175,12 +175,18 @@ end;
 
 procedure TAdministradorFacturas.GuardarArchivo(const aComprobante: IComprobanteFiscal;
                                                  const aArchivoDestino: TFileName);
+var
+   Writer: TStreamWriter;
+const
+  _ENCABEZADO_XML = '<?xml version="1.0" encoding="utf-8"?>' + #13#10;
 begin
-  Assert(aComprobante <> nil, 'La instancia aComprobante no debio ser nula');
-  Assert(aComprobante.OwnerDocument <> nil, 'La instancia aComprobante.OwnerDocument no debio ser nula');
-
-  // El mÈtodo "SaveToFile" forza a que se incluya la declaracion del XML: <?xml ...
-  aComprobante.OwnerDocument.SaveToFile(aArchivoDestino);
+   Writer := TStreamWriter.Create(aArchivoDestino, false, TEncoding.UTF8);
+   try
+     // Forzamos a que siempre se incluya el encabezado del XML
+     Writer.Write(_ENCABEZADO_XML + aComprobante.XML);
+   finally
+     Writer.Free();
+   end;
 end;
 
 function TAdministradorFacturas.LeerDesdeArchivo(const aRutaComprobante: TFileName): IComprobanteFiscal;
@@ -206,7 +212,7 @@ begin
   // Pasamos el XML para poder usarlo en la clase
   documentoXML.XML.Text := aContenidoXML;
 
-  // Checamos la version del CFDI y dependiendo de ello, usamos el mÈtodo
+  // Checamos la version del CFDI y dependiendo de ello, usamos el m√©todo
   // de lectura correcto
   nodoComprobante := documentoXML.ChildNodes.FindNode(_NOMBRE_NODO_COMPROBANTE);
   if (nodoComprobante <> nil) then
@@ -222,7 +228,7 @@ begin
     begin
       versionCFDI := Trim(nodoVersion.Text);
 
-      // Mandamos leer el XML usando la implementaciÛn correspondiente
+      // Mandamos leer el XML usando la implementaci√≥n correspondiente
       if (versionCFDI = '3.2') then
         Result := GetComprobanteFiscalV32(documentoXML);
 
