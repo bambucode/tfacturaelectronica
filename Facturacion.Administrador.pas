@@ -175,12 +175,18 @@ end;
 
 procedure TAdministradorFacturas.GuardarArchivo(const aComprobante: IComprobanteFiscal;
                                                  const aArchivoDestino: TFileName);
+var
+   Writer: TStreamWriter;
+const
+  _ENCABEZADO_XML = '<?xml version="1.0" encoding="utf-8"?>' + #13#10;
 begin
-  Assert(aComprobante <> nil, 'La instancia aComprobante no debio ser nula');
-  Assert(aComprobante.OwnerDocument <> nil, 'La instancia aComprobante.OwnerDocument no debio ser nula');
-
-  // El método "SaveToFile" forza a que se incluya la declaracion del XML: <?xml ...
-  aComprobante.OwnerDocument.SaveToFile(aArchivoDestino);
+   Writer := TStreamWriter.Create(aArchivoDestino, false, TEncoding.UTF8);
+   try
+     // Forzamos a que siempre se incluya el encabezado del XML
+     Writer.Write(_ENCABEZADO_XML + aComprobante.XML);
+   finally
+     Writer.Free();
+   end;
 end;
 
 function TAdministradorFacturas.LeerDesdeArchivo(const aRutaComprobante: TFileName): IComprobanteFiscal;
