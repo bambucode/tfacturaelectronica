@@ -46,6 +46,7 @@ type
   EPACTimbradoRFCNoCorrespondeException         = class(EPACException);
   EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
   EPACTimbradoSinFoliosDisponiblesException     = class(EPACException);
+  EPACNoEncontradoParaCancelarException         = class(EPACException);
   EPACAcuseNoEncontradoException                = class(EPACException);
   EPACNoSePudoObtenerAcuseException             = class(EPACException);
   {$REGION 'Documentation'}

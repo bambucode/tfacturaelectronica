@@ -611,7 +611,7 @@ begin
   SetLength(arregloUUIDs, 1);
   arregloUUIDs[0] := aUUID;
   resultadoCancelacion := Self.CancelarDocumentos(arregloUUIDs);
-  Result := resultadoCancelacion.Items[aUUID];
+  Result               := resultadoCancelacion.Items[aUUID];
 end;
 
 function TProveedorEcodex.ObtenerAcuseDeCancelacion(const aUUID: string):
@@ -662,7 +662,8 @@ var
   arregloGuids : Array_Of_guid;
 const
   // Ref: Pagina 15 de "Guia de integracion Ecodex".
-  _CADENA_CANCELADO = 'Cancelado';
+  _CADENA_CANCELADO     = 'Cancelado';
+  _CADENA_NO_ENCONTRADO = 'No Encontrado';
 begin
   Assert(fwsCancelacionEcodex <> nil, 'La instancia fwsCancelacionEcodex no debio ser nula');
 
@@ -707,6 +708,12 @@ begin
       for I := 0 to Length(respuestaCancelacion.Resultado.ResultadoCancelacion) - 1 do
       begin
         estado := respuestaCancelacion.Resultado.ResultadoCancelacion[I].Estatus.NativeToXS;
+
+        // ¿No se encontró documento?
+        if estado = _CADENA_NO_ENCONTRADO then
+          raise EPACNoEncontradoParaCancelarException.Create('No se encontró la factura ' + respuestaCancelacion.Resultado.ResultadoCancelacion[I].UUID +
+                                                            ' con el PAC. Imposible cancelar', -1, -1, False);
+
         Result.Add(Uppercase(respuestaCancelacion.Resultado.ResultadoCancelacion[I].UUID),
                    estado = _CADENA_CANCELADO);
       end;
@@ -715,7 +722,12 @@ begin
       respuestaCancelacion.Free;
     except
       On E: Exception do
-        ProcesarExcepcionDePAC(E);
+      begin
+        if Not (E Is EPACNoEncontradoParaCancelarException) then
+          ProcesarExcepcionDePAC(E)
+        else
+          raise;
+      end;
     end;
   finally
     if Assigned(solicitudCancelacion) then
