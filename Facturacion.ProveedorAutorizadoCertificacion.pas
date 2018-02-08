@@ -80,7 +80,7 @@ type
 
   EPACDocumentoNoEncontradoException = class(EPACException);
   EPACCancelacionFallidaCertificadoNoCargadoException = class(EPACErrorGenericoException);
-  PACCancelacionFallidaDocumentoNoEncontradoException = class(EPACErrorGenericoException);
+  EPACCancelacionFallidaDocumentoNoEncontradoException = class(EPACErrorGenericoException);
 
   EPACCorreoUsadoPreviamenteException = class(EPACErrorGenericoException);
   EPACEmisorYaExistenteException  = class(EPACErrorGenericoException);
