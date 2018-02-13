@@ -766,6 +766,7 @@ const
   _ERR_EMISOR_EXISTENTE                   = 98;
   _ERR_XML_MAL_FORMADO                    = 301;
   _ERR_FECHA_INVALIDA                     = 401;
+  _ERR_SIN_CERTIFICADO_VIG_CANCELAR       = 402;
   _ERR_UUID_NO_ENCONTRADO                 = 505;
 begin
   mensajeExcepcion := aExcepcion.Message;
@@ -785,6 +786,7 @@ begin
       _ERR_XML_MAL_FORMADO          : raise EPACXMLMalFormadoException.Create(mensajeExcepcion, 0, _ERR_XML_MAL_FORMADO, False);
       _ERR_FECHA_INVALIDA           : raise EPACFechaInvalida.Create(mensajeExcepcion, 0, _ERR_FECHA_INVALIDA, False);
       _ERR_LCO_FUERA_DE_LINEA       : raise EPACLCOFueraDeLinea.Create(mensajeExcepcion, 0, _ERR_LCO_FUERA_DE_LINEA, False);
+      _ERR_SIN_CERTIFICADO_VIG_CANCELAR : raise EPACCancelacionFallidaCertificadoNoCargadoException.Create(mensajeExcepcion, 0, _ERR_SIN_CERTIFICADO_VIG_CANCELAR, False);
     end;
   end;
 
@@ -795,7 +797,7 @@ begin
     raise EPACAcuseNoEncontradoException.Create(_ECODEX_ACUSE_NO_ENCONTRADO, 0, EEcodexFallaValidacionException(aExcepcion).Numero, False);
 
   if AnsiPos(_ECODEX_DOCUMENTO_CANCELAR_NO_ENCONTRADO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise PACCancelacionFallidaDocumentoNoEncontradoException.Create(_ECODEX_DOCUMENTO_CANCELAR_NO_ENCONTRADO, 0,
+    raise EPACCancelacionFallidaDocumentoNoEncontradoException.Create(_ECODEX_DOCUMENTO_CANCELAR_NO_ENCONTRADO, 0,
                                                                      EEcodexFallaValidacionException(aExcepcion).Numero, False);
 
   // TBD: https://github.com/bambucode/eleventa/issues/1721

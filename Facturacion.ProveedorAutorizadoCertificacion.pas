@@ -46,7 +46,6 @@ type
   EPACTimbradoRFCNoCorrespondeException         = class(EPACException);
   EPACTimbradoVersionNoSoportadaPorPACException = class(EPACException);
   EPACTimbradoSinFoliosDisponiblesException     = class(EPACException);
-  EPACCAnceladoSinCertificadosException         = class(EPACException);
   EPACNoEncontradoParaCancelarException         = class(EPACException);
   EPACAcuseNoEncontradoException                = class(EPACException);
   EPACNoSePudoObtenerAcuseException             = class(EPACException);
@@ -81,7 +80,7 @@ type
 
   EPACDocumentoNoEncontradoException = class(EPACException);
   EPACCancelacionFallidaCertificadoNoCargadoException = class(EPACErrorGenericoException);
-  PACCancelacionFallidaDocumentoNoEncontradoException = class(EPACErrorGenericoException);
+  EPACCancelacionFallidaDocumentoNoEncontradoException = class(EPACErrorGenericoException);
 
   EPACCorreoUsadoPreviamenteException = class(EPACErrorGenericoException);
   EPACEmisorYaExistenteException  = class(EPACErrorGenericoException);
