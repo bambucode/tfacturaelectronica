@@ -2,8 +2,13 @@ unit Facturacion.GeneradorQR;
 
 interface
 
-uses System.SysUtils;
-
+uses
+{$IF CompilerVersion >= 23}
+     System.SysUtils
+{$ELSE}
+     SysUtils
+{$IFEND}
+ ;
 type
 
   TGeneradorQR = class
@@ -15,10 +20,18 @@ type
 implementation
 
 uses DelphiZXingQRCode,
+{$IF CompilerVersion >= 23}
      Vcl.Imaging.pngimage,
      Vcl.Imaging.jpeg,
      System.Classes,
-     Vcl.Graphics;
+     Vcl.Graphics
+{$ELSE}
+     pngimage,
+     jpeg,
+     Classes,
+     Graphics
+{$IFEND}
+ ;
 
 const
   _ANCHO_QR_CODE = 1200;

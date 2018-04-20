@@ -13,8 +13,13 @@ uses Facturacion.Comprobante,
      libeay32,
      OpenSSLUtils,
      LibEay32plus,
+{$IF CompilerVersion >= 23}
      Winapi.Windows,
-     System.SysUtils;
+     System.SysUtils
+{$ELSE}
+     Windows,
+     SysUtils
+{$IFEND};
 
 type
 
@@ -113,11 +118,17 @@ type
 
 implementation
 
-uses System.StrUtils,
+uses
+{$IF CompilerVersion >= 23}
+     System.StrUtils,
+     System.Hash
+{$ELSE}
+     StrUtils
+{$IFEND}
 {$IFDEF CODESITE}
-     CodeSiteLogging,
-{$ENDIF}
-     System.Hash;
+     ,CodeSiteLogging
+{$ENDIF};
+
 
 { TOpenSSL }
 
@@ -170,7 +181,7 @@ begin
 
   Tam:=Length(aCadena); // Obtenemos el tamaño de la cadena original
   try
-      System.SysUtils.StrPLCopy(inbuf, aCadena, Tam);  // Copiamos la cadena original al buffer de entrada
+      {$IF CompilerVersion >= 23}System.SysUtils{$ELSE}SysUtils{$IFEND}.StrPLCopy(inbuf, aCadena, Tam);  // Copiamos la cadena original al buffer de entrada
   except
       On E:Exception do
       begin
@@ -188,7 +199,7 @@ begin
   end;
 
   // Establece los datos que vamos a usar
-  EVP_SignUpdate(@mdctx,@inbuf,System.SysUtils.StrLen(inbuf));
+  EVP_SignUpdate(@mdctx,@inbuf,{$IF CompilerVersion >= 23}System.SysUtils{$ELSE}SysUtils{$IFEND}.StrLen(inbuf));
 
   // Realiza la digestion usando la llave privada que obtuvimos y leimos en memoria
   EVP_SignFinal(@mdctx, @outbuf, Len, fLlavePrivadaDesencriptada);
@@ -201,11 +212,11 @@ function TOpenSSL.CalcularSHA1(const aCadena: TCadenaUTF8): TCadenaUTF8;
 var
   Tam, Len: Cardinal;
   {$IF CompilerVersion >= 20}
-      Inbuf: Array[0..1024] of AnsiChar;
-      Outbuf: array[0..EVP_MAX_MD_SIZE] of AnsiChar;
+      Inbuf: Array[0..1023] of AnsiChar;
+      Outbuf: array[0..999999] of AnsiChar;
   {$ELSE}
-      Inbuf: Array[0..1024] of Char;
-      Outbuf: array [0..1024] of Char;
+      Inbuf: Array[0..1023] of Char;
+      Outbuf: array [0..1023] of Char;
   {$IFEND}
   ctx : EVP_MD_CTX;
   res: Integer;
@@ -215,7 +226,7 @@ begin
   // Ref: http://www.disi.unige.it/person/FerranteM/delphiopenssl/example2.html
 
   // Usamos la funcion nativa de Delphi para SHA1
-  {$IF CompilerVersion >= 20}
+  {$IF CompilerVersion >= 23}
     Result := THashSHA1.GetHashString(aCadena);
   {$ELSE}
     raise Exception.Create('Soporte SHA1 nativo para versiones anteriores no implementado');
@@ -226,8 +237,9 @@ begin
     EVP_DigestInit(@ctx, EVP_sha1());
     EVP_DigestUpdate(@ctx, @Inbuf, StrLen(Inbuf));
     EVP_DigestFinal(@ctx, PByte(@Outbuf), Len);
+
     Result := BinToBase64(@Outbuf, Length(Outbuf));
-  {$ENDIF}
+  {$IFEND}
 end;
 
 // Funcion obtenida de: DelphiAccess - http://www.delphiaccess.com/forum/index.php?topic=3092.0

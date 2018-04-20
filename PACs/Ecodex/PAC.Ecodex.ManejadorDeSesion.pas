@@ -12,7 +12,12 @@ interface
 
 uses EcodexWsSeguridad,
      Facturacion.Comprobante,
-     SysUtils;
+{$IF CompilerVersion >= 23}
+     System.SysUtils
+{$ELSE}
+     SysUtils
+{$IFEND}
+;
 
 type
 
@@ -38,7 +43,12 @@ type
 
 implementation
 
-uses System.Hash,
+uses
+{$IF CompilerVersion >= 23}
+    System.Hash,
+{$ELSE}
+    IdGlobal, IdHash, IdHashMessageDigest, IdHashSHA,
+{$IFEND}
      Facturacion.ManejadorErroresComunesWebServices,
      {$IFDEF CODESITE}
      CodeSiteLogging,
@@ -113,6 +123,10 @@ end;
 function TEcodexManejadorDeSesion.ObtenerNuevoTokenDeUsuario: String;
 var
   tokenDeServicio: string;
+{$IF CompilerVersion < 23}
+  LHashSHA1: TIdHashSHA1;
+{$IFEND}
+
 begin
   Assert(fCredenciales.RFC <> '', 'Las credenciales del PAC no fueron asignadas');
 
@@ -124,7 +138,18 @@ begin
 
      // El token de usuario será la combinacion del token de servicio y el ID del integrador
      // concatenados por un "pipe" codificados con el agoritmo SHA1
+{$IF CompilerVersion >= 23}
      Result := THashSHA1.GetHashString(fCredenciales.DistribuidorID + '|' + tokenDeServicio);
+{$ELSE}
+     // NOTA: TIdHashSHA1.HashStringAsHex (Indy 10, Delphi XE1 o menor) devuelve una cadena de hexadecimales en mayúsulas, y
+     //       THashSHA1.GetHashString (Xe2 o superior) devuelve la misma cadena pero en minúsulas
+     LHashSHA1 := TIdHashSHA1.Create;
+     try
+      Result:= LHashSHA1.HashStringAsHex(fCredenciales.DistribuidorID + '|' + tokenDeServicio, nil);
+     finally
+      LHashSHA1.Free;
+     end;
+{$IFEND}
   except
     On E:Exception do
       raise;
@@ -135,6 +160,9 @@ function TEcodexManejadorDeSesion.ObtenerNuevoTokenAltaEmisores(const aRFC,
     aIdIntegrador, aIdAltaEmisores: String): String;
 var
   tokenDeServicio: string;
+{$IF CompilerVersion < 23}
+  LHashSHA1: TIdHashSHA1;
+{$IFEND}
 begin
   Assert(fCredenciales.RFC <> '', 'Las credenciales del PAC no fueron asignadas');
 
@@ -149,9 +177,23 @@ begin
      // - El ID de alta de emisores (en mayusculas forzosamente)
      // - El token de servicio
      // Todos concatenados con un pipe (|) y codificados con el agoritmo SHA1
+{$IF CompilerVersion >= 23}
      Result := THashSHA1.GetHashString(aIdIntegrador + '|' +
                                        Uppercase(aIdAltaEmisores) + '|' +
                                        tokenDeServicio);
+{$ELSE}
+     // NOTA: TIdHashSHA1.HashStringAsHex (Indy 10.5.x, Delphi XE1 o menor) devuelve una cadena de hexadecimales en mayúsulas, y
+     //       THashSHA1.GetHashString (Xe2 o superior) devuelve la misma cadena pero en minúsulas
+     LHashSHA1 := TIdHashSHA1.Create;
+     try
+      Result:= LHashSHA1.HashStringAsHex(aIdIntegrador + '|' +
+                                         Uppercase(aIdAltaEmisores) + '|' +
+                                         tokenDeServicio,
+                                         nil);
+     finally
+      LHashSHA1.Free;
+     end;
+{$IFEND}
   except
     On E:Exception do
       raise;

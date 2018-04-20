@@ -11,7 +11,12 @@ unit Facturacion.GeneradorCadenaOriginal;
 interface
 
 uses Facturacion.Comprobante,
-     System.SysUtils;
+{$IF CompilerVersion >= 23}
+     System.SysUtils
+{$ELSE}
+      Facturacion.Tipos,
+      SysUtils
+{$IFEND};
 
 type
 
@@ -55,13 +60,25 @@ type
 
 implementation
 
-uses  System.IOUtils,
+uses
+{$IF CompilerVersion >= 23}
+      System.IOUtils,
       System.Classes,
       Winapi.Windows,
       System.Win.ComObj,
       Xml.XMLIntf,
       Xml.XMLDom,
-      Xml.XMLDoc;
+      Xml.XMLDoc
+{$ELSE}
+      IOUtils,
+      Classes,
+      Windows,
+      ComObj,
+      XMLIntf,
+      XMLDom,
+      XMLDoc
+{$IFEND};
+
 
 { TTransformadorDeXML }
 

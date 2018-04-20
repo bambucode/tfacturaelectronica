@@ -15,7 +15,7 @@ interface
 
 uses
   Windows, SysUtils, Classes, QuricolAPI,
-  {$IF Compilerversion >= 20}
+  {$IF Compilerversion >= 23}
    Vcl.Graphics;
   {$ELSE}
    Graphics;

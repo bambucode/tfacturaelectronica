@@ -947,7 +947,12 @@ const
 
 implementation
 
-uses System.SysUtils,
+uses
+{$IF CompilerVersion >= 23}
+     System.SysUtils,
+{$ELSE}
+     SysUtils,
+{$IFEND}
      Facturacion.Helper;
 
 const

@@ -3,7 +3,11 @@ unit Facturacion.Helper;
 interface
 
 uses Facturacion.Comprobante,
-     System.SysUtils;
+{$IF CompilerVersion >= 23}
+     System.SysUtils
+{$ELSE}
+     SysUtils
+{$IFEND};
 
 type
 
@@ -39,12 +43,19 @@ const
 implementation
 
 uses
+{$IF CompilerVersion >= 23}
   System.Math,
   System.StrUtils,
-  {$IFDEF CODESITE}
-  CodeSiteLogging,
-  {$ENDIF}
-  Soap.XSBuiltIns;
+  Soap.XSBuiltIns
+{$ELSE}
+  Math,
+  StrUtils,
+  XSBuiltIns
+{$IFEND}
+{$IFDEF CODESITE}
+  CodeSiteLogging
+{$ENDIF};
+
 
 { TFacturacionHelper }
 
@@ -229,7 +240,7 @@ begin
   limiteSuperior := Ceil(limiteSuperior * 100) / 100;
 
   // ¿El importe calculado, esta dentro de rango validado por el SAT?
-  Result := System.Math.InRange(aImporte, limiteInferior, limiteSuperior);
+  Result := {$IF CompilerVersion >= 23}System.Math.{$ELSE}Math.{$IFEND}InRange(aImporte, limiteInferior, limiteSuperior);
 end;
 
 initialization

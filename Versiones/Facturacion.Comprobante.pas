@@ -16,11 +16,16 @@ type
 
   // Definimos el tipo de Cadena estándard que manejaremos en toda la libreia
   // con codificacion en UTF8
-  {$IF Compilerversion >= 20}
+ {$IF Compilerversion >= 20}
   TCadenaUTF8 = RawByteString;
-  {$ELSE}
+ {$ELSE}
   TCadenaUTF8 = UTF8String;
-  {$IFEND}
+  TBytes = array of Char;
+ {$IFEND}
+
+ {$IF CompilerVersion < 23}
+  XmlDomString = WideString;
+ {$IFEND}
 
   TFacturacionCredencialesPAC = record
     RFC: String;

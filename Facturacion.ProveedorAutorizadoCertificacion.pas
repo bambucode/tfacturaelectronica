@@ -9,10 +9,20 @@ unit Facturacion.ProveedorAutorizadoCertificacion;
 
 interface
 
-uses Facturacion.Comprobante,
+uses
+{$IF CompilerVersion >= 23}
      System.Generics.Collections,
-     Facturacion.Tipos,
-     System.SysUtils;
+     System.SysUtils,
+{$ELSE}
+     SysUtils,
+   {$IF CompilerVersion >= 20}
+     Generics.Collections,
+   {$ELSE}
+   {$IFEND}
+{$IFEND}
+     Facturacion.Comprobante,
+     Facturacion.Tipos;
+
 
 type
 

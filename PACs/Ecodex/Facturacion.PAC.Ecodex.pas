@@ -17,8 +17,14 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
   EcodexWsClientes,
   EcodexWsCancelacion,
   PAC.Ecodex.ManejadorDeSesion,
+{$IF CompilerVersion >= 23}
   System.Generics.Collections,
-  System.SysUtils;
+  System.SysUtils
+{$ELSE}
+  Generics.Collections,
+  SysUtils
+{$IFEND}
+  ;
 
 type
 
@@ -62,21 +68,30 @@ const
 
 implementation
 
-uses Classes,
-  xmldom,
+uses
   Facturacion.Tipos,
-  Soap.XSBuiltIns,
-  XMLIntf,
 {$IFDEF CODESITE}
   CodeSiteLogging,
 {$ENDIF}
+
+{$IF Compilerversion >= 23}
+  System.Classes,
+  Soap.XSBuiltIns,
   System.RegularExpressions,
-{$IF Compilerversion >= 20}
+  Xml.xmldom,
+  Xml.XMLIntf,
   Xml.Win.Msxmldom,
+  Xml.XMLDoc
 {$ELSE}
+  Classes,
+  xmldom,
+  XSBuiltIns,
+  XMLIntf,
   Msxmldom,
+  RegularExpressions,
+  XMLDoc
 {$IFEND}
-  XMLDoc;
+  ;
 
 destructor TProveedorEcodex.Destroy;
 begin

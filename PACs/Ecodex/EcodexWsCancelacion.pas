@@ -27,7 +27,13 @@ unit EcodexWSCancelacion;
 
 interface
 
-uses Soap.InvokeRegistry, Soap.SOAPHTTPClient, System.Types, Soap.XSBuiltIns;
+uses
+{$IF CompilerVersion >= 23}
+ Soap.InvokeRegistry, Soap.SOAPHTTPClient, System.Types, Soap.XSBuiltIns
+{$ELSE}
+ InvokeRegistry, SOAPHTTPClient, Types, XSBuiltIns
+{$IFEND}
+;
 
 const
   IS_OPTN = $0001;

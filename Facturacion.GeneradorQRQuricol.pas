@@ -2,8 +2,13 @@ unit Facturacion.GeneradorQRQuricol;
 
 interface
 
-uses System.SysUtils;
-
+uses
+{$IF CompilerVersion >= 23}
+     System.SysUtils
+{$ELSE}
+     SysUtils
+{$IFEND}
+ ;
 type
 
   TGeneradorQRQuricol = class
@@ -15,7 +20,7 @@ type
 implementation
 
 uses QuricolCode, QuricolAPI,
-      {$IF Compilerversion >= 20}
+      {$IF Compilerversion >= 23}
        Vcl.Graphics, Vcl.Imaging.pngimage, Vcl.Imaging.jpeg;
       {$ELSE}
        Graphics, pngimage, Jpeg;
