@@ -9,8 +9,7 @@ unit Facturacion.OpenSSL;
 
 interface
 
-uses Facturacion.Comprobante,
-     libeay32,
+uses libeay32,
      OpenSSLUtils,
      LibEay32plus,
 {$IF CompilerVersion >= 23}
@@ -22,6 +21,12 @@ uses Facturacion.Comprobante,
 {$IFEND};
 
 type
+
+{$IF Compilerversion < 20} //Delphi 2007 y anteriores
+  PAnsiChar = PChar;
+  AnsiChar = Char;
+  AnsiString = String;
+{$IFEND}
 
   TMetodoDigestion = (tdMD5, tdSHA1, tdSHA256);
   ENoExisteArchivoException = class(Exception);
@@ -69,21 +74,20 @@ type
     ///   Si no se ha asignado la llave privada previamente y se intenta hacer
     ///   la digestion
     /// </exception>
-    function HacerDigestion(const aCadena: TCadenaUTF8;
-                            const aTipoDigestion: TMetodoDigestion): TCadenaUTF8;
+    function HacerDigestion(const aCadena: WideString;
+                            const aTipoDigestion: TMetodoDigestion): String;
     /// <summary>
     ///   Se encarga de calcular el SHA1 de la cadena
     /// </summary>
     /// <returns>
-    ///   SHA1 base 64
+    ///   Cadena Hash SHA1 en Hexadecimal de 40 caracteres de longitud
     /// </returns>
     /// <remarks>
     ///   <note type="note">
-    ///     De momento esta función solo funciona en Delphi XE2 y delante
-    ///     pues depende de la unidad System.Hash.
+    ///     Soporta Caracteres ASCII y Unicode
     ///   </note>
     /// </remarks>
-    function CalcularSHA1(const aCadena: TCadenaUTF8) : TCadenaUTF8;
+    function CalcularSHA1(const aCadena: WideString): String;
     function SonPareja(const aRutaCertificado, aRutaLlavePrivada: TFileName; const aClaveLlavePrivada : String): Boolean;
   end;
 
@@ -110,19 +114,21 @@ type
     procedure AfterConstruction; override;
     function SonPareja(const aRutaCertificado, aRutaLlavePrivada: TFileName; const
         aClaveLlavePrivada : String): Boolean;
-    function HacerDigestion(const aCadena: TCadenaUTF8;
-                            const aTipoDigestion: TMetodoDigestion): TCadenaUTF8;
+    function HacerDigestion(const aCadena: WideString;
+                            const aTipoDigestion: TMetodoDigestion): String;
 
-    function CalcularSHA1(const aCadena: TCadenaUTF8) : TCadenaUTF8;
+    function CalcularSHA1(const aCadena: WideString): String;
   end;
 
 implementation
 
 uses
 {$IF CompilerVersion >= 23}
+     System.Classes,
      System.StrUtils,
      System.Hash
 {$ELSE}
+     Classes,
      StrUtils
 {$IFEND}
 {$IFDEF CODESITE}
@@ -160,33 +166,36 @@ begin
                                  aContrasena);
 end;
 
-function TOpenSSL.HacerDigestion(const aCadena: TCadenaUTF8; const
-    aTipoDigestion: TMetodoDigestion): TCadenaUTF8;
+function TOpenSSL.HacerDigestion(const aCadena:WideString; const
+    aTipoDigestion: TMetodoDigestion): String;
 var
   mdctx: EVP_MD_CTX;
   {$IF CompilerVersion >= 20}
       Inbuf: Array[0..999999] of AnsiChar; // Antes [0..8192]
       Outbuf: array [0..1024] of AnsiChar;
+      LAnsiStr: AnsiString;
   {$ELSE}
       Inbuf: Array[0..999999] of Char;
       Outbuf: array [0..1024] of Char;
+      LAnsiStr: String;
   {$IFEND}
   Len, Tam: cardinal;
+
 begin
   Len := 0;
-
+  LAnsiStr := UTF8Encode(aCadena);
   // Verificamos tener la llave privada desencriptada
   if not Assigned(fLlavePrivadaDesencriptada) then
-    Raise ELlaveLecturaException.Create('No se tiene asiganada la llave privada, favor de asignarla con el metodo AsignarLlavePrivada');
+    Raise ELlaveLecturaException.Create('No se tiene asignada la llave privada, favor de asignarla con el método AsignarLlavePrivada');
 
-  Tam:=Length(aCadena); // Obtenemos el tamaño de la cadena original
+  Tam:=Length(LAnsiStr); // Obtenemos el tamaño de la cadena original
   try
-      {$IF CompilerVersion >= 23}System.SysUtils{$ELSE}SysUtils{$IFEND}.StrPLCopy(inbuf, aCadena, Tam);  // Copiamos la cadena original al buffer de entrada
+      {$IF CompilerVersion >= 23}System.SysUtils{$ELSE}SysUtils{$IFEND}.StrPLCopy(inbuf, LAnsiStr, Tam);  // Copiamos la cadena original al buffer de entrada
   except
       On E:Exception do
       begin
           if Pos('Access', E.Message) > 0 then
-             Raise ELongitudBufferPequenoException.Create('Error de sellado digital: La cadena original fue mas grande que el tamaño del buffer,' +
+             Raise ELongitudBufferPequenoException.Create('Error de sellado digital: La cadena original fue más grande que el tamaño del buffer,' +
                                                           'por favor intente aumentando el tamaño del buffer.');
       end;
   end;
@@ -208,38 +217,47 @@ begin
   Result := BinToBase64(@outbuf,Len);
 end;
 
-function TOpenSSL.CalcularSHA1(const aCadena: TCadenaUTF8): TCadenaUTF8;
+function TOpenSSL.CalcularSHA1(const aCadena: WideString): String;
 var
-  Tam, Len: Cardinal;
+  LStrLength, LDigestLength: Cardinal;
+  Inbuf: Array of Byte;
+  Outbuf: Array[0..EVP_MAX_MD_SIZE] of Byte;
   {$IF CompilerVersion >= 20}
-      Inbuf: Array[0..1023] of AnsiChar;
-      Outbuf: array[0..999999] of AnsiChar;
+   LAnsiStr: AnsiString;
   {$ELSE}
-      Inbuf: Array[0..1023] of Char;
-      Outbuf: array [0..1023] of Char;
+   LAnsiStr: String;
   {$IFEND}
   ctx : EVP_MD_CTX;
-  res: Integer;
-  sData, sha1delphi: String;
-  hashbytes: TBytes;
+  Lidx: Integer;
+  LPBin: PByte;
 begin
-  // Ref: http://www.disi.unige.it/person/FerranteM/delphiopenssl/example2.html
+ // Ref: http://www.disi.unige.it/person/FerranteM/delphiopenssl/example2.html
+ // Usamos la funcion nativa de Delphi para SHA1
 
-  // Usamos la funcion nativa de Delphi para SHA1
-  {$IF CompilerVersion >= 23}
-    Result := THashSHA1.GetHashString(aCadena);
-  {$ELSE}
-    raise Exception.Create('Soporte SHA1 nativo para versiones anteriores no implementado');
+ // NOTA: El siguiente código ya funciona
+ result :='';
+ LAnsiStr :=  UTF8Encode( aCadena ) ;
+ LStrLength:= (Length(LAnsiStr)); // Obtenemos el tamaño de la cadena original
+ try
+  SetLength(Inbuf, LStrLength );
 
-    // NOTA: El siguiente codigo no funciona aun...
-    Tam:=Length(aCadena); // Obtenemos el tamaño de la cadena original
-    StrPLCopy(inbuf, aCadena, Tam);
-    EVP_DigestInit(@ctx, EVP_sha1());
-    EVP_DigestUpdate(@ctx, @Inbuf, StrLen(Inbuf));
-    EVP_DigestFinal(@ctx, PByte(@Outbuf), Len);
+  if LStrLength>0 then
+     Move(LAnsiStr[{$IF CompilerVersion >= 24}Low(LAnsiStr){$ELSE}01{$IFEND}], Inbuf[0], LStrLength);
+  EVP_DigestInit(@ctx, EVP_sha1());
+  EVP_DigestUpdate(@ctx, PByte(@Inbuf[0]), LStrLength);
+  EVP_DigestFinal(@ctx, PByte(@Outbuf[0]), LDigestLength);
 
-    Result := BinToBase64(@Outbuf, Length(Outbuf));
-  {$IFEND}
+  LPBin:=@Outbuf[0];
+
+  //Convertir Valor Binario a Hexadecimal
+  for Lidx := 1 to LDigestLength do
+	begin
+		Result := Result + IntToHex(LPBin^, 2);
+	 	LPBin := PByte( PByte(@Outbuf) + Lidx);
+	end;
+
+ finally
+ end;
 end;
 
 // Funcion obtenida de: DelphiAccess - http://www.delphiaccess.com/forum/index.php?topic=3092.0
@@ -259,7 +277,7 @@ begin
 	for i := 1 to DatLen do
 	begin
 		S := S + IntToHex(PBin^, 2);
-		PBin := PBYTE(DWORD(PDat) + i);
+		PBin := PByte(DWORD(PDat) + i);
 	end;
 	case (length(s) mod 3) of
 		0: addnum := 0;

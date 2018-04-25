@@ -20,7 +20,10 @@ type
   TCadenaUTF8 = RawByteString;
  {$ELSE}
   TCadenaUTF8 = UTF8String;
-  TBytes = array of Char;
+  TBytes = Array of Char;
+  PAnsiChar = PChar;
+  AnsiChar = Char;
+  AnsiString = String;
  {$IFEND}
 
  {$IF CompilerVersion < 23}

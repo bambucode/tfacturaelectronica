@@ -149,7 +149,7 @@ begin
       WriteLn('Certificado y llave ... OK');
 
 
-      Writeln('Por favor escribe la version del CFDI que deseas generar (3.2 o 3.3):');
+      Writeln('Por favor escribe la versión del CFDI que deseas generar (3.2 o 3.3):');
       ReadLn(queVersion);
       Writeln;
 
@@ -458,7 +458,7 @@ begin
     except
       on E: Exception do
       begin
-        Writeln('** Ocurrio un error inesperado: ');
+        Writeln('** Ocurrió un error inesperado: ');
         Writeln(E.ClassName, ': ', E.Message);
         Writeln('Presiona cualquier tecla para salir...');
         Readln;
