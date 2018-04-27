@@ -20,6 +20,7 @@ type
   TCadenaUTF8 = RawByteString;
  {$ELSE}
   TCadenaUTF8 = UTF8String;
+  UnicodeString = UTF8String;
   TBytes = Array of Char;
   PAnsiChar = PChar;
   AnsiChar = Char;

@@ -29,13 +29,13 @@ type
   // Info      : Fault
   // Base Types: EFallaServicioException
   // ************************************************************************ //
-  {$REGION 'Documentation'}
+  {$IFDEF undef}{$REGION 'Documentation'}{$ENDIF}
   ///	<summary>
   ///	  Excepciones no controladas o que puedan ser causadas por algun
   ///	  problema en el servidor. Se recomienda implementar un metodo de
   ///	  reintentos en las llamadas.
   ///	</summary>
-  {$ENDREGION}
+  {$IFDEF undef}{$ENDREGION}{$ENDIF}
   EEcodexFallaServicioException = class(ERemotableException)
   private
     FRFC: string;
@@ -61,11 +61,11 @@ type
   // Info      : Fault
   // Base Types: FallaSesion
   // ************************************************************************ //
-  {$REGION 'Documentation'}
+  {$IFDEF undef}{$REGION 'Documentation'}{$ENDIF}
   ///	<summary>
   ///	  Por lo general indica la expiración del token o el uso de uno
   ///	  malformado o que no corresponde al emisor del que se hace la operación.
-  {$ENDREGION}
+  {$IFDEF undef}{$ENDREGION}{$ENDIF}
   EEcodexFallaSesionException = class(ERemotableException)
   private
     FRFC: string;
@@ -90,13 +90,13 @@ type
   // Base Types: EFallaValidacionException
   // ************************************************************************ //
 
-  {$REGION 'Documentation'}
+  {$IFDEF undef}{$REGION 'Documentation'}{$ENDIF}
   ///	<summary>
   ///	  Esta indica algun error en uno o mas datos enviados por la aplicacion cliente.
   ///	  En el caso del timbrado se regresan los errores definidos por el SAT.
   ///	  En el caso del resto de los metodos.
   ///	</summary>
-  {$ENDREGION}
+  {$IFDEF undef}{$ENDREGION}{$ENDIF}
   EEcodexFallaValidacionException = class(ERemotableException)
   private
     FRFC: string;

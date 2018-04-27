@@ -70,7 +70,9 @@ uses
       Xml.XMLDom,
       Xml.XMLDoc
 {$ELSE}
+    {$IF CompilerVersion >= 20}
       IOUtils,
+    {$IFEND}
       Classes,
       Windows,
       ComObj,

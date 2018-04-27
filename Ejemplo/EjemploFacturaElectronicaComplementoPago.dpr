@@ -21,9 +21,9 @@ program EjemploFacturaElectronicaComplementoPago;
 {$ENDIF}
 
 uses
-  System.SysUtils,
   activex,
-  Vcl.Forms,
+  SysUtils,
+  Forms,
   Facturacion.ComprobanteV33 in '..\Versiones\Facturacion.ComprobanteV33.pas',
   Facturacion.Comprobante in '..\Versiones\Facturacion.Comprobante.pas',
   Facturacion.Administrador in '..\Facturacion.Administrador.pas',
@@ -44,7 +44,6 @@ uses
   Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas',
   Facturacion.GeneradorCBBv33 in '..\Versiones\Facturacion.GeneradorCBBv33.pas',
   DelphiZXIngQRCode in '..\Lib\DelphiZXIngQRCode.pas',
-  Facturacion.GeneradorCBB,
   Facturacion.GeneradorQR in '..\Facturacion.GeneradorQR.pas',
   Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas',
   Facturacion.ComprobanteV32 in '..\Versiones\Facturacion.ComprobanteV32.pas',
@@ -55,7 +54,9 @@ uses
   Facturacion.Tipos in '..\Facturacion.Tipos.pas',
   Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas',
   Facturacion.ComplementoPagoV1 in '..\Versiones\Facturacion.ComplementoPagoV1.pas',
-  EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas';
+  EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas',
+  Facturacion.GeneradorCBB in '..\Facturacion.GeneradorCBB.pas',
+  Facturacion.GeneradorQRQuricol in '..\Facturacion.GeneradorQRQuricol.pas';
 
 var
   nuevaFactura : IComprobanteFiscal;
@@ -264,6 +265,8 @@ begin
 
           // Dependiendo de la version usamos diferente servidor de pruebas
           pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
+                         _URL_ECODEX_PRUEBAS_V33,
+                         _URL_ECODEX_PRUEBAS_V33,
                          credencialesPAC,
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL);

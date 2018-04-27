@@ -11,7 +11,7 @@ uses
 
 type
 
-  {$REGION 'Documentation'}
+  {$IFDEF undef}{$REGION 'Documentation'}{$ENDIF}
   ///	<summary>
   ///	  <para>
   ///	    Excepcion heredable que tiene la propiedad Reintentable para saber si
@@ -24,7 +24,7 @@ type
   ///	    generado, etc.)
   ///	  </para>
   ///	</summary>
-  {$ENDREGION}
+  {$IFDEF undef}{$ENDREGION}{$ENDIF}
   ECFDIException = class(Exception)
   protected
     fReintentable : Boolean;
@@ -33,7 +33,7 @@ type
     property Reintentable : Boolean read fReintentable default false;
   end;
 
-  {$REGION 'Excepciones de validacion de la matriz de validaciones de CFDI 3.3'}
+  {$IFDEF undef}{$REGION 'Excepciones de validacion de la matriz de validaciones de CFDI 3.3'}{$ENDIF}
   ESATErrorGenericoException = class(ECFDIException)
   private
     fCodigoError: Integer;
@@ -69,7 +69,7 @@ type
   ESATProblemaDeLlenadoException          = class(ESATErrorGenericoException);
   ESATCampoConfirmacionRequeridoException = class(ESATErrorGenericoException);
   ESATNoIdentificadoException             = class(ESATErrorGenericoException); // CFDI33196
-  {$ENDREGION}
+  {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
 const
   _RFC_VENTA_PUBLICO_EN_GENERAL         = 'XAXX010101000';

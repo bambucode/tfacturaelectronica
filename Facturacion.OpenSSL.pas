@@ -250,10 +250,11 @@ begin
   LPBin:=@Outbuf[0];
 
   //Convertir Valor Binario a Hexadecimal
-  for Lidx := 1 to LDigestLength do
+  for Lidx := 0 to LDigestLength-1 do
 	begin
-		Result := Result + IntToHex(LPBin^, 2);
-	 	LPBin := PByte( PByte(@Outbuf) + Lidx);
+    Result := Result + IntToHex(OutBuf[Lidx], 2);
+		//Result := Result + IntToHex(LPBin^, 2);
+	 	//LPBin := inc(PByte(@Outbuf),Lidx);
 	end;
 
  finally

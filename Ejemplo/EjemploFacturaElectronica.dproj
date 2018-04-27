@@ -39,7 +39,7 @@
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
         <DCC_N>false</DCC_N>
-        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Windows;WinApi;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Windows;WinApi;Vcl;$(DCC_Namespace)</DCC_Namespace>
         <DCC_S>false</DCC_S>
         <SanitizedProjectName>EjemploFacturaElectronica</SanitizedProjectName>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
@@ -66,10 +66,6 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\Versiones\Facturacion.ComprobanteV33.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.Comprobante.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV33.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV33.pas"/>
         <DCCReference Include="..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas"/>
         <DCCReference Include="..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsClientes.pas"/>
@@ -77,15 +73,7 @@
         <DCCReference Include="..\PACs\Ecodex\EcodexWsSeguridad.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsTimbrado.pas"/>
         <DCCReference Include="..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv33.pas"/>
         <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.ComprobanteV32.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV32.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV32.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv32.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.ImpuestosLocalesV1.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsCancelacion.pas"/>
         <DCCReference Include="..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas"/>
         <DCCReference Include="..\PACs\FinkOK\FinkOkWsTimbrado.pas"/>
@@ -103,6 +91,19 @@
         <DCCReference Include="..\Facturacion.OpenSSL.pas"/>
         <DCCReference Include="..\Facturacion.ProveedorAutorizadoCertificacion.pas"/>
         <DCCReference Include="..\Facturacion.Tipos.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.ComplementoPagoV1.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.Comprobante.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.ComprobanteV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.ComprobanteV33.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV33.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv33.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV33.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.ImpuestosLocalesV1.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas"/>
         <RcItem Include="..\Schemas\3.3\cadenaoriginal_3_3.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
@@ -181,21 +182,21 @@
             </Delphi.Personality>
             <Deployment Version="3">
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule"/>
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_3_2.xslt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="EjemploFacturaElectronica.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule"/>
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="EjemploFacturaElectronica.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>EjemploFacturaElectronica.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="EjemploFacturaElectronica.exe" Configuration="Debug" Class="ProjectOutput"/>
                 <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_TFD_1_0.xslt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>

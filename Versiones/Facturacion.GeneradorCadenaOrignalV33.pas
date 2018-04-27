@@ -35,7 +35,9 @@ uses
 {$IF CompilerVersion >= 23}
   System.IOUtils,
 {$ELSE}
-  IOUtils,
+  {$IF CompilerVersion >= 20}
+      IOUtils,
+  {$IFEND}
 {$IFEND}
   Facturacion.ComprobanteV33;
 

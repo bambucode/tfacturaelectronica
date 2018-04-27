@@ -6,7 +6,8 @@ uses Facturacion.Comprobante,
 {$IF CompilerVersion >= 23}
      System.SysUtils
 {$ELSE}
-     SysUtils
+     SysUtils,
+     Windows
 {$IFEND};
 
 type
@@ -179,7 +180,7 @@ end;
 
 class function TFacturacionHelper.ComoFechaISO8601(const aFecha: TDateTime): string;
 begin
-  Result := AnsiReplaceStr(FormatDateTime('yyyy-mm-dd', aFecha) + 'T' + FormatDateTime('hh:nn:ss', aFecha), FormatSettings.TimeSeparator, ':');
+  Result := AnsiReplaceStr(FormatDateTime('yyyy-mm-dd', aFecha) + 'T' + FormatDateTime('hh:nn:ss', aFecha), {$IF CompilerVersion >=17} FormatSettings.{$IFEND}TimeSeparator, ':');
 end;
 
 class function TFacturacionHelper.ComoMoneda(const aValor: Currency; const
@@ -244,5 +245,10 @@ begin
 end;
 
 initialization
+ {$IF CompilerVersion >= 17}
   formatSettingsLocal := TFormatSettings.Create;
+ {$ELSE}
+  GetLocaleFormatSettings(LOCALE_SYSTEM_DEFAULT, formatSettingsLocal);
+ {$IFEND}
+
 end.

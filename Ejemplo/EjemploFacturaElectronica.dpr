@@ -21,19 +21,9 @@ program EjemploFacturaElectronica;
 {$ENDIF}
 
 uses
-{$IF CompilerVersion >= 23}
-   Vcl.Forms,
-   System.SysUtils,
-   WinApi.ActiveX,
-{$ELSE}
-   Forms,
-   SysUtils,
-   ActiveX,
-{$IFEND }
-  Facturacion.ComprobanteV33 in '..\Versiones\Facturacion.ComprobanteV33.pas',
-  Facturacion.Comprobante in '..\Versiones\Facturacion.Comprobante.pas',
-  Facturacion.GeneradorCadenaOrignalV33 in '..\Versiones\Facturacion.GeneradorCadenaOrignalV33.pas',
-  Facturacion.GeneradorSelloV33 in '..\Versiones\Facturacion.GeneradorSelloV33.pas',
+  Forms,
+  SysUtils,
+  ActiveX,
   Facturacion.PAC.Ecodex in '..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas',
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
   EcodexWsClientes in '..\PACs\Ecodex\EcodexWsClientes.pas',
@@ -41,15 +31,7 @@ uses
   EcodexWsSeguridad in '..\PACs\Ecodex\EcodexWsSeguridad.pas',
   EcodexWsTimbrado in '..\PACs\Ecodex\EcodexWsTimbrado.pas',
   Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas',
-  Facturacion.GeneradorCBBv33 in '..\Versiones\Facturacion.GeneradorCBBv33.pas',
   DelphiZXIngQRCode in '..\Lib\DelphiZXIngQRCode.pas',
-  Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas',
-  Facturacion.ComprobanteV32 in '..\Versiones\Facturacion.ComprobanteV32.pas',
-  Facturacion.TimbreFiscalDigitalV32 in '..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas',
-  Facturacion.GeneradorCadenaOrignalV32 in '..\Versiones\Facturacion.GeneradorCadenaOrignalV32.pas',
-  Facturacion.GeneradorSelloV32 in '..\Versiones\Facturacion.GeneradorSelloV32.pas',
-  Facturacion.GeneradorCBBv32 in '..\Versiones\Facturacion.GeneradorCBBv32.pas',
-  Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas',
   EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas',
   Facturacion.PAC.FInkOk in '..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas',
   FinkOkWsTimbrado in '..\PACs\FinkOK\FinkOkWsTimbrado.pas',
@@ -66,7 +48,20 @@ uses
   Facturacion.Helper in '..\Facturacion.Helper.pas',
   Facturacion.OpenSSL in '..\Facturacion.OpenSSL.pas',
   Facturacion.ProveedorAutorizadoCertificacion in '..\Facturacion.ProveedorAutorizadoCertificacion.pas',
-  Facturacion.Tipos in '..\Facturacion.Tipos.pas';
+  Facturacion.Tipos in '..\Facturacion.Tipos.pas',
+  Facturacion.ComplementoPagoV1 in '..\Versiones\Facturacion.ComplementoPagoV1.pas',
+  Facturacion.Comprobante in '..\Versiones\Facturacion.Comprobante.pas',
+  Facturacion.ComprobanteV32 in '..\Versiones\Facturacion.ComprobanteV32.pas',
+  Facturacion.ComprobanteV33 in '..\Versiones\Facturacion.ComprobanteV33.pas',
+  Facturacion.GeneradorCadenaOrignalV32 in '..\Versiones\Facturacion.GeneradorCadenaOrignalV32.pas',
+  Facturacion.GeneradorCadenaOrignalV33 in '..\Versiones\Facturacion.GeneradorCadenaOrignalV33.pas',
+  Facturacion.GeneradorCBBv32 in '..\Versiones\Facturacion.GeneradorCBBv32.pas',
+  Facturacion.GeneradorCBBv33 in '..\Versiones\Facturacion.GeneradorCBBv33.pas',
+  Facturacion.GeneradorSelloV32 in '..\Versiones\Facturacion.GeneradorSelloV32.pas',
+  Facturacion.GeneradorSelloV33 in '..\Versiones\Facturacion.GeneradorSelloV33.pas',
+  Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas',
+  Facturacion.TimbreFiscalDigitalV32 in '..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas',
+  Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas';
 
 var
   nuevaFactura                                                    : IComprobanteFiscal;
@@ -201,7 +196,7 @@ begin
               Exit;
             end;
 
-            {$REGION 'Factura V32'}
+            {$IFDEF undef}{$REGION 'Factura V32'}{$ENDIF}
             // Creamos las instancias correspondientes para la v33
             generadorCadena := TGeneradorCadenaOriginalV32.Create;
             generadorSello := TGeneradorSelloV32.Create;
@@ -240,7 +235,7 @@ begin
               Receptor.Domicilio.Colonia := 'Centro';
               Receptor.Domicilio.Municipio := 'Chihuahua';
               Receptor.Domicilio.Estado := 'Chihuahua';
-              Receptor.Domicilio.Pais := 'M√©xito';
+              Receptor.Domicilio.Pais := 'MÈxito';
 
               concepto32 := Conceptos.Add;
               concepto32.NoIdentificacion := '1';
@@ -258,7 +253,7 @@ begin
 
               Impuestos.TotalImpuestosTrasladados  := '16.00';
             end;
-            {$ENDREGION}
+            {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
           end;
 
@@ -270,7 +265,7 @@ begin
               Exit;
             end;
 
-            {$REGION 'Factura V33'}
+            {$IFDEF undef}{$REGION 'Factura V33'}{$ENDIF}
             // Creamos las instancias correspondientes para la v33
             generadorCadena := TGeneradorCadenaOriginalV33.Create;
             generadorSello := TGeneradorSelloV33.Create;
@@ -287,14 +282,14 @@ begin
 
               NoCertificado := certificadoSellos.NoCertificado;
               Certificado   := certificadoSellos.ContenidoBase64;
-              FormaPago         := '01'; // De cat√°logo
-              CondicionesDePago := 'Credito a 30 dias';
+              FormaPago         := '01'; // De cat·logo
+              CondicionesDePago := 'CrÈdito a 30 dÌaas';
               Subtotal          := '100.00'; // Solo 2 decimales
               Descuento         := TFacturacionHelper.ComoMoneda(0);
-              Moneda            := 'MXN'; // De cat√°logo
+              Moneda            := 'MXN'; // De cat·logo
               TipoCambio        := '1';//TFacturacionHelper.ComoMoneda(1);
               Total             := TFacturacionHelper.ComoMoneda(117);
-              TipoDeComprobante := 'I'; // De cat√°logo
+              TipoDeComprobante := 'I'; // De cat·logo
               MetodoPago        := 'PUE';
               LugarExpedicion   := '76030';
 
@@ -307,16 +302,16 @@ begin
               Receptor.Nombre           := 'Juan & JosÈ & ''NiÒo'' & "NiÒa"';
               Receptor.UsoCFDI          := 'G01';
 
-              Receptor.ResidenciaFiscal := 'USA'; // De cat√°logo
+              Receptor.ResidenciaFiscal := 'USA'; // De cat·logo
               // Solo para cliente extranjero
               Receptor.NumRegIdTrib     := '123456789'; // "formatoDeRegistroDeIdentidadTributaria": "[0-9]{9}",
 
               concepto33 := Conceptos.Add;
-              concepto33.ClaveProdServ    := '52161529';  // De cat√°logo
+              concepto33.ClaveProdServ    := '52161529';  // De cat·logo
               concepto33.NoIdentificacion := '1';
               concepto33.Cantidad         := '1';
-              concepto33.ClaveUnidad      := 'EA';  // De cat√°logo
-              concepto33.Unidad           := 'PZA'; // De cat√°logo
+              concepto33.ClaveUnidad      := 'EA';  // De cat·logo
+              concepto33.Unidad           := 'PZA'; // De cat·logo
               concepto33.Descripcion      := 'Concepto No 1';
               concepto33.ValorUnitario    := '100.00';
               concepto33.Importe          := '100.00';
@@ -329,7 +324,7 @@ begin
               iva33.TasaOCuota  := '0.160000';
               iva33.Importe     := '16.00';
               
-              // NOTA: Agregamos el numero cuenta predial justo despu√©s de indicar
+              // NOTA: Agregamos el numero cuenta predial justo despuÈs de indicar
               // los impuestos del concepto pues el orden importa.
               concepto33.CuentaPredial.Numero := '234989';
 
@@ -341,11 +336,11 @@ begin
               totalIVA33.TasaOCuota := '0.160000';
               totalIVA33.Importe    := '16.00';
             end;
-            {$ENDREGION}
+            {$IFDEF undef}{$ENDREGION}{$ENDIF}
           end;
 
           // Agregamos el impuesto local el cual se maneja de forma especial
-          {$REGION 'Impuestos locales'}
+          {$IFDEF undef}{$REGION 'Impuestos locales'}{$ENDIF}
           impuestoLocalv1 := NewImpuestosLocalesV1;
           impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
           impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
@@ -358,7 +353,7 @@ begin
                                           'implocal',
                                           'http://www.sat.gob.mx/implocal',
                                           'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
-          {$ENDREGION}
+          {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
           //admonFacturas.GuardarArchivo(nuevaFactura,
           //                            ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi-pre.xml');

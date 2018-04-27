@@ -1,9 +1,9 @@
 { ******************************************************* }
-{ }
-{ TFacturaElectronica }
-{ }
-{ Copyright (C) 2017 Bambu Code SA de CV }
-{ }
+{                                                         }
+{ TFacturaElectronica                                     }
+{                                                         }
+{ Copyright (C) 2017 Bambu Code SA de CV                  }
+{                                                         }
 { ******************************************************* }
 
 unit Facturacion.PAC.Ecodex;
@@ -688,7 +688,7 @@ begin
 
   // 1. Creamos la solicitud de timbrado
   solicitudCancelacion := TEcodexSolicitudCancelaMultiple.Create;
-  Result               := TDictionary<String, Boolean>.Create;
+  Result               := TListadoCancelacionUUID.Create;
 
   try
     // 2. Iniciamos una nueva sesion solicitando un nuevo token
@@ -756,6 +756,7 @@ var
   mensajeExcepcion: String;
 const
   _ECODEX_ACUSE_NO_ENCONTRADO             = 'Acuse de cancelacion del documento no encontrado';
+  _ECODEX_ACUSE_NO_ENCONTRADO_DOS         = 'No existe solicitud, no es posible recuperar el acuse';
   _ECODEX_ALTA_EMISOR_CORREO_USADO        = '(97)';
   _ECODEX_ALTA_EMISOR_REPETIDO            = '(98)';
   _ECODEX_ALTA_EMISOR_RFC_INVALIDO        = '(890)';
@@ -808,7 +809,8 @@ begin
   if AnsiPos(_ECODEX_SIN_FOLIOS, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EPACTimbradoSinFoliosDisponiblesException.Create(_ECODEX_SIN_FOLIOS, 0, EEcodexFallaValidacionException(aExcepcion).Numero, False);
 
-  if AnsiPos(_ECODEX_ACUSE_NO_ENCONTRADO, mensajeExcepcion) > _NO_ENCONTRADO then
+  if ((AnsiPos(_ECODEX_ACUSE_NO_ENCONTRADO, mensajeExcepcion) > _NO_ENCONTRADO) Or
+      (AnsiPos(_ECODEX_ACUSE_NO_ENCONTRADO_DOS, mensajeExcepcion) > _NO_ENCONTRADO)) then
     raise EPACAcuseNoEncontradoException.Create(_ECODEX_ACUSE_NO_ENCONTRADO, 0, EEcodexFallaValidacionException(aExcepcion).Numero, False);
 
   if AnsiPos(_ECODEX_DOCUMENTO_CANCELAR_NO_ENCONTRADO, mensajeExcepcion) > _NO_ENCONTRADO then
@@ -818,16 +820,12 @@ begin
   // TBD: https://github.com/bambucode/eleventa/issues/1721
  { if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_USADO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EEcodexAltaEmisorCorreoUsadoException.Create('El correo asignado ya está en uso por otro emisor.', 0, 97, False);
-
   if AnsiPos(_ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA, mensajeExcepcion) > 0 then
     raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta con un integrador.', 0, 98, False);
-
   if AnsiPos(_ECODEX_ALTA_EMISOR_REPETIDO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta.', 0, 98, False);
-
   if AnsiPos(_ECODEX_ALTA_EMISOR_RFC_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EEcodexAltaEmisorRFCInvalidoException.Create('El RFC del emisor no es válido.', 0, 890, False);
-
   if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EEcodexAltaEmisorCorreoInvalidoException.Create('El correo del emisor no es válido.', 0, 891, False);        }
 

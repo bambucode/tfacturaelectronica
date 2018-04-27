@@ -22,12 +22,10 @@ uses
 {$IFEND}
      Facturacion.Comprobante,
      Facturacion.Tipos;
-
-
 type
 
   TListadoUUID = Array of string;
-  // NOTA: Aqui se deberá cambiar el TDictionary por otro codigo para versiones de
+  // NOTA: Aqui se debera cambiar el TDictionary por otro codigo para versiones de
   // Delphi anteriores
   TListadoCancelacionUUID = TDictionary<String, Boolean>;
 
@@ -59,23 +57,23 @@ type
   EPACNoEncontradoParaCancelarException         = class(EPACException);
   EPACAcuseNoEncontradoException                = class(EPACException);
   EPACNoSePudoObtenerAcuseException             = class(EPACException);
-  {$REGION 'Documentation'}
+  {$IFDEF undef}{$REGION 'Documentation'}{$ENDIF}
   ///	<summary>
   ///	  Este error es lanzado cuando la fecha de sellado es mayor a la fecha de la ciudad de mexico, ej. clientes en Cancun
   ///	</summary>
-  {$ENDREGION}
+  {$IFDEF undef}{$ENDREGION}{$ENDIF}
   EPACFechaInvalida = class(EPACException);
-  {$REGION 'Documentation'}
+  {$IFDEF undef}{$REGION 'Documentation'}{$ENDIF}
   ///	<summary>
   ///	  Este tipo de excepcion se lanza cuando se detecta una falla con el
   ///	  internet del usuario el cual es un problema de comunicaci�n con el PAC.
   ///	</summary>
-  {$ENDREGION}
+  {$IFDEF undef}{$ENDREGION}{$ENDIF}
   EPACProblemaConInternetException = class(EPACException);
 
   EPACProblemaTimeoutException = class(EPACException);
 
-  {$REGION 'Documentation'}
+  {$IFDEF undef}{$REGION 'Documentation'}{$ENDIF}
   ///	<summary>
   ///	  Excepcion general para errores no programados/manejados.
   ///	</summary>
@@ -85,7 +83,7 @@ type
   ///	    indicarle al cliente que debe de re-intentar realizar el ultimo proceso
   ///	  </note>
   ///	</remarks>
-  {$ENDREGION}
+  {$IFDEF undef}{$ENDREGION}{$ENDIF}
   EPACErrorGenericoException = class(EPACException);
 
   EPACDocumentoNoEncontradoException = class(EPACException);
