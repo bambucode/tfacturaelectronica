@@ -1,4 +1,4 @@
-﻿{*******************************************************}
+{*******************************************************}
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
@@ -66,7 +66,7 @@ type
   {$IFDEF undef}{$REGION 'Documentation'}{$ENDIF}
   ///	<summary>
   ///	  Este tipo de excepcion se lanza cuando se detecta una falla con el
-  ///	  internet del usuario el cual es un problema de comunicaci�n con el PAC.
+  ///	  internet del usuario el cual es un problema de comunicación con el PAC.
   ///	</summary>
   {$IFDEF undef}{$ENDREGION}{$ENDIF}
   EPACProblemaConInternetException = class(EPACException);

@@ -14,13 +14,13 @@ uses xmldom, XMLDoc, XMLIntf;
 
 type
 
-  // Definimos el tipo de Cadena est·ndard que manejaremos en toda la libreia
+  // Definimos el tipo de Cadena est√°ndard que manejaremos en toda la libreia
   // con codificacion en UTF8
  {$IF Compilerversion >= 20}
   TCadenaUTF8 = RawByteString;
  {$ELSE}
   TCadenaUTF8 = UTF8String;
-  UnicodeString = UTF8String;
+  UnicodeString = Widestring;
   TBytes = Array of Char;
   PAnsiChar = PChar;
   AnsiChar = Char;
@@ -43,8 +43,8 @@ type
   /// </summary>
   /// <remarks>
   ///   <note type="note">
-  ///     Toda nueva versiÛn de un CFDI deber· implementar esta interfase.
-  ///     Para mayor informaciÛn consultar el wiki en:
+  ///     Toda nueva versi√≥n de un CFDI deber√° implementar esta interfase.
+  ///     Para mayor informaci√≥n consultar el wiki en:
   ///     https://github.com/bambucode/tfacturaelectronica/wiki
   ///   </note>
   /// </remarks>
@@ -68,7 +68,7 @@ type
     ///   poder agregar el timbre fiscal digital
     /// </summary>
     /// <param name="aXMLTimbre">
-    ///   XML del timbre tal cual lo mandÛ el PAC
+    ///   XML del timbre tal cual lo mand√≥ el PAC
     /// </param>
     procedure AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
     procedure AgregarComplemento(aNodoAAgregar: IXMLNode;
