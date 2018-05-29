@@ -1,4 +1,4 @@
-﻿{*******************************************************}
+{*******************************************************}
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
@@ -47,7 +47,8 @@ type
     fUUID: string;
     fUUIDList: TUUIDInfoList;
   public
-   constructor Create( aUUID:String; aEncontrado: Boolean; aCancelado: Boolean; aExtraInfo: string=''; aUUIDList: TUUIDInfoList=nil);  reintroduce; overload;
+   constructor Create( aUUID:String; aEncontrado: Boolean; aCancelado: Boolean;
+    aExtraInfo: string=''; aUUIDList: TUUIDInfoList=nil); reintroduce; overload;
    property UUID: string read fUUID write fUUID;
    property Cancelado: boolean read fCancelado write fCancelado;
    property Encontrado: boolean read fEncontrado write fEncontrado;
@@ -63,7 +64,8 @@ type
    destructor Destroy; override;
    procedure Clear; override;
    procedure Delete(Index: Integer); override;
-   function Add(aUUID:String; aEncontrado: Boolean; aCancelado: Boolean; aExtraInfo: string=''): TUUIDInfoListItem; reintroduce; overload;
+   function Add(aUUID:String; aEncontrado: Boolean; aCancelado: Boolean;
+    aExtraInfo: string=''): TUUIDInfoListItem; reintroduce; overload;
    function Add(aUUID:String; aCancelado: Boolean; aExtraInfo: string=''): TUUIDInfoListItem; overload;
    function AddCancelado(aUUID:String; aExtraInfo: string=''): TUUIDInfoListItem; overload;
   end;
