@@ -50,7 +50,7 @@ A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
 - Otros complementos (comercio electronico, etc.)
 - Pruebas de unidad
 - Validaciones de campos basado en los múltiples catálogos publicados por el SAT.
-- Soporte para ediciones anteriores de Delphi 2007, 2010, etc.
+- Soporte para ediciones anteriores de Delphi 2007, 2010, etc. - WIP (Work In Progress)
 
 ¿Cómo puedo ayudar?
 -------------------
