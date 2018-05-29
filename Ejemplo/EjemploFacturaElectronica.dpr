@@ -235,7 +235,7 @@ begin
               Receptor.Domicilio.Colonia := 'Centro';
               Receptor.Domicilio.Municipio := 'Chihuahua';
               Receptor.Domicilio.Estado := 'Chihuahua';
-              Receptor.Domicilio.Pais := 'Méxito';
+              Receptor.Domicilio.Pais := 'México';
 
               concepto32 := Conceptos.Add;
               concepto32.NoIdentificacion := '1';
@@ -283,7 +283,7 @@ begin
               NoCertificado := certificadoSellos.NoCertificado;
               Certificado   := certificadoSellos.ContenidoBase64;
               FormaPago         := '01'; // De catálogo
-              CondicionesDePago := 'Crédito a 30 díaas';
+              CondicionesDePago := 'Crédito a 30 días';
               Subtotal          := '100.00'; // Solo 2 decimales
               Descuento         := TFacturacionHelper.ComoMoneda(0);
               Moneda            := 'MXN'; // De catálogo

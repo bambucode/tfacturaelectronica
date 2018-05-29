@@ -1,4 +1,4 @@
-{*******************************************************}
+﻿{*******************************************************}
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
@@ -18,6 +18,7 @@ uses
    {$IF CompilerVersion >= 20}
      Generics.Collections,
    {$ELSE}
+     Classes,
    {$IFEND}
 {$IFEND}
      Facturacion.Comprobante,
@@ -27,7 +28,48 @@ type
   TListadoUUID = Array of string;
   // NOTA: Aqui se debera cambiar el TDictionary por otro codigo para versiones de
   // Delphi anteriores
+
+ {$IF CompilerVersion >= 20}
   TListadoCancelacionUUID = TDictionary<String, Boolean>;
+ {$ELSE}
+  // No es la clase mas optimizada que pueda existir para Delphi 7, pero cumple con las
+  // funciones basicas
+
+  TUUIDInfoList=class;
+  TUUIDInfoListItem = class(TObject)
+  private
+  protected
+    fCancelado: boolean;
+    fEncontrado: boolean;
+    fExtraInfo: string;
+    fTag: NativeInt;
+    fTagStr: String;
+    fUUID: string;
+    fUUIDList: TUUIDInfoList;
+  public
+   constructor Create( aUUID:String; aEncontrado: Boolean; aCancelado: Boolean; aExtraInfo: string=''; aUUIDList: TUUIDInfoList=nil);  reintroduce; overload;
+   property UUID: string read fUUID write fUUID;
+   property Cancelado: boolean read fCancelado write fCancelado;
+   property Encontrado: boolean read fEncontrado write fEncontrado;
+   property ExtraInfo: string read fExtraInfo write fExtraInfo;
+   property Tag: NativeInt read fTag write fTag;
+   property TagStr: String read fTagStr write fTagStr;
+  end;
+
+  TUUIDInfoList = class(TStringList)
+  protected
+   procedure FreeItems;
+  public
+   destructor Destroy; override;
+   procedure Clear; override;
+   procedure Delete(Index: Integer); override;
+   function Add(aUUID:String; aEncontrado: Boolean; aCancelado: Boolean; aExtraInfo: string=''): TUUIDInfoListItem; reintroduce; overload;
+   function Add(aUUID:String; aCancelado: Boolean; aExtraInfo: string=''): TUUIDInfoListItem; overload;
+   function AddCancelado(aUUID:String; aExtraInfo: string=''): TUUIDInfoListItem; overload;
+  end;
+
+  TListadoCancelacionUUID = class(TUUIDInfoList);
+ {$IFEND}
 
   EPACNoConfiguradoException = class(Exception);
 
@@ -120,4 +162,72 @@ begin
   fCodigoErrorPAC := aCodigoErrorPAC;
 end;
 
+{$IF CompilerVersion < 20}
+{ TUUIDInfoListItem }
+
+constructor TUUIDInfoListItem.Create(aUUID: String; aEncontrado,
+  aCancelado: Boolean; aExtraInfo: string; aUUIDList: TUUIDInfoList);
+begin
+ Inherited Create;
+ fUUID := aUUID;
+ fEncontrado := aEncontrado;
+ fCancelado := aCancelado;
+ fExtraInfo := aExtraInfo;
+ fUUIDList := aUUIDList;
+end;
+
+{ TUUIDInfoList }
+
+function TUUIDInfoList.Add(aUUID: String; aEncontrado,
+  aCancelado: Boolean; aExtraInfo: string=''): TUUIDInfoListItem;
+begin
+ result := TUUIDInfoListItem.Create(aUUID, aEncontrado, aCancelado, aExtraInfo, self);
+ AddObject(aUUID, result);
+end;
+
+function TUUIDInfoList.Add(aUUID: String; aCancelado: Boolean;
+  aExtraInfo: string): TUUIDInfoListItem;
+begin
+ result := Add(aUUID, True, aCancelado, aExtraInfo);
+end;
+
+function TUUIDInfoList.AddCancelado(aUUID: String; aExtraInfo: string): TUUIDInfoListItem;
+begin
+ result := Add(aUUID, True, True, aExtraInfo);
+end;
+
+
+procedure TUUIDInfoList.Clear;
+begin
+  FreeItems;
+  inherited;
+end;
+
+procedure TUUIDInfoList.Delete(Index: Integer);
+var LObj: TObject;
+begin
+  LObj := GetObject(Index);
+  if Assigned(LObj) then
+      FreeAndNil(LObj);
+  inherited Delete(index);
+end;
+
+destructor TUUIDInfoList.Destroy;
+begin
+  FreeItems;
+  inherited;
+end;
+
+procedure TUUIDInfoList.FreeItems;
+var LObj: TObject;
+     LIdx: Integer;
+begin
+  for LIdx := 0 to count-1 do
+  begin
+   LObj := Objects[LIdx];
+   if Assigned(LObj) then
+      FreeAndNil(LObj);
+  end;
+end;
+{$IFEND}
 end.

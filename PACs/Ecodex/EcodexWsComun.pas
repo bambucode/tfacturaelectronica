@@ -1,11 +1,11 @@
-﻿{* *****************************************************************************
+{* *****************************************************************************
   PROYECTO FACTURACION ELECTRONICA
-  Copyright (C) 2010-2014 - Bambú Code SA de CV
+  Copyright (C) 2010-2014 - Bambu Code SA de CV
 
-  Este archivo pertenece al proyecto de codigo abierto de Bambú Code:
+  Este archivo pertenece al proyecto de codigo abierto de Bambu Code:
   http://bambucode.com/codigoabierto
 
-  La licencia de este código fuente se encuentra en:
+  La licencia de este c�digo fuente se encuentra en:
   http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
 
   ***************************************************************************** *}

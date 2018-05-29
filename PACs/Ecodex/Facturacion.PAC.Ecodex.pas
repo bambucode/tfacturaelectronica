@@ -21,7 +21,9 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
   System.Generics.Collections,
   System.SysUtils
 {$ELSE}
-  Generics.Collections,
+  {$IF CompilerVersion >= 23}
+   Generics.Collections,
+  {$IFEND}
   SysUtils
 {$IFEND}
   ;
@@ -88,8 +90,8 @@ uses
   XSBuiltIns,
   XMLIntf,
   Msxmldom,
-  RegularExpressions,
-  XMLDoc
+  XMLDoc,
+  RegularExpressions
 {$IFEND}
   ;
 
