@@ -50,7 +50,7 @@ A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
 - Otros complementos (comercio electronico, etc.)
 - Pruebas de unidad
 - Validaciones de campos basado en los múltiples catálogos publicados por el SAT.
-- ~~Soporte para ediciones anteriores de Delphi 7, Delphi 2007, 2010, XE1 etc. (Implementado el 2018-05-30 por @fduenas)
+- ~~Soporte para ediciones anteriores de Delphi 7, Delphi 2007, 2010, XE1 etc.~~ con ayuda de @fduenas
 - Realizar pruebas en Delphi 2007, Delphi 2009 y Delphi 2010
 
 Notas de Compatibilidad con otras versiones de Delphi
