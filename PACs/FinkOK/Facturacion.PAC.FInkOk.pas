@@ -21,6 +21,7 @@ uses
 {$IFEND}
      Facturacion.ProveedorAutorizadoCertificacion,
      Facturacion.Comprobante,
+     Facturacion.Compatibilidad,
      FinkOkWsTimbrado;
 
 type
@@ -63,8 +64,12 @@ uses Facturacion.Tipos,
      Xml.Win.Msxmldom,
      Xml.XMLDoc
 {$ELSE}
-     Classes,
+   {$IF Compilerversion >= 20}
      RegularExpressions,
+   {$ELSE}
+     PerlRegEx,
+   {$IFEND}
+     Classes,
      xmldom,
      XMLIntf,
      Msxmldom,
@@ -201,16 +206,35 @@ end;
 function TProveedorFinkOk.ExtraerNodoTimbre(const aComprobanteXML : RawByteString): TCadenaUTF8;
 var
   contenidoComprobanteXML: TCadenaUTF8;
+{$IF Compilerversion < 20}
+  LRegEx: TPerlRegEx;
+{$IFEND}
+const
+ _REGEX_TIMBRE = '<tfd:TimbreFiscalDigital.*?/>';
 begin
   Assert(aComprobanteXML <> '', 'La respuesta del servicio de timbrado fue nula');
   {$IF Compilerversion >= 20}
   // Delphi 2010 y superiores
   contenidoComprobanteXML := aComprobanteXML;
-  {$ELSE}
+  Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
+ {$ELSE}
   contenidoComprobanteXML := UTF8Encode(aComprobanteXML);
-  {$IFEND}
-
-  Result := TRegEx.Match(contenidoComprobanteXML, '<tfd:TimbreFiscalDigital.*?/>').Value;
+  LRegEx := TPerlRegEx.Create;
+  try
+  	LRegEx.RegEx := _REGEX_TIMBRE;
+  	LRegEx.Options := [];
+  	LRegEx.State := [];
+  	LRegEx.Subject := contenidoComprobanteXML;
+	 if LRegEx.Match then begin
+	 	Result := LRegEx.MatchedText;
+	 end
+  	else begin
+  		Result := '';
+  	end;
+  finally
+   LRegex.Free;
+  end;
+ {$IFEND}
   Assert(Result <> '', 'El XML del timbre estuvo vacio');
 end;
 

@@ -35,8 +35,11 @@ const
 
 
 type
-
+ {$IF Compilerversion >= 20}
   TTipoComprobanteXML = String;
+ {$ELSE}
+  TTipoComprobanteXML = WideString;
+ {$IFEND}
 
   // ************************************************************************ //
   // The following types, referred to in the WSDL document are not being represented

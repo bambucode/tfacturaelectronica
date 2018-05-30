@@ -183,6 +183,11 @@ var
 
 begin
   Len := 0;
+
+  // Nota: en Delphi 7 si la cadena ya viene codificada en UTF8 (UTFEncode),
+  // por lo tanto se necesita Decodificar (UTFDecode) antes de ser pasada esta
+  // función, de lo contrario se Volverá a Codificar alterando el resultado
+
   LAnsiStr := UTF8Encode(aCadena);
   // Verificamos tener la llave privada desencriptada
   if not Assigned(fLlavePrivadaDesencriptada) then
@@ -236,6 +241,11 @@ begin
 
  // NOTA: El siguiente código ya funciona
  result :='';
+
+ // Nota: en Delphi 7 si la cadena ya viene codificada en UTF8 (UTFEncode),
+ // por lo tanto se necesita Decodificar (UTFDecode) antes de ser pasada esta
+ // función, de lo contrario se Volverá a Codificar alterando el resultado
+
  LAnsiStr :=  UTF8Encode( aCadena ) ;
  LStrLength:= (Length(LAnsiStr)); // Obtenemos el tamaño de la cadena original
  try

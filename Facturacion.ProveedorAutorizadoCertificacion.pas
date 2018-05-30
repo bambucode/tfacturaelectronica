@@ -22,7 +22,8 @@ uses
    {$IFEND}
 {$IFEND}
      Facturacion.Comprobante,
-     Facturacion.Tipos;
+     Facturacion.Tipos,
+     Facturacion.Compatibilidad;
 type
 
   TListadoUUID = Array of string;
@@ -58,6 +59,11 @@ type
   end;
 
   TUUIDInfoList = class(TStringList)
+  private
+    function GetCancelado(const UUID: string): Boolean;
+    function GetItems(const UUID: string): TUUIDInfoListItem;
+    procedure SetCancelado(const UUID: string; const Value: Boolean);
+    procedure SetItems(const UUID: string; const Value: TUUIDInfoListItem);
   protected
    procedure FreeItems;
   public
@@ -68,6 +74,8 @@ type
     aExtraInfo: string=''): TUUIDInfoListItem; reintroduce; overload;
    function Add(aUUID:String; aCancelado: Boolean; aExtraInfo: string=''): TUUIDInfoListItem; overload;
    function AddCancelado(aUUID:String; aExtraInfo: string=''): TUUIDInfoListItem; overload;
+   property Items[const UUID: string]: TUUIDInfoListItem read GetItems write SetItems;
+   property Cancelado[const UUID: string]: Boolean read GetCancelado write SetCancelado;
   end;
 
   TListadoCancelacionUUID = class(TUUIDInfoList);
@@ -231,5 +239,30 @@ begin
       FreeAndNil(LObj);
   end;
 end;
+
+function TUUIDInfoList.GetCancelado(const UUID: string): Boolean;
+begin
+ result := GetItems( UUID ).Cancelado;
+end;
+
+function TUUIDInfoList.GetItems(const UUID: string): TUUIDInfoListItem;
+var LIndex: Integer;
+begin
+ result := nil;
+ result := TUUIDInfoListItem( Objects[ IndexOf( UUID ) ] );
+end;
+
+procedure TUUIDInfoList.SetCancelado(const UUID: string;
+  const Value: Boolean);
+begin
+ GetItems(UUID).Cancelado := Value;
+end;
+
+procedure TUUIDInfoList.SetItems(const UUID: string;
+  const Value: TUUIDInfoListItem);
+begin
+ Objects[ IndexOf(UUID) ] := Value;
+end;
 {$IFEND}
+
 end.

@@ -11,6 +11,7 @@ unit Facturacion.GeneradorCadenaOriginal;
 interface
 
 uses Facturacion.Comprobante,
+     Facturacion.Compatibilidad,
 {$IF CompilerVersion >= 23}
      System.SysUtils
 {$ELSE}
@@ -55,7 +56,7 @@ type
   TTransformadorDeXML = class
   public
     function ObtenerXSLTDeRecurso(const aNombreRecurso: string): TCadenaUTF8;
-    function TransformarXML(const aXMLData: string; aXSLT: string): TCadenaUTF8;
+    function TransformarXML(const aXMLData: UnicodeString; aXSLT: UnicodeString): TCadenaUTF8;
   end;
 
 implementation
@@ -96,7 +97,7 @@ begin
       sl := TStringList.Create;
       try
         sl.LoadFromStream(Stream);
-        Result := sl.Text;
+        Result := UTF8Encode(sl.Text);
       finally
         sl.Free;
       end;
@@ -111,8 +112,8 @@ begin
 
 end;
 
-function TTransformadorDeXML.TransformarXML(const aXMLData: string; aXSLT:
-    string): TCadenaUTF8;
+function TTransformadorDeXML.TransformarXML(const aXMLData: UnicodeString; aXSLT:
+    UnicodeString): TCadenaUTF8;
 var
   xmlInput, xsltInput, xmlOutput: IXMLDocument;
   LOutput: XmlDomString;

@@ -26,7 +26,9 @@ uses DelphiZXingQRCode,
      System.Classes,
      Vcl.Graphics
 {$ELSE}
-     pngimage,
+     {$IF CompilerVersion >= 20}
+      pngimage,
+     {$IFEND}
      jpeg,
      Classes,
      Graphics
@@ -61,8 +63,12 @@ begin
     QRCode.Encoding     := qrAuto;
     // Margen del QR Code
     QRCode.QuietZone    := 1;
-
-    QRCodeBitmap.SetSize(QRCode.Rows, QRCode.Columns);
+    {$IF CompilerVersion >= 20}
+      QRCodeBitmap.SetSize(QRCode.Rows, QRCode.Columns);
+    {$ELSE}
+      QRCodeBitmap.Height := QRCode.Rows;
+      QRCodeBitmap.Width := QRCode.Columns;
+    {$IFEND}
 
     for Row := 0 to QRCode.Rows - 1 do
     begin

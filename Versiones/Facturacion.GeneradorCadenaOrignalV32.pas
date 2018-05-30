@@ -16,7 +16,7 @@ uses
 {$ELSE}
      SysUtils,
 {$IFEND}
-      Facturacion.Comprobante,
+      Facturacion.Comprobante, Facturacion.Compatibilidad,
       Facturacion.GeneradorCadenaOriginal;
 
 type
@@ -38,7 +38,9 @@ uses
       Xml.XMLDom,
       Xml.XMLDoc,
 {$ELSE}
+  {$IF CompilerVersion >= 20}
       IOUtils,
+  {$IFEND}
       Classes,
       Windows,
       XMLIntf,

@@ -528,6 +528,7 @@ initialization
   InvRegistry.RegisterDefaultSOAPAction(TypeInfo(TimbradoPortType), 'urn:%operationName%');
   InvRegistry.RegisterInvokeOptions(TypeInfo(TimbradoPortType), ioDocument);
   { TimbradoPortType.cancelarPorNotaCredito }
+  {$IF CompilerVersion >= 20}
   InvRegistry.RegisterMethodInfo(TypeInfo(TimbradoPortType), 'cancelarPorNotaCredito', '',
                                  '[ReturnName="return"]', IS_OPTN or IS_NLBL);
   InvRegistry.RegisterParamInfo(TypeInfo(TimbradoPortType), 'cancelarPorNotaCredito', 'usuario', '',
@@ -624,6 +625,7 @@ initialization
                                 '', IS_NLBL);
   InvRegistry.RegisterParamInfo(TypeInfo(TimbradoPortType), 'cancelarBase64', 'return', '',
                                 '[Namespace="http://timbrado.ws.cfdi.solucionfactible.com/xsd"]', IS_NLBL);
+  {$IFEND}
   RemClassRegistry.RegisterXSInfo(TypeInfo(Array_Of_CFDIResultadoCancelacion), 'http://timbrado.ws.cfdi.solucionfactible.com/xsd', 'Array_Of_CFDIResultadoCancelacion');
   RemClassRegistry.RegisterXSInfo(TypeInfo(Array_Of_CFDIResultadoCertificacion), 'http://timbrado.ws.cfdi.solucionfactible.com/xsd', 'Array_Of_CFDIResultadoCertificacion');
   RemClassRegistry.RegisterXSClass(CFDICertificacion, 'http://timbrado.ws.cfdi.solucionfactible.com/xsd', 'CFDICertificacion');

@@ -23,7 +23,7 @@ uses QuricolCode, QuricolAPI,
       {$IF Compilerversion >= 23}
        Vcl.Graphics, Vcl.Imaging.pngimage, Vcl.Imaging.jpeg;
       {$ELSE}
-       Graphics, pngimage, Jpeg;
+       Graphics, {$IF Compilerversion >= 20} pngimage, {$IFEND} Jpeg;
       {$IFEND}
 
 { TGeneradorCBBGenerico }
@@ -43,7 +43,19 @@ begin
   // 2. Generamos la imagen auxiliandonos de la liberia Quaricol
   jpgResultado := TJPEGImage.Create;
   try
-    bmpCBB := TQRCode.GetBitmapImage(aTexto, _IMAGEN_MARGEN, _TAMANO_PIXELES, QualityHigh);
+    {$IF Compilerversion >= 20}
+     bmpCBB := TQRCode.GetBitmapImage(aTexto, _IMAGEN_MARGEN, _TAMANO_PIXELES, QualityHigh);
+    {$ELSE}
+     with TQRCode.Create do
+     begin
+      try
+       bmpCBB := GetBitmapImage(aTexto, _IMAGEN_MARGEN, _TAMANO_PIXELES, QualityHigh);
+      finally
+       Free;
+      end;
+     end;
+    {$IFEND}
+
     try
       // La asignamos el JPG y la guardamos
       jpgResultado.Assign(bmpCBB);

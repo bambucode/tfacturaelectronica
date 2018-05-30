@@ -12,6 +12,7 @@ interface
 
 uses Facturacion.ProveedorAutorizadoCertificacion,
      Facturacion.Comprobante,
+     Facturacion.Compatibilidad,
      SolucionFactibleWsTimbrado,
 {$IF CompilerVersion >= 23}
    System.Types,
@@ -58,8 +59,12 @@ uses
      Xml.Win.Msxmldom,
      Xml.XMLDoc
 {$ELSE}
-     Classes,
+    {$IF Compilerversion >= 20}
      RegularExpressions,
+   {$ELSE}
+     PerlRegEx,
+   {$IFEND}
+     Classes,
      xmldom,
      XMLIntf,
      Msxmldom,
@@ -114,6 +119,10 @@ var
    respuestaTimbrado: CFDICertificacion;
    sXML: TBytedynArray;
    sXMLStr: RawByteString;
+   {$IF Compilerversion < 20}
+     Buffer: AnsiString;
+   {$ifeNd}
+
 begin
    sXML := UTF8Bytes(aComprobante.Xml);
    respuestaTimbrado := fwsTimbradoSolucionFactible.timbrar(fCredencialesPAC.RFC, fCredencialesPAC.Clave, sXML, False);
@@ -122,7 +131,13 @@ begin
       Begin
          if respuestaTimbrado.resultados[0].status = 200 then
             Begin
-               sXMLStr := TEncoding.UTF8.GetString( TBytes(respuestaTimbrado.resultados[0].cfdiTimbrado) );
+                {$IF Compilerversion >= 20}
+                 sXMLStr := TEncoding.UTF8.GetString( TBytes(respuestaTimbrado.resultados[0].cfdiTimbrado) );
+                {$ELSE}
+                 SetLength(Buffer, Length(respuestaTimbrado.resultados[0].cfdiTimbrado));
+                 System.Move(respuestaTimbrado.resultados[0].cfdiTimbrado[0], Buffer[1], Length(respuestaTimbrado.resultados[0].cfdiTimbrado));
+                 sXMLStr := UTF8Encode( Buffer );
+                {$IFEND}
                Result := ExtraerNodoTimbre(sXMLStr)
             End
          else
@@ -162,7 +177,7 @@ begin
    {$ELSE}
    contenidoComprobanteXML := UTF8Encode(aComprobanteXML);
    {$IFEND}
-   Result := TRegEx.Match(contenidoComprobanteXML, '<tfd:TimbreFiscalDigital.*?/>').Value;
+   //Result := TRegEx.Match(contenidoComprobanteXML, '<tfd:TimbreFiscalDigital.*?/>').Value;
    Assert(Result <> '', 'El XML del timbre estuvo vacio');
 end;
 

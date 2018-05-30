@@ -1,4 +1,4 @@
-﻿{*******************************************************}
+{*******************************************************}
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
@@ -10,7 +10,7 @@ unit Facturacion.Administrador;
 
 interface
 
-uses Facturacion.Comprobante,
+uses Facturacion.Comprobante, Facturacion.Compatibilidad,
      Facturacion.GeneradorCadenaOriginal,
      Facturacion.GeneradorSello,
 {$IF CompilerVersion >= 23}
@@ -132,6 +132,9 @@ uses
      Xml.XMLDoc,
      Xml.XMLIntf,
 {$ELSE}
+ {$IF CompilerVersion < 20}
+   WideStrings,
+ {$IFEND}
      Classes,
      XMLDoc,
      XMLIntf,
@@ -189,14 +192,32 @@ end;
 procedure TAdministradorFacturas.GuardarArchivo(const aComprobante: IComprobanteFiscal;
                                                  const aArchivoDestino: TFileName);
 var
+  {$IF CompilerVersion >= 20}
    Writer: TStreamWriter;
+  {$ELSE}
+   Writer: TWideStringList;
+  {$IFEND}
+
+
 const
   _ENCABEZADO_XML = '<?xml version="1.0" encoding="utf-8"?>' + #13#10;
 begin
+  {$IF CompilerVersion >= 20}
    Writer := TStreamWriter.Create(aArchivoDestino, false, TEncoding.UTF8);
+  {$ELSE}
+   Writer := TWideStringList.create;
+  {$IFEND}
+
    try
      // Forzamos a que siempre se incluya el encabezado del XML
+    {$IF CompilerVersion >= 20}
      Writer.Write(_ENCABEZADO_XML + aComprobante.XML);
+    {$ELSE}
+     writer.Text := _ENCABEZADO_XML + aComprobante.XML;
+     Writer.SaveToFile(aArchivoDestino);
+    {$IFEND}
+
+
    finally
      Writer.Free();
    end;

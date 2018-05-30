@@ -11,7 +11,7 @@ unit Facturacion.ComprobanteV32;
 interface
 
 uses xmldom, XMLDoc, XMLIntf,
-     Facturacion.Comprobante,
+     Facturacion.Comprobante, Facturacion.Compatibilidad,
      Facturacion.TimbreFiscalDigitalV32;
 
 type

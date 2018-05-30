@@ -13,12 +13,15 @@ program EjemploFacturaElectronica;
 {$R *.res}
 
 // Incluimos el archivo de recurso .RC que contiene los XSLTs para generar las cadenas originales
-{$R *.dres}
+
 
 // ¿Se quiere soporte para el Debugger FASTMM?
 {$IFDEF FASTMM}
   {$INCLUDE FastMM4Options.inc}
 {$ENDIF}
+
+
+{$R *.dres}
 
 uses
   Forms,
@@ -61,7 +64,8 @@ uses
   Facturacion.GeneradorSelloV33 in '..\Versiones\Facturacion.GeneradorSelloV33.pas',
   Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas',
   Facturacion.TimbreFiscalDigitalV32 in '..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas',
-  Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas';
+  Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas',
+  Facturacion.Compatibilidad in '..\Facturacion.Compatibilidad.pas';
 
 var
   nuevaFactura                                                    : IComprobanteFiscal;
@@ -144,7 +148,7 @@ begin
       WriteLn('Certificado y llave ... OK');
 
 
-      Writeln('Por favor escribe la versión del CFDI que deseas generar (3.2 o 3.3):');
+      Writeln('Por favor escribe la version del CFDI que deseas generar (3.2 o 3.3):');
       ReadLn(queVersion);
       Writeln;
 
@@ -446,14 +450,14 @@ begin
       generadorCBB.GenerarImagenCBB(nuevaFactura,
                                     ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.jpg');
 
-      Writeln('Generación de CFDI v' + nuevaFactura.Version + ' exitoso.');
+      Writeln('Generacion de CFDI v' + nuevaFactura.Version + ' exitoso.');
       Writeln;
       Writeln('Presiona cualquier tecla para salir...');
       Readln;
     except
       on E: Exception do
       begin
-        Writeln('** Ocurrió un error inesperado: ');
+        Writeln('** Ocurrio un error inesperado: ');
         Writeln(E.ClassName, ': ', E.Message);
         Writeln('Presiona cualquier tecla para salir...');
         Readln;

@@ -12,6 +12,7 @@ interface
 
 uses Facturacion.ProveedorAutorizadoCertificacion,
   Facturacion.Comprobante,
+  Facturacion.Compatibilidad,
   EcodexWsComun,
   EcodexWsTimbrado,
   EcodexWsClientes,
@@ -91,7 +92,11 @@ uses
   XMLIntf,
   Msxmldom,
   XMLDoc,
-  RegularExpressions
+  {$IF Compilerversion >= 20}
+   RegularExpressions
+  {$ELSE}
+   PerlRegEx
+  {$IFEND}
 {$IFEND}
   ;
 
@@ -139,18 +144,37 @@ function TProveedorEcodex.ExtraerNodoTimbre(const aComprobanteXML
   : TEcodexComprobanteXML): TCadenaUTF8;
 var
   contenidoComprobanteXML: TCadenaUTF8;
+{$IF Compilerversion < 20}
+  LRegEx: TPerlRegEx;
+{$IFEND}
 const
-  _REGEX_TIMBRE = '<tfd:TimbreFiscalDigital.*?/>';
+ _REGEX_TIMBRE = '<tfd:TimbreFiscalDigital.*?/>';
 begin
   Assert(aComprobanteXML <> nil,
     'La respuesta del servicio de timbrado fue nula');
-{$IF Compilerversion >= 20}
+ {$IF Compilerversion >= 20}
   // Delphi 2010 y superiores
   contenidoComprobanteXML := aComprobanteXML.DatosXML;
-{$ELSE}
-  contenidoComprobanteXML := UTF8Encode(aComprobanteXML.DatosXML);
-{$IFEND}
   Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
+ {$ELSE}
+  contenidoComprobanteXML := UTF8Encode(aComprobanteXML.DatosXML);
+  LRegEx := TPerlRegEx.Create;
+  try
+  	LRegEx.RegEx := _REGEX_TIMBRE;
+  	LRegEx.Options := [];
+  	LRegEx.State := [];
+  	LRegEx.Subject := contenidoComprobanteXML;
+	 if LRegEx.Match then begin
+	 	Result := LRegEx.MatchedText;
+	 end
+  	else begin
+  		Result := '';
+  	end;
+  finally
+   LRegex.Free;
+  end;
+ {$IFEND}
+
   Assert(Result <> '', 'El XML del timbre estuvo vacio');
 end;
 
@@ -628,7 +652,11 @@ begin
   SetLength(arregloUUIDs, 1);
   arregloUUIDs[0] := aUUID;
   resultadoCancelacion := Self.CancelarDocumentos(arregloUUIDs);
+ {$IF CompilerVersion >= 20}
   Result               := resultadoCancelacion.Items[aUUID];
+ {$ELSE}
+  Result :=            resultadoCancelacion.cancelado[aUUID];
+ {$IFEND}
 end;
 
 function TProveedorEcodex.ObtenerAcuseDeCancelacion(const aUUID: string):

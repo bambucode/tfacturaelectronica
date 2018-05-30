@@ -10,7 +10,8 @@ unit Facturacion.TimbreFiscalDigitalV33;
 
 interface
 
-uses xmldom, XMLDoc, XMLIntf, Facturacion.Comprobante;
+uses xmldom, XMLDoc, XMLIntf, Facturacion.Comprobante,
+ Facturacion.Compatibilidad;
 
 type
 
