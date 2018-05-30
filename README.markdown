@@ -58,9 +58,9 @@ Notas de Compatibilidad con otras versiones de Delphi
 -  Se agregó y probó exitósamente el soporte con Delphi 7 y Delphi XE1, por lo cual no debe haber problema con Delphi 2009 y 2010
 -  Para el soporte con Delphi 7, Delphi 2007, Delphi 2009 y Delphi 2010 se requiere usar la librería TPerlRegExp para el uso de Expresiones Regulares.
 	- Esta puede descargarse desde la página: <https://www.regular-expressions.info/delphi.html>
-     o directamente <https://www.regular-expressions.info/download/TPerlRegEx.zip>
-	- También se conserva una copia de dicha librería desde el repositorio <https://github.com/fduenas/TPerlRegEx>
-	- Una vez descardado, extraerlo en la carpeta de su conveniencia 
+     o directamente desde: <https://www.regular-expressions.info/download/TPerlRegEx.zip>
+	- También se conserva una copia de dicha librería desde el repositorio: <https://github.com/fduenas/TPerlRegEx>
+	- Una vez descargado el archivo, extraerlo en la carpeta de su conveniencia 
 	- Agregar el folder que contiene los archivos a la configuracion Library Path del Delphi: Tools/Environment Options/Library/Library path
 	
 	- Para Mayor información acerca del uso de esta librería consultar: https://www.regular-expressions.info/delphi.html
