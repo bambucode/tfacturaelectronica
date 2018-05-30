@@ -59,7 +59,7 @@ uses
      Xml.Win.Msxmldom,
      Xml.XMLDoc
 {$ELSE}
-    {$IF Compilerversion >= 20}
+    {$IF Compilerversion >= 22}
      RegularExpressions,
    {$ELSE}
      PerlRegEx,
@@ -171,8 +171,8 @@ var
    contenidoComprobanteXML: TCadenaUTF8;
 begin
    Assert(aComprobanteXML <> '', 'La respuesta del servicio de timbrado fue nula');
-   {$IF Compilerversion >= 20}
-   // Delphi 2010 y superiores
+   {$IF Compilerversion >= 22}
+   // Delphi XE1 y superiores
    contenidoComprobanteXML := aComprobanteXML;
    {$ELSE}
    contenidoComprobanteXML := UTF8Encode(aComprobanteXML);

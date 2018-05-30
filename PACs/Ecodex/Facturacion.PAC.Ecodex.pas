@@ -92,7 +92,7 @@ uses
   XMLIntf,
   Msxmldom,
   XMLDoc,
-  {$IF Compilerversion >= 20}
+  {$IF Compilerversion >= 22}
    RegularExpressions
   {$ELSE}
    PerlRegEx
@@ -152,8 +152,8 @@ const
 begin
   Assert(aComprobanteXML <> nil,
     'La respuesta del servicio de timbrado fue nula');
- {$IF Compilerversion >= 20}
-  // Delphi 2010 y superiores
+ {$IF Compilerversion >= 22}
+  // Delphi XE1 y superiores
   contenidoComprobanteXML := aComprobanteXML.DatosXML;
   Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
  {$ELSE}

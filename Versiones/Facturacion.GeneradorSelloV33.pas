@@ -36,7 +36,6 @@ end;
 
 function TGeneradorSelloV33.GenerarSelloDeFactura(const aCadenaOriginal:
     TCadenaUTF8): TCadenaUTF8;
-var test: WideString;
 begin
   Assert(fInstanciaOpenSSL <> nil, 'La instancia fInstancia OpenSSL no debio ser nula. Favor de mandar la instancia en el metodo Configurar');
   // CFDI v3.3 utiliza SHA256

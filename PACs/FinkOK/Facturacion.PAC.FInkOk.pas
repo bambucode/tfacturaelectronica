@@ -64,7 +64,7 @@ uses Facturacion.Tipos,
      Xml.Win.Msxmldom,
      Xml.XMLDoc
 {$ELSE}
-   {$IF Compilerversion >= 20}
+   {$IF Compilerversion >= 22}
      RegularExpressions,
    {$ELSE}
      PerlRegEx,
@@ -213,8 +213,8 @@ const
  _REGEX_TIMBRE = '<tfd:TimbreFiscalDigital.*?/>';
 begin
   Assert(aComprobanteXML <> '', 'La respuesta del servicio de timbrado fue nula');
-  {$IF Compilerversion >= 20}
-  // Delphi 2010 y superiores
+  {$IF Compilerversion >= 22}
+  // Delphi XE1 y superiores
   contenidoComprobanteXML := aComprobanteXML;
   Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
  {$ELSE}
