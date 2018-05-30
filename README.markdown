@@ -53,7 +53,7 @@ A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
 - ~~Soporte para ediciones anteriores de Delphi 7, Delphi 2007, 2010, XE1 etc.~~ con ayuda de @fduenas
 - Realizar pruebas en Delphi 2007, Delphi 2009 y Delphi 2010
 
-Notas de Compatibilidad con otras versiones de Delphi
+Notas de compatibilidad con otras versiones de Delphi
 -------------------
 -  Se agregó y probó exitósamente el soporte con Delphi 7 y Delphi XE1, por lo cual no debe haber problema con Delphi 2009 y 2010
 -  Para el soporte con Delphi 7, Delphi 2007, Delphi 2009 y Delphi 2010 se requiere usar la librería TPerlRegExp para el uso de Expresiones Regulares.
