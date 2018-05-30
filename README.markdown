@@ -92,5 +92,5 @@ Colaboradores actuales.
 * Ing. Luis Carrasco - Bambú Code SA de CV - <http://github.com/lcarrasco>
 * Ing. Eduardo  Padilla - Bambú Code SA de CV - <https://github.com/epadillac>
 * Ing. Pablo Torres - <http://www.tecsisnet.net>
-* Felipe Faccinetto <https://github.com/ffaccinetto>
-* Lic. Francisco Armando Dueñas Rodriguez <https://github.com/fduenas>
+* Felipe Faccinetto - <https://github.com/ffaccinetto>
+* Lic. Francisco Armando Dueñas Rodriguez - <https://github.com/fduenas>
