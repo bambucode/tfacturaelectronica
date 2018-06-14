@@ -10,8 +10,13 @@ unit Facturacion.GeneradorCadenaOrignalV32;
 
 interface
 
-uses  Facturacion.Comprobante,
-      System.SysUtils,
+uses
+{$IF CompilerVersion >= 23}
+     System.SysUtils,
+{$ELSE}
+     SysUtils,
+{$IFEND}
+      Facturacion.Comprobante, Facturacion.Compatibilidad,
       Facturacion.GeneradorCadenaOriginal;
 
 type
@@ -24,13 +29,25 @@ type
 
 implementation
 
-uses  System.IOUtils,
+uses
+{$IF CompilerVersion >= 23}
+      System.IOUtils,
       System.Classes,
       Winapi.Windows,
       Xml.XMLIntf,
       Xml.XMLDom,
-      Facturacion.ComprobanteV32,
-      Xml.XMLDoc;
+      Xml.XMLDoc,
+{$ELSE}
+  {$IF CompilerVersion >= 20}
+      IOUtils,
+  {$IFEND}
+      Classes,
+      Windows,
+      XMLIntf,
+      XMLDom,
+      XMLDoc,
+{$IFEND}
+      Facturacion.ComprobanteV32;
 
 const
   _NOMBRE_RECURSO_CADENA_ORIGINAL     = 'XSLT_CADENAORIGINAL_V32';

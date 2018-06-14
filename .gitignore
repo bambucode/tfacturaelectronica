@@ -4,6 +4,8 @@ __*
 *.stat
 *.identcache
 *.local
+*.rsm
+*.skincfg
 .DS_Store
 Ejemplo/*.xml
 Ejemplo/*.jpg

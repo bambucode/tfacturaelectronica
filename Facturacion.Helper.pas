@@ -3,7 +3,12 @@ unit Facturacion.Helper;
 interface
 
 uses Facturacion.Comprobante,
-     System.SysUtils;
+{$IF CompilerVersion >= 23}
+     System.SysUtils
+{$ELSE}
+     SysUtils,
+     Windows
+{$IFEND};
 
 type
 
@@ -39,12 +44,19 @@ const
 implementation
 
 uses
+{$IF CompilerVersion >= 23}
   System.Math,
   System.StrUtils,
-  {$IFDEF CODESITE}
-  CodeSiteLogging,
-  {$ENDIF}
-  Soap.XSBuiltIns;
+  Soap.XSBuiltIns
+{$ELSE}
+  Math,
+  StrUtils,
+  XSBuiltIns
+{$IFEND}
+{$IFDEF CODESITE}
+  CodeSiteLogging
+{$ENDIF};
+
 
 { TFacturacionHelper }
 
@@ -168,7 +180,7 @@ end;
 
 class function TFacturacionHelper.ComoFechaISO8601(const aFecha: TDateTime): string;
 begin
-  Result := AnsiReplaceStr(FormatDateTime('yyyy-mm-dd', aFecha) + 'T' + FormatDateTime('hh:nn:ss', aFecha), FormatSettings.TimeSeparator, ':');
+  Result := AnsiReplaceStr(FormatDateTime('yyyy-mm-dd', aFecha) + 'T' + FormatDateTime('hh:nn:ss', aFecha), {$IF CompilerVersion >=17} FormatSettings.{$IFEND}TimeSeparator, ':');
 end;
 
 class function TFacturacionHelper.ComoMoneda(const aValor: Currency; const
@@ -229,9 +241,14 @@ begin
   limiteSuperior := Ceil(limiteSuperior * 100) / 100;
 
   // ¿El importe calculado, esta dentro de rango validado por el SAT?
-  Result := System.Math.InRange(aImporte, limiteInferior, limiteSuperior);
+  Result := {$IF CompilerVersion >= 23}System.Math.{$ELSE}Math.{$IFEND}InRange(aImporte, limiteInferior, limiteSuperior);
 end;
 
 initialization
+ {$IF CompilerVersion >= 17}
   formatSettingsLocal := TFormatSettings.Create;
+ {$ELSE}
+  GetLocaleFormatSettings(LOCALE_SYSTEM_DEFAULT, formatSettingsLocal);
+ {$IFEND}
+
 end.

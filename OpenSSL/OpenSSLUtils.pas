@@ -535,7 +535,7 @@ if certfile = nil then
   raise EOpenSSL.Create('Error creating BIO.');
 
   // Returns 0 for failure. Ref: http://www.openssl.org/docs/crypto/BIO_s_file.html
-  if BIO_read_filename(certfile, PWideChar(AnsiString((FileName)))) = 0 then
+  if BIO_read_filename(certfile, PChar(AnsiString((FileName)))) = 0 then
       raise Exception.Create('Unable to read certificate file');
 
 if (Encoding = auto) or (encoding = DER) then

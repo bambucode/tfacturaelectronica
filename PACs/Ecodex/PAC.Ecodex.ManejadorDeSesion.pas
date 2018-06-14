@@ -10,9 +10,21 @@ unit PAC.Ecodex.ManejadorDeSesion;
 
 interface
 
+//Habilitita o Deshabilita el uso de la Clase TOpenSSL Para Generar el Hash SHA1
+{$DEFINE OpenSSL}
+
 uses EcodexWsSeguridad,
      Facturacion.Comprobante,
-     SysUtils;
+{$IF CompilerVersion >= 23}
+     {$UNDEF OpenSSL}
+     System.SysUtils
+{$ELSE}
+     SysUtils
+{$IFEND}
+{$IFDEF OpenSSL}
+     ,Facturacion.OpenSSL
+{$ENDIF}
+;
 
 type
 
@@ -22,27 +34,40 @@ type
     fCredenciales: TFacturacionCredencialesPAC;
     wsSeguridad : IEcodexServicioSeguridad;
     fNumeroTransaccion: Int64;
+  {$IFDEF OpenSSL}
+    fOpenSSL: IOpenSSL;
+  {$ENDIF}
     function GetNumeroDeTransaccion: Int64;
     function ObtenerNuevoTokenDeServicio(const aRFC: String): String;
     procedure ProcesarFallaEcodex(const aExcepcion: Exception);
+   {$IFDEF OpenSSL}
+    function GetOpenSSL: IOpenSSL;
+   {$ENDIF}
   public
     constructor Create(const aDominioWebService: String; const
         aIdTransaccionInicial: Integer);
+    destructor Destroy; override;
     procedure AfterConstruction; override;
     procedure AsignarCredenciales(const aCredenciales: TFacturacionCredencialesPAC);
     function ObtenerNuevoTokenAltaEmisores(const aRFC, aIdIntegrador,
         aIdAltaEmisores: String): String;
     function ObtenerNuevoTokenDeUsuario: String;
     property NumeroDeTransaccion: Int64 read GetNumeroDeTransaccion;
+  {$IFDEF OpenSSL}
+    property OpenSSL: IOpenSSL read GetOpenSSL;
+  {$ENDIF}
   end;
 
 implementation
 
-uses System.Hash,
-     Facturacion.ManejadorErroresComunesWebServices,
-     {$IFDEF CODESITE}
-     CodeSiteLogging,
-     {$ENDIF}
+uses
+{$IF CompilerVersion >= 23}
+    System.Hash,
+{$IFEND}
+    Facturacion.ManejadorErroresComunesWebServices,
+{$IFDEF CODESITE}
+    CodeSiteLogging,
+{$ENDIF}
      Facturacion.ProveedorAutorizadoCertificacion;
 
 constructor TEcodexManejadorDeSesion.Create(const aDominioWebService: String;
@@ -52,6 +77,14 @@ begin
   fDominioWebService := aDominioWebService;
   // Establecemos el numero de transaccion con que comenzaremos para que sea un consecutivo
   fNumeroTransaccion := aIdTransaccionInicial;
+end;
+
+destructor TEcodexManejadorDeSesion.Destroy;
+begin
+{$IFDEF OpenSSL}
+ fOpenSSL := nil;
+{$ENDIF}
+ inherited;
 end;
 
 procedure TEcodexManejadorDeSesion.AfterConstruction;
@@ -73,6 +106,15 @@ function TEcodexManejadorDeSesion.GetNumeroDeTransaccion: Int64;
 begin
   Result := fNumeroTransaccion;
 end;
+
+{$IFDEF OpenSSL}
+function TEcodexManejadorDeSesion.GetOpenSSL: IOpenSSL;
+begin
+ if not Assigned(fOpenSSL) then
+    fOpenSSL := TOpenSSL.Create;
+ result := fOpenSSL;
+end;
+{$ENDIF}
 
 function TEcodexManejadorDeSesion.ObtenerNuevoTokenDeServicio(const aRFC:
     String): String;
@@ -124,7 +166,33 @@ begin
 
      // El token de usuario será la combinacion del token de servicio y el ID del integrador
      // concatenados por un "pipe" codificados con el agoritmo SHA1
-     Result := THashSHA1.GetHashString(fCredenciales.DistribuidorID + '|' + tokenDeServicio);
+  {$IFDEF OpenSSL}
+    Result := OpenSSL.CalcularSHA1( fCredenciales.DistribuidorID + '|' + tokenDeServicio );
+  {$ELSE}
+   {$IF CompilerVersion >= 23}
+      Result := THashSHA1.GetHashString(fCredenciales.DistribuidorID + '|' + tokenDeServicio);
+   {$ELSE}
+     // NOTA: Soporte Nativo de SHA1 no está disponible en versiones anteriores a XE2
+     // Se recomienda usar OpenSSL ($DEFINE OpenSSL}) ó el método
+     // TIdHashSHA1.HashStringAsHex (Indy v10.5.x)
+     // Ejemplo:
+     // uses IdGlobal, IdHashSHA
+     // ...
+     // ...
+     // var LHashSHA1: TIdHashSHA1;
+     // begin
+     //  LHashSHA1 := TIdHashSHA1.Create;
+     //  try
+     //   Result:= LHashSHA1.HashStringAsHex(fCredenciales.DistribuidorID + '|' +
+     //                                      tokenDeServicio,
+     //                                      {$IF CompilerVersion >= 25}IndyTextEncoding_UTF8 {$ELSE} TIdTextEncoding.UTF8{$IFEND});
+     //  finally
+     //   LHashSHA1.Free;
+     //  end;
+     // end;
+      raise Exception.Create('Soporte SHA1 nativo para versiones anteriores no implementado');
+   {$IFEND}
+  {$ENDIF}
   except
     On E:Exception do
       raise;
@@ -149,9 +217,38 @@ begin
      // - El ID de alta de emisores (en mayusculas forzosamente)
      // - El token de servicio
      // Todos concatenados con un pipe (|) y codificados con el agoritmo SHA1
-     Result := THashSHA1.GetHashString(aIdIntegrador + '|' +
+  {$IFDEF OpenSSL}
+    Result := OpenSSL.CalcularSHA1( aIdIntegrador + '|' +
+                                       Uppercase(aIdAltaEmisores) + '|' +
+                                       tokenDeServicio );
+  {$ELSE}
+   {$IF CompilerVersion >= 23}
+      Result := THashSHA1.GetHashString(aIdIntegrador + '|' +
                                        Uppercase(aIdAltaEmisores) + '|' +
                                        tokenDeServicio);
+   {$ELSE}
+     // NOTA: Soporte Nativo de SHA1 no está disponible en versiones anteriores a XE2
+     // Se recomienda usar OpenSSL ($DEFINE OpenSSL}) ó el método
+     // TIdHashSHA1.HashStringAsHex (Indy v10.5.x)
+     // Ejemplo:
+     // uses IdGlobal, IdHashSHA
+     // ...
+     // ...
+     // var LHashSHA1: TIdHashSHA1;
+     // begin
+     //  LHashSHA1 := TIdHashSHA1.Create;
+     //  try
+     //   Result:= LHashSHA1.HashStringAsHex(aIdIntegrador + '|' +
+     //                                      Uppercase(aIdAltaEmisores) + '|' +
+     //                                      tokenDeServicio,
+     //                                      {$IF CompilerVersion >= 25}IndyTextEncoding_UTF8 {$ELSE} TIdTextEncoding.UTF8{$IFEND});
+     //  finally
+     //   LHashSHA1.Free;
+     //  end;
+     // end;
+      raise Exception.Create('Soporte SHA1 nativo para versiones anteriores no implementado');
+   {$IFEND}
+  {$ENDIF}
   except
     On E:Exception do
       raise;

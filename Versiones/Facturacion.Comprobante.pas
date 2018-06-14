@@ -10,17 +10,10 @@ unit Facturacion.Comprobante;
 
 interface
 
-uses xmldom, XMLDoc, XMLIntf;
+uses Facturacion.Compatibilidad,
+     xmldom, XMLDoc, XMLIntf;
 
 type
-
-  // Definimos el tipo de Cadena estándard que manejaremos en toda la libreia
-  // con codificacion en UTF8
-  {$IF Compilerversion >= 20}
-  TCadenaUTF8 = RawByteString;
-  {$ELSE}
-  TCadenaUTF8 = UTF8String;
-  {$IFEND}
 
   TFacturacionCredencialesPAC = record
     RFC: String;
@@ -34,8 +27,8 @@ type
   /// </summary>
   /// <remarks>
   ///   <note type="note">
-  ///     Toda nueva versión de un CFDI deberá implementar esta interfase.
-  ///     Para mayor información consultar el wiki en:
+  ///     Toda nueva version de un CFDI debera¡ implementar esta interfase.
+  ///     Para mayor informaciÃ³n consultar el wiki en:
   ///     https://github.com/bambucode/tfacturaelectronica/wiki
   ///   </note>
   /// </remarks>
@@ -59,7 +52,7 @@ type
     ///   poder agregar el timbre fiscal digital
     /// </summary>
     /// <param name="aXMLTimbre">
-    ///   XML del timbre tal cual lo mandó el PAC
+    ///   XML del timbre tal cual lo mandÃ³ el PAC
     /// </param>
     procedure AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
     procedure AgregarComplemento(aNodoAAgregar: IXMLNode;

@@ -13,7 +13,13 @@ unit SolucionFactibleWsTimbrado;
 
 interface
 
-uses Soap.InvokeRegistry, Soap.SOAPHTTPClient, System.Types, Soap.XSBuiltIns;
+uses
+{$IF CompilerVersion >= 23}
+ Soap.InvokeRegistry, Soap.SOAPHTTPClient, System.Types, Soap.XSBuiltIns
+{$ELSE}
+ InvokeRegistry, SOAPHTTPClient, Types, XSBuiltIns
+{$IFEND}
+ ;
 
 const
   IS_OPTN = $0001;
@@ -225,7 +231,13 @@ function GetTimbradoPortType(UseWSDL: Boolean=System.False; Addr: string=''; HTT
 
 
 implementation
-  uses System.SysUtils;
+  uses
+{$IF CompilerVersion >= 23}
+     System.SysUtils
+{$ELSE}
+     SysUtils
+{$IFEND}
+;
 
 function GetTimbradoPortType(UseWSDL: Boolean; Addr: string; HTTPRIO: THTTPRIO): TimbradoPortType;
 const
@@ -269,7 +281,7 @@ var
   I: Integer;
 begin
   for I := 0 to System.Length(Fresultados)-1 do
-    System.SysUtils.FreeAndNil(Fresultados[I]);
+    {$IF CompilerVersion >= 23}System.SysUtils{$ELSE}SysUtils{$IFEND}.FreeAndNil(Fresultados[I]);
   System.SetLength(Fresultados, 0);
   inherited Destroy;
 end;
@@ -312,7 +324,7 @@ var
   I: Integer;
 begin
   for I := 0 to System.Length(Fresultados)-1 do
-    System.SysUtils.FreeAndNil(Fresultados[I]);
+    {$IF CompilerVersion >= 23}System.SysUtils{$ELSE}SysUtils{$IFEND}.FreeAndNil(Fresultados[I]);
   System.SetLength(Fresultados, 0);
   inherited Destroy;
 end;
@@ -396,7 +408,7 @@ end;
 
 destructor CFDIResultadoCertificacion.Destroy;
 begin
-  System.SysUtils.FreeAndNil(FfechaTimbrado);
+  {$IF CompilerVersion >= 23}System.SysUtils{$ELSE}SysUtils{$IFEND}.FreeAndNil(FfechaTimbrado);
   inherited Destroy;
 end;
 
@@ -516,6 +528,7 @@ initialization
   InvRegistry.RegisterDefaultSOAPAction(TypeInfo(TimbradoPortType), 'urn:%operationName%');
   InvRegistry.RegisterInvokeOptions(TypeInfo(TimbradoPortType), ioDocument);
   { TimbradoPortType.cancelarPorNotaCredito }
+  {$IF CompilerVersion >= 20}
   InvRegistry.RegisterMethodInfo(TypeInfo(TimbradoPortType), 'cancelarPorNotaCredito', '',
                                  '[ReturnName="return"]', IS_OPTN or IS_NLBL);
   InvRegistry.RegisterParamInfo(TypeInfo(TimbradoPortType), 'cancelarPorNotaCredito', 'usuario', '',
@@ -612,6 +625,7 @@ initialization
                                 '', IS_NLBL);
   InvRegistry.RegisterParamInfo(TypeInfo(TimbradoPortType), 'cancelarBase64', 'return', '',
                                 '[Namespace="http://timbrado.ws.cfdi.solucionfactible.com/xsd"]', IS_NLBL);
+  {$IFEND}
   RemClassRegistry.RegisterXSInfo(TypeInfo(Array_Of_CFDIResultadoCancelacion), 'http://timbrado.ws.cfdi.solucionfactible.com/xsd', 'Array_Of_CFDIResultadoCancelacion');
   RemClassRegistry.RegisterXSInfo(TypeInfo(Array_Of_CFDIResultadoCertificacion), 'http://timbrado.ws.cfdi.solucionfactible.com/xsd', 'Array_Of_CFDIResultadoCertificacion');
   RemClassRegistry.RegisterXSClass(CFDICertificacion, 'http://timbrado.ws.cfdi.solucionfactible.com/xsd', 'CFDICertificacion');

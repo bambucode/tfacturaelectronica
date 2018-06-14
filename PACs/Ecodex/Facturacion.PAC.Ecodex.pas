@@ -1,9 +1,9 @@
 { ******************************************************* }
-{ }
-{ TFacturaElectronica }
-{ }
-{ Copyright (C) 2017 Bambu Code SA de CV }
-{ }
+{                                                         }
+{ TFacturaElectronica                                     }
+{                                                         }
+{ Copyright (C) 2017 Bambu Code SA de CV                  }
+{                                                         }
 { ******************************************************* }
 
 unit Facturacion.PAC.Ecodex;
@@ -12,13 +12,22 @@ interface
 
 uses Facturacion.ProveedorAutorizadoCertificacion,
   Facturacion.Comprobante,
+  Facturacion.Compatibilidad,
   EcodexWsComun,
   EcodexWsTimbrado,
   EcodexWsClientes,
   EcodexWsCancelacion,
   PAC.Ecodex.ManejadorDeSesion,
+{$IF CompilerVersion >= 23}
   System.Generics.Collections,
-  System.SysUtils;
+  System.SysUtils
+{$ELSE}
+  {$IF CompilerVersion >= 23}
+   Generics.Collections,
+  {$IFEND}
+  SysUtils
+{$IFEND}
+  ;
 
 type
 
@@ -62,21 +71,34 @@ const
 
 implementation
 
-uses Classes,
-  xmldom,
+uses
   Facturacion.Tipos,
-  Soap.XSBuiltIns,
-  XMLIntf,
 {$IFDEF CODESITE}
   CodeSiteLogging,
 {$ENDIF}
+
+{$IF Compilerversion >= 23}
+  System.Classes,
+  Soap.XSBuiltIns,
   System.RegularExpressions,
-{$IF Compilerversion >= 20}
+  Xml.xmldom,
+  Xml.XMLIntf,
   Xml.Win.Msxmldom,
+  Xml.XMLDoc
 {$ELSE}
+  Classes,
+  xmldom,
+  XSBuiltIns,
+  XMLIntf,
   Msxmldom,
+  XMLDoc,
+  {$IF Compilerversion >= 22}
+   RegularExpressions
+  {$ELSE}
+   PerlRegEx
+  {$IFEND}
 {$IFEND}
-  XMLDoc;
+  ;
 
 destructor TProveedorEcodex.Destroy;
 begin
@@ -122,18 +144,37 @@ function TProveedorEcodex.ExtraerNodoTimbre(const aComprobanteXML
   : TEcodexComprobanteXML): TCadenaUTF8;
 var
   contenidoComprobanteXML: TCadenaUTF8;
+{$IF Compilerversion < 20}
+  LRegEx: TPerlRegEx;
+{$IFEND}
 const
-  _REGEX_TIMBRE = '<tfd:TimbreFiscalDigital.*?/>';
+ _REGEX_TIMBRE = '<tfd:TimbreFiscalDigital.*?/>';
 begin
   Assert(aComprobanteXML <> nil,
     'La respuesta del servicio de timbrado fue nula');
-{$IF Compilerversion >= 20}
-  // Delphi 2010 y superiores
+ {$IF Compilerversion >= 22}
+  // Delphi XE1 y superiores
   contenidoComprobanteXML := aComprobanteXML.DatosXML;
-{$ELSE}
-  contenidoComprobanteXML := UTF8Encode(aComprobanteXML.DatosXML);
-{$IFEND}
   Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
+ {$ELSE}
+  contenidoComprobanteXML := UTF8Encode(aComprobanteXML.DatosXML);
+  LRegEx := TPerlRegEx.Create;
+  try
+  	LRegEx.RegEx := _REGEX_TIMBRE;
+  	LRegEx.Options := [];
+  	LRegEx.State := [];
+  	LRegEx.Subject := contenidoComprobanteXML;
+	 if LRegEx.Match then begin
+	 	Result := LRegEx.MatchedText;
+	 end
+  	else begin
+  		Result := '';
+  	end;
+  finally
+   LRegex.Free;
+  end;
+ {$IFEND}
+
   Assert(Result <> '', 'El XML del timbre estuvo vacio');
 end;
 
@@ -611,7 +652,11 @@ begin
   SetLength(arregloUUIDs, 1);
   arregloUUIDs[0] := aUUID;
   resultadoCancelacion := Self.CancelarDocumentos(arregloUUIDs);
+ {$IF CompilerVersion >= 20}
   Result               := resultadoCancelacion.Items[aUUID];
+ {$ELSE}
+  Result :=            resultadoCancelacion.cancelado[aUUID];
+ {$IFEND}
 end;
 
 function TProveedorEcodex.ObtenerAcuseDeCancelacion(const aUUID: string):
@@ -673,7 +718,7 @@ begin
 
   // 1. Creamos la solicitud de timbrado
   solicitudCancelacion := TEcodexSolicitudCancelaMultiple.Create;
-  Result               := TDictionary<String, Boolean>.Create;
+  Result               := TListadoCancelacionUUID.Create;
 
   try
     // 2. Iniciamos una nueva sesion solicitando un nuevo token
@@ -805,16 +850,12 @@ begin
   // TBD: https://github.com/bambucode/eleventa/issues/1721
  { if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_USADO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EEcodexAltaEmisorCorreoUsadoException.Create('El correo asignado ya está en uso por otro emisor.', 0, 97, False);
-
   if AnsiPos(_ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA, mensajeExcepcion) > 0 then
     raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta con un integrador.', 0, 98, False);
-
   if AnsiPos(_ECODEX_ALTA_EMISOR_REPETIDO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta.', 0, 98, False);
-
   if AnsiPos(_ECODEX_ALTA_EMISOR_RFC_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EEcodexAltaEmisorRFCInvalidoException.Create('El RFC del emisor no es válido.', 0, 890, False);
-
   if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EEcodexAltaEmisorCorreoInvalidoException.Create('El correo del emisor no es válido.', 0, 891, False);        }
 

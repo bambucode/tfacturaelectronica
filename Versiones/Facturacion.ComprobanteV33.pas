@@ -14,7 +14,7 @@ unit Facturacion.ComprobanteV33;
 interface
 
 uses xmldom, XMLDoc, XMLIntf,
-     Facturacion.Comprobante,
+     Facturacion.Comprobante, Facturacion.Compatibilidad,
      Facturacion.TimbreFiscalDigitalV33;
 
 type
@@ -947,7 +947,12 @@ const
 
 implementation
 
-uses System.SysUtils,
+uses
+{$IF CompilerVersion >= 23}
+     System.SysUtils,
+{$ELSE}
+     SysUtils,
+{$IFEND}
      Facturacion.Helper;
 
 const

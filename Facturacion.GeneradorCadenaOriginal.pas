@@ -11,7 +11,13 @@ unit Facturacion.GeneradorCadenaOriginal;
 interface
 
 uses Facturacion.Comprobante,
-     System.SysUtils;
+     Facturacion.Compatibilidad,
+{$IF CompilerVersion >= 23}
+     System.SysUtils
+{$ELSE}
+      Facturacion.Tipos,
+      SysUtils
+{$IFEND};
 
 type
 
@@ -50,18 +56,32 @@ type
   TTransformadorDeXML = class
   public
     function ObtenerXSLTDeRecurso(const aNombreRecurso: string): TCadenaUTF8;
-    function TransformarXML(const aXMLData: string; aXSLT: string): TCadenaUTF8;
+    function TransformarXML(const aXMLData: UnicodeString; aXSLT: UnicodeString): TCadenaUTF8;
   end;
 
 implementation
 
-uses  System.IOUtils,
+uses
+{$IF CompilerVersion >= 23}
+      System.IOUtils,
       System.Classes,
       Winapi.Windows,
       System.Win.ComObj,
       Xml.XMLIntf,
       Xml.XMLDom,
-      Xml.XMLDoc;
+      Xml.XMLDoc
+{$ELSE}
+    {$IF CompilerVersion >= 20}
+      IOUtils,
+    {$IFEND}
+      Classes,
+      Windows,
+      ComObj,
+      XMLIntf,
+      XMLDom,
+      XMLDoc
+{$IFEND};
+
 
 { TTransformadorDeXML }
 
@@ -77,7 +97,7 @@ begin
       sl := TStringList.Create;
       try
         sl.LoadFromStream(Stream);
-        Result := sl.Text;
+        Result := UTF8Encode(sl.Text);
       finally
         sl.Free;
       end;
@@ -92,8 +112,8 @@ begin
 
 end;
 
-function TTransformadorDeXML.TransformarXML(const aXMLData: string; aXSLT:
-    string): TCadenaUTF8;
+function TTransformadorDeXML.TransformarXML(const aXMLData: UnicodeString; aXSLT:
+    UnicodeString): TCadenaUTF8;
 var
   xmlInput, xsltInput, xmlOutput: IXMLDocument;
   LOutput: XmlDomString;
