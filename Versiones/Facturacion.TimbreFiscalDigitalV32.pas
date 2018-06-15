@@ -13,6 +13,10 @@ interface
 uses xmldom, XMLDoc, XMLIntf;
 
 type
+ {$IF Compilerversion >= 20}
+ {$ELSE}
+  UnicodeString = Widestring;
+ {$IFEND}
 
 { Forward Decls }
 

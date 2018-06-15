@@ -13,17 +13,18 @@ program EjemploFacturaElectronicaComplementoPago;
 {$R *.res}
 
 // Incluimos el archivo de recurso .RC que contiene los XSLTs para generar las cadenas originales
-{$R *.dres}
+
 
 // ¿Se quiere soporte para el Debugger FASTMM?
 {$IFDEF FASTMM}
   {$INCLUDE FastMM4Options.inc}
 {$ENDIF}
 
+{$R *.dres}
 uses
-  System.SysUtils,
   activex,
-  Vcl.Forms,
+  SysUtils,
+  Forms,
   Facturacion.ComprobanteV33 in '..\Versiones\Facturacion.ComprobanteV33.pas',
   Facturacion.Comprobante in '..\Versiones\Facturacion.Comprobante.pas',
   Facturacion.Administrador in '..\Facturacion.Administrador.pas',
@@ -44,7 +45,6 @@ uses
   Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas',
   Facturacion.GeneradorCBBv33 in '..\Versiones\Facturacion.GeneradorCBBv33.pas',
   DelphiZXIngQRCode in '..\Lib\DelphiZXIngQRCode.pas',
-  Facturacion.GeneradorCBB,
   Facturacion.GeneradorQR in '..\Facturacion.GeneradorQR.pas',
   Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas',
   Facturacion.ComprobanteV32 in '..\Versiones\Facturacion.ComprobanteV32.pas',
@@ -55,7 +55,11 @@ uses
   Facturacion.Tipos in '..\Facturacion.Tipos.pas',
   Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas',
   Facturacion.ComplementoPagoV1 in '..\Versiones\Facturacion.ComplementoPagoV1.pas',
-  EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas';
+  EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas',
+  Facturacion.GeneradorCBB in '..\Facturacion.GeneradorCBB.pas',
+  Facturacion.GeneradorQRQuricol in '..\Facturacion.GeneradorQRQuricol.pas',
+  Facturacion.Compatibilidad in '..\Facturacion.Compatibilidad.pas',
+  Facturacion.GeneradorLigaVerificacion in '..\Facturacion.GeneradorLigaVerificacion.pas';
 
 var
   nuevaFactura : IComprobanteFiscal;
@@ -155,7 +159,7 @@ begin
               Exit;
             end;
 
-            {$REGION 'Factura V33'}
+            {$IFDEF undef}{$REGION 'Factura V33'}{$ENDIF}
             // Creamos las instancias correspondientes para la v33
             generadorCadena := TGeneradorCadenaOriginalV33.Create;
             generadorSello := TGeneradorSelloV33.Create;
@@ -194,7 +198,7 @@ begin
               concepto33.ValorUnitario    := '0';        // Por Definicion del SAT
               concepto33.Importe          := '0';        // Por Definicion del SAT
 
-              {$REGION 'Complemento Pagos'}
+              {$IFDEF undef}{$REGION 'Complemento Pagos'}{$ENDIF}
               complementoPagoV1 := NewComplementoPagoV1;
               pagoComplementPagoV1 := complementoPagoV1.Add;
 
@@ -227,10 +231,10 @@ begin
                                               'pago10',
                                               'http://www.sat.gob.mx/Pagos',
                                               'http://www.sat.gob.mx/Pagos http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos10.xsd');
-              {$ENDREGION}
+              {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
               // Agregamos el impuesto local el cual se maneja de forma especial
-              {$REGION 'Impuestos locales'}
+              {$IFDEF undef}{$REGION 'Impuestos locales'}{$ENDIF}
               {impuestoLocalv1 := NewImpuestosLocalesV1;
               impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
               impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
@@ -243,9 +247,9 @@ begin
                                               'implocal',
                                               'http://www.sat.gob.mx/implocal',
                                               'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd'); }
-              {$ENDREGION}
+              {$IFDEF undef}{$ENDREGION}{$ENDIF}
             end;
-            {$ENDREGION}
+            {$IFDEF undef}{$ENDREGION}{$ENDIF}
           end;
 
 
@@ -264,6 +268,8 @@ begin
 
           // Dependiendo de la version usamos diferente servidor de pruebas
           pac.Configurar(_URL_ECODEX_PRUEBAS_V33,
+                         _URL_ECODEX_PRUEBAS_V33,
+                         _URL_ECODEX_PRUEBAS_V33,
                          credencialesPAC,
                          credencialesPAC,
                          _NUEMRO_TRANSACCION_INICIAL);
@@ -306,7 +312,7 @@ begin
 //      generadorCBB.GenerarImagenCBB(nuevaFactura,
 //                                    ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi-pago.jpg');
 
-      Writeln('Generación de CFDI v' + nuevaFactura.Version + ' exitoso.');
+      Writeln('Generacion de CFDI v' + nuevaFactura.Version + ' exitoso.');
       Writeln;
       Writeln('Presiona cualquier tecla para salir...');
       Readln;

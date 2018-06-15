@@ -15,7 +15,7 @@ interface
 
 uses
   Windows, SysUtils, Classes, QuricolAPI,
-  {$IF Compilerversion >= 20}
+  {$IF Compilerversion >= 23}
    Vcl.Graphics;
   {$ELSE}
    Graphics;
@@ -59,10 +59,10 @@ type
 
   TQRCode = class
   private
-    class function  GetBgColor : TColor; static;
-    class procedure SetBgColor(Value : TColor); static;
-    class function  GetFgColor : TColor; static;
-    class procedure SetFgColor(Value : TColor); static;
+    class function  GetBgColor : TColor; {$IF Compilerversion >= 20}static;{$IFEND}
+    class procedure SetBgColor(Value : TColor); {$IF Compilerversion >= 20}static;{$IFEND}
+    class function  GetFgColor : TColor;  {$IF Compilerversion >= 20}static;{$IFEND}
+    class procedure SetFgColor(Value : TColor);  {$IF Compilerversion >= 20}static;{$IFEND}
   public
     { \ \ 
       Summary
@@ -72,8 +72,8 @@ type
       Description
       Use BackgroundColor property to get or set the value of the
       generated image background color                            }
-    class property BackgroundColor : TColor read GetBgColor write SetBgColor;
-    { \ \ 
+    {$IF Compilerversion >= 20}class{$IFEND} property BackgroundColor : TColor read GetBgColor write SetBgColor;
+    { \ \
       Summary
       Specifies the foreground color of the image
       
@@ -81,7 +81,7 @@ type
       Description
       Use ForegroundColor property to get or set the value of the
       generated image foreground color                            }
-    class property ForegroundColor : TColor read GetFgColor write SetFgColor;
+    {$IF Compilerversion >= 20}class{$IFEND} property ForegroundColor : TColor read GetFgColor write SetFgColor;
     { Summary
       Generates Windows Bitmap file with the text encoded as QR
       code

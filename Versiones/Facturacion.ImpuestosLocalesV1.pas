@@ -10,7 +10,7 @@ unit Facturacion.ImpuestosLocalesV1;
 
 interface
 
-uses xmldom, XMLDoc, XMLIntf;
+uses Facturacion.Compatibilidad, xmldom, XMLDoc, XMLIntf;
 
 type
 

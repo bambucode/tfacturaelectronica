@@ -2,8 +2,13 @@ unit Facturacion.GeneradorQR;
 
 interface
 
-uses System.SysUtils;
-
+uses
+{$IF CompilerVersion >= 23}
+     System.SysUtils
+{$ELSE}
+     SysUtils
+{$IFEND}
+ ;
 type
 
   TGeneradorQR = class
@@ -15,10 +20,20 @@ type
 implementation
 
 uses DelphiZXingQRCode,
+{$IF CompilerVersion >= 23}
      Vcl.Imaging.pngimage,
      Vcl.Imaging.jpeg,
      System.Classes,
-     Vcl.Graphics;
+     Vcl.Graphics
+{$ELSE}
+     {$IF CompilerVersion >= 20}
+      pngimage,
+     {$IFEND}
+     jpeg,
+     Classes,
+     Graphics
+{$IFEND}
+ ;
 
 const
   _ANCHO_QR_CODE = 1200;
@@ -48,8 +63,12 @@ begin
     QRCode.Encoding     := qrAuto;
     // Margen del QR Code
     QRCode.QuietZone    := 1;
-
-    QRCodeBitmap.SetSize(QRCode.Rows, QRCode.Columns);
+    {$IF CompilerVersion >= 20}
+      QRCodeBitmap.SetSize(QRCode.Rows, QRCode.Columns);
+    {$ELSE}
+      QRCodeBitmap.Height := QRCode.Rows;
+      QRCodeBitmap.Width := QRCode.Columns;
+    {$IFEND}
 
     for Row := 0 to QRCode.Rows - 1 do
     begin
