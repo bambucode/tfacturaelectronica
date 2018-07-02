@@ -57,7 +57,7 @@ Notas de compatibilidad con otras versiones de Delphi
 -------------------
 -  Se agregó y probó exitósamente el soporte con Delphi 7, Delphi XE1 y Delphi XE 10.2.3 (Tokyo), por lo que no debe haber problemas con Delphi 2009 y 2010 y demás versiones intermedias.
 
--  Para el soporte con Delphi 7, Delphi 2007, Delphi 2009 y Delphi 2010 se requiere usar la librería TPerlRegExp para el uso de Expresiones Regulares, debido a que el soporte nativo para estas se aregó a partir de Delphi XE1.
+-  Para el soporte con Delphi 7, Delphi 2007, Delphi 2009 y Delphi 2010 se requiere usar la librería TPerlRegExp para el uso de Expresiones Regulares, debido a que el soporte nativo para estas últimas se aregó a partir de Delphi XE1.
 	- Esta puede descargarse desde la página: <https://www.regular-expressions.info/delphi.html>
      o directamente desde: <https://www.regular-expressions.info/download/TPerlRegEx.zip>
 	- También se conserva una copia de dicha librería desde el repositorio: <https://github.com/fduenas/TPerlRegEx>
@@ -67,8 +67,8 @@ Notas de compatibilidad con otras versiones de Delphi
 	- Para Mayor información acerca del uso de esta librería consultar: https://www.regular-expressions.info/delphi.html
 
 - NOTA especial para versiones que no son Unicode (Delphi 7 - Delphi 2007)
-	- Casi todos los archivos de XSLT y XSD usados en esta librería han sido convertidos a un formato Unicode UTF-8 Sin BOM (Bye Order Mark), esto asegurar su portabilidad entre versiones antiguas y nuevas de delphi al momento de ser leídas como resources o Binary Streams. Por lo que si desean agregar nuevos archivos o nuevas versiones de los ya existentes, deben asegurarse de ello para garantizar que puedan ser usados en diferentes versiones de Delphi.
-	- Lo anterior se puede lograr usando editores de text avanzados, en este caso yo usé NotePad++, abriendo el archivo correspondiente, y en la opción 'Codificación' cambiar a 'Codificación UTF-8 Sin BOM', si la interface de NotePad++ está en Inglés, está opción será 'Encoding/Encode in UTF-8', una vez seleccionada esa opción hay que guardar el archivo.
+	- Casi todos los archivos de XSLT y XSD usados en esta librería han sido convertidos a un formato Unicode UTF-8 Sin BOM (Bye Order Mark), esto asegura su portabilidad entre versiones antiguas y nuevas de Delphi al momento de ser leídas como Resources o Binary Streams. Por lo que si desean agregar nuevos archivos o nuevas versiones de los ya existentes, deben asegurarse de ello para garantizar que puedan ser usados en diferentes versiones de Delphi.
+	- Lo anterior se puede lograr usando editores de texto avanzados, en este caso se usó NotePad++, abriendo el archivo correspondiente, y en la opción 'Codificación' cambiar a 'Codificación UTF-8 Sin BOM', si la interface de NotePad++ está en Inglés, está opción será 'Encoding/Encode in UTF-8', una vez seleccionada esa opción hay que guardar el archivo y, si estos archivos son includios como Recursos (*.res, *.dres), es necesario recompilar los archivos fuente de recurso (*.rc).
 
 ¿Cómo puedo ayudar?
 -------------------
@@ -90,7 +90,7 @@ Icono proporcionado por: http://pc.de/icons/
 
 Compatibilidad con versiones
 ------------
-La libreria ha sido probada solamente con Delphi 7, Delphi XE1, Delphi XE2, delphi XE10.2.3 (Tokyo), por lo que no debería haber problema con versiones intermedias y aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 7, si se encuentra algún error favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2. Antes de realizar pruebas con versiones anteriores a Rad Studio XE1, es importante leer la sección <Notas de compatibilidad con otras versiones de Delphi>.
+La libreria ha sido probada solamente con Delphi 7, Delphi XE1, Delphi XE2, delphi XE10.2.3 (Tokyo), por lo que no debería haber problema con versiones intermedias y aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 7, si se encuentra algún error, favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2. Antes de realizar pruebas con versiones anteriores a Rad Studio XE1, es importante leer la sección <Notas de compatibilidad con otras versiones de Delphi>.
 
 Colaboradores actuales.
 -------------
