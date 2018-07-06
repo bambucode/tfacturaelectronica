@@ -786,7 +786,7 @@ var
   mensajeExcepcion: String;
 const
   _ECODEX_ACUSE_NO_ENCONTRADO             = 'Acuse de cancelacion del documento no encontrado';
-  _ECODEX_ACUSE_NO_ENCONTRADO_DOS         = 'No existe solicitud, no es posible recuperar el acuse';
+  _ECODEX_NO_EXISTE_SOLICITUD             = 'No existe solicitud, no es posible recuperar el acuse';
   _ECODEX_ALTA_EMISOR_CORREO_USADO        = '(97)';
   _ECODEX_ALTA_EMISOR_REPETIDO            = '(98)';
   _ECODEX_ALTA_EMISOR_RFC_INVALIDO        = '(890)';
@@ -839,8 +839,10 @@ begin
   if AnsiPos(_ECODEX_SIN_FOLIOS, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EPACTimbradoSinFoliosDisponiblesException.Create(_ECODEX_SIN_FOLIOS, 0, EEcodexFallaValidacionException(aExcepcion).Numero, False);
 
-  if ((AnsiPos(_ECODEX_ACUSE_NO_ENCONTRADO, mensajeExcepcion) > _NO_ENCONTRADO) Or
-      (AnsiPos(_ECODEX_ACUSE_NO_ENCONTRADO_DOS, mensajeExcepcion) > _NO_ENCONTRADO)) then
+   if AnsiPos(_ECODEX_NO_EXISTE_SOLICITUD, mensajeExcepcion) > _NO_ENCONTRADO then
+    raise EPACNoExisteSolicitudCancelacionException.Create(_ECODEX_NO_EXISTE_SOLICITUD, 0, EEcodexFallaValidacionException(aExcepcion).Numero, False);
+
+  if AnsiPos(_ECODEX_ACUSE_NO_ENCONTRADO, mensajeExcepcion) > _NO_ENCONTRADO then
     raise EPACAcuseNoEncontradoException.Create(_ECODEX_ACUSE_NO_ENCONTRADO, 0, EEcodexFallaValidacionException(aExcepcion).Numero, False);
 
   if AnsiPos(_ECODEX_DOCUMENTO_CANCELAR_NO_ENCONTRADO, mensajeExcepcion) > _NO_ENCONTRADO then
