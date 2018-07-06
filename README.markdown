@@ -50,7 +50,25 @@ A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
 - Otros complementos (comercio electronico, etc.)
 - Pruebas de unidad
 - Validaciones de campos basado en los múltiples catálogos publicados por el SAT.
-- Soporte para ediciones anteriores de Delphi 2007, 2010, etc.
+- ~~Soporte para ediciones anteriores de Delphi 7, Delphi 2007, 2010, XE1 etc.~~ con ayuda de @fduenas
+- Realizar pruebas en Delphi 2007, Delphi 2009 y Delphi 2010
+
+Notas de compatibilidad con otras versiones de Delphi
+-------------------
+-  Se agregó y probó exitósamente el soporte con Delphi 7, Delphi XE1 y Delphi XE 10.2.3 (Tokyo), por lo que no debe haber problemas con Delphi 2009 y 2010 y demás versiones intermedias.
+
+-  Para el soporte con Delphi 7, Delphi 2007, Delphi 2009 y Delphi 2010 se requiere usar la librería TPerlRegExp para el uso de Expresiones Regulares, debido a que el soporte nativo para estas últimas se agregó a partir de Delphi XE1.
+	- Esta puede descargarse desde la página: <https://www.regular-expressions.info/delphi.html>
+     o directamente desde: <https://www.regular-expressions.info/download/TPerlRegEx.zip>
+	- También se conserva una copia de dicha librería desde el repositorio: <https://github.com/fduenas/TPerlRegEx>
+	- Una vez descargado el archivo, extraerlo en la carpeta de su conveniencia 
+	- Agregar el folder que contiene los archivos a la configuracion Library Path del Delphi: Tools/Environment Options/Library/Library path
+	
+	- Para Mayor información acerca del uso de esta librería consultar: https://www.regular-expressions.info/delphi.html
+
+- NOTA especial para versiones que no son Unicode (Delphi 7 - Delphi 2007)
+	- Casi todos los archivos de XSLT y XSD usados en esta librería han sido convertidos a un formato Unicode UTF-8 Sin BOM (Bye Order Mark), esto asegura su portabilidad entre versiones antiguas y nuevas de Delphi al momento de ser leídas como Resources o Binary Streams. Por lo que si desean agregar nuevos archivos o nuevas versiones de los ya existentes, deben asegurarse de ello para garantizar que puedan ser usados en diferentes versiones de Delphi.
+	- Lo anterior se puede lograr usando editores de texto avanzados, en este caso se usó NotePad++, abriendo el archivo correspondiente, y en la opción 'Codificación' cambiar a 'Codificación UTF-8 Sin BOM', si la interface de NotePad++ está en Inglés, está opción será 'Encoding/Encode in UTF-8', una vez seleccionada esa opción hay que guardar el archivo y, si estos archivos son includios como Recursos (*.res, *.dres), es necesario recompilar los archivos fuente de recurso (*.rc).
 
 ¿Cómo puedo ayudar?
 -------------------
@@ -72,11 +90,12 @@ Icono proporcionado por: http://pc.de/icons/
 
 Compatibilidad con versiones
 ------------
-La libreria ha sido probada solamente con Delphi XE2 aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 2007 si se encuentra algún error favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2.
+La libreria ha sido probada solamente con Delphi 7, Delphi XE1, Delphi XE2, delphi XE10.2.3 (Tokyo), por lo que no debería haber problema con versiones intermedias y aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 7, si se encuentra algún error, favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2. Antes de realizar pruebas con versiones anteriores a Rad Studio XE1, es importante leer la sección <Notas de compatibilidad con otras versiones de Delphi>.
 
 Colaboradores actuales.
 -------------
 * Ing. Luis Carrasco - Bambú Code SA de CV - <http://github.com/lcarrasco>
 * Ing. Eduardo  Padilla - Bambú Code SA de CV - <https://github.com/epadillac>
 * Ing. Pablo Torres - <http://www.tecsisnet.net>
-* Felipe Faccinetto <https://github.com/ffaccinetto>
+* Felipe Faccinetto - <https://github.com/ffaccinetto>
+* Lic. Francisco Armando Dueñas Rodriguez - <https://github.com/fduenas>

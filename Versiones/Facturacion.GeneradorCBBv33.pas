@@ -2,7 +2,12 @@ unit Facturacion.GeneradorCBBv33;
 
 interface
 
-uses System.SysUtils,
+uses
+{$IF CompilerVersion >= 23}
+     System.SysUtils,
+{$ELSE}
+     SysUtils,
+{$IFEND}
      Facturacion.Comprobante,
      Facturacion.GeneradorCBB,
      {$IFDEF GENERACION_CBB_NATIVA}
