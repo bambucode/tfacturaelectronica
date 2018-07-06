@@ -48,6 +48,7 @@ type
   EPACTimbradoSinFoliosDisponiblesException     = class(EPACException);
   EPACNoEncontradoParaCancelarException         = class(EPACException);
   EPACAcuseNoEncontradoException                = class(EPACException);
+  EPACNoExisteSolicitudCancelacionException     = class(EPACException);
   EPACNoSePudoObtenerAcuseException             = class(EPACException);
   {$REGION 'Documentation'}
   ///	<summary>
