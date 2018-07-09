@@ -29,7 +29,7 @@ unit FinkOkWsTimbrado;
 
 interface
 
-uses InvokeRegistry, SOAPHTTPClient, {$IF CompilerVersion >= 23}System.Types{$ELSE}Types{$IFEND}, XSBuiltIns,Facturacion.Comprobante, Facturacion.Compatibilidad;
+uses InvokeRegistry, SOAPHTTPClient, {$IF CompilerVersion >= 23}System.Types{$ELSE}Types{$IFEND}, XSBuiltIns,Facturacion.Comprobante;
 
 type
 
