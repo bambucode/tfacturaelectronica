@@ -90,7 +90,7 @@ Icono proporcionado por: http://pc.de/icons/
 
 Compatibilidad con versiones
 ------------
-La libreria ha sido probada solamente con Delphi 7, Delphi XE1, Delphi XE2, delphi XE10.2.3 (Tokyo), por lo que no debería haber problema con versiones intermedias y aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 7, si se encuentra algún error, favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2. Antes de realizar pruebas con versiones anteriores a Rad Studio XE1, es importante leer la sección "Notas de compatibilidad con otras versiones de Delphi".
+La libreria ha sido probada solamente con Delphi 7, Delphi XE1, Delphi XE2, delphi XE10.2.3 (Tokyo), por lo que no debería haber problema con versiones intermedias y aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 7, si se encuentra algún error, favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2. Antes de realizar pruebas con versiones anteriores a Rad Studio XE1, es importante leer la sección <Notas de compatibilidad con otras versiones de Delphi>.
 
 Colaboradores actuales.
 -------------
