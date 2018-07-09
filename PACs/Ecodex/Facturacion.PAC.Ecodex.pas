@@ -12,7 +12,6 @@ interface
 
 uses Facturacion.ProveedorAutorizadoCertificacion,
   Facturacion.Comprobante,
-  Facturacion.Compatibilidad,
   EcodexWsComun,
   EcodexWsTimbrado,
   EcodexWsClientes,

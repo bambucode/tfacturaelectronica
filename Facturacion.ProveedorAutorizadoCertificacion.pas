@@ -1,4 +1,4 @@
-{*******************************************************}
+﻿{*******************************************************}
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
@@ -22,8 +22,7 @@ uses
    {$IFEND}
 {$IFEND}
      Facturacion.Comprobante,
-     Facturacion.Tipos,
-     Facturacion.Compatibilidad;
+     Facturacion.Tipos;
 type
 
   TListadoUUID = Array of string;

@@ -11,7 +11,6 @@ unit Facturacion.GeneradorSello;
 interface
 
 uses Facturacion.Comprobante,
-     Facturacion.Compatibilidad,
      Facturacion.OpenSSL;
 
 type
