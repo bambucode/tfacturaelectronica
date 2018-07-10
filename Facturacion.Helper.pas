@@ -54,7 +54,7 @@ uses
   XSBuiltIns
 {$IFEND}
 {$IFDEF CODESITE}
-  CodeSiteLogging
+  ,CodeSiteLogging
 {$ENDIF};
 
 

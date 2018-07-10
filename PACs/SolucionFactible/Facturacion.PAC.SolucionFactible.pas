@@ -12,7 +12,6 @@ interface
 
 uses Facturacion.ProveedorAutorizadoCertificacion,
      Facturacion.Comprobante,
-     Facturacion.Compatibilidad,
      SolucionFactibleWsTimbrado,
 {$IF CompilerVersion >= 23}
    System.Types,

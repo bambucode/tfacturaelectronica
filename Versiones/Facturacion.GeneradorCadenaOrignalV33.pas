@@ -10,7 +10,7 @@ unit Facturacion.GeneradorCadenaOrignalV33;
 
 interface
 
-uses Facturacion.Comprobante, Facturacion.Compatibilidad,
+uses Facturacion.Comprobante,
   Facturacion.GeneradorCadenaOriginal,
 {$IF CompilerVersion >= 23}
   System.SysUtils

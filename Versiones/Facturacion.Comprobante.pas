@@ -10,10 +10,27 @@ unit Facturacion.Comprobante;
 
 interface
 
-uses Facturacion.Compatibilidad,
-     xmldom, XMLDoc, XMLIntf;
+uses xmldom, XMLDoc, XMLIntf;
 
 type
+
+ // Definimos el tipo de Cadena estandard que manejaremos en toda la libreia
+ // con codificacion en UTF8
+ {$IF Compilerversion >= 20}
+  TCadenaUTF8 = RawByteString;
+ {$ELSE}
+  TCadenaUTF8 = UTF8String;
+  RawByteString = UTF8String;
+  UnicodeString = Widestring;
+  TBytes = Array of Char;
+  PAnsiChar = PChar;
+  AnsiChar = Char;
+  AnsiString = String;
+ {$IFEND}
+
+ {$IF CompilerVersion < 23}
+  XmlDomString = WideString;
+ {$IFEND}
 
   TFacturacionCredencialesPAC = record
     RFC: String;
