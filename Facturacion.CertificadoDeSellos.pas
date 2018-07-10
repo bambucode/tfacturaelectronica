@@ -27,6 +27,7 @@ type
   ICertificadoDeSellos = Interface
     ['{C4F1BC13-8975-4944-AF8F-5FB885C155FF}']
     function GetContenidoBase64: string;
+    function GetContenidoPEM: string;
     function GetEmitidoParaNombre: string;
     function GetEmitidoParaRFC: String;
     function GetNoCertificado: string;
@@ -34,6 +35,7 @@ type
     function GetVigenciaFin: TDateTime;
     function GetVigenciaInicio: TDateTime;
     procedure Leer(const aRutaCertificado: TFileName);
+    property ContenidoPEM: string read GetContenidoPEM;
     property ContenidoBase64: string read GetContenidoBase64;
     property EmitidoParaNombre: string read GetEmitidoParaNombre;
     property EmitidoParaRFC: String read GetEmitidoParaRFC;
@@ -54,6 +56,7 @@ type
     fSubjectCertificado: String;
     fTipoCertificado: TTipoCertificado;
     function GetContenidoBase64: string;
+    function GetContenidoPEM: string;
     function GetEmitidoParaNombre: string;
     function GetEmitidoParaRFC: String;
     function GetNoCertificado: string;
@@ -61,7 +64,6 @@ type
     function GetVigenciaFin: TDateTime;
     function GetVigenciaInicio: TDateTime;
     procedure IdentificarTipoDeCertificado(const aContenidoCertificado: String);
-    function GetContenidoPEM: string;
   public
     destructor Destroy; override;
     procedure Leer(const aRutaCertificado: TFileName);
