@@ -21,7 +21,6 @@ uses
 {$IFEND}
      Facturacion.ProveedorAutorizadoCertificacion,
      Facturacion.Comprobante,
-     Facturacion.Compatibilidad,
      FinkOkWsTimbrado;
 
 type

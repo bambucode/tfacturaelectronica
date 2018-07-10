@@ -16,7 +16,7 @@ uses
 {$ELSE}
      SysUtils,
 {$IFEND}
-      Facturacion.Comprobante, Facturacion.Compatibilidad,
+      Facturacion.Comprobante,
       Facturacion.GeneradorCadenaOriginal;
 
 type
