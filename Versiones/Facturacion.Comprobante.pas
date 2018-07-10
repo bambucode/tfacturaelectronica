@@ -28,7 +28,7 @@ type
   /// <remarks>
   ///   <note type="note">
   ///     Toda nueva version de un CFDI debera¡ implementar esta interfase.
-  ///     Para mayor informaciÃ³n consultar el wiki en:
+  ///     Para mayor información consultar el wiki en:
   ///     https://github.com/bambucode/tfacturaelectronica/wiki
   ///   </note>
   /// </remarks>
@@ -52,7 +52,7 @@ type
     ///   poder agregar el timbre fiscal digital
     /// </summary>
     /// <param name="aXMLTimbre">
-    ///   XML del timbre tal cual lo mandÃ³ el PAC
+    ///   XML del timbre tal cual lo mandó el PAC
     /// </param>
     procedure AsignarTimbreFiscal(const aXMLTimbre: TCadenaUTF8);
     procedure AgregarComplemento(aNodoAAgregar: IXMLNode;

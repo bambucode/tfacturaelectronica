@@ -138,6 +138,13 @@ begin
 
       certificadoSellos := TCertificadoDeSellos.Create;
       certificadoSellos.Leer(rutaCertificado);
+      Writeln( 'LLave Privada Base64' );
+      Writeln( openSSL.LlavePrivadaComoBase64 );
+      Writeln( '' );
+      Writeln( 'Certificado Base64' );
+      Writeln( certificadoSellos.ContenidoBase64 );
+      Writeln( '' );
+
       // Checamos que el certificado y la llave privada sean pareja
       WriteLn('Verificando certificado de sellos y llave privada...');
       if Not openSSL.SonPareja(rutaCertificado, rutaLlavePrivada, claveLlavePrivada) then
