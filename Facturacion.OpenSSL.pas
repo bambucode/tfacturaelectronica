@@ -36,6 +36,7 @@ type
   ELlaveLecturaException = class(Exception);
   ELlavePrivadaClaveIncorrectaException = class(Exception);
   ELlavePareceSerFiel = class(Exception);
+  ELlaveNoAsignadaException = class(Exception);
   ELongitudBufferPequenoException = class(Exception);
 
 
@@ -57,6 +58,34 @@ type
     /// </param>
     procedure AsignarLlavePrivada(const aRutaArchivoLlavePrivada: String;
                                   const aContrasena: String);
+
+    /// <summary>
+    ///   Se encarga de devolver, en formato PEM, el contenido de la llave
+    ///   privada que ha sido cargada previamente "en cache" mediante el método
+    ///   AsignarLlavePrivada.
+    /// </summary>
+    /// <returns>
+    ///   Cadena cifrada en Base64 con delimitadores
+    /// </returns>
+    /// <exception cref="ELlaveNoAsignadaException">
+    ///   Si la llave privada no ha sido asignada/cargada previamente
+    /// </exception>
+    function LlavePrivadaComoPEM: String;
+
+
+    /// <summary>
+    ///   Se encarga de devolver en formato Base64, el contenido de la llave
+    ///   privada que ha sido cargada previamente "en cache" mediante el método
+    ///   AsignarLlavePrivada.
+    /// </summary>
+    /// <returns>
+    ///   Cadena cifrada en Base64
+    /// </returns>
+    /// <exception cref="ELlaveNoAsignadaException">
+    ///   Si la llave privada no ha sido asignada/cargada previamente
+    /// </exception>
+    function LlavePrivadaComoBase64: String;
+
     /// <summary>
     ///   Se encarga de realizar la digestion de la cadena usando la llave
     ///   privada previamente asignada con el método AsignarLlavePrivada
@@ -76,6 +105,7 @@ type
     /// </exception>
     function HacerDigestion(const aCadena: WideString;
                             const aTipoDigestion: TMetodoDigestion): String;
+
     /// <summary>
     ///   Se encarga de calcular el SHA1 de la cadena
     /// </summary>
@@ -111,6 +141,8 @@ type
     destructor Destroy; override;
     procedure AsignarLlavePrivada(const aRutaArchivoLlavePrivada, aContrasena:
         string);
+    function LlavePrivadaComoPEM: String;
+    function LlavePrivadaComoBase64: string;
     procedure AfterConstruction; override;
     function SonPareja(const aRutaCertificado, aRutaLlavePrivada: TFileName; const
         aClaveLlavePrivada : String): Boolean;
@@ -126,10 +158,12 @@ uses
 {$IF CompilerVersion >= 23}
      System.Classes,
      System.StrUtils,
-     System.Hash
+     System.Hash,
+     System.WideStrUtils
 {$ELSE}
      Classes,
-     StrUtils
+     StrUtils,
+     WideStrUtils
 {$IFEND}
 {$IFDEF CODESITE}
      ,CodeSiteLogging
@@ -177,18 +211,24 @@ var
   {$ELSE}
       Inbuf: Array[0..999999] of Char;
       Outbuf: array [0..1024] of Char;
-      LAnsiStr: String;
+      LAnsiStr: Utf8String;
   {$IFEND}
   Len, Tam: cardinal;
 
 begin
   Len := 0;
 
-  // Nota: en Delphi 7 si la cadena ya viene codificada en UTF8 (UTFEncode),
-  // por lo tanto se necesita Decodificar (UTFDecode) antes de ser pasada esta
-  // función, de lo contrario se Volverá a Codificar alterando el resultado
+  // Nota:
+  // En Delphi 7 la cadena ya viene codificada en UTF-8 por default,
+  // y existe un BUG en la Funcion UTF8Encode, el cual no valida que ya esté
+  // codificada previamente, por lo tanto, se recodifica y se altera el
+  // contenido de la cadena.
+  // La siguiente validación suprime ese BUG (Solo delphi 7)
+  if  not IsUTF8String( aCadena ) then
+      LAnsiStr :=   UTF8Encode( aCadena )
+  else
+      LAnsiStr :=  aCadena;
 
-  LAnsiStr := UTF8Encode(aCadena);
   // Verificamos tener la llave privada desencriptada
   if not Assigned(fLlavePrivadaDesencriptada) then
     Raise ELlaveLecturaException.Create('No se tiene asignada la llave privada, favor de asignarla con el método AsignarLlavePrivada');
@@ -562,4 +602,56 @@ begin
     EVP_PKEY_free(fLlavePrivadaDesencriptada);
 end;
 
+function TOpenSSL.LlavePrivadaComoBase64: string;
+const
+  _CADENA_INICIO_LLAVE_PRIVADA = '-----BEGIN PRIVATE KEY-----';
+  _CADENA_FIN_LLAVE_PRIVADA    = '-----END PRIVATE KEY-----';
+var
+ sCadenaLlavePrivada: string;
+begin
+ sCadenaLlavePrivada := LlavePrivadaComoPEM;
+
+  Assert(Pos(_CADENA_INICIO_LLAVE_PRIVADA, sCadenaLlavePrivada) > 0, 'No se tuvo cadena de inicio de llave privada');
+  Assert(Pos(_CADENA_FIN_LLAVE_PRIVADA, sCadenaLlavePrivada) > 0, 'No se tuvo cadena de fin de llave privada');
+
+ // Quita los encabezados, pie y retornos de carro de la llave privada
+  sCadenaLlavePrivada:=StringReplace(sCadenaLlavePrivada, #13, '', [rfReplaceAll, rfIgnoreCase]);
+  sCadenaLlavePrivada:=StringReplace(sCadenaLlavePrivada, #10, '', [rfReplaceAll, rfIgnoreCase]);
+
+  // Quitamos encabezado de la llave privada
+  sCadenaLlavePrivada:=StringReplace(sCadenaLlavePrivada, _CADENA_INICIO_LLAVE_PRIVADA, '', [rfReplaceAll, rfIgnoreCase]);
+
+  // Quitamos el pie de la llave privada
+  Result:=StringReplace(sCadenaLlavePrivada, _CADENA_FIN_LLAVE_PRIVADA, '', [rfReplaceAll, rfIgnoreCase]);
+
+end;
+
+function TOpenSSL.LlavePrivadaComoPEM: String;
+var
+  bioOut: pBIO;
+  Buffer: array [0..4096] of AnsiChar;
+  Res: String;
+begin
+  if not Assigned(fLlavePrivadaDesencriptada) then
+     Raise ELlaveNoAsignadaException.Create('La Llave privada no ha sido asignada');
+
+  // This code was translated from x509.c from the OpenSSL source code
+  Res := '';
+  Buffer:='';
+  bioOut:=nil;
+  try
+
+      bioOut := BIO_new(BIO_s_mem);
+      // We obtain the certificate in base64 encoded format into the bioOut pointer
+      if PEM_write_bio_PrivateKey(bioOut, fLlavePrivadaDesencriptada,nil,'',0,nil,nil) = 1 then
+         BIO_read(bioOut, @Buffer, SizeOf(Buffer))
+      else
+          Res:='';
+  finally
+      // Free the memory
+      BIO_free_all(bioOut);
+  end;
+
+  Result:=StrPas(Buffer);
+end;
 end.

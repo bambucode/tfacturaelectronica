@@ -40,11 +40,7 @@ begin
   Assert(fInstanciaOpenSSL <> nil, 'La instancia fInstancia OpenSSL no debio ser nula. Favor de mandar la instancia en el metodo Configurar');
   // CFDI v3.3 utiliza SHA256
 
- // Nota: en Delphi 7 aCadenaOriginal ya viene codificada en UTF8 (UTFEncode),
- // por lo tanto se necesita Decodificar (UTFDecode) antes de ser pasada esta
- // función, de lo contrario se Volverá a Codificar alterando el resultado
-
-  Result := fInstanciaOpenSSL.HacerDigestion(UTF8Decode(aCadenaOriginal), tdSHA256);
+  Result := fInstanciaOpenSSL.HacerDigestion( aCadenaOriginal, tdSHA256);
 end;
 
 

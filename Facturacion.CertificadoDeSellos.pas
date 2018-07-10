@@ -61,10 +61,12 @@ type
     function GetVigenciaFin: TDateTime;
     function GetVigenciaInicio: TDateTime;
     procedure IdentificarTipoDeCertificado(const aContenidoCertificado: String);
+    function GetContenidoPEM: string;
   public
     destructor Destroy; override;
     procedure Leer(const aRutaCertificado: TFileName);
     property ContenidoBase64: string read GetContenidoBase64;
+    property ContenidoPEM: string read GetContenidoPEM;
     property EmitidoParaNombre: string read GetEmitidoParaNombre;
     property EmitidoParaRFC: String read GetEmitidoParaRFC;
     property NoCertificado: string read GetNoCertificado;
@@ -164,6 +166,12 @@ begin
   sCertificadoBase64:=StringReplace(sCertificadoBase64, _CADENA_INICIO_CERTIFICADO, '', [rfReplaceAll, rfIgnoreCase]);
   // Quitamos el pie del certificado
   Result:=StringReplace(sCertificadoBase64, _CADENA_FIN_CERTIFICADO, '', [rfReplaceAll, rfIgnoreCase]);
+end;
+
+function TCertificadoDeSellos.GetContenidoPEM: string;
+begin
+ Assert(fx509Certificado <> nil, 'El certificado interno X509 fue nulo');
+ result := fx509Certificado.AsBase64;
 end;
 
 function TCertificadoDeSellos.GetEmitidoParaNombre: string;
