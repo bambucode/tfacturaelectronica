@@ -1,4 +1,4 @@
-{*******************************************************}
+﻿{*******************************************************}
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
@@ -23,6 +23,7 @@ uses
 {$IFEND}
      Facturacion.Comprobante,
      Facturacion.Tipos;
+<<<<<<< HEAD
   Const
 
    PAC_PARAM_SVC_URL_API = 'PAC_PARAM_SVC_URL_API';
@@ -47,6 +48,8 @@ uses
    PAC_PARAM_SEGURIDAD_LLAVEPRIVADA       = 'PAC_PARAM_SEGURIDAD_LLAVEPRIVADA';
    PAC_PARAM_SEGURIDAD_LLAVEPRIVADA_CLAVE = 'PAC_PARAM_SEGURIDAD_LLAVEPRIVADA_CLAVE';
 
+=======
+>>>>>>> b6e7ec2ea5703f4e07d9023331866b9af1740dad
 type
 
   TListadoUUID = Array of string;

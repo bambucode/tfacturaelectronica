@@ -58,7 +58,6 @@ uses
   EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas',
   Facturacion.GeneradorCBB in '..\Facturacion.GeneradorCBB.pas',
   Facturacion.GeneradorQRQuricol in '..\Facturacion.GeneradorQRQuricol.pas',
-  Facturacion.Compatibilidad in '..\Facturacion.Compatibilidad.pas',
   Facturacion.GeneradorLigaVerificacion in '..\Facturacion.GeneradorLigaVerificacion.pas';
 
 var
