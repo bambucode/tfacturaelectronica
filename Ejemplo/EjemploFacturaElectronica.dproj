@@ -634,13 +634,13 @@
 					<ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
 				</Deployment>
 				<Platforms>
-					<Platform value="iOSSimulator">False</Platform>
+					<Platform value="iOSDevice32">False</Platform>
 					<Platform value="Android">False</Platform>
 					<Platform value="Win32">True</Platform>
 					<Platform value="iOSDevice64">False</Platform>
 					<Platform value="OSX32">False</Platform>
+					<Platform value="iOSSimulator">False</Platform>
 					<Platform value="Win64">False</Platform>
-					<Platform value="iOSDevice32">False</Platform>
 				</Platforms>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>

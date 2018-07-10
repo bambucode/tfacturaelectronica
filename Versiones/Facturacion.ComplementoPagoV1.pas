@@ -12,7 +12,7 @@ unit Facturacion.ComplementoPagoV1;
 
 interface
 
-uses xmldom, XMLDoc, XMLIntf;
+uses Facturacion.Comprobante, xmldom, XMLDoc, XMLIntf;
 
 type
 
