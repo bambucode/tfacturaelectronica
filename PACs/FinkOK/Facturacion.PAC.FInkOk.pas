@@ -15,13 +15,14 @@ uses
 {$IF CompilerVersion >= 23}
      System.Types,
      System.SysUtils,
+     System.Classes,
 {$ELSE}
      Types,
      SysUtils,
+     Classes,
 {$IFEND}
      Facturacion.ProveedorAutorizadoCertificacion,
      Facturacion.Comprobante,
-     Facturacion.Compatibilidad,
      FinkOkWsTimbrado;
 
 type
@@ -29,15 +30,20 @@ type
   TProveedorFinkOk = class(TInterfacedObject, IProveedorAutorizadoCertificacion)
   private
     fwsTimbradoFinkOk: IFinkOkServicioTimbrado;
+    fwsClientesFinkOk: IFinkOkAltaCliente;
+    fwsCancelacionFinkOk: IFinkOkCancelaTimbrado;
     fDominioWebService : string;
     fCredencialesPAC :  TFacturacionCredencialesPAC;
+    fParametros: TStrings;
     function ExtraerNodoTimbre(const aComprobanteXML : RawByteString): TCadenaUTF8;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
     function UTF8Bytes(const s: UTF8String): TBytedynArray; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
   public
+    destructor Destroy; override;
     procedure  Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
                          const aCredencialesPAC, aCredencialesIntegrador : TFacturacionCredencialesPAC;
                          const aTransaccionInicial: Int64);
+    function Parametros: TStrings;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
         aTransaccion: Int64): TCadenaUTF8; overload;
     function TimbrarDocumento(const aXML : TCadenaUTF8; const aTransaccion : Int64): TCadenaUTF8; overload;
@@ -57,7 +63,6 @@ uses Facturacion.Tipos,
      CodeSiteLogging,
      {$ENDIF}
 {$IF Compilerversion >= 23}
-     System.Classes,
      System.RegularExpressions,
      Xml.xmldom,
      Xml.XMLIntf,
@@ -69,7 +74,6 @@ uses Facturacion.Tipos,
    {$ELSE}
      PerlRegEx,
    {$IFEND}
-     Classes,
      xmldom,
      XMLIntf,
      Msxmldom,
@@ -102,8 +106,36 @@ procedure TProveedorFinkOk.Configurar(const aWsTimbrado, aWsClientes, aWsCancela
 begin
   fDominioWebService := aWsTimbrado;
   fCredencialesPAC := aCredencialesPAC;
-  // Incializamos las instancias de los WebServices
+  // Inicializamos las instancias de los WebServices
   fwsTimbradoFinkOk := GetWsFinkOkTimbrado(False, fDominioWebService + '/stamp');
+  fwsClientesFinkOk := GetFinkOkCliente(False, fDominioWebService + '/registration');
+  fwsCancelacionFinkOk := GetFinkOkCancelar(False, fDominioWebService + '/cancel');
+
+  Parametros.Values[PAC_PARAM_SESION_PAC_USUARIO_ID] := aCredencialesPAC.RFC;
+  Parametros.Values[PAC_PARAM_SESION_PAC_USUARIO_CLAVE] := aCredencialesPAC.Clave;
+  Parametros.Values[PAC_PARAM_SESION_PAC_DISTRIBUIDOR_ID] := aCredencialesPAC.DistribuidorID;
+
+  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_USUARIO_ID] := aCredencialesIntegrador.RFC;
+  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_USUARIO_CLAVE] := aCredencialesIntegrador.Clave;
+  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID] := aCredencialesIntegrador.DistribuidorID;
+
+  Parametros.Values[PAC_PARAM_SESION_TRANSACCION_INICIAL] := IntToStr(aTransaccionInicial);
+
+  Parametros.Values[PAC_PARAM_SVC_URL_API] := fDominioWebService;
+
+  Parametros.Values[PAC_PARAM_SVC_URL_API_TIMBRADO] := fDominioWebService +
+    '/stamp';
+  Parametros.Values[PAC_PARAM_SVC_URL_API_CLIENTES] := fDominioWebService +
+    '/registration';
+  Parametros.Values[PAC_PARAM_SVC_URL_API_CANCELACION] := fDominioWebService +
+    '/cancel';
+end;
+
+destructor TProveedorFinkOk.Destroy;
+begin
+  if Assigned(fParametros) then
+     FreeAndNil(fParametros);
+  inherited;
 end;
 
 function TProveedorFinkOk.UTF8Bytes(const s: UTF8String): TBytedynArray; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
@@ -236,6 +268,13 @@ begin
   end;
  {$IFEND}
   Assert(Result <> '', 'El XML del timbre estuvo vacio');
+end;
+
+function TProveedorFinkOk.Parametros: TStrings;
+begin
+ if not Assigned(fParametros) then
+    fParametros := TStringList.Create;
+ result := fParametros;
 end;
 
 procedure TProveedorFinkOk.ProcesarExcepcionDePAC(const aExcepcion: Exception);

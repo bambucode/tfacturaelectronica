@@ -10,7 +10,7 @@ unit Facturacion.Administrador;
 
 interface
 
-uses Facturacion.Comprobante, Facturacion.Compatibilidad,
+uses Facturacion.Comprobante,
      Facturacion.GeneradorCadenaOriginal,
      Facturacion.GeneradorSello,
 {$IF CompilerVersion >= 23}

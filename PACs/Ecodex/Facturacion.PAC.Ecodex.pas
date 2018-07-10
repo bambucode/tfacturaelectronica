@@ -12,7 +12,6 @@ interface
 
 uses Facturacion.ProveedorAutorizadoCertificacion,
   Facturacion.Comprobante,
-  Facturacion.Compatibilidad,
   EcodexWsComun,
   EcodexWsTimbrado,
   EcodexWsClientes,
@@ -20,11 +19,13 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
   PAC.Ecodex.ManejadorDeSesion,
 {$IF CompilerVersion >= 23}
   System.Generics.Collections,
+  System.Classes,
   System.SysUtils
 {$ELSE}
   {$IF CompilerVersion >= 23}
    Generics.Collections,
   {$IFEND}
+  Classes,
   SysUtils
 {$IFEND}
   ;
@@ -40,6 +41,7 @@ type
     fwsClientesEcodex: IEcodexServicioClientes;
     fwsTimbradoEcodex: IEcodexServicioTimbrado;
     fwsCancelacionEcodex: IEcodexServicioCancelacion;
+    fParametros: TStrings;
     function ExtraerNodoTimbre(const aComprobanteXML: TEcodexComprobanteXML)
       : TCadenaUTF8;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
@@ -54,6 +56,7 @@ type
     procedure Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
         const aCredencialesPAC, aCredencialesIntegrador:
         TFacturacionCredencialesPAC; const aTransaccionInicial: Int64);
+    function Parametros: TStrings;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;
     function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
     function CancelarDocumentos(const aUUIDS: TListadoUUID):
@@ -86,7 +89,6 @@ uses
   Xml.Win.Msxmldom,
   Xml.XMLDoc
 {$ELSE}
-  Classes,
   xmldom,
   XSBuiltIns,
   XMLIntf,
@@ -105,6 +107,8 @@ begin
   if Assigned(fManejadorDeSesion) then
     FreeAndNil(fManejadorDeSesion);
 
+  if Assigned(fParametros) then
+     FreeAndNil(fParametros);
   inherited;
 end;
 
@@ -138,6 +142,27 @@ begin
     '/ServicioClientes.svc');
   fwsCancelacionEcodex := GetWsEcodexCancelacion(False, aWsCancelacion +
     '/ServicioCancelacion.svc');
+
+  Parametros.Values[PAC_PARAM_SESION_PAC_USUARIO_ID] := aCredencialesPAC.RFC;
+  Parametros.Values[PAC_PARAM_SESION_PAC_USUARIO_CLAVE] := aCredencialesPAC.Clave;
+  Parametros.Values[PAC_PARAM_SESION_PAC_DISTRIBUIDOR_ID] := aCredencialesPAC.DistribuidorID;
+
+  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_USUARIO_ID] := aCredencialesIntegrador.RFC;
+  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_USUARIO_CLAVE] := aCredencialesIntegrador.Clave;
+  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID] := aCredencialesIntegrador.DistribuidorID;
+
+  Parametros.Values[PAC_PARAM_SESION_TRANSACCION_INICIAL] := IntToStr(aTransaccionInicial);
+
+  Parametros.Values[PAC_PARAM_SVC_URL_API] := aWsTimbrado;
+
+  Parametros.Values[PAC_PARAM_SVC_URL_API_TIMBRADO] := aWsTimbrado +
+    '/ServicioTimbrado.svc';
+  Parametros.Values[PAC_PARAM_SVC_URL_API_CLIENTES] := aWsClientes +
+    '/ServicioClientes.svc';
+  Parametros.Values[PAC_PARAM_SVC_URL_API_CANCELACION] := aWsCancelacion +
+    '/ServicioCancelacion.svc';
+
+
 end;
 
 function TProveedorEcodex.ExtraerNodoTimbre(const aComprobanteXML
@@ -241,6 +266,13 @@ begin
     // fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsClientes;
     solicitudEdoCuenta.Free;
   end;
+end;
+
+function TProveedorEcodex.Parametros: TStrings;
+begin
+ if not Assigned(fParametros) then
+    fParametros := TStringList.Create;
+ result := fParametros;
 end;
 
 procedure TProveedorEcodex.ProcesarExcepcionDePAC(const aExcepcion: Exception);
@@ -354,6 +386,7 @@ begin
   try
     // 2. Iniciamos una nueva sesion solicitando un nuevo token
     tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
+    Parametros.Values[PAC_PARAM_SESION_ID] := tokenDeUsuario;
 
     // 3. Asignamos el documento XML
     solicitudTimbrado.ComprobanteXML          := TEcodexComprobanteXML.Create;

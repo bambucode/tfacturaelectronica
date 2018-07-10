@@ -11,19 +11,42 @@ interface
 
 uses
 {$IF CompilerVersion >= 23}
-     System.Generics.Collections,
+     System.Classes,
      System.SysUtils,
+     System.Generics.Collections,
 {$ELSE}
+     Classes,
      SysUtils,
    {$IF CompilerVersion >= 20}
      Generics.Collections,
-   {$ELSE}
-     Classes,
    {$IFEND}
 {$IFEND}
      Facturacion.Comprobante,
-     Facturacion.Tipos,
-     Facturacion.Compatibilidad;
+     Facturacion.Tipos;
+  Const
+
+   PAC_PARAM_SVC_URL_API = 'PAC_PARAM_SVC_URL_API';
+   PAC_PARAM_SVC_URL_API_TIMBRADO = 'PAC_PARAM_SVC_URL_API_TIMBRADO';
+   PAC_PARAM_SVC_URL_API_CANCELACION = 'PAC_PARAM_SVC_URL_API_CANCELACION';
+   PAC_PARAM_SVC_URL_API_CLIENTES    = 'PAC_PARAM_SVC_URL_API_CLIENTES';
+   PAC_PARAM_SVC_MODO_PRODUCCION = 'PAC_PARAM_SVC_MODO_PRODUCCION';
+
+   PAC_PARAM_SESION_TRANSACCION_INICIAL = 'PAC_PARAM_TRANSACCION_INICIAL';
+
+   //Credenciales
+   PAC_PARAM_SESION_ID                              = 'PAC_PARAM_SESION_ID';
+   PAC_PARAM_SESION_PAC_USUARIO_ID     = 'PAC_PARAM_SESION_PAC_USUARIO_ID';
+   PAC_PARAM_SESION_PAC_USUARIO_CLAVE  = 'PAC_PARAM_SESION_PAC_USUARIO_CLAVE';
+   PAC_PARAM_SESION_PAC_DISTRIBUIDOR_ID = 'PAC_PARAM_SESION_PAC_DISTRIBUIDOR_ID';
+
+   PAC_PARAM_SESION_INTEGRADOR_USUARIO_ID     = 'PAC_PARAM_SESION_INTEGRADOR_USUARIO_ID';
+   PAC_PARAM_SESION_INTEGRADOR_USUARIO_CLAVE  = 'PAC_PARAM_SESION_INTEGRADOR_USUARIO_CLAVE';
+   PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID = 'PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID';
+
+   PAC_PARAM_SEGURIDAD_CERTIFICADO        = 'PAC_PARAM_SEGURIDAD_CERTIFICADO';
+   PAC_PARAM_SEGURIDAD_LLAVEPRIVADA       = 'PAC_PARAM_SEGURIDAD_LLAVEPRIVADA';
+   PAC_PARAM_SEGURIDAD_LLAVEPRIVADA_CLAVE = 'PAC_PARAM_SEGURIDAD_LLAVEPRIVADA_CLAVE';
+
 type
 
   TListadoUUID = Array of string;
@@ -152,6 +175,7 @@ type
     procedure Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
                          const aCredencialesPAC, aCredencialesIntegrador : TFacturacionCredencialesPAC;
                          const aTransaccionInicial: Int64);
+    function Parametros: TStrings;
     function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;

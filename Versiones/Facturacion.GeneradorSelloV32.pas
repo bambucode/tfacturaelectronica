@@ -10,7 +10,7 @@ unit Facturacion.GeneradorSelloV32;
 
 interface
 
-uses Facturacion.Comprobante, Facturacion.Compatibilidad,
+uses Facturacion.Comprobante,
      Facturacion.GeneradorSello,
      Facturacion.OpenSSL;
 
