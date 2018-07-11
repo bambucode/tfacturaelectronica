@@ -16,7 +16,7 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
 {$IF CompilerVersion >= 23}
    System.Types,
    System.SysUtils,
-   System.Classes,
+   System.Classes
 {$ELSE}
    Types,
    SysUtils,

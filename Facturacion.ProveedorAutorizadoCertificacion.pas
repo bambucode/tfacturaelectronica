@@ -25,12 +25,15 @@ uses
      Facturacion.Tipos;
 
   Const
+   PAC_VALOR_CFDI_VERSION_32 = '3.2';
+   PAC_VALOR_CFDI_VERSION_33 = '3.3';
 
    PAC_PARAM_SVC_URL_API = 'PAC_PARAM_SVC_URL_API';
    PAC_PARAM_SVC_URL_API_TIMBRADO = 'PAC_PARAM_SVC_URL_API_TIMBRADO';
    PAC_PARAM_SVC_URL_API_CANCELACION = 'PAC_PARAM_SVC_URL_API_CANCELACION';
    PAC_PARAM_SVC_URL_API_CLIENTES    = 'PAC_PARAM_SVC_URL_API_CLIENTES';
    PAC_PARAM_SVC_MODO_PRODUCCION = 'PAC_PARAM_SVC_MODO_PRODUCCION';
+   PAC_PARAM_SVC_CFDI_VERSION = 'PAC_PARAM_SVC_CFDI_VERSION';
 
    PAC_PARAM_SESION_TRANSACCION_INICIAL = 'PAC_PARAM_TRANSACCION_INICIAL';
 
@@ -66,9 +69,9 @@ type
   protected
     fCancelado: boolean;
     fEncontrado: boolean;
-    fExtraInfo: string;
+    fExtraInfo: WideString;
     fTag: NativeInt;
-    fTagStr: String;
+    fTagStr: WideString;
     fUUID: string;
     fUUIDList: TUUIDInfoList;
   public
@@ -77,9 +80,9 @@ type
    property UUID: string read fUUID write fUUID;
    property Cancelado: boolean read fCancelado write fCancelado;
    property Encontrado: boolean read fEncontrado write fEncontrado;
-   property ExtraInfo: string read fExtraInfo write fExtraInfo;
+   property ExtraInfo: Widestring read fExtraInfo write fExtraInfo;
    property Tag: NativeInt read fTag write fTag;
-   property TagStr: String read fTagStr write fTagStr;
+   property TagStr: WideString read fTagStr write fTagStr;
   end;
 
   TUUIDInfoList = class(TStringList)

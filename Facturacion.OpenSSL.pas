@@ -134,11 +134,12 @@ type
     procedure AlmacenarLlavePrivadaEnMemoria(const aRutaLlavePrivada, aClave: String);
     procedure LiberarLlavePrivadaSiAsignada;
     function ObtenerUltimoMensajeDeError: string;
-    function BinToBase64(const PDat: PBYTE; const DatLen: DWORD): string;
+
     function ObtenerModulusDeCertificado(const aRutaCertificado: string): String;
     function ObtenerModulusDeLlavePrivada(const aRutaLlavePrivada, aClaveLlavePrivada: String): String;
   public
     destructor Destroy; override;
+    function BinToBase64(const PDat: PBYTE; const DatLen: DWORD): string;
     procedure AsignarLlavePrivada(const aRutaArchivoLlavePrivada, aContrasena:
         string);
     function LlavePrivadaComoPEM: String;

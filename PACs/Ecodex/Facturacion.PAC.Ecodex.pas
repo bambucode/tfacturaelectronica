@@ -81,7 +81,6 @@ uses
 {$ENDIF}
 
 {$IF Compilerversion >= 23}
-  System.Classes,
   Soap.XSBuiltIns,
   System.RegularExpressions,
   Xml.xmldom,

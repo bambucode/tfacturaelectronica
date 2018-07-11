@@ -71,6 +71,7 @@ uses
 {$IF CompilerVersion >= 23}
       System.IOUtils,
       System.Classes,
+      widestrutils,
       Winapi.Windows,
       System.Win.ComObj,
       Xml.XMLIntf,
