@@ -2,17 +2,17 @@
 {                                                         }
 { TFacturaElectronica                                     }
 {                                                         }
-{ Soporte del PAC Facturacion México                      }
+{ Soporte del PAC MultiFacturas                           }
 {                                                         }
 { ******************************************************* }
 
-unit Facturacion.PAC.FacturacionMexico;
+unit Facturacion.PAC.MultiFacturas;
 
 interface
 
 uses Facturacion.ProveedorAutorizadoCertificacion,
      Facturacion.Comprobante,
-     FacturacionMexicoWsTimbrado,
+     MultiFacturasWsTimbrado,
 {$IF CompilerVersion >= 23}
    System.Types,
    System.SysUtils,
@@ -26,25 +26,22 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
 
 type
 
-   TProveedorFacturacionMexico = class(TInterfacedObject, IProveedorAutorizadoCertificacion)
+   TProveedorMultiFacturas = class(TProveedorAutorizadoCertificacionBase, IProveedorAutorizadoCertificacion)
    private
       fwsTimbrado: wservicePortType;
       fDominioWebService: string;
       fCredencialesPAC: TFacturacionCredencialesPAC;
-      fParametros: TStrings;
-      function ExtraerNodoTimbre(const aComprobanteXML: RawByteString) : TCadenaUTF8;
       procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
-      function UTF8ToBytes(const s: TCadenaUTF8): TBytedynArray; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
-      function BytesToUTF8(const ABytes: TBytedynArray): TCadenaUTF8; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
+      function UTF8ToBytes(const s: TCadenaUTF8): TByteDynArray; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
+      function BytesToUTF8(const ABytes: TByteDynArray): TCadenaUTF8; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
       function Decode64(S: String): TByteDynArray;  // http://delphiaccess.com/foros/index.php/topic/11984-base64/
       function Encode64(Bin: PByte; Count: integer): String; // http://delphiaccess.com/foros/index.php/topic/11984-base64/
    public
       procedure AfterConstruction; override;
       destructor Destroy; override;
-      procedure  Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
+      procedure Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
                          const aCredencialesPAC, aCredencialesIntegrador : TFacturacionCredencialesPAC;
                          const aTransaccionInicial: Int64);
-      function Parametros: TStrings;
       function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8; overload;
       function TimbrarDocumento(const aXML : TCadenaUTF8; const aTransaccion : Int64): TCadenaUTF8; overload;
       function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;
@@ -106,43 +103,49 @@ const
 
 { TProveedorSolucionFactible }
 
-procedure TProveedorFacturacionMexico.AfterConstruction;
+procedure TProveedorMultiFacturas.AfterConstruction;
 begin
   inherited;
-  Parametros.Values[PAC_PARAM_SVC_MODO_PRODUCCION] := 'SI';
-  Parametros.Values[PAC_PARAM_SVC_CFDI_VERSION]    := PAC_VALOR_CFDI_VERSION_33;
+  AsignarParametro(PAC_PARAM_SVC_CFG_MULTIPLES_URLS, PAC_VALOR_SI);
 end;
 
-function TProveedorFacturacionMexico.AgregarCliente(const aRFC, aRazonSocial,
+function TProveedorMultiFacturas.AgregarCliente(const aRFC, aRazonSocial,
   aCorreo: String): string;
 begin
 
 end;
 
-function TProveedorFacturacionMexico.BytesToUTF8(
-  const ABytes: TBytedynArray): TCadenaUTF8;
+function TProveedorMultiFacturas.BytesToUTF8(
+  const ABytes: TByteDynArray): TCadenaUTF8;
 begin
    SetLength(Result, Length(ABytes));
    if Length(Result) > 0 then
       Move(abytes[0], Result[1], Length(ABytes));
 end;
 
-function TProveedorFacturacionMexico.CancelarDocumento(
+function TProveedorMultiFacturas.CancelarDocumento(
   const aUUID: TCadenaUTF8): Boolean;
+var LExtraInfo: TCadenaUTF8;
 begin
 
+ result := CancelarDocumento(aUUID, LExtraInfo);
 
 end;
 
-function TProveedorFacturacionMexico.CancelarDocumento(const aUUID: TCadenaUTF8;
+function TProveedorMultiFacturas.CancelarDocumento(const aUUID: TCadenaUTF8;
   var aExtraInfo: TCadenaUTF8): Boolean;
 var
  LRespuestaCancelacion: RespuestaCancelacion;
 begin
+  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO)='' then
+     raise EPACRSACertificadoNoAsignadoException.Create('Certificado no asignado o vacío',0,0,false)
+  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA)='' then
+     raise EPACRSALlavePrivadaNoAsignadaException.Create('Llave privada no asignada o vacía',0,0,false);
+
   LRespuestaCancelacion := fwsTimbrado.cancelar( fCredencialesPAC.RFC, fCredencialesPAC.Clave, aUUID,
-  Parametros.Values[PAC_PARAM_SEGURIDAD_CERTIFICADO],
-  Parametros.Values[PAC_PARAM_SEGURIDAD_LLAVEPRIVADA],
-  Parametros.Values[PAC_PARAM_SEGURIDAD_LLAVEPRIVADA_CLAVE]  );
+   ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO),
+   ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA),
+   ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE) );
   if LRespuestaCancelacion.codigo_mf_numero=0 then
   begin
    result := true;
@@ -155,7 +158,7 @@ begin
   end;
 end;
 
-function TProveedorFacturacionMexico.CancelarDocumentos(
+function TProveedorMultiFacturas.CancelarDocumentos(
   const aUUID: TListadoUUID): TListadoCancelacionUUID;
 var LIdx: Integer;
     LExtraInfo: TCadenaUTF8;
@@ -168,34 +171,38 @@ begin
  end;
 end;
 
-procedure TProveedorFacturacionMexico.Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
+procedure TProveedorMultiFacturas.Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
                          const aCredencialesPAC, aCredencialesIntegrador : TFacturacionCredencialesPAC;
                          const aTransaccionInicial: Int64);
 begin
    fDominioWebService := aWsTimbrado;
    fCredencialesPAC := aCredencialesPAC;
+
    // Inicializamos las instancias de los WebServices
-   fwsTimbrado := GetwservicePortTypeRandom(False, fDominioWebService);
+   if ObtenerParametro(PAC_PARAM_SVC_CFG_MULTIPLES_URLS)=PAC_VALOR_SI then
+      fwsTimbrado := GetwservicePortTypeRandom(False, fDominioWebService)
+   else
+      fwsTimbrado := GetwservicePortType(False, fDominioWebService);
 
-  Parametros.Values[PAC_PARAM_SESION_PAC_USUARIO_ID] := aCredencialesPAC.RFC;
-  Parametros.Values[PAC_PARAM_SESION_PAC_USUARIO_CLAVE] := aCredencialesPAC.Clave;
-  Parametros.Values[PAC_PARAM_SESION_PAC_DISTRIBUIDOR_ID] := aCredencialesPAC.DistribuidorID;
+  AsignarParametro(PAC_PARAM_SESION_PAC_USUARIO_ID, aCredencialesPAC.RFC);
+  AsignarParametro(PAC_PARAM_SESION_PAC_USUARIO_CLAVE, aCredencialesPAC.Clave);
+  AsignarParametro(PAC_PARAM_SESION_PAC_DISTRIBUIDOR_ID, aCredencialesPAC.DistribuidorID);
 
-  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_USUARIO_ID] := aCredencialesIntegrador.RFC;
-  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_USUARIO_CLAVE] := aCredencialesIntegrador.Clave;
-  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID] := aCredencialesIntegrador.DistribuidorID;
+  AsignarParametro(PAC_PARAM_SESION_INTEGRADOR_USUARIO_ID, aCredencialesIntegrador.RFC);
+  AsignarParametro(PAC_PARAM_SESION_INTEGRADOR_USUARIO_CLAVE, aCredencialesIntegrador.Clave);
+  AsignarParametro(PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID, aCredencialesIntegrador.DistribuidorID);
 
-  Parametros.Values[PAC_PARAM_SESION_TRANSACCION_INICIAL] := IntToStr(aTransaccionInicial);
+  AsignarParametro(PAC_PARAM_SESION_TRANSACCION_INICIAL, IntToStr(aTransaccionInicial));
 
-  Parametros.Values[PAC_PARAM_SVC_URL_API] := aWsTimbrado;
+  AsignarParametro(PAC_PARAM_SVC_URL_API, aWsTimbrado);
 
-  Parametros.Values[PAC_PARAM_SVC_URL_API_TIMBRADO] := aWsTimbrado;
-  Parametros.Values[PAC_PARAM_SVC_URL_API_CLIENTES] := aWsTimbrado;
-  Parametros.Values[PAC_PARAM_SVC_URL_API_CANCELACION] := aWsTimbrado;
+  AsignarParametro(PAC_PARAM_SVC_URL_API_TIMBRADO, aWsTimbrado);
+  AsignarParametro(PAC_PARAM_SVC_URL_API_CLIENTES, aWsTimbrado);
+  AsignarParametro(PAC_PARAM_SVC_URL_API_CANCELACION, aWsTimbrado);
 
 end;
 
-function TProveedorFacturacionMexico.Decode64(S: String): TByteDynArray;
+function TProveedorMultiFacturas.Decode64(S: String): TByteDynArray;
 var
   B: array[0..3] of BYTE;
   L, n, i, j: integer;
@@ -220,7 +227,7 @@ begin
   until n > L;
 end;
 
-destructor TProveedorFacturacionMexico.Destroy;
+destructor TProveedorMultiFacturas.Destroy;
 begin
   if Assigned(fParametros) then
      FreeAndNil(fParametros);
@@ -228,7 +235,7 @@ begin
 end;
 
 // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
-function TProveedorFacturacionMexico.UTF8ToBytes(const s:  TCadenaUTF8): TBytedynArray;
+function TProveedorMultiFacturas.UTF8ToBytes(const s:  TCadenaUTF8): TBytedynArray;
 begin
    {$IF Compilerversion >= 20}
    Assert(StringElementSize(s) = 1)
@@ -238,18 +245,18 @@ begin
       Move(s[1], Result[0], Length(s));
 end;
 
-function TProveedorFacturacionMexico.TimbrarDocumento(const aComprobante: IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8;
+function TProveedorMultiFacturas.TimbrarDocumento(const aComprobante: IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8;
 begin
  Result := TimbrarDocumento( UTF8Encode( aComprobante.XML ), aTransaccion );
 end;
 
-function TProveedorFacturacionMexico.ObtenerAcuseDeCancelacion(
+function TProveedorMultiFacturas.ObtenerAcuseDeCancelacion(
   const aUUID: string): string;
 begin
 
 end;
 
-function TProveedorFacturacionMexico.ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;
+function TProveedorMultiFacturas.ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;
 var LSaldoReponse: saldoResponse;
 begin
  result := -1;
@@ -277,13 +284,13 @@ begin
    {No existe esta funcionalidad para Solucion Factible, dejada solo por compatibilidad.}
 end;
 
-function TProveedorFacturacionMexico.ObtenerTimbrePrevio(
+function TProveedorMultiFacturas.ObtenerTimbrePrevio(
   const aIdTransaccionOriginal: Int64): TCadenaUTF8;
 begin
 
 end;
 
-function TProveedorFacturacionMexico.Encode64(Bin: PByte;
+function TProveedorMultiFacturas.Encode64(Bin: PByte;
   Count: integer): String;
 var
   B0, B1, B2: BYTE;
@@ -312,51 +319,7 @@ begin
   if n - Count = 2  then Result[L-1]:= '=';
 end;
 
-function TProveedorFacturacionMexico.ExtraerNodoTimbre(const aComprobanteXML: RawByteString): TCadenaUTF8;
-var
-  contenidoComprobanteXML: TCadenaUTF8;
-{$IF Compilerversion < 20}
-  LRegEx: TPerlRegEx;
-{$IFEND}
-const
- _REGEX_TIMBRE = '<tfd:TimbreFiscalDigital.*?/>';
-begin
-  Assert(aComprobanteXML <> '',
-    'La respuesta del servicio de timbrado fue nula');
- {$IF Compilerversion >= 22}
-  // Delphi XE1 y superiores
-  contenidoComprobanteXML := aComprobanteXML;
-  Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
- {$ELSE}
-  contenidoComprobanteXML := UTF8Encode(aComprobanteXML);
-  LRegEx := TPerlRegEx.Create;
-  try
-  	LRegEx.RegEx := _REGEX_TIMBRE;
-  	LRegEx.Options := [];
-  	LRegEx.State := [];
-  	LRegEx.Subject := contenidoComprobanteXML;
-	 if LRegEx.Match then begin
-	 	Result := LRegEx.MatchedText;
-	 end
-  	else begin
-  		Result := '';
-  	end;
-  finally
-   LRegex.Free;
-  end;
- {$IFEND}
-
-  Assert(Result <> '', 'El XML del timbre estuvo vacio');
-end;
-
-function TProveedorFacturacionMexico.Parametros: TStrings;
-begin
-if not Assigned(fParametros) then
-    fParametros := TStringList.Create;
- result := fParametros;
-end;
-
-procedure TProveedorFacturacionMexico.ProcesarExcepcionDePAC(const aExcepcion: Exception);
+procedure TProveedorMultiFacturas.ProcesarExcepcionDePAC(const aExcepcion: Exception);
 var
    mensajeExcepcion: string;
    numeroErrorSAT: Integer;
@@ -365,7 +328,7 @@ begin
    raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
 end;
 
-function TProveedorFacturacionMexico.TimbrarDocumento(const aXML: TCadenaUTF8;
+function TProveedorMultiFacturas.TimbrarDocumento(const aXML: TCadenaUTF8;
   const aTransaccion: Int64): TCadenaUTF8;
 var
    respuestaTimbrado: Respuesta;
@@ -379,10 +342,10 @@ var
 begin
    sXMLStr := Encode64( PByte(UTF8ToBytes( aXml )), Length(aXml) );
 
-   if Parametros.Values[PAC_PARAM_SVC_CFDI_VERSION] = PAC_VALOR_CFDI_VERSION_33 then
-      respuestaTimbrado := fwsTimbrado.timbrar33(fCredencialesPAC.RFC, fCredencialesPAC.Clave, sXMLStr, Parametros.Values[PAC_PARAM_SVC_MODO_PRODUCCION])
+   if ObtenerParametroDef(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_33) = PAC_VALOR_CFDI_VERSION_33 then
+      respuestaTimbrado := fwsTimbrado.timbrar33(fCredencialesPAC.RFC, fCredencialesPAC.Clave, sXMLStr, ObtenerParametroDef(PAC_PARAM_SVC_CFG_MODO_PRODUCCION,PAC_VALOR_NO))
    else
-      respuestaTimbrado := fwsTimbrado.timbrar32(fCredencialesPAC.RFC, fCredencialesPAC.Clave, sXMLStr, Parametros.Values[PAC_PARAM_SVC_MODO_PRODUCCION]);
+      respuestaTimbrado := fwsTimbrado.timbrar32(fCredencialesPAC.RFC, fCredencialesPAC.Clave, sXMLStr, ObtenerParametroDef(PAC_PARAM_SVC_CFG_MODO_PRODUCCION,PAC_VALOR_NO));
 
    if respuestaTimbrado.codigo_mf_numero=0 then
    Begin

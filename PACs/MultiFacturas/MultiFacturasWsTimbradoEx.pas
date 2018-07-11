@@ -9,7 +9,7 @@
 // (10/07/2018 08:38:06 p. m. - - $Rev: 34800 $)
 // ************************************************************************ //
 
-unit FacturacionMexicoWsTimbradoEx;
+unit MultiFacturasWsTimbradoEx;
 
 interface
 uses
@@ -133,7 +133,7 @@ type
   end;
 
 function GetwservicePortType(UseWSDL: Boolean=System.False; Addr: string=''; HTTPRIO: THTTPRIO = nil): wservicePortType;
-
+function GetwservicePortTypeRandom(UseWSDL: Boolean; Addr: string; HTTPRIO: THTTPRIO): wservicePortType;
 
 implementation
   uses SysUtils, Math;

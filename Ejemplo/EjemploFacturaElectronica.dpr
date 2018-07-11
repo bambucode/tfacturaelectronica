@@ -40,6 +40,9 @@ uses
   FinkOkWsTimbrado in '..\PACs\FinkOK\FinkOkWsTimbrado.pas',
   Facturacion.PAC.SolucionFactible in '..\PACs\SolucionFactible\Facturacion.PAC.SolucionFactible.pas',
   SolucionFactibleWsTimbrado in '..\PACs\SolucionFactible\SolucionFactibleWsTimbrado.pas',
+  MultiFacturasWsTimbrado in '..\PACs\MultiFacturas\MultiFacturasWsTimbrado.pas',
+  Facturacion.PAC.MultiFacturas in '..\PACs\MultiFacturas\Facturacion.PAC.MultiFacturas.pas',
+  MultiFacturasWsTimbradoEx in '..\PACs\MultiFacturas\MultiFacturasWsTimbradoEx.pas',
   Facturacion.Administrador in '..\Facturacion.Administrador.pas',
   Facturacion.CertificadoDeSellos in '..\Facturacion.CertificadoDeSellos.pas',
   Facturacion.GeneradorCadenaOriginal in '..\Facturacion.GeneradorCadenaOriginal.pas',
@@ -64,10 +67,7 @@ uses
   Facturacion.GeneradorSelloV33 in '..\Versiones\Facturacion.GeneradorSelloV33.pas',
   Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas',
   Facturacion.TimbreFiscalDigitalV32 in '..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas',
-  Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas',
-  FacturacionMexicoWsTimbrado in '..\PACs\FacturacionMexico\FacturacionMexicoWsTimbrado.pas',
-  Facturacion.PAC.FacturacionMexico in '..\PACs\FacturacionMexico\Facturacion.PAC.FacturacionMexico.pas',
-  FacturacionMexicoWsTimbradoEx in '..\PACs\FacturacionMexico\FacturacionMexicoWsTimbradoEx.pas';
+  Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas';
 
 var
   nuevaFactura                                                    : IComprobanteFiscal;
@@ -109,15 +109,15 @@ const
   _URL_FINKOK_PRUEBAS            = 'http://demo-facturacion.finkok.com/servicios/soap';
   _URL_COMERCIO_PRUEBAS          = 'https://pruebas.comercio-digital.mx';
   _URL_SOLUCIONFACTIBLE_PRUEBAS  = 'https://testing.solucionfactible.com/ws/services/Timbrado';
-  _URL_FACTURACIONMEXICO_PRUEBAS  = '' {'http://ws.facturacionmexico.com.mx/pac/timbrarnet.php'};   //SE DEBE ESPECIFICAR QUE ES MODO PRODUCCION
-  _NUEMRO_TRANSACCION_INICIAL    = 1;
+  _URL_MULTIFACTURAS_PRUEBAS     = 'http://ws.facturacionmexico.com.mx/pac/timbrarjava.php';   //SE DEBE ESPECIFICAR QUE ES MODO PRODUCCION
+  _NUMERO_TRANSACCION_INICIAL    = 1;
 
   //Hablitar solo una de las siguientes opciones
-  {.$define PAC_ECODEX}
-  {.$define PAC_FINOK}
-  {.$define PAC_COMERCIODIGITAL}
-  {.$define PAC_SOLUCIONFACTIBLE}
-  {$define PAC_FACTURACIONMEXICO}
+  {$define PAC_DEMO_ECODEX}
+  {.$define PAC_DEMO_FINOK}
+  {.$define PAC_DEMO_COMERCIODIGITAL}
+  {.$define PAC_DEMO_SOLUCIONFACTIBLE}
+  {.$define PAC_DEMO_MULTIFACTURAS}
 
 begin
   CoInitialize(nil);
@@ -134,7 +134,7 @@ begin
       claveLlavePrivada := '12345678a';
 
      // Configuramos al PAC con los datos para pruebas
-     {$ifdef PAC_ECODEX}
+     {$ifdef PAC_DEMO_ECODEX}
       rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer';
       rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.key';
       claveLlavePrivada := '12345678a';
@@ -148,32 +148,32 @@ begin
       Url_WS := _URL_ECODEX_PRUEBAS_V33;
      {$endif}
 
-     {$ifdef PAC_COMERCIODIGITAL}
+     {$ifdef PAC_DEMO_COMERCIODIGITAL}
       pac := TProveedorComercio.Create;
       CredencialesPAC.RFC   := 'AAA010101AAA';
       CredencialesPAC.Clave := 'PWD';
       Url_WS := _URL_COMERCIO_PRUEBAS;
      {$endif}
 
-     {$ifdef PAC_FINOK}
+     {$ifdef PAC_DEMO_FINOK}
       pac := TProveedorFinkOk.Create;
       CredencialesPAC.RFC   := 'TuUsuario';
       CredencialesPAC.Clave := 'TuPassword';
       Url_WS := _URL_FINKOK_PRUEBAS;
      {$endif}
 
-     {$ifdef PAC_SOLUCIONFACTIBLE}
+     {$ifdef PAC_DEMO_SOLUCIONFACTIBLE}
       pac := TProveedorSolucionFactible.Create;
-      CredencialesPAC.RFC   := 'testing@solucionfactible.com';;
+      CredencialesPAC.RFC   := 'testing@solucionfactible.com';
       CredencialesPAC.Clave := 'timbrado.SF.16672';
       Url_WS := _URL_SOLUCIONFACTIBLE_PRUEBAS;
      {$endif}
 
-     {$ifdef PAC_FACTURACIONMEXICO}
-      pac := TProveedorFacturacionMexico.Create;
+     {$ifdef PAC_DEMO_MULTIFACTURAS}
+      pac := TProveedorMultiFacturas.Create;
       CredencialesPAC.RFC   := 'DEMO700101XXX';
       CredencialesPAC.Clave := 'DEMO700101XXX';
-      Url_WS := _URL_FACTURACIONMEXICO_PRUEBAS;
+      Url_WS := _URL_MULTIFACTURAS_PRUEBAS;
      {$endif}
 
       openSSL := TOpenSSL.Create;
@@ -188,10 +188,6 @@ begin
       Writeln( 'Certificado PEM Base64' );
       Writeln( certificadoSellos.ContenidoPEM );
       Writeln( '' );
-
-      pac.Parametros.Values[PAC_PARAM_SEGURIDAD_CERTIFICADO]  := certificadoSellos.ContenidoBase64;
-      pac.Parametros.Values[PAC_PARAM_SEGURIDAD_LLAVEPRIVADA] := openSSL.LlavePrivadaComoBase64;
-      pac.Parametros.Values[PAC_PARAM_SEGURIDAD_LLAVEPRIVADA_CLAVE] := claveLlavePrivada;
 
       // Checamos que el certificado y la llave privada sean pareja
       WriteLn('Verificando certificado de sellos y llave privada...');
@@ -404,18 +400,27 @@ begin
 
           // Dependiendo de la version usamos diferente servidor de pruebas
 
-          pac.Parametros.Values[PAC_PARAM_SVC_MODO_PRODUCCION] := 'NO';
+          {
+          pac.AsignarParametro(PAC_PARAM_SEGURIDAD_CERTIFICADO, certificadoSellos.ContenidoBase64);
+          pac.AsignarParametro(PAC_PARAM_SEGURIDAD_LLAVEPRIVADA, openSSL.LlavePrivadaComoBase64);
+          pac.AsignarParametro(PAC_PARAM_SEGURIDAD_LLAVEPRIVADA_CLAVE, claveLlavePrivada);
+
+          }
+
+          //Especificar que se encuentra en modo de pruebas
+          pac.AsignarParametro(PAC_PARAM_SVC_CFG_MODO_PRODUCCION, PAC_VALOR_NO);
+
           if nuevaFactura.Version = '3.3' then
           begin
-           pac.Parametros.Values[PAC_PARAM_SVC_CFDI_VERSION] := PAC_VALOR_CFDI_VERSION_33;
-           {$ifdef PAC_ECODEX}
+           pac.AsignarParametro(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_33);
+           {$ifdef PAC_DEMO_ECODEX}
              Url_WS := _URL_ECODEX_PRUEBAS_V33;
            {$endif}
           end
           else
           begin
-           pac.Parametros.Values[PAC_PARAM_SVC_CFDI_VERSION] := PAC_VALOR_CFDI_VERSION_32;
-           {$ifdef PAC_ECODEX}
+           pac.AsignarParametro(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_32);
+           {$ifdef PAC_DEMO_ECODEX}
              Url_WS := _URL_ECODEX_PRUEBAS_V32;
            {$endif}
           end;
@@ -425,7 +430,7 @@ begin
                          Url_WS,
                          credencialesPAC,
                          credencialesIntegrador,
-                         _NUEMRO_TRANSACCION_INICIAL);
+                         _NUMERO_TRANSACCION_INICIAL);
 
           // 4. La mandamos timbrar
           Writeln('Intentando timbrar comprobante...');

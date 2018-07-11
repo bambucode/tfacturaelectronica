@@ -32,7 +32,7 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
 
 type
 
-  TProveedorEcodex = class(TInterfacedObject, IProveedorAutorizadoCertificacion)
+  TProveedorEcodex = class(TProveedorAutorizadoCertificacionBase, IProveedorAutorizadoCertificacion)
   private
     fCredencialesPAC: TFacturacionCredencialesPAC;
     fCredencialesIntegrador: TFacturacionCredencialesPAC;
@@ -42,8 +42,6 @@ type
     fwsTimbradoEcodex: IEcodexServicioTimbrado;
     fwsCancelacionEcodex: IEcodexServicioCancelacion;
     fParametros: TStrings;
-    function ExtraerNodoTimbre(const aComprobanteXML: TEcodexComprobanteXML)
-      : TCadenaUTF8;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
     procedure ProcesarFallasEspecificasDeEcodex(const aExcepcion: Exception);
     function TimbrarDocumentoPrimeraVez(const aComprobante : IComprobanteFiscal;
@@ -52,11 +50,9 @@ type
                                         const aTransaccion: Int64): TCadenaUTF8; overload;
   public
     destructor Destroy; override;
-    procedure AfterConstruction; override;
     procedure Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
         const aCredencialesPAC, aCredencialesIntegrador:
         TFacturacionCredencialesPAC; const aTransaccionInicial: Int64);
-    function Parametros: TStrings;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;
     function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
     function CancelarDocumentos(const aUUIDS: TListadoUUID):
@@ -105,18 +101,7 @@ destructor TProveedorEcodex.Destroy;
 begin
   if Assigned(fManejadorDeSesion) then
     FreeAndNil(fManejadorDeSesion);
-
-  if Assigned(fParametros) then
-     FreeAndNil(fParametros);
   inherited;
-end;
-
-procedure TProveedorEcodex.AfterConstruction;
-begin
-  inherited;
-  {$IFDEF CODESITE}
-  CodeSite.Send('Se creo instancia de PAC Ecodex');
-  {$ENDIF}
 end;
 
 { TProveedorEcodex }
@@ -142,66 +127,26 @@ begin
   fwsCancelacionEcodex := GetWsEcodexCancelacion(False, aWsCancelacion +
     '/ServicioCancelacion.svc');
 
-  Parametros.Values[PAC_PARAM_SESION_PAC_USUARIO_ID] := aCredencialesPAC.RFC;
-  Parametros.Values[PAC_PARAM_SESION_PAC_USUARIO_CLAVE] := aCredencialesPAC.Clave;
-  Parametros.Values[PAC_PARAM_SESION_PAC_DISTRIBUIDOR_ID] := aCredencialesPAC.DistribuidorID;
+  AsignarParametro(PAC_PARAM_SESION_PAC_USUARIO_ID, aCredencialesPAC.RFC);
+  AsignarParametro(PAC_PARAM_SESION_PAC_USUARIO_CLAVE, aCredencialesPAC.Clave);
+  AsignarParametro(PAC_PARAM_SESION_PAC_DISTRIBUIDOR_ID, aCredencialesPAC.DistribuidorID);
 
-  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_USUARIO_ID] := aCredencialesIntegrador.RFC;
-  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_USUARIO_CLAVE] := aCredencialesIntegrador.Clave;
-  Parametros.Values[PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID] := aCredencialesIntegrador.DistribuidorID;
+  AsignarParametro(PAC_PARAM_SESION_INTEGRADOR_USUARIO_ID, aCredencialesIntegrador.RFC);
+  AsignarParametro(PAC_PARAM_SESION_INTEGRADOR_USUARIO_CLAVE, aCredencialesIntegrador.Clave);
+  AsignarParametro(PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID, aCredencialesIntegrador.DistribuidorID);
 
-  Parametros.Values[PAC_PARAM_SESION_TRANSACCION_INICIAL] := IntToStr(aTransaccionInicial);
+  AsignarParametro(PAC_PARAM_SESION_TRANSACCION_INICIAL, IntToStr(aTransaccionInicial));
 
-  Parametros.Values[PAC_PARAM_SVC_URL_API] := aWsTimbrado;
+  AsignarParametro(PAC_PARAM_SVC_URL_API, aWsTimbrado);
 
-  Parametros.Values[PAC_PARAM_SVC_URL_API_TIMBRADO] := aWsTimbrado +
-    '/ServicioTimbrado.svc';
-  Parametros.Values[PAC_PARAM_SVC_URL_API_CLIENTES] := aWsClientes +
-    '/ServicioClientes.svc';
-  Parametros.Values[PAC_PARAM_SVC_URL_API_CANCELACION] := aWsCancelacion +
-    '/ServicioCancelacion.svc';
-
+  AsignarParametro(PAC_PARAM_SVC_URL_API_TIMBRADO, aWsTimbrado+
+    '/ServicioTimbrado.svc');
+  AsignarParametro(PAC_PARAM_SVC_URL_API_CLIENTES, aWsTimbrado+
+    '/ServicioClientes.svc');
+  AsignarParametro(PAC_PARAM_SVC_URL_API_CANCELACION, aWsTimbrado+
+    '/ServicioCancelacion.svc');
 
 end;
-
-function TProveedorEcodex.ExtraerNodoTimbre(const aComprobanteXML
-  : TEcodexComprobanteXML): TCadenaUTF8;
-var
-  contenidoComprobanteXML: TCadenaUTF8;
-{$IF Compilerversion < 20}
-  LRegEx: TPerlRegEx;
-{$IFEND}
-const
- _REGEX_TIMBRE = '<tfd:TimbreFiscalDigital.*?/>';
-begin
-  Assert(aComprobanteXML <> nil,
-    'La respuesta del servicio de timbrado fue nula');
- {$IF Compilerversion >= 22}
-  // Delphi XE1 y superiores
-  contenidoComprobanteXML := aComprobanteXML.DatosXML;
-  Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
- {$ELSE}
-  contenidoComprobanteXML := UTF8Encode(aComprobanteXML.DatosXML);
-  LRegEx := TPerlRegEx.Create;
-  try
-  	LRegEx.RegEx := _REGEX_TIMBRE;
-  	LRegEx.Options := [];
-  	LRegEx.State := [];
-  	LRegEx.Subject := contenidoComprobanteXML;
-	 if LRegEx.Match then begin
-	 	Result := LRegEx.MatchedText;
-	 end
-  	else begin
-  		Result := '';
-  	end;
-  finally
-   LRegex.Free;
-  end;
- {$IFEND}
-
-  Assert(Result <> '', 'El XML del timbre estuvo vacio');
-end;
-
 
 function TProveedorEcodex.ObtenerSaldoTimbresDeCliente
   (const aRFC: String): Integer;
@@ -265,13 +210,6 @@ begin
     // fUltimoXMLRecibido := GetUltimoXMLRecibidoEcodexWsClientes;
     solicitudEdoCuenta.Free;
   end;
-end;
-
-function TProveedorEcodex.Parametros: TStrings;
-begin
- if not Assigned(fParametros) then
-    fParametros := TStringList.Create;
- result := fParametros;
 end;
 
 procedure TProveedorEcodex.ProcesarExcepcionDePAC(const aExcepcion: Exception);
@@ -385,7 +323,8 @@ begin
   try
     // 2. Iniciamos una nueva sesion solicitando un nuevo token
     tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
-    Parametros.Values[PAC_PARAM_SESION_ID] := tokenDeUsuario;
+
+    AsignarParametro(PAC_PARAM_SESION_ID,tokenDeUsuario);
 
     // 3. Asignamos el documento XML
     solicitudTimbrado.ComprobanteXML          := TEcodexComprobanteXML.Create;
@@ -400,7 +339,7 @@ begin
       // 4. Realizamos la solicitud de timbrado
       respuestaTimbrado := fwsTimbradoEcodex.TimbraXML(solicitudTimbrado);
 
-      Result := ExtraerNodoTimbre(respuestaTimbrado.ComprobanteXML);
+      Result := ExtraerNodoTimbre(respuestaTimbrado.ComprobanteXML.DatosXML);
       respuestaTimbrado.Free;
     except
       On E: Exception do
@@ -445,7 +384,7 @@ begin
       // 4. Realizamos la solicitud de timbrado
       respuestaTimbrado := fwsTimbradoEcodex.TimbraXML(solicitudTimbrado);
 
-      Result := ExtraerNodoTimbre(respuestaTimbrado.ComprobanteXML);
+      Result := ExtraerNodoTimbre(respuestaTimbrado.ComprobanteXML.DatosXML);
       respuestaTimbrado.Free;
     except
       On E: Exception do
@@ -588,7 +527,7 @@ begin
       respuestaObtenerTimbre := fWsTimbradoEcodex.ObtenerTimbrado(solicitudObtenerTimbre);
 
       // 5. Extraemos las propiedades del timbre de la respuesta del WebService
-      Result := ExtraerNodoTimbre(respuestaObtenerTimbre.ComprobanteXML);
+      Result := ExtraerNodoTimbre(respuestaObtenerTimbre.ComprobanteXML.DatosXML);
 
       respuestaObtenerTimbre.Free;
     except

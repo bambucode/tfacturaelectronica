@@ -15,11 +15,6 @@
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Android' and '$(Base)'=='true') or '$(Base_Android)'!=''">
-        <Base_Android>true</Base_Android>
-        <CfgParent>Base</CfgParent>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
         <Cfg_1>true</Cfg_1>
         <CfgParent>Base</CfgParent>
@@ -50,9 +45,6 @@
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>2058</VerInfo_Locale>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Base_Android)'!=''">
-        <EnabledSysJars>android-support-v4.dex.jar;cloud-messaging.dex.jar;fmx.dex.jar;google-analytics-v2.dex.jar;google-play-billing.dex.jar;google-play-licensing.dex.jar;google-play-services-ads-7.0.0.dex.jar;google-play-services-analytics-7.0.0.dex.jar;google-play-services-base-7.0.0.dex.jar;google-play-services-gcm-7.0.0.dex.jar;google-play-services-identity-7.0.0.dex.jar;google-play-services-maps-7.0.0.dex.jar;google-play-services-panorama-7.0.0.dex.jar;google-play-services-plus-7.0.0.dex.jar;google-play-services-wallet-7.0.0.dex.jar;google-play-services.dex.jar</EnabledSysJars>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
@@ -63,7 +55,6 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <BT_BuildType>Debug</BT_BuildType>
-        <Manifest_File>(None)</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_DebugInformation>0</DCC_DebugInformation>
@@ -90,6 +81,16 @@
         <DCCReference Include="..\PACs\Ecodex\EcodexWsComun.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsSeguridad.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsTimbrado.pas"/>
+        <DCCReference Include="..\PACs\Ecodex\EcodexWsCancelacion.pas"/>
+        <DCCReference Include="..\Facturacion.GeneradorCBB.pas"/>
+        <DCCReference Include="..\Facturacion.GeneradorQRQuricol.pas"/>
+        <DCCReference Include="..\Facturacion.GeneradorLigaVerificacion.pas"/>
+        <DCCReference Include="..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas"/>
+        <DCCReference Include="..\PACs\FinkOK\FinkOkWsTimbrado.pas"/>
+        <DCCReference Include="..\PACs\SolucionFactible\Facturacion.PAC.SolucionFactible.pas"/>
+        <DCCReference Include="..\PACs\SolucionFactible\SolucionFactibleWsTimbrado.pas"/>
+        <DCCReference Include="..\PACs\MultiFacturas\Facturacion.PAC.MultiFacturas.pas"/>
+        <DCCReference Include="..\PACs\MultiFacturas\MultiFacturasWsTimbrado.pas"/>
         <DCCReference Include="..\Facturacion.CertificadoDeSellos.pas"/>
         <DCCReference Include="..\Facturacion.Helper.pas"/>
         <DCCReference Include="..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas"/>
@@ -105,9 +106,6 @@
         <DCCReference Include="..\Facturacion.Tipos.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ImpuestosLocalesV1.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ComplementoPagoV1.pas"/>
-        <DCCReference Include="..\PACs\Ecodex\EcodexWsCancelacion.pas"/>
-        <DCCReference Include="..\Facturacion.GeneradorCBB.pas"/>
-        <DCCReference Include="..\Facturacion.GeneradorQRQuricol.pas"/>
         <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
@@ -185,14 +183,50 @@
                 </VersionInfoKeys>
             </Delphi.Personality>
             <Deployment Version="3">
+                <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_3_2.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="EjemploFacturaElectronicaComplementoPago.exe" Configuration="Debug" Class="ProjectOutput"/>
+                <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_TFD_1_0.xslt" Configuration="Debug" Class="ProjectFile"/>
+                <DeployFile LocalName="..\Schemas\3.3\cadenaoriginal_TFD_1_1.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
+                <DeployFile LocalName="EjemploFacturaElectronicaComplementoPago.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win32">
+                        <RemoteName>EjemploFacturaElectronicaComplementoPago.rsm</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_TFD_1_0.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="..\Schemas\3.3\cadenaoriginal_3_3.xslt" Configuration="Debug" Class="ProjectFile"/>
+                <DeployFile LocalName="EjemploFacturaElectronicaComplementoPago.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>EjemploFacturaElectronicaComplementoPago.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="..\Schemas\3.3\cadenaoriginal_TFD_1_1.xslt" Configuration="Debug" Class="ProjectFile"/>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule"/>
                 <DeployFile LocalName="$(BDS)\Redist\osx32\libcgsqlite3.dylib" Class="DependencyModule"/>
-                <DeployFile LocalName="EjemploFacturaElectronicaComplementoPago.exe" Configuration="Debug" Class="ProjectOutput"/>
-                <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_TFD_1_0.xslt" Configuration="Debug" Class="ProjectFile"/>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libPCRE.dylib" Class="DependencyModule"/>
+                <DeployFile LocalName="..\Schemas\3.3\cadenaoriginal_3_3.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_3_2.xslt" Configuration="Debug" Class="ProjectFile"/>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="iOSSimulator">

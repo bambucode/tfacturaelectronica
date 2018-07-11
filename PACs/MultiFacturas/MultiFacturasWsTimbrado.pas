@@ -9,7 +9,7 @@
 // (10/07/2018 08:51:54 p. m. - - $Rev: 34800 $)
 // ************************************************************************ //
 
-unit FacturacionMexicoWsTimbrado;
+unit MultiFacturasWsTimbrado;
 
 interface
 
