@@ -1334,7 +1334,11 @@ function SMIME_read_PKCS7(bp: pBIO; var bcont: pBIO): pPKCS7; cdecl;
 implementation
 
 uses
+ {$IF CompilerVersion >= 23}
+  WinApi.Windows, System.SysUtils;
+ {$ELSE}
   Windows, SysUtils;
+ {$IFEND}
 
 const
   LIBEAY_DLL_NAME = 'libeay32.dll';
