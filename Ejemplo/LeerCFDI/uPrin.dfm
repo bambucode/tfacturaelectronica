@@ -31,9 +31,9 @@ object frmPrin: TfrmPrin
     Top = 66
     Width = 121
     Height = 21
-    EditLabel.Width = 51
+    EditLabel.Width = 35
     EditLabel.Height = 13
-    EditLabel.Caption = 'edtVersion'
+    EditLabel.Caption = 'Version'
     TabOrder = 1
   end
   object mmoConceptos: TMemo
@@ -48,9 +48,9 @@ object frmPrin: TfrmPrin
     Top = 114
     Width = 121
     Height = 21
-    EditLabel.Width = 38
+    EditLabel.Width = 22
     EditLabel.Height = 13
-    EditLabel.Caption = 'edtFolio'
+    EditLabel.Caption = 'Folio'
     TabOrder = 3
   end
   object edtEmisor: TLabeledEdit
