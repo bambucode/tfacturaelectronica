@@ -88,7 +88,7 @@ type
                              const aArchivoDestino: TFileName);
 
     function LeerDesdeArchivo(const aRutaComprobante: TFileName) : IComprobanteFiscal;
-    function LeerDesdeXML(const aContenidoXML: TCadenaUTF8) : IComprobanteFiscal;
+    function LeerDesdeXML(const aContenidoXML: UnicodeString) : IComprobanteFiscal;
     procedure SetOnCadenaOriginalGenerada(const Value:
         TOnCadenaOriginalGeneradaEvent);
     procedure SetOnSelloGenerado(const Value: TOnSelloGeneradoEvent);
@@ -117,7 +117,7 @@ type
     procedure GuardarArchivo(const aComprobante: IComprobanteFiscal;
                              const aArchivoDestino: TFileName);
     function LeerDesdeArchivo(const aRutaComprobante: TFileName) : IComprobanteFiscal;
-    function LeerDesdeXML(const aContenidoXML: TCadenaUTF8) : IComprobanteFiscal;
+    function LeerDesdeXML(const aContenidoXML: UnicodeString) : IComprobanteFiscal;
     property OnSelloGenerado: TOnSelloGeneradoEvent read GetOnSelloGenerado
                                                     write SetOnSelloGenerado;
     property OnCadenaOriginalGenerada: TOnCadenaOriginalGeneradaEvent read GetOnCadenaOriginalGenerada
@@ -232,19 +232,19 @@ begin
   Result := LeerDesdeXML(documentoXML.XML.Text);
 end;
 
-function TAdministradorFacturas.LeerDesdeXML(const aContenidoXML: TCadenaUTF8): IComprobanteFiscal;
+function TAdministradorFacturas.LeerDesdeXML(const aContenidoXML: UnicodeString): IComprobanteFiscal;
 var
   documentoXML: IXMLDocument;
   nodoComprobante, nodoVersion: IXMLNode;
   versionCFDI: TCadenaUTF8;
 const
-  _NOMBRE_NODO_COMPROBANTE = 'Comprobante';
+  _NOMBRE_NODO_COMPROBANTE = 'cfdi:Comprobante';
   _NOMBRE_NODO_VERSION     = 'Version';
 begin
   documentoXML := TXMLDocument.Create(nil);
 
   // Pasamos el XML para poder usarlo en la clase
-  documentoXML.XML.Text := aContenidoXML;
+  documentoXML.LoadFromXML(aContenidoXML);
 
   // Checamos la version del CFDI y dependiendo de ello, usamos el método
   // de lectura correcto
