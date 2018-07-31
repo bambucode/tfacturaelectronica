@@ -3,8 +3,15 @@ unit uPrin;
 interface
 
 uses
+  {$IF CompilerVersion >= 23}
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
+  Xml.XMLIntf,
+  {$ELSE}
+  Windows, Messages, SysUtils, Variants, Classes, Graphics,
+  Controls, Forms, Dialogs, StdCtrls, ExtCtrls,
+  XMLIntf,
+  {$IFEND}
   Facturacion.ComprobanteV33,
   Facturacion.ComprobanteV32,
   Facturacion.Comprobante,
@@ -24,7 +31,6 @@ uses
   Facturacion.CertificadoDeSellos,
   Facturacion.ImpuestosLocalesV1,
   Facturacion.Helper,
-  Xml.XMLIntf,
   Facturacion.ManejadorErroresComunesWebServices;
 
 type
@@ -56,7 +62,13 @@ var
 
 implementation
 
-uses Xml.XMLDoc;
+uses
+{$IF CompilerVersion >= 23}
+  Xml.XMLDoc;
+{$ELSE}
+  XMLDoc;
+{$IFEND}
+
 {$R *.dfm}
 
 procedure TfrmPrin.FormCreate(Sender: TObject);

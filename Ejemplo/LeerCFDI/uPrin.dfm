@@ -12,6 +12,9 @@ object frmPrin: TfrmPrin
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
+  DesignSize = (
+    826
+    526)
   PixelsPerInch = 96
   TextHeight = 13
   object btn1: TButton
@@ -65,6 +68,7 @@ object frmPrin: TfrmPrin
     Top = 8
     Width = 447
     Height = 510
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Color = clBlack
     Font.Charset = ANSI_CHARSET
     Font.Color = clWhite
