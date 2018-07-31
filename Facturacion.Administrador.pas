@@ -238,7 +238,7 @@ var
   nodoComprobante, nodoVersion: IXMLNode;
   versionCFDI: TCadenaUTF8;
 const
-  _NOMBRE_NODO_COMPROBANTE = 'cfdi:Comprobante';
+  _NOMBRE_NODO_COMPROBANTE = 'Comprobante';
   _NOMBRE_NODO_VERSION     = 'Version';
 begin
   documentoXML := TXMLDocument.Create(nil);
