@@ -132,9 +132,6 @@ uses
      Xml.XMLDoc,
      Xml.XMLIntf,
 {$ELSE}
- {$IF CompilerVersion < 20}
-   WideStrings,
- {$IFEND}
      Classes,
      XMLDoc,
      XMLIntf,
@@ -195,9 +192,8 @@ var
   {$IF CompilerVersion >= 20}
    Writer: TStreamWriter;
   {$ELSE}
-   Writer: TWideStringList;
+   XML: IXMLDocument;
   {$IFEND}
-
 
 const
   _ENCABEZADO_XML = '<?xml version="1.0" encoding="utf-8"?>' + #13#10;
@@ -205,7 +201,7 @@ begin
   {$IF CompilerVersion >= 20}
    Writer := TStreamWriter.Create(aArchivoDestino, false, TEncoding.UTF8);
   {$ELSE}
-   Writer := TWideStringList.create;
+   XML := NewXMLDocument;
   {$IFEND}
 
    try
@@ -213,13 +209,23 @@ begin
     {$IF CompilerVersion >= 20}
      Writer.Write(_ENCABEZADO_XML + aComprobante.XML);
     {$ELSE}
-     writer.Text := _ENCABEZADO_XML + aComprobante.XML;
-     Writer.SaveToFile(aArchivoDestino);
+
+     XML.LoadFromXML( _ENCABEZADO_XML + aComprobante.XML );
+
+     //Esto es necesario para que el Encoding UTF-8 se guarde en el archivo
+     Xml.Options := Xml.Options + [doNodeAutoIndent];
+     Xml.ParseOptions := Xml.ParseOptions + [poPreserveWhiteSpace];
+     Xml.Encoding := 'UTF-8';
+
+     XML.SaveToFile(aArchivoDestino);
     {$IFEND}
 
 
    finally
-     Writer.Free();
+    {$IF CompilerVersion >= 20}
+      Writer.Free();
+    {$ELSE}
+    {$IFEND}
    end;
 end;
 
@@ -228,8 +234,15 @@ var
   documentoXML: IXMLDocument;
 begin
   // TBD: Lanzar excepciones si el archivo no existe, etc.
-  documentoXML := LoadXMLDocument(aRutaComprobante);
-  Result := LeerDesdeXML(documentoXML.XML.Text);
+
+  documentoXML :=  LoadXMLDocument(aRutaComprobante);
+ {$IF CompilerVersion >= 20}
+  Result := LeerDesdeXML( documentoXML.XML.Text );
+ {$ELSE}
+  documentoXML.Options := documentoXML.Options + [doNodeAutoIndent];
+  documentoXML.Encoding := 'UTF-8';
+  Result := LeerDesdeXML( UTF8Decode( documentoXML.XML.Text ) );
+ {$IFEND}
 end;
 
 function TAdministradorFacturas.LeerDesdeXML(const aContenidoXML: UnicodeString): IComprobanteFiscal;
