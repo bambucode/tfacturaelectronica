@@ -1,4 +1,4 @@
-Ôªø{*******************************************************}
+{*******************************************************}
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
@@ -44,14 +44,14 @@ type
     function GetOnCadenaOriginalGenerada: TOnCadenaOriginalGeneradaEvent;
     function GetOnSelloGenerado: TOnSelloGeneradoEvent;
     /// <summary>
-    ///   Se encarga de crear una nueva instancia del CFDI seg√∫n el par√°metro
-    ///   versi√≥n especificado
+    ///   Se encarga de crear una nueva instancia del CFDI seg˙n el par·metro
+    ///   versiÛn especificado
     /// </summary>
     /// <param name="aVersion">
-    ///   Versi√≥n del CFDI, ejem: 3.3
+    ///   VersiÛn del CFDI, ejem: 3.3
     /// </param>
     /// <exception cref="EVersionDeCFDINoSoportadaException">
-    ///   Excepcion lazanda cuando la versi√≥n especificada no est√° soportada o
+    ///   Excepcion lazanda cuando la versiÛn especificada no est· soportada o
     ///   implementada.
     /// </exception>
     function Nueva(const aVersion: String) : IComprobanteFiscal;
@@ -63,32 +63,32 @@ type
     ///   Instancia del CFDI a sellar
     /// </param>
     /// <param name="aGeneradorCadenaOriginal">
-    ///   Instancia del generador de la cadena original, debe ser especf√≠co
-    ///   para la versi√≥n del CFDI
+    ///   Instancia del generador de la cadena original, debe ser especÌfico
+    ///   para la versiÛn del CFDI
     /// </param>
     /// <param name="aGeneradorSello">
-    ///   Sellador del comprobante, debe ser espec√≠fico para la versi√≥n del
+    ///   Sellador del comprobante, debe ser especÌfico para la versiÛn del
     ///   CFDI
     /// </param>
     procedure Sellar(const aComprobante: IComprobanteFiscal; const
         aGeneradorCadenaOriginal: IGeneradorCadenaOriginal; const aGeneradorSello:
         IGeneradorSello);
     /// <summary>
-    ///   M√©todo encargado de guardar el CFDI como archivo XML con su encoding
+    ///   MÈtodo encargado de guardar el CFDI como archivo XML con su encoding
     ///   respectivo en UTF8.
     /// </summary>
     /// <param name="aComprobante">
     ///   Instancia del comprobante
     /// </param>
     /// <param name="aArchivoDestino">
-    ///   Ruta completa con nombre incluido del archivo XML donde se guardar√°
+    ///   Ruta completa con nombre incluido del archivo XML donde se guardar·
     ///   el comprobante
     /// </param>
     procedure GuardarArchivo(const aComprobante: IComprobanteFiscal;
                              const aArchivoDestino: TFileName);
 
     function LeerDesdeArchivo(const aRutaComprobante: TFileName) : IComprobanteFiscal;
-    function LeerDesdeXML(const aContenidoXML: TCadenaUTF8) : IComprobanteFiscal;
+    function LeerDesdeXML(const aContenidoXML: UnicodeString) : IComprobanteFiscal;
     procedure SetOnCadenaOriginalGenerada(const Value:
         TOnCadenaOriginalGeneradaEvent);
     procedure SetOnSelloGenerado(const Value: TOnSelloGeneradoEvent);
@@ -100,7 +100,7 @@ type
 
 
 
-  // Implementaci√≥n de la instancia
+  // ImplementaciÛn de la instancia
   TAdministradorFacturas = class(TInterfacedObject, IAdministradorFacturas)
   private
     fOnCadenaOriginalGenerada: TOnCadenaOriginalGeneradaEvent;
@@ -117,7 +117,7 @@ type
     procedure GuardarArchivo(const aComprobante: IComprobanteFiscal;
                              const aArchivoDestino: TFileName);
     function LeerDesdeArchivo(const aRutaComprobante: TFileName) : IComprobanteFiscal;
-    function LeerDesdeXML(const aContenidoXML: TCadenaUTF8) : IComprobanteFiscal;
+    function LeerDesdeXML(const aContenidoXML: UnicodeString) : IComprobanteFiscal;
     property OnSelloGenerado: TOnSelloGeneradoEvent read GetOnSelloGenerado
                                                     write SetOnSelloGenerado;
     property OnCadenaOriginalGenerada: TOnCadenaOriginalGeneradaEvent read GetOnCadenaOriginalGenerada
@@ -132,9 +132,6 @@ uses
      Xml.XMLDoc,
      Xml.XMLIntf,
 {$ELSE}
- {$IF CompilerVersion < 20}
-   WideStrings,
- {$IFEND}
      Classes,
      XMLDoc,
      XMLIntf,
@@ -159,7 +156,7 @@ begin
     Result := NewComprobanteFiscalV33;
 
   if Result = nil then
-    raise EVersionDeCFDINoSoportadaException.Create('La versi√≥n solicitada : ' + aVersion + ', no tiene implementaci√≥n actual');
+    raise EVersionDeCFDINoSoportadaException.Create('La versiÛn solicitada : ' + aVersion + ', no tiene implementaciÛn actual');
 end;
 
 procedure TAdministradorFacturas.Sellar(const aComprobante: IComprobanteFiscal;
@@ -195,9 +192,8 @@ var
   {$IF CompilerVersion >= 20}
    Writer: TStreamWriter;
   {$ELSE}
-   Writer: TWideStringList;
+   XML: IXMLDocument;
   {$IFEND}
-
 
 const
   _ENCABEZADO_XML = '<?xml version="1.0" encoding="utf-8"?>' + #13#10;
@@ -205,7 +201,7 @@ begin
   {$IF CompilerVersion >= 20}
    Writer := TStreamWriter.Create(aArchivoDestino, false, TEncoding.UTF8);
   {$ELSE}
-   Writer := TWideStringList.create;
+   XML := NewXMLDocument;
   {$IFEND}
 
    try
@@ -213,13 +209,23 @@ begin
     {$IF CompilerVersion >= 20}
      Writer.Write(_ENCABEZADO_XML + aComprobante.XML);
     {$ELSE}
-     writer.Text := _ENCABEZADO_XML + aComprobante.XML;
-     Writer.SaveToFile(aArchivoDestino);
+
+     XML.LoadFromXML( _ENCABEZADO_XML + aComprobante.XML );
+
+     //Esto es necesario para que el Encoding UTF-8 se guarde en el archivo
+     Xml.Options := Xml.Options + [doNodeAutoIndent];
+     Xml.ParseOptions := Xml.ParseOptions + [poPreserveWhiteSpace];
+     Xml.Encoding := 'UTF-8';
+
+     XML.SaveToFile(aArchivoDestino);
     {$IFEND}
 
 
    finally
-     Writer.Free();
+    {$IF CompilerVersion >= 20}
+      Writer.Free();
+    {$ELSE}
+    {$IFEND}
    end;
 end;
 
@@ -228,11 +234,18 @@ var
   documentoXML: IXMLDocument;
 begin
   // TBD: Lanzar excepciones si el archivo no existe, etc.
-  documentoXML := LoadXMLDocument(aRutaComprobante);
-  Result := LeerDesdeXML(documentoXML.XML.Text);
+
+  documentoXML :=  LoadXMLDocument(aRutaComprobante);
+ {$IF CompilerVersion >= 20}
+  Result := LeerDesdeXML( documentoXML.XML.Text );
+ {$ELSE}
+  documentoXML.Options := documentoXML.Options + [doNodeAutoIndent];
+  documentoXML.Encoding := 'UTF-8';
+  Result := LeerDesdeXML( UTF8Decode( documentoXML.XML.Text ) );
+ {$IFEND}
 end;
 
-function TAdministradorFacturas.LeerDesdeXML(const aContenidoXML: TCadenaUTF8): IComprobanteFiscal;
+function TAdministradorFacturas.LeerDesdeXML(const aContenidoXML: UnicodeString): IComprobanteFiscal;
 var
   documentoXML: IXMLDocument;
   nodoComprobante, nodoVersion: IXMLNode;
@@ -244,9 +257,9 @@ begin
   documentoXML := TXMLDocument.Create(nil);
 
   // Pasamos el XML para poder usarlo en la clase
-  documentoXML.XML.Text := aContenidoXML;
+  documentoXML.LoadFromXML(aContenidoXML);
 
-  // Checamos la version del CFDI y dependiendo de ello, usamos el m√©todo
+  // Checamos la version del CFDI y dependiendo de ello, usamos el mÈtodo
   // de lectura correcto
   nodoComprobante := documentoXML.ChildNodes.FindNode(_NOMBRE_NODO_COMPROBANTE);
   if (nodoComprobante <> nil) then
@@ -262,7 +275,7 @@ begin
     begin
       versionCFDI := Trim(nodoVersion.Text);
 
-      // Mandamos leer el XML usando la implementaci√≥n correspondiente
+      // Mandamos leer el XML usando la implementaciÛn correspondiente
       if (versionCFDI = '3.2') then
         Result := GetComprobanteFiscalV32(documentoXML);
 

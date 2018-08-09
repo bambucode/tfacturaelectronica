@@ -94,8 +94,8 @@ OutputDir=
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=..\OpenSSL;..\PACs\Ecodex;..\Schemas\3.2;..\Schemas\3.3;..\Lib
-Packages=vcl;rtl;dbrtl;inet;inetdb;dsnap;bdertl;vclx;vcldb;vcldbx;visualclx;visualdbclx;vclactnband;vclshlctrls;vclie;xmlrtl;inetdbbde;inetdbxpress;webdsnap;soaprtl;websnap;adortl;dbexpress;dsnapcon;dbxcds;ibxpress;teeui;teedb;tee;dss;indy;VclSmp;qrpt;teeqr;Rave50CLX;Rave50VCL;IntrawebDB_50_70;Intraweb_50_70;VclNewlyext;EzGISD7;TVidGrab
+SearchPath=..\OpenSSL;..\Lib
+Packages=rtl;vcl;dbrtl;inet;inetdb;dsnap;bdertl;vclx;vcldb;vcldbx;visualclx;visualdbclx;vclactnband;vclshlctrls;vclie;xmlrtl;inetdbbde;inetdbxpress;webdsnap;soaprtl;websnap;adortl;dbexpress;dsnapcon;dbxcds;ibxpress;teeui;teedb;tee;dss;IndyCore70;IndySystem70;IndyProtocols70;VclSmp;qrpt;teeqr;Rave50CLX;Rave50VCL;IntrawebDB_50_70;Intraweb_50_70;VclNewlyext
 Conditionals=
 DebugSourceDirs=
 UsePackages=0
@@ -108,7 +108,7 @@ DebugCWD=
 [Language]
 ActiveLang=
 ProjectLang=
-RootDir=C:\Program Files\Borland\Delphi7\Bin\
+RootDir=C:\Program Files (x86)\Borland\Delphi7\Bin\
 [Version Info]
 IncludeVerInfo=0
 AutoIncBuild=0
@@ -128,5 +128,5 @@ Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
 Count=2
-Item0=..\OpenSSL;..\PACs\Ecodex;..\Schemas\3.2;..\Schemas\3.3;..\Lib
-Item1=..\OpenSSL;..\PACs\Ecodex;..\Schemas\3.2;..\Schemas\3.3
+Item0=..\OpenSSL;..\Lib
+Item1=..\OpenSSL

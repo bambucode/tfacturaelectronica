@@ -15,24 +15,26 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
      SolucionFactibleWsTimbrado,
 {$IF CompilerVersion >= 23}
    System.Types,
-   System.SysUtils
+   System.SysUtils,
+   System.Classes
 {$ELSE}
    Types,
-   SysUtils
+   SysUtils,
+   Classes
 {$IFEND}
  ;
 
 type
 
-   TProveedorSolucionFactible = class(TInterfacedObject, IProveedorAutorizadoCertificacion)
+   TProveedorSolucionFactible = class(TProveedorAutorizadoCertificacionBase, IProveedorAutorizadoCertificacion)
    private
       fwsTimbradoSolucionFactible: TimbradoPortType;
       fDominioWebService: string;
       fCredencialesPAC: TFacturacionCredencialesPAC;
-      function ExtraerNodoTimbre(const aComprobanteXML: RawByteString) : TCadenaUTF8;
       procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
       function UTF8Bytes(const s: UTF8String): TBytedynArray; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
    public
+      destructor Destroy; override;
       procedure  Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
                          const aCredencialesPAC, aCredencialesIntegrador : TFacturacionCredencialesPAC;
                          const aTransaccionInicial: Int64);
@@ -51,7 +53,6 @@ implementation
 uses
    Facturacion.Tipos,
 {$IF Compilerversion >= 23}
-     System.Classes,
      System.RegularExpressions,
      Xml.xmldom,
      Xml.XMLIntf,
@@ -63,7 +64,6 @@ uses
    {$ELSE}
      PerlRegEx,
    {$IFEND}
-     Classes,
      xmldom,
      XMLIntf,
      Msxmldom,
@@ -100,6 +100,30 @@ begin
    // Incializamos las instancias de los WebServices
    fwsTimbradoSolucionFactible := GetTimbradoPortType(False,
      fDominioWebService);
+
+  AsignarParametro(PAC_PARAM_SESION_PAC_USUARIO_ID, aCredencialesPAC.RFC);
+  AsignarParametro(PAC_PARAM_SESION_PAC_USUARIO_CLAVE, aCredencialesPAC.Clave);
+  AsignarParametro(PAC_PARAM_SESION_PAC_DISTRIBUIDOR_ID, aCredencialesPAC.DistribuidorID);
+
+  AsignarParametro(PAC_PARAM_SESION_INTEGRADOR_USUARIO_ID, aCredencialesIntegrador.RFC);
+  AsignarParametro(PAC_PARAM_SESION_INTEGRADOR_USUARIO_CLAVE, aCredencialesIntegrador.Clave);
+  AsignarParametro(PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID, aCredencialesIntegrador.DistribuidorID);
+
+  AsignarParametro(PAC_PARAM_SESION_TRANSACCION_INICIAL, IntToStr(aTransaccionInicial));
+
+  AsignarParametro(PAC_PARAM_SVC_URL_API, aWsTimbrado);
+
+  AsignarParametro(PAC_PARAM_SVC_URL_API_TIMBRADO, aWsTimbrado);
+  AsignarParametro(PAC_PARAM_SVC_URL_API_CLIENTES, aWsTimbrado);
+  AsignarParametro(PAC_PARAM_SVC_URL_API_CANCELACION, aWsTimbrado);
+
+end;
+
+destructor TProveedorSolucionFactible.Destroy;
+begin
+  if Assigned(fParametros) then
+     FreeAndNil(fParametros);
+  inherited;
 end;
 
 // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
@@ -163,21 +187,6 @@ function TProveedorSolucionFactible.ObtenerTimbrePrevio(
   const aIdTransaccionOriginal: Int64): TCadenaUTF8;
 begin
 
-end;
-
-function TProveedorSolucionFactible.ExtraerNodoTimbre(const aComprobanteXML: RawByteString): TCadenaUTF8;
-var
-   contenidoComprobanteXML: TCadenaUTF8;
-begin
-   Assert(aComprobanteXML <> '', 'La respuesta del servicio de timbrado fue nula');
-   {$IF Compilerversion >= 22}
-   // Delphi XE1 y superiores
-   contenidoComprobanteXML := aComprobanteXML;
-   {$ELSE}
-   contenidoComprobanteXML := UTF8Encode(aComprobanteXML);
-   {$IFEND}
-   //Result := TRegEx.Match(contenidoComprobanteXML, '<tfd:TimbreFiscalDigital.*?/>').Value;
-   Assert(Result <> '', 'El XML del timbre estuvo vacio');
 end;
 
 procedure TProveedorSolucionFactible.ProcesarExcepcionDePAC(const aExcepcion: Exception);

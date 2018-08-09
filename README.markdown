@@ -66,10 +66,6 @@ Notas de compatibilidad con otras versiones de Delphi
 	
 	- Para Mayor información acerca del uso de esta librería consultar: https://www.regular-expressions.info/delphi.html
 
-- NOTA especial para versiones que no son Unicode (Delphi 7 - Delphi 2007)
-	- Casi todos los archivos de XSLT y XSD usados en esta librería han sido convertidos a un formato Unicode UTF-8 Sin BOM (Bye Order Mark), esto asegura su portabilidad entre versiones antiguas y nuevas de Delphi al momento de ser leídas como Resources o Binary Streams. Por lo que si desean agregar nuevos archivos o nuevas versiones de los ya existentes, deben asegurarse de ello para garantizar que puedan ser usados en diferentes versiones de Delphi.
-	- Lo anterior se puede lograr usando editores de texto avanzados, en este caso se usó NotePad++, abriendo el archivo correspondiente, y en la opción 'Codificación' cambiar a 'Codificación UTF-8 Sin BOM', si la interface de NotePad++ está en Inglés, está opción será 'Encoding/Encode in UTF-8', una vez seleccionada esa opción hay que guardar el archivo y, si estos archivos son includios como Recursos (*.res, *.dres), es necesario recompilar los archivos fuente de recurso (*.rc).
-
 ¿Cómo puedo ayudar?
 -------------------
 La librería lleva más de 4 años de haber sido liberada al público, sin embargo aun falta mucho trabajo por hacer. Puedes comenzar checando el apartado de "Issues" del proyecto para ver en que puedes colaborar, una vez que lo hagas puedes mandar un pull-request para que implementemos tus cambios.
