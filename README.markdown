@@ -65,7 +65,7 @@ Notas de compatibilidad con otras versiones de Delphi
 	- Agregar el folder que contiene los archivos a la configuracion Library Path del Delphi: Tools/Environment Options/Library/Library path
 	
 	- Para Mayor información acerca del uso de esta librería consultar: https://www.regular-expressions.info/delphi.html
-
+	- Para que el Pac Comercio Digital pueda funcionar es necesaria la libreria SynaCode, se puede obtener en el siguiente link: http://synapse.ararat.cz/doc/help/synacode.html
 ¿Cómo puedo ayudar?
 -------------------
 La librería lleva más de 4 años de haber sido liberada al público, sin embargo aun falta mucho trabajo por hacer. Puedes comenzar checando el apartado de "Issues" del proyecto para ver en que puedes colaborar, una vez que lo hagas puedes mandar un pull-request para que implementemos tus cambios.
