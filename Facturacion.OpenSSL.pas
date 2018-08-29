@@ -127,8 +127,6 @@ type
   private
     fLlavePrivadaDesencriptada : pEVP_PKEY;
 
-    function AbrirLlavePrivada(const aRuta, aClaveLlavePrivada: String):
-        pPKCS8_Priv_Key_Info;
     function ObtenerLlavePrivadaDesencriptada(const aRutaLlavePrivada,
                                               aClaveLlavePrivada: String): pEVP_PKEY;
     procedure AlmacenarLlavePrivadaEnMemoria(const aRutaLlavePrivada, aClave: String);
@@ -151,6 +149,10 @@ type
                             const aTipoDigestion: TMetodoDigestion): String;
 
     function CalcularSHA1(const aCadena: WideString): String;
+    function AbrirLlavePrivada(const aRuta, aClaveLlavePrivada: String):
+        pPKCS8_Priv_Key_Info;
+    procedure GuardarLlavePrivadaEnPEM(
+      const aLlaveAbierta: pPKCS8_Priv_Key_Info; const aArchivoDestino: String);
   end;
 
 implementation
@@ -261,6 +263,22 @@ begin
 
   // Regresa los resultados en formato Base64
   Result := BinToBase64(@outbuf,Len);
+end;
+
+procedure TOpenSSL.GuardarLlavePrivadaEnPEM(const aLlaveAbierta:
+    pPKCS8_Priv_Key_Info; const aArchivoDestino: String);
+var
+  bioArchivoPEM: pBIO;
+begin
+  bioArchivoPEM := BIO_new(BIO_s_file());
+  try
+    if BIO_write_filename(bioArchivoPEM, ToChar(aArchivoDestino)) = 0 then
+      raise Exception.Create('Error al intentar guardar llave privada en formato PEM:' + ObtenerUltimoMensajeDeError())
+    else
+      PEM_write_bio_PKCS8_PRIV_KEY_INFO(bioArchivoPEM, aLlaveAbierta);
+  finally
+    BIO_free(bioArchivoPEM);
+  end;
 end;
 
 function TOpenSSL.CalcularSHA1(const aCadena: WideString): String;
@@ -652,7 +670,6 @@ begin
       // Free the memory
       BIO_free_all(bioOut);
   end;
-
   Result:=StrPas(Buffer);
 end;
 end.

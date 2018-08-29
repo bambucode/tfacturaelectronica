@@ -1,4 +1,15 @@
 unit FinkOkWsTimbrado;
+{* *****************************************************************************
+  PROYECTO FACTURACION ELECTRONICA
+  Copyright (C) 2010-2018 - Bambú Code SA de CV
+
+  Este archivo pertenece al proyecto de codigo abierto de Bambú Code:
+  http://bambucode.com/codigoabierto
+
+  La licencia de este código fuente se encuentra en:
+  http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
+
+  ***************************************************************************** *}
 
 // ************************************************************************ //
 // The types declared in this file were generated from data read from the
@@ -12,15 +23,6 @@ unit FinkOkWsTimbrado;
 // ************************************************************************ //
 // The types declared in this file were generated from data read from the
 // WSDL File described below:
-// WSDL     : http://demo-facturacion.finkok.com/servicios/soap/cancel.wsdl
-// Encoding : UTF-8
-// Version  : 1.0
-// (11/25/2013 1:11:58 PM - 1.33.2.5)
-// ************************************************************************ //
-
-// ************************************************************************ //
-// The types declared in this file were generated from data read from the
-// WSDL File described below:
 // WSDL     : http://demo-facturacion.finkok.com/servicios/soap/registration.wsdl
 // Encoding : UTF-8
 // Version  : 1.0
@@ -29,7 +31,7 @@ unit FinkOkWsTimbrado;
 
 interface
 
-uses InvokeRegistry, SOAPHTTPClient, {$IF CompilerVersion >= 23}System.Types{$ELSE}Types{$IFEND}, XSBuiltIns,Facturacion.Comprobante;
+uses InvokeRegistry, SOAPHTTPClient,SysUtils, {$IF CompilerVersion >= 23}System.Types{$ELSE}Types{$IFEND}, XSBuiltIns,Facturacion.Comprobante;
 
 type
 
@@ -46,16 +48,6 @@ type
   TFinkOkComprobanteXML       = class;                 { "apps.services.soap.core.views" } //timbrar y cancelar
   Incidencia               = class;                 { "apps.services.soap.core.views" }
   TFinkOkRespuestaTimbrado = class;                 { "apps.services.soap.core.views" }
-// usados para cancelar
-  UUIDS                    = class;                 { "apps.services.soap.core.views" }
-  Folio                    = class;                 { "apps.services.soap.core.views" }
-  CancelaCFDResult         = class;                 { "apps.services.soap.core.views" }
-  ReceiptResult            = class;                 { "apps.services.soap.core.views" }
-// usados para registrar nuevo rfc
-  IFinkOkRespuestaRegistro       = class;                 { "apps.services.soap.core.views" }
-  stringArray = array of WideString;            { "http://facturacion.finkok.com/cancellation" }
-
-
   // ************************************************************************ //
   // Namespace : apps.services.soap.core.views
   // ************************************************************************ //
@@ -141,74 +133,6 @@ type
   // ************************************************************************ //
   // Namespace : apps.services.soap.core.views
   // ************************************************************************ //
-  UUIDS = class(TRemotable)
-  private
-    Fuuids: stringArray;
-//    constructor Create; overload;
-  published
-    property uuids: stringArray read Fuuids write Fuuids;
-  end;
-
-
-  // ************************************************************************ //
-  // Namespace : apps.services.soap.core.views
-  // ************************************************************************ //
-  Folio = class(TRemotable)
-  private
-    FEstatusUUID: WideString;
-    FUUID: WideString;
-  published
-    property EstatusUUID: WideString read FEstatusUUID write FEstatusUUID;
-    property UUID: WideString read FUUID write FUUID;
-  end;
-
-  FolioArray = array of Folio;                  { "apps.services.soap.core.views" }
-
-  // ************************************************************************ //
-  // Namespace : apps.services.soap.core.views
-  // ************************************************************************ //
-  CancelaCFDResult = class(TRemotable)
-  private
-    FFolios: FolioArray;
-    FAcuse: WideString;
-    FFecha: WideString;
-    FRfcEmisor: WideString;
-    FCodEstatus: WideString;
-  public
-    destructor Destroy; override;
-  published
-    property Folios: FolioArray read FFolios write FFolios;
-    property Acuse: WideString read FAcuse write FAcuse;
-    property Fecha: WideString read FFecha write FFecha;
-    property RfcEmisor: WideString read FRfcEmisor write FRfcEmisor;
-    property CodEstatus: WideString read FCodEstatus write FCodEstatus;
-  end;
-
-
-
-  // ************************************************************************ //
-  // Namespace : apps.services.soap.core.views
-  // ************************************************************************ //
-  ReceiptResult = class(TRemotable)
-  private
-    Fuuid: WideString;
-    Fsuccess: Boolean;
-    Freceipt: WideString;
-    Ftaxpayer_id: WideString;
-    Ferror: WideString;
-    Fdate: WideString;
-  published
-    property uuid: WideString read Fuuid write Fuuid;
-    property success: Boolean read Fsuccess write Fsuccess;
-    property receipt: WideString read Freceipt write Freceipt;
-    property taxpayer_id: WideString read Ftaxpayer_id write Ftaxpayer_id;
-    property error: WideString read Ferror write Ferror;
-    property date: WideString read Fdate write Fdate;
-  end;
-
-  // ************************************************************************ //
-  // Namespace : apps.services.soap.core.views
-  // ************************************************************************ //
   IFinkOkRespuestaRegistro = class(TRemotable)
   private
     Fmessage: WideString;
@@ -238,25 +162,6 @@ type
   end;
 
   // ************************************************************************ //
-  // Namespace : http://facturacion.finkok.com/cancel
-  // soapAction: %operationName%
-  // transport : http://schemas.xmlsoap.org/soap/http
-  // style     : document
-  // binding   : Aplicacion
-  // service   : CancelSOAP
-  // port      : Aplicacion
-  // URL       : http://demo-facturacion.finkok.com/servicios/soap/cancel
-  // ************************************************************************ //
-
-  IFinkOkCancelaTimbrado = interface(IInvokable)
-  ['{A50B2847-80CB-1437-9E24-A9C18DE43316}']
-    function  cancel(const UUIDS: UUIDS; const username: WideString; const password: WideString; const taxpayer_id: WideString; const cer: TByteDynArray; const key: TByteDynArray; const store_pending: Boolean): CancelaCFDResult; stdcall;
-    function  query_pending_cancellation(const username: WideString; const password: WideString; const uuid: WideString): TFinkOkComprobanteXML; stdcall;
-    function  get_receipt(const username: WideString; const password: WideString; const taxpayer_id: WideString; const uuid: WideString; const type_: WideString): ReceiptResult; stdcall;
-    function  out_cancel(const xml: TByteDynArray; const username: WideString; const password: WideString; const taxpayer_id: WideString; const cer: TByteDynArray; const key: TByteDynArray; const store_pending: Boolean): CancelaCFDResult; stdcall;
-  end;
-
-  // ************************************************************************ //
   // Namespace : http://facturacion.finkok.com/registration
   // soapAction: %operationName%
   // transport : http://schemas.xmlsoap.org/soap/http
@@ -273,7 +178,7 @@ type
     function  delete(const reseller_username: WideString; const reseller_password: WideString; const taxpayer_id: WideString): IFinkOkRespuestaRegistro; stdcall;
   end;
 function GetWsFinkOkTimbrado(UseWSDL: Boolean=System.False; Addr: string=''; HTTPRIO: THTTPRIO = nil): IFinkOkServicioTimbrado;
-function GetFinkOkCancelar(UseWSDL: Boolean=System.False; Addr: string=''; HTTPRIO: THTTPRIO = nil):   IFinkOkCancelaTimbrado;
+//function GetFinkOkCancelar(UseWSDL: Boolean=System.False; Addr: string=''; HTTPRIO: THTTPRIO = nil):   IFinkOkCancelaTimbrado;
 function GetFinkOkCliente(UseWSDL: Boolean=System.False; Addr: string=''; HTTPRIO: THTTPRIO = nil): IFinkOkAltaCliente;
 
 implementation
@@ -314,7 +219,7 @@ begin
   end;
 end;
 
-function GetFinkOkCancelar(UseWSDL: Boolean; Addr: string; HTTPRIO: THTTPRIO): IFinkOkCancelaTimbrado;
+{function GetFinkOkCancelar(UseWSDL: Boolean; Addr: string; HTTPRIO: THTTPRIO): IFinkOkCancelaTimbrado;
 const
   defWSDL = 'http://demo-facturacion.finkok.com/servicios/soap/cancel.wsdl';
   defURL  = 'http://demo-facturacion.finkok.com/servicios/soap/cancel';
@@ -349,7 +254,7 @@ begin
       RIO.Free;
   end;
 end;
-
+}
 function GetFinkOkCliente(UseWSDL: Boolean; Addr: string; HTTPRIO: THTTPRIO): IFinkOkAltaCliente;
 const
   defWSDL = 'http://demo-facturacion.finkok.com/servicios/soap/registration.wsdl';
@@ -397,17 +302,6 @@ begin
   inherited Destroy;
 end;
 
-destructor CancelaCFDResult.Destroy;
-var
-  I: Integer;
-begin
-  for I := 0 to Length(FFolios)-1 do
-    if Assigned(FFolios[I]) then
-      FFolios[I].Free;
-  SetLength(FFolios, 0);
-  inherited Destroy;
-end;
-
 initialization
   InvRegistry.RegisterInterface(TypeInfo(IFinkOkServicioTimbrado), 'http://facturacion.finkok.com/stamp', 'UTF-8');
   InvRegistry.RegisterDefaultSOAPAction(TypeInfo(IFinkOkServicioTimbrado), '%operationName%');
@@ -417,16 +311,16 @@ initialization
   RemClassRegistry.RegisterXSInfo(TypeInfo(IncidenciaArray), 'apps.services.soap.core.views', 'IncidenciaArray');
   RemClassRegistry.RegisterXSClass(TFinkOkRespuestaTimbrado, 'apps.services.soap.core.views', 'AcuseRecepcionCFDI');
 /// registro las que son para cancelar
-  InvRegistry.RegisterInterface(TypeInfo(IFinkOkCancelaTimbrado), 'http://facturacion.finkok.com/cancel', 'UTF-8');
-  InvRegistry.RegisterDefaultSOAPAction(TypeInfo(IFinkOkCancelaTimbrado), '%operationName%');
-  InvRegistry.RegisterInvokeOptions(TypeInfo(IFinkOkCancelaTimbrado), ioDocument);
-  InvRegistry.RegisterExternalParamName(TypeInfo(IFinkOkCancelaTimbrado), 'get_receipt', 'type_', 'type');
-  RemClassRegistry.RegisterXSInfo(TypeInfo(stringArray), 'http://facturacion.finkok.com/cancellation', 'stringArray');
-  RemClassRegistry.RegisterXSClass(UUIDS, 'apps.services.soap.core.views', 'UUIDS');
-  RemClassRegistry.RegisterXSClass(Folio, 'apps.services.soap.core.views', 'Folio');
-  RemClassRegistry.RegisterXSInfo(TypeInfo(FolioArray), 'apps.services.soap.core.views', 'FolioArray');
-  RemClassRegistry.RegisterXSClass(CancelaCFDResult, 'apps.services.soap.core.views', 'CancelaCFDResult');
-  RemClassRegistry.RegisterXSClass(ReceiptResult, 'apps.services.soap.core.views', 'ReceiptResult');
+//  InvRegistry.RegisterInterface(TypeInfo(IFinkOkCancelaTimbrado), 'http://facturacion.finkok.com/cancel', 'UTF-8');
+//  InvRegistry.RegisterDefaultSOAPAction(TypeInfo(IFinkOkCancelaTimbrado), '%operationName%');
+//  InvRegistry.RegisterInvokeOptions(TypeInfo(IFinkOkCancelaTimbrado), ioDocument);
+//  InvRegistry.RegisterExternalParamName(TypeInfo(IFinkOkCancelaTimbrado), 'get_receipt', 'type_', 'type');
+//  RemClassRegistry.RegisterXSInfo(TypeInfo(stringArray), 'http://facturacion.finkok.com/cancellation', 'stringArray');
+//  RemClassRegistry.RegisterXSClass(UUIDS, 'apps.services.soap.core.views', 'UUIDS');
+//  RemClassRegistry.RegisterXSClass(Folio, 'apps.services.soap.core.views', 'Folio');
+//  RemClassRegistry.RegisterXSInfo(TypeInfo(FolioArray), 'apps.services.soap.core.views', 'FolioArray');
+//  RemClassRegistry.RegisterXSClass(CancelaCFDResult, 'apps.services.soap.core.views', 'CancelaCFDResult');
+//  RemClassRegistry.RegisterXSClass(ReceiptResult, 'apps.services.soap.core.views', 'ReceiptResult');
 // registro las que son para dar de alta Clientes (RFC)
   InvRegistry.RegisterInterface(TypeInfo(IFinkOkAltaCliente), 'http://facturacion.finkok.com/registration', 'UTF-8');
   InvRegistry.RegisterDefaultSOAPAction(TypeInfo(IFinkOkAltaCliente), '%operationName%');

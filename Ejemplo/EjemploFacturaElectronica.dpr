@@ -21,7 +21,7 @@ program EjemploFacturaElectronica;
 {$ENDIF}
 
 
-{$R *.dres}
+
 
 uses
   Forms,
@@ -36,8 +36,6 @@ uses
   Facturacion.ManejadorErroresComunesWebServices in '..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas',
   DelphiZXIngQRCode in '..\Lib\DelphiZXIngQRCode.pas',
   EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas',
-  Facturacion.PAC.FInkOk in '..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas',
-  FinkOkWsTimbrado in '..\PACs\FinkOK\FinkOkWsTimbrado.pas',
   Facturacion.PAC.SolucionFactible in '..\PACs\SolucionFactible\Facturacion.PAC.SolucionFactible.pas',
   SolucionFactibleWsTimbrado in '..\PACs\SolucionFactible\SolucionFactibleWsTimbrado.pas',
   MultiFacturasWsTimbrado in '..\PACs\MultiFacturas\MultiFacturasWsTimbrado.pas',
@@ -67,7 +65,14 @@ uses
   Facturacion.GeneradorSelloV33 in '..\Versiones\Facturacion.GeneradorSelloV33.pas',
   Facturacion.ImpuestosLocalesV1 in '..\Versiones\Facturacion.ImpuestosLocalesV1.pas',
   Facturacion.TimbreFiscalDigitalV32 in '..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas',
-  Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas';
+  Facturacion.TimbreFiscalDigitalV33 in '..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas',
+  Facturacion.PAC.FInkOk in '..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas',
+  FinkOkWsTimbrado in '..\PACs\FinkOK\FinkOkWsTimbrado.pas',
+  FinkOkWsCancelacion in '..\PACs\FinkOK\FinkOkWsCancelacion.pas',
+  FinkOkWsComun in '..\PACs\FinkOK\FinkOkWsComun.pas',
+  Cancelacion.PAC.Comercio in '..\PACs\ComercioDigital\Cancelacion.PAC.Comercio.pas',
+  ComercioWsComun in '..\PACs\ComercioDigital\ComercioWsComun.pas',
+  Facturacion.PAC.Comercio in '..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas';
 
 var
   nuevaFactura                                                    : IComprobanteFiscal;
@@ -113,7 +118,7 @@ const
   _NUMERO_TRANSACCION_INICIAL    = 1;
 
   //Hablitar solo una de las siguientes opciones
-  {$define PAC_DEMO_ECODEX}
+  {.$define PAC_DEMO_ECODEX}
   {.$define PAC_DEMO_FINOK}
   {.$define PAC_DEMO_COMERCIODIGITAL}
   {.$define PAC_DEMO_SOLUCIONFACTIBLE}
