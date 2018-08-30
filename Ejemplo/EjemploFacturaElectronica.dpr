@@ -11,6 +11,7 @@ program EjemploFacturaElectronica;
 {$APPTYPE CONSOLE}
 
 {$R *.res}
+{$R *.dres}
 
 // Incluimos el archivo de recurso .RC que contiene los XSLTs para generar las cadenas originales
 
@@ -72,7 +73,16 @@ uses
   FinkOkWsComun in '..\PACs\FinkOK\FinkOkWsComun.pas',
   Cancelacion.PAC.Comercio in '..\PACs\ComercioDigital\Cancelacion.PAC.Comercio.pas',
   ComercioWsComun in '..\PACs\ComercioDigital\ComercioWsComun.pas',
-  Facturacion.PAC.Comercio in '..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas';
+  Facturacion.PAC.Comercio in '..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas',
+  synacode in '..\Lib\synapse\synacode.pas',
+  httpsend in '..\Lib\synapse\httpsend.pas',
+  ssl_openssl in '..\Lib\synapse\ssl_openssl.pas',
+  blcksock in '..\Lib\synapse\blcksock.pas',
+  synafpc in '..\Lib\synapse\synafpc.pas',
+  synsock in '..\Lib\synapse\synsock.pas',
+  synautil in '..\Lib\synapse\synautil.pas',
+  synaip in '..\Lib\synapse\synaip.pas',
+  ssl_openssl_lib in '..\Lib\synapse\ssl_openssl_lib.pas';
 
 var
   nuevaFactura                                                    : IComprobanteFiscal;
