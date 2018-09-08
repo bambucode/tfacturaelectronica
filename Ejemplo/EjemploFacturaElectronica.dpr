@@ -424,6 +424,7 @@ begin
 
           //Especificar que se encuentra en modo de pruebas
           pac.AsignarParametro(PAC_PARAM_SVC_CFG_MODO_PRODUCCION, PAC_VALOR_NO);
+          pac.AsignarParametro(PAC_PARAM_SVC_CFG_MULTIPLES_URLS, PAC_VALOR_NO);
 
           if nuevaFactura.Version = '3.3' then
           begin

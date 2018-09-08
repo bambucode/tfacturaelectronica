@@ -32,6 +32,7 @@ Proveedores Autorizados de Certificación (PAC) Soportados por v2.0
 * FinkOk - colaboración de @ptorres
 * ComercioDigital - colaboración de @ptorres
 * Solución Factible - colaboración de @ffaccinetto 
+* Multifacturas - colaboracion de @fduenas
 
 Documentación Técnica
 -------------
