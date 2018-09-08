@@ -6,6 +6,9 @@ __*
 *.local
 *.rsm
 *.skincfg
+*.dproj.local
+*.tvsconfig
 .DS_Store
+thumbs.db
 Ejemplo/*.xml
 Ejemplo/*.jpg
