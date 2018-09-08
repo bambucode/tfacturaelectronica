@@ -216,15 +216,19 @@ type
   public
     destructor Destroy; override;
     procedure AfterConstruction; override;
+    procedure Configurar(const aDominioWebService: string;
+              const aCredencialesPAC: TFacturacionCredencialesPAC;
+              const aTransaccionInicial: Int64); overload; virtual;
     procedure Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
                          const aCredencialesPAC, aCredencialesIntegrador : TFacturacionCredencialesPAC;
-                         const aTransaccionInicial: Int64); virtual; abstract;
+                         const aTransaccionInicial: Int64); overload; virtual; abstract;
     procedure AsignarParametro( ANombreParametro: string; AValorParametro: string ); virtual;
     function Nombre: string; virtual;
     function ObtenerParametro( ANombreParametro: string ): String; virtual;
     function ObtenerParametroDef( ANombreParametro: string; AValorPorDefault: string ): String; virtual;
     function Parametros: TStrings; virtual;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; virtual; abstract;
+    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; overload; virtual; abstract;
+    function CancelarDocumento(const aUUID: TCadenaUTF8; var aExtraInfo: TCadenaUTF8): Boolean; overload; virtual; abstract;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID; virtual; abstract;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
                               const aTransaccion: Int64) : TCadenaUTF8; overload; virtual;  abstract;
@@ -369,6 +373,14 @@ procedure TProveedorAutorizadoCertificacionBase.AsignarParametro(
   ANombreParametro, AValorParametro: string);
 begin
  Parametros.Values[ANombreParametro] := AValorParametro;
+end;
+
+procedure TProveedorAutorizadoCertificacionBase.Configurar(
+  const aDominioWebService: string;
+  const aCredencialesPAC: TFacturacionCredencialesPAC;
+  const aTransaccionInicial: Int64);
+begin
+ Configurar(aDominioWebService,aDominioWebService,aDominioWebService,aCredencialesPAC,aCredencialesPAC, aTransaccionInicial);
 end;
 
 destructor TProveedorAutorizadoCertificacionBase.Destroy;
