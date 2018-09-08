@@ -467,11 +467,11 @@ end;
 
 procedure TPagosV1.AfterConstruction;
 begin
-   if (Self.AttributeNodes.FindNode('version') = nil) then
+   if (Self.AttributeNodes.FindNode('Version') = nil) then
     Self.Set_Version('1.0');
 
   RegisterChildNode('Pago', TPagos_PagoV1);
-  ItemTag := 'Pago10:Pago';
+  ItemTag := 'pago10:Pago';
   ItemInterface := IPagos_PagoV1;
   inherited;
 end;
