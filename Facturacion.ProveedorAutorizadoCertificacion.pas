@@ -456,6 +456,7 @@ function TProveedorAutorizadoCertificacionBase.FacturacionHelper: TFacturacionHe
 begin
  if not assigned(fFacturacionHelper) then
    fFacturacionHelper := TFacturacionHelper.Create;
+ result := fFacturacionHelper;
 end;
 
 function TProveedorAutorizadoCertificacionBase.Nombre: string;
