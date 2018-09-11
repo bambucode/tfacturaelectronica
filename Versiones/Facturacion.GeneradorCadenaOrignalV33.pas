@@ -94,15 +94,16 @@ begin
 
   transformador := TTransformadorDeXML.Create;
   try
-    // Existe un error en el XSLT del Timbre fiscal donde si el Nodo Leyenda se auto-agregó al final
-    //  Ej: cuando se consulta el valor de 'TimbreFiscalDigitalV33.Leyenda'
-    // la transformación incluirá un CHR(10)+Chr(13) o #$D#$A entre el RFC y la Leyenda
-    // Por la tanto si el nodo de la Leyenda se auto-agregó después del timbrado se moverá o
-    // se eliminará si el nodo está o no vacío para evitar ese error:
+    // Existe un error en el XSLT del Timbre fiscal donde si el Nodo Leyenda se auto-agregó al final,
+    //  Ej: cuando se consulta el valor de 'TimbreFiscalDigitalV33.Leyenda', entonces
+    // la transformación incluirá un CHR(10)+Chr(13) o #$D#$A entre el RFC y la Leyenda.
 
     //Ejemplo:
     // Sin Leyenda              : '|1.1|4ab11a49-cdcf-4e42-8278-3b89219431ca|2018-09-11T15:53:23|AAA010101AAA|ghabiW....Bxl7Q==|20001000000300022323'
     // Con Leyenda ('' ó 'XX..'): '|1.1|4ab11a49-cdcf-4e42-8278-3b89219431ca|2018-09-11T15:53:23|AAA010101AAA'+'#$D#$A'+'||ghabiW....Bxl7Q==|20001000000300022323'
+
+    // Por la tanto si el nodo de la Leyenda se auto-agregó después del timbrado,
+    // este se eliminará si el nodo está vacío para evitar ese error
 
     nodoLeyenda := facturaV33.Complemento.TimbreFiscalDigital.AttributeNodes.FindNode('Leyenda');
     if Assigned( nodoLeyenda ) and
@@ -110,7 +111,7 @@ begin
       (facturaV33.Complemento.TimbreFiscalDigital.AttributeNodes.IndexOf('Leyenda') =
       (facturaV33.Complemento.TimbreFiscalDigital.AttributeNodes.Count-1) ) Then
     begin
-     {Si La posición de Leyenda es la última del nodo, quiere decir que se agregó después del timbrado}
+     {Si La posición de Leyenda es la última de la lista de nodos, quiere decir que se agregó después del timbrado}
      facturaV33.Complemento.TimbreFiscalDigital.AttributeNodes.Delete('Leyenda');
     end;
 
