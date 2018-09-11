@@ -134,26 +134,26 @@ function TTimbreFiscalDigitalV33.GetXML: DOMString;
 var
   nodoLeyenda: IXMLNode;
 begin
-    // Existe un error en el XSLT del Timbre fiscal donde si el Nodo Leyenda se auto-agregó al final,
-    //  Ej: cuando se consulta el valor de 'TimbreFiscalDigitalV33.Leyenda', entonces
-    // la transformación incluirá un CHR(10)+Chr(13) o #$D#$A entre el RFC y la Leyenda.
+ // Existe un error en el XSLT del Timbre fiscal donde si el Nodo Leyenda se auto-agregó al final,
+ //  Ej: cuando se consulta el valor de 'TimbreFiscalDigitalV33.Leyenda', entonces
+ // la transformación incluirá un CHR(10)+Chr(13) o #$D#$A entre el RFC y la Leyenda.
 
-    //Ejemplo:
-    // Sin Leyenda              : '|1.1|4ab11a49-cdcf-4e42-8278-3b89219431ca|2018-09-11T15:53:23|AAA010101AAA|ghabiW....Bxl7Q==|20001000000300022323'
-    // Con Leyenda ('' ó 'XX..'): '|1.1|4ab11a49-cdcf-4e42-8278-3b89219431ca|2018-09-11T15:53:23|AAA010101AAA'+'#$D#$A'+'||ghabiW....Bxl7Q==|20001000000300022323'
+ //Ejemplo:
+ // Sin Leyenda              : '|1.1|4ab11a49-cdcf-4e42-8278-3b89219431ca|2018-09-11T15:53:23|AAA010101AAA|ghabiW....Bxl7Q==|20001000000300022323'
+ // Con Leyenda ('' ó 'XX..'): '|1.1|4ab11a49-cdcf-4e42-8278-3b89219431ca|2018-09-11T15:53:23|AAA010101AAA'+'#$D#$A'+'||ghabiW....Bxl7Q==|20001000000300022323'
 
-    // Por la tanto si el nodo de la Leyenda se auto-agregó después del timbrado,
-    // este se eliminará si el nodo está vacío para evitar ese error
+ // Por la tanto si el nodo de la Leyenda se auto-agregó después del timbrado,
+ // este se eliminará si el nodo está vacío para evitar ese error
 
-    nodoLeyenda := self.AttributeNodes.FindNode('Leyenda');
-    if Assigned( nodoLeyenda ) and
-      (nodoLeyenda.Text='') and
-      (self.AttributeNodes.IndexOf('Leyenda') = (self.AttributeNodes.Count-1) ) Then
-    begin
-     {Si la posición del nodo Leyenda es la última en la lista de nodos,
-      quiere decir que se agregó después del timbrado, por lo tanto se elimina}
-     self.AttributeNodes.Delete('Leyenda');
-    end;
+ nodoLeyenda := self.AttributeNodes.FindNode('Leyenda');
+ if Assigned( nodoLeyenda ) and
+   (nodoLeyenda.Text='') and
+   (self.AttributeNodes.IndexOf('Leyenda') = (self.AttributeNodes.Count-1) ) Then
+ begin
+  {Si la posición del nodo Leyenda es la última en la lista de nodos,
+   quiere decir que se agregó después del timbrado, por lo tanto se elimina}
+  self.AttributeNodes.Delete('Leyenda');
+ end;
  result := inherited GetXML;
 end;
 
