@@ -39,6 +39,7 @@ uses
       IOUtils,
   {$IFEND}
 {$IFEND}
+  XMLIntf,
   Facturacion.ComprobanteV33;
 
 const
@@ -78,6 +79,7 @@ var
   contenidoXSLTCadenaOriginal: TCadenaUTF8;
   transformador: TTransformadorDeXML;
   facturaV33: IComprobanteFiscalV33;
+  nodoLeyenda: IXMLNode;
 begin
   Assert(aComprobante <> nil, 'La instancia aComprobante no debio ser nula');
   // Verificamos que la versión del comprobante sea 3.3 pues solo será una cadena original válida para dicha versión
@@ -92,10 +94,30 @@ begin
 
   transformador := TTransformadorDeXML.Create;
   try
+    // Existe un error en el XSLT del Timbre fiscal donde si el Nodo Leyenda se auto-agregó al final
+    //  Ej: cuando se consulta el valor de 'TimbreFiscalDigitalV33.Leyenda'
+    // la transformación incluirá un CHR(10)+Chr(13) o #$D#$A entre el RFC y la Leyenda
+    // Por la tanto si el nodo de la Leyenda se auto-agregó después del timbrado se moverá o
+    // se eliminará si el nodo está o no vacío para evitar ese error:
+
+    //Ejemplo:
+    // Sin Leyenda              : '|1.1|4ab11a49-cdcf-4e42-8278-3b89219431ca|2018-09-11T15:53:23|AAA010101AAA|ghabiW....Bxl7Q==|20001000000300022323'
+    // Con Leyenda ('' ó 'XX..'): '|1.1|4ab11a49-cdcf-4e42-8278-3b89219431ca|2018-09-11T15:53:23|AAA010101AAA'+'#$D#$A'+'||ghabiW....Bxl7Q==|20001000000300022323'
+
+    nodoLeyenda := facturaV33.Complemento.TimbreFiscalDigital.AttributeNodes.FindNode('Leyenda');
+    if Assigned( nodoLeyenda ) and
+      (trim(nodoLeyenda.Text)='') and
+      (facturaV33.Complemento.TimbreFiscalDigital.AttributeNodes.IndexOf('Leyenda') =
+      (facturaV33.Complemento.TimbreFiscalDigital.AttributeNodes.Count-1) ) Then
+    begin
+     {Si La posición de Leyenda es la última del nodo, quiere decir que se agregó después del timbrado}
+     facturaV33.Complemento.TimbreFiscalDigital.AttributeNodes.Delete('Leyenda');
+    end;
+
     contenidoXMLComprobante := facturaV33.Complemento.TimbreFiscalDigital.XML;
     contenidoXSLTCadenaOriginal :=
       transformador.obtenerXSLTDeRecurso(_NOMBRE_RECURSO_CADENA_ORIGINAL_TFD);
-    // Obtenemos la Cadena originak del CFDI 3.3 usando el archivo XSLT proveido por el SAT
+    // Obtenemos la Cadena original del CFDI 3.3 usando el archivo XSLT proveido por el SAT
     Result := UTF8Encode('|' +
       transformador.TransformarXML(contenidoXMLComprobante,
       contenidoXSLTCadenaOriginal) + '||');
