@@ -40,12 +40,12 @@ type
   public
     procedure  Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
                          const aCredencialesPAC, aCredencialesIntegrador : TFacturacionCredencialesPAC;
-                         const aTransaccionInicial: Int64);
+                         const aTransaccionInicial: Int64); override;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
-        aTransaccion: Int64): TCadenaUTF8; overload;
-    function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
+        aTransaccion: Int64): TCadenaUTF8; overload; override;
+    function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer; override;
     function CancelarDocumento(RFCR,UUID,EmailR,EmailE,TipoC,Total:String): TCadenaUTF8; overload;
-   published
+   public
     property Respuesta :TCadenaUTF8 read fRespuesta write fRespuesta;
     property Saldo :String read fSaldo;
     property ErrorMsg :String read fErrorMsg;
@@ -59,10 +59,11 @@ uses xmldom,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
-     {$IF Compilerversion >= 20}
+     {$IF Compilerversion >= 23}
      System.RegularExpressions,
      Xml.Win.Msxmldom,
      {$ELSE}
+     RegularExpressions,
      msxmldom,
      {$IFEND}
      XMLDoc;
@@ -109,9 +110,9 @@ var
   Res: TStrings;
 begin
   // TODO: Cambiar este codigo para no depender de Synapse
-  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO)='' then
+  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_BASE64)='' then
    raise EPACRSACertificadoNoAsignadoException.Create('Certificado no asignado o vacío',0,0,false)
-  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA)='' then
+  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)='' then
    raise EPACRSALlavePrivadaNoAsignadaException.Create('Llave privada no asignada o vacía',0,0,false);
   HTTP := THTTPSend.Create;
   respuestaDeServidor := TStringList.Create;
@@ -123,8 +124,8 @@ begin
    res.Add('RFCE='+EncodeURL(fCredencialesPAC.RFC));
    res.Add('UUID='+Trim(UUID));
    res.Add('PWDK='+ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));//Trim(fclaveLlavePrivada));
-   res.Add('KEYF='+EncodeF(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA)));//frutaLlavePrivada));
-   res.Add('CERT='+EncodeF(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO)));//frutaCertificado));
+   res.Add('KEYF='+EncodeF(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)));//frutaLlavePrivada));
+   res.Add('CERT='+EncodeF(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_BASE64)));//frutaCertificado));
    Res.Add('TIPO=cfdi3.3');//+Trim(fqueVersion));
    res.Add('ACUS=SI');
    res.Add('RFCR='+EncodeURL(RFCR));//receptor
@@ -225,7 +226,7 @@ begin
     {$IFEND}
    end
  else
-  CodEstatus(Copy(Trim(fRespuesta),Pos('CODIGO',UpperCase(Trim(fRespuesta)))+8,3));
+  PACCodEstatus(Copy(Trim(fRespuesta),Pos('CODIGO',UpperCase(Trim(fRespuesta)))+8,3));
  except
   On E:Exception do
    begin
@@ -266,7 +267,7 @@ begin
     {$IFEND}
     end
    else
-    CodEstatus(Copy(Trim(fRespuesta),Pos('CODIGO',UpperCase(Trim(fRespuesta)))+8,3));
+    PACCodEstatus(Copy(Trim(fRespuesta),Pos('CODIGO',UpperCase(Trim(fRespuesta)))+8,3));
   except
     On E:Exception do
     begin
