@@ -91,7 +91,7 @@ ImageBase=4194304
 ExeDescription=
 [Directories]
 OutputDir=
-UnitOutputDir=
+UnitOutputDir=.\Win32\Debug
 PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=..\OpenSSL;..\PACs\Ecodex;..\Schemas\3.2;..\Schemas\3.3;..\Lib
@@ -110,7 +110,7 @@ ActiveLang=
 ProjectLang=
 RootDir=C:\Program Files\Borland\Delphi7\Bin\
 [Version Info]
-IncludeVerInfo=0
+IncludeVerInfo=1
 AutoIncBuild=0
 MajorVer=1
 MinorVer=0
@@ -123,6 +123,17 @@ Private=0
 DLL=0
 Locale=1033
 CodePage=1252
+[Version Info Keys]
+CompanyName=
+FileDescription=EjemploFacturaElectronica
+FileVersion=1.0.0.0
+InternalName=
+LegalCopyright=
+LegalTrademarks=
+OriginalFilename=
+ProductName=EjemploFacturaElectronica
+ProductVersion=1.0.0.0
+ProgramID=com.embarcadero.EjemploFacturaElectronica
 [HistoryLists\hlUnitAliases]
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
@@ -130,3 +141,6 @@ Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 Count=2
 Item0=..\OpenSSL;..\PACs\Ecodex;..\Schemas\3.2;..\Schemas\3.3;..\Lib
 Item1=..\OpenSSL;..\PACs\Ecodex;..\Schemas\3.2;..\Schemas\3.3
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=.\Win32\Debug
