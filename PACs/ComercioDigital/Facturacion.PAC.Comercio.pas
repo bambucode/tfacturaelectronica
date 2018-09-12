@@ -60,10 +60,8 @@ uses xmldom,
      CodeSiteLogging,
      {$ENDIF}
      {$IF Compilerversion >= 23}
-     System.RegularExpressions,
      Xml.Win.Msxmldom,
      {$ELSE}
-     RegularExpressions,
      msxmldom,
      {$IFEND}
      XMLDoc;
@@ -110,9 +108,9 @@ var
   Res: TStrings;
 begin
   // TODO: Cambiar este codigo para no depender de Synapse
-  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_BASE64)='' then
+  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO)='' then
    raise EPACRSACertificadoNoAsignadoException.Create('Certificado no asignado o vacío',0,0,false)
-  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)='' then
+  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)='' then
    raise EPACRSALlavePrivadaNoAsignadaException.Create('Llave privada no asignada o vacía',0,0,false);
   HTTP := THTTPSend.Create;
   respuestaDeServidor := TStringList.Create;
@@ -124,8 +122,8 @@ begin
    res.Add('RFCE='+EncodeURL(fCredencialesPAC.RFC));
    res.Add('UUID='+Trim(UUID));
    res.Add('PWDK='+ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));//Trim(fclaveLlavePrivada));
-   res.Add('KEYF='+EncodeF(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)));//frutaLlavePrivada));
-   res.Add('CERT='+EncodeF(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_BASE64)));//frutaCertificado));
+   res.Add('KEYF='+EncodeF(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)));//frutaLlavePrivada));
+   res.Add('CERT='+EncodeF(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO)));//frutaCertificado));
    Res.Add('TIPO=cfdi3.3');//+Trim(fqueVersion));
    res.Add('ACUS=SI');
    res.Add('RFCR='+EncodeURL(RFCR));//receptor
