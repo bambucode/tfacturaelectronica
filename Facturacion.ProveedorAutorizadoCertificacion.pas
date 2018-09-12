@@ -400,6 +400,10 @@ begin
   inherited;
 end;
 
+{.$DEFINE  PerlRegEx2009} // Define si se usa esta antigua versión, la cual no es compatible con XE1 y recientes
+                          // URL: https://www.regular-expressions.info/download/TPerlRegEx2009.zip
+                          // URL de la más reciente es: https://www.regular-expressions.info/download/TPerlRegEx.zip
+                          // Más info: https://www.regular-expressions.info/delphi.html
 function TProveedorAutorizadoCertificacionBase.ExtraerNodoTimbre(
   const aComprobanteXML: UnicodeString): UnicodeString;
 var
@@ -417,14 +421,23 @@ begin
   // Delphi XE1 y superiores
   Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
  {$ELSE}
-  LRegEx := TPerlRegEx.Create;
+  {$IFNDEF PerlRegEx2009}
+   LRegEx := TPerlRegEx.Create; // No se necesita NIL si se usa la versión más reciente de TPerlRegEx: https://www.regular-expressions.info/download/TPerlRegEx.zip
+  {$ELSE}
+    LRegEx := TPerlRegEx.Create(nil);
+  {$ENDIF}
   try
   	LRegEx.RegEx := _REGEX_TIMBRE;
   	LRegEx.Options := [];
   	LRegEx.State := [];
   	LRegEx.Subject := contenidoComprobanteXML;
-	 if LRegEx.Match then begin
-    Result:=LRegEx.MatchedText;
+	 if LRegEx.Match then
+   begin
+    {$IFNDEF PerlRegEx2009}
+     Result:=LRegEx.MatchedText; // antes era MatchedExpression (deprecated), pero esta usa la versión más reciente de TPerlRegEx, más info: https://www.regular-expressions.info/delphi.html
+    {$ELSE}
+     Result:=LRegEx.MatchedExpression
+    {$ENDIF}
 	 end
   	else begin
   		Result := '';
