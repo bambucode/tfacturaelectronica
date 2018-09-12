@@ -417,14 +417,14 @@ begin
   // Delphi XE1 y superiores
   Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
  {$ELSE}
-  LRegEx := TPerlRegEx.Create(nil);
+  LRegEx := TPerlRegEx.Create;
   try
   	LRegEx.RegEx := _REGEX_TIMBRE;
   	LRegEx.Options := [];
   	LRegEx.State := [];
   	LRegEx.Subject := contenidoComprobanteXML;
 	 if LRegEx.Match then begin
-    Result:=LRegEx.MatchedExpression;
+    Result:=LRegEx.MatchedText;
 	 end
   	else begin
   		Result := '';
