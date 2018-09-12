@@ -14,7 +14,8 @@ implementation
    result := true;
    if ICodigo = 0 then
    begin
-    Exit(false);
+    result := false;
+    exit;
    end
    else if Codigo='203' then raise EPACNoEncontradoParaCancelarException.Create('UUID No encontrado o no corresponde en el emisor',-1,iCodigo,False)
    else if Codigo='204' then raise EPACNoEncontradoParaCancelarException.Create('UUID No aplicable para cancelación',-1,iCodigo,False)

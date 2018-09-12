@@ -7,6 +7,9 @@ uses Facturacion.Comprobante,
      System.SysUtils,
      System.Types
 {$ELSE}
+    {$IF CompilerVersion < 17}     
+     Windows,
+    {$IFEND}
      SysUtils,
      Types
 {$IFEND};
