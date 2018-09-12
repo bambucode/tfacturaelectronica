@@ -63,7 +63,8 @@ begin
     contenidoXMLComprobante := aComprobante.XML;
     contenidoXSLTCadenaOriginal :=
       transformador.ObtenerXSLTDeRecurso(_NOMBRE_RECURSO_CADENA_ORIGINAL);
-    // Obtenemos la Cadena originak del CFDI 3.3 usando el archivo XSLT proveido por el SAT
+
+    // Obtenemos la Cadena original del CFDI 3.3 usando el archivo XSLT proveido por el SAT
     Result := UTF8Encode('|' +
       transformador.TransformarXML(contenidoXMLComprobante,
       contenidoXSLTCadenaOriginal) + '||');
