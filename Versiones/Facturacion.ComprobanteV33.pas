@@ -1029,7 +1029,7 @@ begin
   // Anexamos el Namespace del complemento
   Self.DeclareNamespace(aNameSpacePrefijo, aNameSpaceURI);
 
-  // Agregamos el XSD del TFD
+  // Agregamos el XSD del complemento
   schemaLocation := Self.AttributeNodes.FindNode(_NODO_SL).Text;
   Self.SetAttribute(_NODO_SL,schemaLocation+ ' '+ aAnexarSchema);
   Self.Resync;
