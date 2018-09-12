@@ -55,10 +55,12 @@ uses
    PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID = 'PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID';
 
    //Certificado
-   PAC_PARAM_RSA_CERTIFICADO_BASE64        = 'PAC_PARAM_RSA_CERTIFICADO_BASE64';  //contenido del certificado en Base64
-   PAC_PARAM_RSA_LLAVEPRIVADA_BASE64       = 'PAC_PARAM_RSA_LLAVEPRIVADA_BASE64'; //contenido de la llave privada en Base64
-   PAC_PARAM_RSA_CERTIFICADO_ARCHIVO        = 'PAC_PARAM_RSA_CERTIFICADO_ARCHIVO';  //Ruta y nombre del archivo de ceriticado (cer)
-   PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO       = 'PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO'; //Ruta y nombre del archivo de la llave privada (key)
+   PAC_PARAM_RSA_CERTIFICADO_BASE64   = 'PAC_PARAM_RSA_CERTIFICADO_BASE64';  //contenido del certificado en Base64: usar ICertificadoSellos.ContenidoBase64
+   PAC_PARAM_RSA_LLAVEPRIVADA_BASE64  = 'PAC_PARAM_RSA_LLAVEPRIVADA_BASE64'; //contenido de la llave privada en Base64: usar IOpenSSL.LlavePrivadaComoBase64
+   PAC_PARAM_RSA_CERTIFICADO_PEM      = 'PAC_PARAM_RSA_CERTIFICADO_PEM';  //formato PEM del certificado: usar ICertificadoSellos.ContenidoPEM
+   PAC_PARAM_RSA_LLAVEPRIVADA_PEM     = 'PAC_PARAM_RSA_LLAVEPRIVADA_PEM'; //formato PEM de la llave privada: usar IOpenSSL.LlavePrivadaComoPEM
+   PAC_PARAM_RSA_CERTIFICADO_ARCHIVO  = 'PAC_PARAM_RSA_CERTIFICADO_ARCHIVO';  //Ruta y nombre del archivo de ceriticado (cer)
+   PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO = 'PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO'; //Ruta y nombre del archivo de la llave privada (key)
 
    PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE = 'PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE'; //Clave/contraseña de la llave privada
 
