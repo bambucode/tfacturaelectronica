@@ -11,18 +11,14 @@ program EjemploFacturaElectronica;
 {$APPTYPE CONSOLE}
 
 {$R *.res}
-{$R *.dres}
-
-// Incluimos el archivo de recurso .RC que contiene los XSLTs para generar las cadenas originales
-
 
 // ¿Se quiere soporte para el Debugger FASTMM?
 {$IFDEF FASTMM}
   {$INCLUDE FastMM4Options.inc}
 {$ENDIF}
 
-
-
+// Incluimos el archivo de recurso .RC que contiene los XSLTs para generar las cadenas originales
+{$R *.dres}
 
 uses
   Forms,
@@ -54,6 +50,7 @@ uses
   Facturacion.OpenSSL in '..\Facturacion.OpenSSL.pas',
   Facturacion.ProveedorAutorizadoCertificacion in '..\Facturacion.ProveedorAutorizadoCertificacion.pas',
   Facturacion.Tipos in '..\Facturacion.Tipos.pas',
+  Facturacion.ComplementoComercioExteriorV11 in '..\Versiones\Facturacion.ComplementoComercioExteriorV11.pas',
   Facturacion.ComplementoPagoV1 in '..\Versiones\Facturacion.ComplementoPagoV1.pas',
   Facturacion.Comprobante in '..\Versiones\Facturacion.Comprobante.pas',
   Facturacion.ComprobanteV32 in '..\Versiones\Facturacion.ComprobanteV32.pas',
@@ -149,6 +146,7 @@ begin
       claveLlavePrivada := '12345678a';
 
      // Configuramos al PAC con los datos para pruebas
+     // Dependiendo de la version usamos diferente servidor de pruebas
      {$ifdef PAC_DEMO_ECODEX}
       rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer';
       rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.key';
@@ -190,6 +188,16 @@ begin
       CredencialesPAC.Clave := 'DEMO700101XXX';
       Url_WS := _URL_MULTIFACTURAS_PRUEBAS;
      {$endif}
+
+      if not assigned(pac) then
+      begin
+        Writeln('El PAC no ha sido especificado,'+#10#13+
+                'En la parte superior de este ejemplo, defina un PAC ({$define PAC_DEMO_XXXX}) para usar en el timbrado');
+
+        Writeln('Presiona cualquier tecla para salir...');
+        Readln;
+        exit;
+      end;
 
       openSSL := TOpenSSL.Create;
       openSSL.AsignarLlavePrivada(rutaLlavePrivada,
@@ -413,17 +421,26 @@ begin
           // selloDeLaFactura := generadorSello.GenerarSelloDeFactura(cadenaOriginal);
           // Writeln(selloDeLaFactura);
 
-          // Dependiendo de la version usamos diferente servidor de pruebas
-
+          { Si el PAC requiere el uso del certificado CSD, este se puede asignar
+            por medio de las siguientes maneras
+          }
           {
-          pac.AsignarParametro(PAC_PARAM_SEGURIDAD_CERTIFICADO, certificadoSellos.ContenidoBase64);
-          pac.AsignarParametro(PAC_PARAM_SEGURIDAD_LLAVEPRIVADA, openSSL.LlavePrivadaComoBase64);
-          pac.AsignarParametro(PAC_PARAM_SEGURIDAD_LLAVEPRIVADA_CLAVE, claveLlavePrivada);
+          pac.AsignarParametro(PAC_PARAM_RSA_CERTIFICADO_BASE64, certificadoSellos.ContenidoBase64);
+          pac.AsignarParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64, openSSL.LlavePrivadaComoBase64);
 
+          pac.AsignarParametro(PAC_PARAM_RSA_CERTIFICADO_PEM, certificadoSellos.ContenidoPEM);
+          pac.AsignarParametro(PAC_PARAM_RSA_LLAVEPRIVADA_PEM, openSSL.LlavePrivadaComoPEM);
+
+          pac.AsignarParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO, rutaCertificado);
+          pac.AsignarParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO, rutaLlavePrivada);
+
+          pac.AsignarParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE, claveLlavePrivada);
           }
 
           //Especificar que se encuentra en modo de pruebas
           pac.AsignarParametro(PAC_PARAM_SVC_CFG_MODO_PRODUCCION, PAC_VALOR_NO);
+
+          //Si el PAC soporta multiples URLs para mejor desempeño, habilitar esta opcion
           pac.AsignarParametro(PAC_PARAM_SVC_CFG_MULTIPLES_URLS, PAC_VALOR_NO);
 
           if nuevaFactura.Version = '3.3' then

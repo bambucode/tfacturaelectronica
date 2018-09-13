@@ -69,6 +69,7 @@
         <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;Xml.Win;System.Win;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=;CFBundleName=</VerInfo_Keys>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
@@ -137,6 +138,7 @@
         <DCCReference Include="..\Facturacion.OpenSSL.pas"/>
         <DCCReference Include="..\Facturacion.ProveedorAutorizadoCertificacion.pas"/>
         <DCCReference Include="..\Facturacion.Tipos.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.ComplementoComercioExteriorV11.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ComplementoPagoV1.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.Comprobante.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ComprobanteV32.pas"/>
@@ -166,6 +168,26 @@
         <DCCReference Include="..\Lib\synapse\synautil.pas"/>
         <DCCReference Include="..\Lib\synapse\synaip.pas"/>
         <DCCReference Include="..\Lib\synapse\ssl_openssl_lib.pas"/>
+        <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>XSLT_CADENAORIGINAL_V32</ResourceId>
+        </RcItem>
+        <RcItem Include="..\Schemas\3.3\cadenaoriginal_3_3.xslt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>XSLT_CADENAORIGINAL_V33</ResourceId>
+        </RcItem>
+        <RcItem Include="..\Schemas\3.2\cadenaoriginal_TFD_1_0.xslt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>XSLT_CADENAORIGINALTFD_V32</ResourceId>
+        </RcItem>
+        <RcItem Include="..\Schemas\3.3\cadenaoriginal_TFD_1_1.xslt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>XSLT_CADENAORIGINALTFD_V33</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
