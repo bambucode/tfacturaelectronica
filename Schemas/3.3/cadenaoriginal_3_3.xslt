@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:cce11="http://www.sat.gob.mx/ComercioExterior11" xmlns:donat="http://www.sat.gob.mx/donat" xmlns:divisas="http://www.sat.gob.mx/divisas" xmlns:implocal="http://www.sat.gob.mx/implocal" xmlns:leyendasFisc="http://www.sat.gob.mx/leyendasFiscales" xmlns:pfic="http://www.sat.gob.mx/pfic" xmlns:tpe="http://www.sat.gob.mx/TuristaPasajeroExtranjero" xmlns:nomina12="http://www.sat.gob.mx/nomina12" xmlns:registrofiscal="http://www.sat.gob.mx/registrofiscal" xmlns:pagoenespecie="http://www.sat.gob.mx/pagoenespecie" xmlns:aerolineas="http://www.sat.gob.mx/aerolineas" xmlns:valesdedespensa="http://www.sat.gob.mx/valesdedespensa" xmlns:consumodecombustibles="http://www.sat.gob.mx/consumodecombustibles" xmlns:notariospublicos="http://www.sat.gob.mx/notariospublicos" xmlns:vehiculousado="http://www.sat.gob.mx/vehiculousado" xmlns:servicioparcial="http://www.sat.gob.mx/servicioparcialconstruccion" xmlns:decreto="http://www.sat.gob.mx/renovacionysustitucionvehiculos" xmlns:destruccion="http://www.sat.gob.mx/certificadodestruccion" xmlns:obrasarte="http://www.sat.gob.mx/arteantiguedades" xmlns:ine="http://www.sat.gob.mx/ine" xmlns:iedu="http://www.sat.gob.mx/iedu" xmlns:ventavehiculos="http://www.sat.gob.mx/ventavehiculos" xmlns:terceros="http://www.sat.gob.mx/terceros" xmlns:pago10="http://www.sat.gob.mx/Pagos" xmlns:detallista="http://www.sat.gob.mx/detallista" xmlns:ecc12="http://www.sat.gob.mx/EstadoDeCuentaCombustible12" xmlns:consumodecombustibles11="http://www.sat.gob.mx/ConsumoDeCombustibles11" xmlns:spei="http://www.sat.gob.mx/spei"> 
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fn="http://www.w3.org/2005/xpath-functions" xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:cce11="http://www.sat.gob.mx/ComercioExterior11" xmlns:donat="http://www.sat.gob.mx/donat" xmlns:divisas="http://www.sat.gob.mx/divisas" xmlns:implocal="http://www.sat.gob.mx/implocal" xmlns:leyendasFisc="http://www.sat.gob.mx/leyendasFiscales" xmlns:pfic="http://www.sat.gob.mx/pfic" xmlns:tpe="http://www.sat.gob.mx/TuristaPasajeroExtranjero" xmlns:nomina12="http://www.sat.gob.mx/nomina12" xmlns:registrofiscal="http://www.sat.gob.mx/registrofiscal" xmlns:pagoenespecie="http://www.sat.gob.mx/pagoenespecie" xmlns:aerolineas="http://www.sat.gob.mx/aerolineas" xmlns:valesdedespensa="http://www.sat.gob.mx/valesdedespensa" xmlns:consumodecombustibles="http://www.sat.gob.mx/consumodecombustibles" xmlns:notariospublicos="http://www.sat.gob.mx/notariospublicos" xmlns:vehiculousado="http://www.sat.gob.mx/vehiculousado" xmlns:servicioparcial="http://www.sat.gob.mx/servicioparcialconstruccion" xmlns:decreto="http://www.sat.gob.mx/renovacionysustitucionvehiculos" xmlns:destruccion="http://www.sat.gob.mx/certificadodestruccion" xmlns:obrasarte="http://www.sat.gob.mx/arteantiguedades" xmlns:ine="http://www.sat.gob.mx/ine" xmlns:iedu="http://www.sat.gob.mx/iedu" xmlns:ventavehiculos="http://www.sat.gob.mx/ventavehiculos" xmlns:terceros="http://www.sat.gob.mx/terceros" xmlns:pago10="http://www.sat.gob.mx/Pagos" xmlns:detallista="http://www.sat.gob.mx/detallista" xmlns:ecc12="http://www.sat.gob.mx/EstadoDeCuentaCombustible12" xmlns:consumodecombustibles11="http://www.sat.gob.mx/ConsumoDeCombustibles11"> 
 
   <!-- Con el siguiente método se establece que la salida deberá ser en texto -->
   <xsl:output method="text" version="1.0" encoding="UTF-8" indent="no"/>
@@ -61,8 +61,7 @@
   <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos10.xslt"/>
   <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/detallista/detallista.xslt"/>
   <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/EstadoDeCuentaCombustible/ecc12.xslt"/>
-  <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/consumodecombustibles/consumodeCombustibles11.xslt"/>
-  <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/spei/spei.xslt"/>
+  <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/consumodecombustibles/consumodeCombustibles11.xslt"/>  
   -->
 
 	<!-- 	INICIA REEMPLAZO de <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/EstadoDeCuentaCombustible/ecc11.xslt"/> -->
@@ -2434,86 +2433,6 @@
     </xsl:call-template>
   </xsl:template>
   <!-- 	FINALIZA REEMPLAZO de <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/consumodecombustibles/consumodeCombustibles11.xslt"/> -->
-
-  <!-- 	INICIA REEMPLAZO de <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/spei/spei.xslt"/> -->
-	<!-- Manejador de nodos tipo Complemento_SPEI-->
-	<xsl:template match="spei:Complemento_SPEI">
-		<!--Iniciamos el tratamiento del complemento SPEI-->
-		<xsl:for-each select="./spei:SPEI_Tercero">
-			<xsl:apply-templates select="."/>
-		</xsl:for-each>
-	</xsl:template>
-	
-	<!-- Manejador de atributos de SPEI_Tercero-->	
-	<xsl:template match="spei:SPEI_Tercero">
-		<!-- Manejo de los atributos del Ordenante-->
-		<xsl:call-template name="Requerido">	
-			<xsl:with-param name="valor" select="./@FechaOperacion"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@Hora"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@ClaveSPEI"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@sello"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@numeroCertificado"/>
-		</xsl:call-template>	
-		<xsl:apply-templates select="./spei:Ordenante"/>
-		<xsl:apply-templates select="./spei:Beneficiario"/>
-		
-	</xsl:template>
-	
-	<!-- Manejador de nodos tipo SPEI-->
-	<xsl:template match="spei:Ordenante">
-		<!-- Manejo de los atributos del Ordenante-->
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@BancoEmisor"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@Nombre"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@TipoCuenta"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@Cuenta"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@RFC"/>
-		</xsl:call-template>
-	</xsl:template>
-	<xsl:template match="spei:Beneficiario">
-		<!-- Manejo de los atributos del Beneficiario-->
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@BancoReceptor"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@Nombre"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@TipoCuenta"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@Cuenta"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@RFC"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@Concepto"/>
-		</xsl:call-template>
-		<xsl:call-template name="Opcional">
-			<xsl:with-param name="valor" select="./@IVA"/>
-		</xsl:call-template>
-		<xsl:call-template name="Requerido">
-			<xsl:with-param name="valor" select="./@MontoPago"/>
-		</xsl:call-template>
-	</xsl:template>
-  <!-- 	FINALIZA REEMPLAZO de <xsl:include href="http://www.sat.gob.mx/sitio_internet/cfd/spei/spei.xslt"/> -->
 
   <!-- Aquí iniciamos el procesamiento de la cadena original con su | inicial y el terminador || -->
   <xsl:template match="/">|<xsl:apply-templates select="/cfdi:Comprobante"/>||</xsl:template>
