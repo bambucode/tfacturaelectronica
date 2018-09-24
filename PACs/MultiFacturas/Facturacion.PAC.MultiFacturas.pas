@@ -210,11 +210,6 @@ begin
 
  except
  end;
-
-
-
-    result := lsaldoreponse.saldo
-   {No existe esta funcionalidad para Solucion Factible, dejada solo por compatibilidad.}
 end;
 
 function TProveedorMultiFacturas.ObtenerTimbrePrevio(
