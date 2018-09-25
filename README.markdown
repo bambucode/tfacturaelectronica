@@ -32,7 +32,7 @@ Proveedores Autorizados de Certificación (PAC) Soportados por v2.0
 * FinkOk - colaboración de @ptorres
 * ComercioDigital - colaboración de @ptorres
 * Solución Factible - colaboración de @ffaccinetto 
-* Multifacturas - colaboracion de @fduenas
+* Multifacturas - <http://www.multifacturas.com> - colaboración de @fduenas
 
 Complementos de Factura Soportados por v2.0
 -------------
@@ -46,14 +46,14 @@ Complementos de Factura Soportados por v2.0
 		- Timbre Fiscal Digital 1.1
 		- Impuestos Locales 1.0
 		- Recepción de Pagos 1.0
-		- Comercio Exterior 1.1	
+		- Comercio Exterior 1.1	- colaboración de @fduenas
 	- Se ha modificado el archivo cadenaoriginal_3_3.xslt para que cualquiera de los complementos implementados por el SAT a la fecha (2018-09-01) sea tomado en cuenta al generarse la cadena original, con esto, aunque no exista una clase específica para un complemento (ej: TComercioExteriorV11), este puedan agregarse al nodo \<cfdi:Complemento\> de manera manual usando los métodos: 
-		- IComprobanteFiscalV33.Complementos.AddNode(\<nombre_complemento\>) --> Nueva Instancia IXMLNode
+		- IComprobanteFiscalV33.Complemento.AddNode(\<nombre_complemento\>) --> Nueva Instancia IXMLNode
 		- IXMLNode.AddNode(\<nombre_nodohijo\>)
 		- IXMLNode.FindNode(\<nombre_nodohijo\>)
 		- IXMLNode.AttributeNodes\[\<nombre_atributo\>\].Text
 		- Para mayor información acerca de cómo trabajar con nodos XML en Delphi, consultar: http://docwiki.embarcadero.com/RADStudio/Tokyo/en/Working_with_XML_Nodes
-	- El complemento que sea agregado de manera manual debe cumpplir con las especificaciones establecidas por el SAT para dicho complemento. Para mayor información consultar la documentación técnica del complemento.
+	- El complemento que sea agregado de manera manual debe cumplir con las especificaciones establecidas por el SAT para dicho complemento. Para mayor información consultar la documentación técnica del complemento a agregar.
 
 Documentación Técnica
 -------------
