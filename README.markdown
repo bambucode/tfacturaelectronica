@@ -47,7 +47,7 @@ Complementos de Factura Soportados por v2.0
 		- Impuestos Locales 1.0
 		- Recepción de Pagos 1.0
 		- Comercio Exterior 1.1	
-	- Se ha modificado el archivo cadenaoriginal_3_3.xslt para que cualquiera de los complementos soportados a la fecha (2018-09-01) sea tomado en cuenta al generarse la cadena original, con esto, aunque no exista una clase específica para un complemento (ej: TComercioExteriorV11), este puedan agregarse al nodo <cfdi:Complemento></cfdi:Complemento> de manera manual usando los métodos: 
+	- Se ha modificado el archivo cadenaoriginal_3_3.xslt para que cualquiera de los complementos soportados a la fecha (2018-09-01) sea tomado en cuenta al generarse la cadena original, con esto, aunque no exista una clase específica para un complemento (ej: TComercioExteriorV11), este puedan agregarse al nodo \<cfdi:Complemento\> de manera manual usando los métodos: 
 		- IComprobanteFiscalV33.Complementos.AddNode(\<nombre_complemento\>) --> Nueva Instancia IXMLNode
 		- IXMLNode.AddNode(\<nombre_nodohijo\>)
 		- IXMLNode.FindNode(\<nombre_nodohijo\>)
