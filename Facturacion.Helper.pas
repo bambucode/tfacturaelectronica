@@ -351,22 +351,19 @@ end;
 class function TFacturacionHelper.DesdeFechaISO8601(
   const aCadenaFecha: String): TDateTime;
 begin
-  {  Hay un error en la conversión (Al menos en D7 y XE1),
-     la cual resta o suma N horas (según zona horaria) a la hora
-     especificada en aCadenaFecha, aún  cuando la Z no esté
-     especificada en aCadenaFecha.
-     Ref: https://es.wikipedia.org/wiki/ISO_8601
-  }
+{$DEFINE USAR_XSDATETIME}
 
-  {with TXSDateTime.Create() do
+{$IFDEF USAR_XSDATETIME}
+  with TXSDateTime.Create() do
   try
     XSToNative(aCadenaFecha);
-    Result := AsDateTime;
+    Result := AsUTCDateTime;
   finally
     Free;
-  end;}
-
+  end;
+{$ELSE}
   result := StrToDateTime( AnsiReplaceStr(aCadenaFecha,'T',' '), formatSettingsLocalISO8601 );
+{$ENDIF}
 end;
 
 class function TFacturacionHelper.VerificarImporteEnRangoDeRedondeo(const
