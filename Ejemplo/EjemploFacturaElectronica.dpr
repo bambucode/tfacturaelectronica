@@ -304,6 +304,10 @@ begin
               iva32.Importe     := '16.00';
 
               Impuestos.TotalImpuestosTrasladados  := '16.00';
+			  
+			  //Agregamos una Addenda de ejemplo
+              WriteLn('Agregando Addenda CFDI v3.2...');
+              Addenda.AddChild('Ejemplo_Addenda').Attributes['observaciones'] := 'Linea 01'+sLineBreak+'Linea 02';
             end;
             {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
@@ -387,6 +391,10 @@ begin
               totalIVA33.TipoFactor := 'Tasa';
               totalIVA33.TasaOCuota := '0.160000';
               totalIVA33.Importe    := '16.00';
+			  
+			  //Agregamos una Addenda de ejemplo
+              WriteLn('Agregando Addenda CFDI v3.3...');
+              Addenda.AddChild('Ejemplo_Addenda').Attributes['observaciones'] := 'Linea 01'+sLineBreak+'Linea 02';
             end;
             {$IFDEF undef}{$ENDREGION}{$ENDIF}
           end;
@@ -494,6 +502,18 @@ begin
 
       Writeln('Cadena Original de Timbre:');
       Writeln(generadorCadena.obtenerCadenaOriginalDeTimbre(nuevaFactura));
+
+      Writeln('XML del Timbre');
+      facturaCFDIv33.Complemento.TimbreFiscalDigital.Leyenda := '';
+      Writeln( facturaCFDIv33.Complemento.TimbreFiscalDigital.XML );
+
+      if facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado<>
+         FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado ) ) then
+      begin
+       Writeln('La conversión de la Fecha Del Timbre es incorrecta');
+       Writeln(' Fecha del Timbre (Original)  : '+facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado);
+       Writeln(' Fecha del Timbre (Conversión): '+ FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado )) );
+      end;
 
       Writeln('Guardando XML...');
       admonFacturas.GuardarArchivo(nuevaFactura,
