@@ -138,7 +138,6 @@
         <DCCReference Include="..\Facturacion.OpenSSL.pas"/>
         <DCCReference Include="..\Facturacion.ProveedorAutorizadoCertificacion.pas"/>
         <DCCReference Include="..\Facturacion.Tipos.pas"/>
-        <DCCReference Include="..\Versiones\Facturacion.ComplementoComercioExteriorV11.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ComplementoPagoV1.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.Comprobante.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ComprobanteV32.pas"/>
@@ -168,6 +167,8 @@
         <DCCReference Include="..\Lib\synapse\synautil.pas"/>
         <DCCReference Include="..\Lib\synapse\synaip.pas"/>
         <DCCReference Include="..\Lib\synapse\ssl_openssl_lib.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.ComplementoComercioExteriorV11.pas"/>
+        <DCCReference Include="EjemploFacturaElectronicaMain.pas"/>
         <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
@@ -216,6 +217,30 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
+                <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_TFD_1_0.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Schemas\3.3\cadenaoriginal_TFD_1_1.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Schemas\3.3\cadenaoriginal_3_3.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_3_2.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="EjemploFacturaElectronica.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>EjemploFacturaElectronica.exe</RemoteName>

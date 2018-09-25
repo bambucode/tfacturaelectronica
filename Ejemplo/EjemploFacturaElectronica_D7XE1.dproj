@@ -5,7 +5,7 @@
 			<Base>True</Base>
 			<Config Condition="'$(Config)'==''">Debug</Config>
 			<Platform>Win32</Platform>
-			<AppType>Application</AppType>
+			<AppType>Console</AppType>
 			<FrameworkType>VCL</FrameworkType>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<ProjectVersion>12.3</ProjectVersion>
@@ -105,6 +105,7 @@
 			<DCCReference Include="..\Lib\synapse\synaip.pas"/>
 			<DCCReference Include="..\Lib\synapse\ssl_openssl_lib.pas"/>
 			<DCCReference Include="..\Versiones\Facturacion.ComplementoComercioExteriorV11.pas"/>
+			<DCCReference Include="EjemploFacturaElectronicaMain.pas"/>
 			<RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
 				<ContainerId>ResourceItem</ContainerId>
 				<ResourceType>RCDATA</ResourceType>
