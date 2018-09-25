@@ -34,6 +34,27 @@ Proveedores Autorizados de Certificación (PAC) Soportados por v2.0
 * Solución Factible - colaboración de @ffaccinetto 
 * Multifacturas - colaboracion de @fduenas
 
+Complementos de Factura Soportados por v2.0
+-------------
+* Para CFDI 3.2
+	- Vía OOP, usando clases autogeneradas por medio de XML Databinding de Delphi (IXMLDocument, IXMLNode, etc.)
+		- Timbre Fiscal Digital 1.0
+		- Impuestos Locales 1.0
+	
+* Para CFDI 3.3
+	- Vía OOP, usando clases autogeneradas por medio de XML Databinding de Delphi (IXMLDocument, IXMLNode, etc.)
+		- Timbre Fiscal Digital 1.1
+		- Impuestos Locales 1.0
+		- Recepción de Pagos 1.0
+		- Comercio Exterior 1.1	
+	- Se ha modificado el archivo cadenaoriginal_3_3.xslt para que cualquiera de los complementos soportados a la fecha (2018-09-01) sea tomado en cuenta al generarse la cadena original, con esto, aunque no exista una clase específica para un complemento (ej: TComercioExteriorV11), este puedan agregarse al nodo <cfdi:Complemento></cfdi:Complemento> de manera manual usando los métodos: 
+		- IComprobanteFiscalV33.Complementos.AddNode(\<nombre_complemento\>) --> Nueva Instancia IXMLNode
+		- IXMLNode.AddNode(\<nombre_nodohijo\>)
+		- IXMLNode.FindNode(\<nombre_nodohijo\>)
+		- IXMLNode.AttributeNodes\[\<nombre_atributo\>\].Text
+		- Para mayor información acerca de cómo trabajar con nodos XML en Delphi, consultar: http://docwiki.embarcadero.com/RADStudio/Tokyo/en/Working_with_XML_Nodes
+	- El complemento que sea agregado de manera manual debe cumpplir con las especificaciones establecidas por el SAT para dicho complemento. Para mayor información consultar la documentación técnica del complemento.
+
 Documentación Técnica
 -------------
 A partir de la v2.0 de la librería, se ha documentado de forma extensiva el proyecto, la estructura, su funcionamiento, etc. para ello te invitamos a consultar <https://github.com/bambucode/tfacturaelectronica/wiki>
@@ -48,7 +69,7 @@ A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
 - ~~Lanzar excepciones basado en el catálogo de errores de CFDI 3.3~~ (Parcial)
 - ~~Poder incluir impuestos locales (3.2 y 3.3)~~.
 - ~~Complemento de pagos~~ con ayuda de @ffaccinetto
-- Otros complementos (comercio electronico, etc.)
+- Otros complementos (~~comercio electronico~~, nómina, etc.)
 - Pruebas de unidad
 - Validaciones de campos basado en los múltiples catálogos publicados por el SAT.
 - ~~Soporte para ediciones anteriores de Delphi 7, Delphi 2007, 2010, XE1 etc.~~ con ayuda de @fduenas
@@ -59,14 +80,16 @@ Notas de compatibilidad con otras versiones de Delphi
 -  Se agregó y probó exitósamente el soporte con Delphi 7, Delphi XE1 y Delphi XE 10.2.3 (Tokyo), por lo que no debe haber problemas con Delphi 2009 y 2010 y demás versiones intermedias.
 
 -  Para el soporte con Delphi 7, Delphi 2007, Delphi 2009 y Delphi 2010 se requiere usar la librería TPerlRegExp para el uso de Expresiones Regulares, debido a que el soporte nativo para estas últimas se agregó a partir de Delphi XE1.
-	- Esta puede descargarse desde la página: <https://www.regular-expressions.info/delphi.html>
-     o directamente desde: <https://www.regular-expressions.info/download/TPerlRegEx.zip>
-	- También se conserva una copia de dicha librería desde el repositorio: <https://github.com/fduenas/TPerlRegEx>
+	- Esta se encuentra en la carpeta: lib/external/legacy/TPerlRegEx (agregada el 2018-09-25)
+	- También puede descargarse desde la página: <https://www.regular-expressions.info/delphi.html> 
+     		o directamente desde: <https://www.regular-expressions.info/download/TPerlRegEx.zip>
+	- Además se conserva una copia de dicha librería desde el repositorio: <https://github.com/fduenas/TPerlRegEx>
 	- Una vez descargado el archivo, extraerlo en la carpeta de su conveniencia 
-	- Agregar el folder que contiene los archivos a la configuracion Library Path del Delphi: Tools/Environment Options/Library/Library path
+	- Agregar el folder que contiene los archivos a la configuracion Library Path del Proyecto (Project/Options/Delphi Compiler/Search path) o del IDE de Delphi (Tools/Environment Options/Library/Library path)
 	
 	- Para Mayor información acerca del uso de esta librería consultar: https://www.regular-expressions.info/delphi.html
 	- Para que el Pac Comercio Digital pueda funcionar es necesaria la libreria SynaCode, se encuentra en el directorio de Lib\synapse
+
 ¿Cómo puedo ayudar?
 -------------------
 La librería lleva más de 4 años de haber sido liberada al público, sin embargo aun falta mucho trabajo por hacer. Puedes comenzar checando el apartado de "Issues" del proyecto para ver en que puedes colaborar, una vez que lo hagas puedes mandar un pull-request para que implementemos tus cambios.
