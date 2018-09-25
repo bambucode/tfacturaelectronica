@@ -69,7 +69,7 @@ A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
 - ~~Lanzar excepciones basado en el catálogo de errores de CFDI 3.3~~ (Parcial)
 - ~~Poder incluir impuestos locales (3.2 y 3.3)~~.
 - ~~Complemento de pagos~~ con ayuda de @ffaccinetto
-- Otros complementos (~~comercio electronico~~, nómina, etc.)
+- Otros complementos (comercio electrónico, nómina, etc.)
 - Pruebas de unidad
 - Validaciones de campos basado en los múltiples catálogos publicados por el SAT.
 - ~~Soporte para ediciones anteriores de Delphi 7, Delphi 2007, 2010, XE1 etc.~~ con ayuda de @fduenas
