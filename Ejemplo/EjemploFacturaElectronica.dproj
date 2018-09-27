@@ -119,7 +119,6 @@
         <DCCReference Include="..\PACs\Ecodex\EcodexWsSeguridad.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsTimbrado.pas"/>
         <DCCReference Include="..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas"/>
-        <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsCancelacion.pas"/>
         <DCCReference Include="..\PACs\SolucionFactible\Facturacion.PAC.SolucionFactible.pas"/>
         <DCCReference Include="..\PACs\SolucionFactible\SolucionFactibleWsTimbrado.pas"/>
@@ -169,6 +168,12 @@
         <DCCReference Include="..\Lib\synapse\ssl_openssl_lib.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ComplementoComercioExteriorV11.pas"/>
         <DCCReference Include="EjemploFacturaElectronicaMain.pas"/>
+        <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
+        <DCCReference Include="..\Lib\QuricolAPI.pas"/>
+        <DCCReference Include="..\Lib\QuricolCode.pas"/>
+        <DCCReference Include="..\OpenSSL\libeay32.pas"/>
+        <DCCReference Include="..\OpenSSL\LibEay32Plus.pas"/>
+        <DCCReference Include="..\OpenSSL\OpenSSLUtils.pas"/>
         <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
