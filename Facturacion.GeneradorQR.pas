@@ -18,6 +18,13 @@ type
   end;
 
 implementation
+{.$define USAR_PNGIMAGE} //Para forzar el uso de PNGImage  (Delphi 7, 2007}
+
+ {$IF CompilerVersion >= 20}
+   {$IFNDEF USAR_PNGIMAGE}
+    {$define USAR_PNGIMAGE}
+   {$ENDIF}
+ {$IFEND}
 
 uses DelphiZXingQRCode,
 {$IF CompilerVersion >= 23}
@@ -26,9 +33,9 @@ uses DelphiZXingQRCode,
      System.Classes,
      Vcl.Graphics
 {$ELSE}
-     {$IF CompilerVersion >= 20}
-      pngimage,
-     {$IFEND}
+     {$IFDEF USAR_PNGIMAGE}
+       pngimage,
+     {$ENDIF}
      jpeg,
      Classes,
      Graphics
@@ -47,9 +54,27 @@ var
   QRCode: TDelphiZXingQRCode;
   Row, Column: Integer;
   QRCodeBitmap, bmpFinal: TBitmap;
-  jpgResultado : TJPEGImage;
+  imgResultado: TGraphic;
   Scale: Double;
 begin
+  // Checamos que los parámetros esten correctos
+  Assert(aRutaAGuardar <> '', 'La ruta fue vacia');
+
+  // 2. Generamos la imagen auxiliándonos de la liberia Quaricol
+  if SameText( ExtractFileExt(aRutaAGuardar), '.bmp')   then
+     imgResultado := TBitmap.Create
+  else if SameText( ExtractFileExt(aRutaAGuardar), '.jpg') or
+          SameText( ExtractFileExt(aRutaAGuardar), '.jpeg')   then
+     imgResultado := TJPEGImage.Create
+ {$IFDEF USAR_PNGIMAGE}
+   else if SameText( ExtractFileExt(aRutaAGuardar), '.png')   then
+     imgResultado := TPngImage.Create
+ {$ENDIF}
+   else if SameText( ExtractFileExt(aRutaAGuardar), '.wmf')   then
+     imgResultado := TMetafile.Create
+   else
+     raise Exception.Create('No se pudo determinar la clase gráfica para el archivo: '+ExtractFileName(aRutaAGuardar));
+
   QRCodeBitmap := TBitmap.Create;
 
   bmpFinal     := TBitmap.Create;
@@ -89,23 +114,16 @@ begin
 
     // Transferimos el QR redimensionado al BMP "final"
     bmpFinal.Canvas.StretchDraw(Rect(0, 0, Trunc(Scale * QRCodeBitmap.Width), Trunc(Scale * QRCodeBitmap.Height)), QRCodeBitmap);
-  finally
-    QRCode.Free;
-  end;
-
-  // 2. Generamos la imagen pero en formato JPG
-  jpgResultado := TJPEGImage.Create;
-  try
     try
-      // La asignamos el JPG y la guardamos
-      jpgResultado.Assign(bmpFinal);
-      jpgResultado.SaveToFile(aRutaAGuardar);
+      // Le asignamos el bitmap y la guardamos
+     imgResultado.Assign(bmpFinal);
+     imgResultado.SaveToFile(aRutaAGuardar);
     finally
-      QRCodeBitmap.Free;
     end;
   finally
-    jpgResultado.Free;
+    QRCode.Free;
     bmpFinal.Free;
+    imgResultado.Free;
   end;
 end;
 
