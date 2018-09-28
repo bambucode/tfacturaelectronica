@@ -112,6 +112,21 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
+        <DCCReference Include="..\Lib\QuricolAPI.pas"/>
+        <DCCReference Include="..\Lib\QuricolCode.pas"/>
+        <DCCReference Include="..\OpenSSL\libeay32.pas"/>
+        <DCCReference Include="..\OpenSSL\LibEay32Plus.pas"/>
+        <DCCReference Include="..\OpenSSL\OpenSSLUtils.pas"/>
+        <DCCReference Include="..\Lib\synapse\synacode.pas"/>
+        <DCCReference Include="..\Lib\synapse\httpsend.pas"/>
+        <DCCReference Include="..\Lib\synapse\ssl_openssl.pas"/>
+        <DCCReference Include="..\Lib\synapse\blcksock.pas"/>
+        <DCCReference Include="..\Lib\synapse\synafpc.pas"/>
+        <DCCReference Include="..\Lib\synapse\synsock.pas"/>
+        <DCCReference Include="..\Lib\synapse\synautil.pas"/>
+        <DCCReference Include="..\Lib\synapse\synaip.pas"/>
+        <DCCReference Include="..\Lib\synapse\ssl_openssl_lib.pas"/>
         <DCCReference Include="..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas"/>
         <DCCReference Include="..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsClientes.pas"/>
@@ -157,23 +172,8 @@
         <DCCReference Include="..\PACs\ComercioDigital\Cancelacion.PAC.Comercio.pas"/>
         <DCCReference Include="..\PACs\ComercioDigital\ComercioWsComun.pas"/>
         <DCCReference Include="..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas"/>
-        <DCCReference Include="..\Lib\synapse\synacode.pas"/>
-        <DCCReference Include="..\Lib\synapse\httpsend.pas"/>
-        <DCCReference Include="..\Lib\synapse\ssl_openssl.pas"/>
-        <DCCReference Include="..\Lib\synapse\blcksock.pas"/>
-        <DCCReference Include="..\Lib\synapse\synafpc.pas"/>
-        <DCCReference Include="..\Lib\synapse\synsock.pas"/>
-        <DCCReference Include="..\Lib\synapse\synautil.pas"/>
-        <DCCReference Include="..\Lib\synapse\synaip.pas"/>
-        <DCCReference Include="..\Lib\synapse\ssl_openssl_lib.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ComplementoComercioExteriorV11.pas"/>
         <DCCReference Include="EjemploFacturaElectronicaMain.pas"/>
-        <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
-        <DCCReference Include="..\Lib\QuricolAPI.pas"/>
-        <DCCReference Include="..\Lib\QuricolCode.pas"/>
-        <DCCReference Include="..\OpenSSL\libeay32.pas"/>
-        <DCCReference Include="..\OpenSSL\LibEay32Plus.pas"/>
-        <DCCReference Include="..\OpenSSL\OpenSSLUtils.pas"/>
         <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
