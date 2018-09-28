@@ -45,9 +45,10 @@ Complementos de Factura Soportados por v2.0
 	- Vía OOP, usando clases autogeneradas por medio de XML Databinding de Delphi (IXMLDocument, IXMLNode, etc.)
 		- Timbre Fiscal Digital 1.1
 		- Impuestos Locales 1.0
-		- Recepción de Pagos 1.0
-		- Comercio Exterior 1.1	- colaboración de @fduenas
-	- Se ha modificado el archivo cadenaoriginal_3_3.xslt para que cualquiera de los complementos implementados por el SAT a la fecha (2018-09-01) sea tomado en cuenta al generarse la cadena original, con esto, aunque no exista una clase específica para un complemento (ej: TComercioExteriorV11), este puedan agregarse al nodo \<cfdi:Complemento\> de manera manual usando los métodos: 
+		- Recepción de Pagos 1.0	
+		- Comercio Exterior 1.1		- colaboración de @fduenas
+		- Nómina 1.2 			- colaboración de @fduenas
+	- Se ha modificado el archivo cadenaoriginal_3_3.xslt para que cualquiera de los complementos implementados por el SAT a la fecha (2018-09-28) sea tomado en cuenta al generarse la cadena original, con esto, aunque no exista una clase específica para un complemento (ej: TComercioExteriorV11), este puedan agregarse al nodo \<cfdi:Complemento\> de manera manual usando los métodos: 
 		- IComprobanteFiscalV33.Complemento.AddNode(\<nombre_complemento\>) --> Nueva Instancia IXMLNode
 		- IXMLNode.AddNode(\<nombre_nodohijo\>)
 		- IXMLNode.FindNode(\<nombre_nodohijo\>)
@@ -69,7 +70,7 @@ A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
 - ~~Lanzar excepciones basado en el catálogo de errores de CFDI 3.3~~ (Parcial)
 - ~~Poder incluir impuestos locales (3.2 y 3.3)~~.
 - ~~Complemento de pagos~~ con ayuda de @ffaccinetto
-- Otros complementos (donatarias, nómina, notarios, etc.)
+- Otros complementos (donatarias, hidrocarburos, etc.)
 - Pruebas de unidad
 - Validaciones de campos basado en los múltiples catálogos publicados por el SAT.
 - ~~Soporte para ediciones anteriores de Delphi 7, Delphi 2007, 2010, XE1 etc.~~ con ayuda de @fduenas
