@@ -1,20 +1,12 @@
-{***********************************************************}
-{                                                           }
-{       TFacturaElectronica                                 }
-{                                                           }
-{       Copyright (C) 2018 Bambu Code SA de CV              }
-{       Soporte del Complemento ComercioExterior v1.1       }
-{                                                           }
-{***********************************************************}
 
-{***********************************************************************************************************}
-{                                                                                                           }
-{                                          XML Data Binding                                                 }
-{                                                                                                           }
-{         Generated on: 11/09/2018 07:33:50 p. m.                                                           }
-{       Generated from: http://www.sat.gob.mx/sitio_internet/cfd/ComercioExterior11/ComercioExterior11.xsd  }
-{                                                                                                           }
-{***********************************************************************************************************}
+{****************************************************************************************************************}
+{                                                                                                                }
+{                                          XML Data Binding                                                      }
+{                                                                                                                }
+{         Generated on: 11/09/2018 07:33:50 p. m.                                                                }
+{       Generated from: http://www.sat.gob.mx/sitio_internet/cfd/ComercioExterior11/ComercioExterior11.xsd       }
+{                                                                                                                }
+{****************************************************************************************************************}
 
 unit Facturacion.ComplementoComercioExteriorV11;
 
@@ -27,20 +19,20 @@ type
 { Forward Decls }
 
   IComercioExteriorV11 = interface;
-  IComercioExterior_EmisorV11 = interface;
-  IComercioExterior_Emisor_DomicilioV11 = interface;
-  IComercioExterior_PropietarioV11 = interface;
-  IComercioExterior_PropietarioV11List = interface;
-  IComercioExterior_ReceptorV11 = interface;
-  IComercioExterior_Receptor_DomicilioV11 = interface;
-  IComercioExterior_DestinatarioV11 = interface;
-  IComercioExterior_DestinatarioV11List = interface;
-  IComercioExterior_Destinatario_DomicilioV11 = interface;
-  IComercioExterior_MercanciasV11 = interface;
-  IComercioExterior_Mercancias_MercanciaV11 = interface;
-  IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11 = interface;
+  IComercioExteriorV11_Emisor = interface;
+  IComercioExteriorV11_Emisor_Domicilio = interface;
+  IComercioExteriorV11_Propietario = interface;
+  IComercioExteriorV11_PropietarioList = interface;
+  IComercioExteriorV11_Receptor = interface;
+  IComercioExteriorV11_Receptor_Domicilio = interface;
+  IComercioExteriorV11_Destinatario = interface;
+  IComercioExteriorV11_DestinatarioList = interface;
+  IComercioExteriorV11_Destinatario_Domicilio = interface;
+  IComercioExteriorV11_Mercancias = interface;
+  IComercioExteriorV11_Mercancias_Mercancia = interface;
+  IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas = interface;
 
-{ IComercioExteriorV11 }
+{ IComercioExterior }
 
   IComercioExteriorV11 = interface(IXMLNode)
     ['{FAAD7239-1E31-4EE1-A5DB-CBE5E2305096}']
@@ -57,11 +49,11 @@ type
     function Get_Observaciones: UnicodeString;
     function Get_TipoCambioUSD: UnicodeString;
     function Get_TotalUSD: UnicodeString;
-    function Get_Emisor: IComercioExterior_EmisorV11;
-    function Get_Propietario: IComercioExterior_PropietarioV11List;
-    function Get_Receptor: IComercioExterior_ReceptorV11;
-    function Get_Destinatario: IComercioExterior_DestinatarioV11List;
-    function Get_Mercancias: IComercioExterior_MercanciasV11;
+    function Get_Emisor: IComercioExteriorV11_Emisor;
+    function Get_Propietario: IComercioExteriorV11_PropietarioList;
+    function Get_Receptor: IComercioExteriorV11_Receptor;
+    function Get_Destinatario: IComercioExteriorV11_DestinatarioList;
+    function Get_Mercancias: IComercioExteriorV11_Mercancias;
     procedure Set_Version(Value: UnicodeString);
     procedure Set_MotivoTraslado(Value: UnicodeString);
     procedure Set_TipoOperacion(Value: UnicodeString);
@@ -87,29 +79,29 @@ type
     property Observaciones: UnicodeString read Get_Observaciones write Set_Observaciones;
     property TipoCambioUSD: UnicodeString read Get_TipoCambioUSD write Set_TipoCambioUSD;
     property TotalUSD: UnicodeString read Get_TotalUSD write Set_TotalUSD;
-    property Emisor: IComercioExterior_EmisorV11 read Get_Emisor;
-    property Propietario: IComercioExterior_PropietarioV11List read Get_Propietario;
-    property Receptor: IComercioExterior_ReceptorV11 read Get_Receptor;
-    property Destinatario: IComercioExterior_DestinatarioV11List read Get_Destinatario;
-    property Mercancias: IComercioExterior_MercanciasV11 read Get_Mercancias;
+    property Emisor: IComercioExteriorV11_Emisor read Get_Emisor;
+    property Propietario: IComercioExteriorV11_PropietarioList read Get_Propietario;
+    property Receptor: IComercioExteriorV11_Receptor read Get_Receptor;
+    property Destinatario: IComercioExteriorV11_DestinatarioList read Get_Destinatario;
+    property Mercancias: IComercioExteriorV11_Mercancias read Get_Mercancias;
   end;
 
-{ IComercioExterior_EmisorV11 }
+{ IComercioExteriorV11_Emisor }
 
-  IComercioExterior_EmisorV11 = interface(IXMLNode)
+  IComercioExteriorV11_Emisor = interface(IXMLNode)
     ['{5E7EF1CD-2292-407C-B06A-7F3BBBE0C3D9}']
     { Property Accessors }
     function Get_Curp: UnicodeString;
-    function Get_Domicilio: IComercioExterior_Emisor_DomicilioV11;
+    function Get_Domicilio: IComercioExteriorV11_Emisor_Domicilio;
     procedure Set_Curp(Value: UnicodeString);
     { Methods & Properties }
     property Curp: UnicodeString read Get_Curp write Set_Curp;
-    property Domicilio: IComercioExterior_Emisor_DomicilioV11 read Get_Domicilio;
+    property Domicilio: IComercioExteriorV11_Emisor_Domicilio read Get_Domicilio;
   end;
 
-{ IComercioExterior_Emisor_DomicilioV11 }
+{ IComercioExteriorV11_Emisor_Domicilio }
 
-  IComercioExterior_Emisor_DomicilioV11 = interface(IXMLNode)
+  IComercioExteriorV11_Emisor_Domicilio = interface(IXMLNode)
     ['{A93737C3-DC72-4A8F-88AB-C825662644CD}']
     { Property Accessors }
     function Get_Calle: UnicodeString;
@@ -145,9 +137,9 @@ type
     property CodigoPostal: UnicodeString read Get_CodigoPostal write Set_CodigoPostal;
   end;
 
-{ IComercioExterior_PropietarioV11 }
+{ IComercioExteriorV11_Propietario }
 
-  IComercioExterior_PropietarioV11 = interface(IXMLNode)
+  IComercioExteriorV11_Propietario = interface(IXMLNode)
     ['{63FACE0F-0CD1-42B4-8B58-897859329863}']
     { Property Accessors }
     function Get_NumRegIdTrib: UnicodeString;
@@ -159,34 +151,34 @@ type
     property ResidenciaFiscal: UnicodeString read Get_ResidenciaFiscal write Set_ResidenciaFiscal;
   end;
 
-{ IComercioExterior_PropietarioV11List }
+{ IComercioExteriorV11_PropietarioList }
 
-  IComercioExterior_PropietarioV11List = interface(IXMLNodeCollection)
+  IComercioExteriorV11_PropietarioList = interface(IXMLNodeCollection)
     ['{87EFC71C-A1AC-44C3-AAF1-C3271951DCA0}']
     { Methods & Properties }
-    function Add: IComercioExterior_PropietarioV11;
-    function Insert(const Index: Integer): IComercioExterior_PropietarioV11;
+    function Add: IComercioExteriorV11_Propietario;
+    function Insert(const Index: Integer): IComercioExteriorV11_Propietario;
 
-    function Get_Item(Index: Integer): IComercioExterior_PropietarioV11;
-    property Items[Index: Integer]: IComercioExterior_PropietarioV11 read Get_Item; default;
+    function Get_Item(Index: Integer): IComercioExteriorV11_Propietario;
+    property Items[Index: Integer]: IComercioExteriorV11_Propietario read Get_Item; default;
   end;
 
-{ IComercioExterior_ReceptorV11 }
+{ IComercioExteriorV11_Receptor }
 
-  IComercioExterior_ReceptorV11 = interface(IXMLNode)
+  IComercioExteriorV11_Receptor = interface(IXMLNode)
     ['{3AEB4BBB-A3D7-459B-9D32-79BEB996E9D7}']
     { Property Accessors }
     function Get_NumRegIdTrib: UnicodeString;
-    function Get_Domicilio: IComercioExterior_Receptor_DomicilioV11;
+    function Get_Domicilio: IComercioExteriorV11_Receptor_Domicilio;
     procedure Set_NumRegIdTrib(Value: UnicodeString);
     { Methods & Properties }
     property NumRegIdTrib: UnicodeString read Get_NumRegIdTrib write Set_NumRegIdTrib;
-    property Domicilio: IComercioExterior_Receptor_DomicilioV11 read Get_Domicilio;
+    property Domicilio: IComercioExteriorV11_Receptor_Domicilio read Get_Domicilio;
   end;
 
-{ IComercioExterior_Receptor_DomicilioV11 }
+{ IComercioExteriorV11_Receptor_Domicilio }
 
-  IComercioExterior_Receptor_DomicilioV11 = interface(IXMLNode)
+  IComercioExteriorV11_Receptor_Domicilio = interface(IXMLNode)
     ['{1057F994-1A8A-4FDC-9ADB-57B1D97F9C9E}']
     { Property Accessors }
     function Get_Calle: UnicodeString;
@@ -222,39 +214,39 @@ type
     property CodigoPostal: UnicodeString read Get_CodigoPostal write Set_CodigoPostal;
   end;
 
-{ IComercioExterior_DestinatarioV11 }
+{ IComercioExteriorV11_Destinatario }
 
-  IComercioExterior_DestinatarioV11 = interface(IXMLNodeCollection)
+  IComercioExteriorV11_Destinatario = interface(IXMLNodeCollection)
     ['{8ED925B3-087B-4333-B175-88DBA526F622}']
     { Property Accessors }
     function Get_NumRegIdTrib: UnicodeString;
     function Get_Nombre: UnicodeString;
-    function Get_Domicilio(Index: Integer): IComercioExterior_Destinatario_DomicilioV11;
+    function Get_Domicilio(Index: Integer): IComercioExteriorV11_Destinatario_Domicilio;
     procedure Set_NumRegIdTrib(Value: UnicodeString);
     procedure Set_Nombre(Value: UnicodeString);
     { Methods & Properties }
-    function Add: IComercioExterior_Destinatario_DomicilioV11;
-    function Insert(const Index: Integer): IComercioExterior_Destinatario_DomicilioV11;
+    function Add: IComercioExteriorV11_Destinatario_Domicilio;
+    function Insert(const Index: Integer): IComercioExteriorV11_Destinatario_Domicilio;
     property NumRegIdTrib: UnicodeString read Get_NumRegIdTrib write Set_NumRegIdTrib;
     property Nombre: UnicodeString read Get_Nombre write Set_Nombre;
-    property Domicilio[Index: Integer]: IComercioExterior_Destinatario_DomicilioV11 read Get_Domicilio; default;
+    property Domicilio[Index: Integer]: IComercioExteriorV11_Destinatario_Domicilio read Get_Domicilio; default;
   end;
 
-{ IComercioExterior_DestinatarioV11List }
+{ IComercioExteriorV11_DestinatarioList }
 
-  IComercioExterior_DestinatarioV11List = interface(IXMLNodeCollection)
+  IComercioExteriorV11_DestinatarioList = interface(IXMLNodeCollection)
     ['{038C8B96-5628-4437-AB1A-CB1F70F6C17D}']
     { Methods & Properties }
-    function Add: IComercioExterior_DestinatarioV11;
-    function Insert(const Index: Integer): IComercioExterior_DestinatarioV11;
+    function Add: IComercioExteriorV11_Destinatario;
+    function Insert(const Index: Integer): IComercioExteriorV11_Destinatario;
 
-    function Get_Item(Index: Integer): IComercioExterior_DestinatarioV11;
-    property Items[Index: Integer]: IComercioExterior_DestinatarioV11 read Get_Item; default;
+    function Get_Item(Index: Integer): IComercioExteriorV11_Destinatario;
+    property Items[Index: Integer]: IComercioExteriorV11_Destinatario read Get_Item; default;
   end;
 
-{ IComercioExterior_Destinatario_DomicilioV11 }
+{ IComercioExteriorV11_Destinatario_Domicilio }
 
-  IComercioExterior_Destinatario_DomicilioV11 = interface(IXMLNode)
+  IComercioExteriorV11_Destinatario_Domicilio = interface(IXMLNode)
     ['{EEEABB6E-7269-4C5E-A479-12758F2FDF79}']
     { Property Accessors }
     function Get_Calle: UnicodeString;
@@ -290,21 +282,21 @@ type
     property CodigoPostal: UnicodeString read Get_CodigoPostal write Set_CodigoPostal;
   end;
 
-{ IComercioExterior_MercanciasV11 }
+{ IComercioExteriorV11_Mercancias }
 
-  IComercioExterior_MercanciasV11 = interface(IXMLNodeCollection)
+  IComercioExteriorV11_Mercancias = interface(IXMLNodeCollection)
     ['{5CD77B30-4A67-4809-A397-60405A5691D8}']
     { Property Accessors }
-    function Get_Mercancia(Index: Integer): IComercioExterior_Mercancias_MercanciaV11;
+    function Get_Mercancia(Index: Integer): IComercioExteriorV11_Mercancias_Mercancia;
     { Methods & Properties }
-    function Add: IComercioExterior_Mercancias_MercanciaV11;
-    function Insert(const Index: Integer): IComercioExterior_Mercancias_MercanciaV11;
-    property Mercancia[Index: Integer]: IComercioExterior_Mercancias_MercanciaV11 read Get_Mercancia; default;
+    function Add: IComercioExteriorV11_Mercancias_Mercancia;
+    function Insert(const Index: Integer): IComercioExteriorV11_Mercancias_Mercancia;
+    property Mercancia[Index: Integer]: IComercioExteriorV11_Mercancias_Mercancia read Get_Mercancia; default;
   end;
 
-{ IComercioExterior_Mercancias_MercanciaV11 }
+{ IComercioExteriorV11_Mercancias_Mercancia }
 
-  IComercioExterior_Mercancias_MercanciaV11 = interface(IXMLNodeCollection)
+  IComercioExteriorV11_Mercancias_Mercancia = interface(IXMLNodeCollection)
     ['{ADE4925B-D2EB-4D80-B831-66D75966D1D5}']
     { Property Accessors }
     function Get_NoIdentificacion: UnicodeString;
@@ -313,7 +305,7 @@ type
     function Get_UnidadAduana: UnicodeString;
     function Get_ValorUnitarioAduana: UnicodeString;
     function Get_ValorDolares: UnicodeString;
-    function Get_DescripcionesEspecificas(Index: Integer): IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
+    function Get_DescripcionesEspecificas(Index: Integer): IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
     procedure Set_NoIdentificacion(Value: UnicodeString);
     procedure Set_FraccionArancelaria(Value: UnicodeString);
     procedure Set_CantidadAduana(Value: UnicodeString);
@@ -321,20 +313,20 @@ type
     procedure Set_ValorUnitarioAduana(Value: UnicodeString);
     procedure Set_ValorDolares(Value: UnicodeString);
     { Methods & Properties }
-    function Add: IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
-    function Insert(const Index: Integer): IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
+    function Add: IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
+    function Insert(const Index: Integer): IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
     property NoIdentificacion: UnicodeString read Get_NoIdentificacion write Set_NoIdentificacion;
     property FraccionArancelaria: UnicodeString read Get_FraccionArancelaria write Set_FraccionArancelaria;
     property CantidadAduana: UnicodeString read Get_CantidadAduana write Set_CantidadAduana;
     property UnidadAduana: UnicodeString read Get_UnidadAduana write Set_UnidadAduana;
     property ValorUnitarioAduana: UnicodeString read Get_ValorUnitarioAduana write Set_ValorUnitarioAduana;
     property ValorDolares: UnicodeString read Get_ValorDolares write Set_ValorDolares;
-    property DescripcionesEspecificas[Index: Integer]: IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11 read Get_DescripcionesEspecificas; default;
+    property DescripcionesEspecificas[Index: Integer]: IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas read Get_DescripcionesEspecificas; default;
   end;
 
-{ IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11 }
+{ IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas }
 
-  IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11 = interface(IXMLNode)
+  IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas = interface(IXMLNode)
     ['{FD2DFDA2-3DC2-4855-83C0-59522729D4F7}']
     { Property Accessors }
     function Get_Marca: UnicodeString;
@@ -355,27 +347,27 @@ type
 { Forward Decls }
 
   TComercioExteriorV11 = class;
-  TComercioExterior_EmisorV11 = class;
-  TComercioExterior_Emisor_DomicilioV11 = class;
-  TComercioExterior_PropietarioV11 = class;
-  TComercioExterior_PropietarioV11List = class;
-  TComercioExterior_ReceptorV11 = class;
-  TComercioExterior_Receptor_DomicilioV11 = class;
-  TComercioExterior_DestinatarioV11 = class;
-  TComercioExterior_DestinatarioV11List = class;
-  TComercioExterior_Destinatario_DomicilioV11 = class;
-  TComercioExterior_MercanciasV11 = class;
-  TComercioExterior_Mercancias_MercanciaV11 = class;
-  TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11 = class;
+  TComercioExteriorV11_Emisor = class;
+  TComercioExteriorV11_Emisor_Domicilio = class;
+  TComercioExteriorV11_Propietario = class;
+  TComercioExteriorV11_PropietarioList = class;
+  TComercioExteriorV11_Receptor = class;
+  TComercioExteriorV11_Receptor_Domicilio = class;
+  TComercioExteriorV11_Destinatario = class;
+  TComercioExteriorV11_DestinatarioList = class;
+  TComercioExteriorV11_Destinatario_Domicilio = class;
+  TComercioExteriorV11_Mercancias = class;
+  TComercioExteriorV11_Mercancias_Mercancia = class;
+  TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas = class;
 
-{ TComercioExteriorV11 }
+{ TComercioExterior }
 
   TComercioExteriorV11 = class(TXMLNode, IComercioExteriorV11)
   private
-    FPropietario: IComercioExterior_PropietarioV11List;
-    FDestinatario: IComercioExterior_DestinatarioV11List;
+    FPropietario: IComercioExteriorV11_PropietarioList;
+    FDestinatario: IComercioExteriorV11_DestinatarioList;
   protected
-    { IComercioExteriorV11 }
+    { IComercioExterior }
     function Get_Version: UnicodeString;
     function Get_MotivoTraslado: UnicodeString;
     function Get_TipoOperacion: UnicodeString;
@@ -388,11 +380,11 @@ type
     function Get_Observaciones: UnicodeString;
     function Get_TipoCambioUSD: UnicodeString;
     function Get_TotalUSD: UnicodeString;
-    function Get_Emisor: IComercioExterior_EmisorV11;
-    function Get_Propietario: IComercioExterior_PropietarioV11List;
-    function Get_Receptor: IComercioExterior_ReceptorV11;
-    function Get_Destinatario: IComercioExterior_DestinatarioV11List;
-    function Get_Mercancias: IComercioExterior_MercanciasV11;
+    function Get_Emisor: IComercioExteriorV11_Emisor;
+    function Get_Propietario: IComercioExteriorV11_PropietarioList;
+    function Get_Receptor: IComercioExteriorV11_Receptor;
+    function Get_Destinatario: IComercioExteriorV11_DestinatarioList;
+    function Get_Mercancias: IComercioExteriorV11_Mercancias;
     procedure Set_Version(Value: UnicodeString);
     procedure Set_MotivoTraslado(Value: UnicodeString);
     procedure Set_TipoOperacion(Value: UnicodeString);
@@ -409,23 +401,23 @@ type
     procedure AfterConstruction; override;
   end;
 
-{ TComercioExterior_EmisorV11 }
+{ TComercioExteriorV11_Emisor }
 
-  TComercioExterior_EmisorV11 = class(TXMLNode, IComercioExterior_EmisorV11)
+  TComercioExteriorV11_Emisor = class(TXMLNode, IComercioExteriorV11_Emisor)
   protected
-    { IComercioExterior_EmisorV11 }
+    { IComercioExteriorV11_Emisor }
     function Get_Curp: UnicodeString;
-    function Get_Domicilio: IComercioExterior_Emisor_DomicilioV11;
+    function Get_Domicilio: IComercioExteriorV11_Emisor_Domicilio;
     procedure Set_Curp(Value: UnicodeString);
   public
     procedure AfterConstruction; override;
   end;
 
-{ TComercioExterior_Emisor_DomicilioV11 }
+{ TComercioExteriorV11_Emisor_Domicilio }
 
-  TComercioExterior_Emisor_DomicilioV11 = class(TXMLNode, IComercioExterior_Emisor_DomicilioV11)
+  TComercioExteriorV11_Emisor_Domicilio = class(TXMLNode, IComercioExteriorV11_Emisor_Domicilio)
   protected
-    { IComercioExterior_Emisor_DomicilioV11 }
+    { IComercioExteriorV11_Emisor_Domicilio }
     function Get_Calle: UnicodeString;
     function Get_NumeroExterior: UnicodeString;
     function Get_NumeroInterior: UnicodeString;
@@ -448,45 +440,45 @@ type
     procedure Set_CodigoPostal(Value: UnicodeString);
   end;
 
-{ TComercioExterior_PropietarioV11 }
+{ TComercioExteriorV11_Propietario }
 
-  TComercioExterior_PropietarioV11 = class(TXMLNode, IComercioExterior_PropietarioV11)
+  TComercioExteriorV11_Propietario = class(TXMLNode, IComercioExteriorV11_Propietario)
   protected
-    { IComercioExterior_PropietarioV11 }
+    { IComercioExteriorV11_Propietario }
     function Get_NumRegIdTrib: UnicodeString;
     function Get_ResidenciaFiscal: UnicodeString;
     procedure Set_NumRegIdTrib(Value: UnicodeString);
     procedure Set_ResidenciaFiscal(Value: UnicodeString);
   end;
 
-{ TComercioExterior_PropietarioV11List }
+{ TComercioExteriorV11_PropietarioList }
 
-  TComercioExterior_PropietarioV11List = class(TXMLNodeCollection, IComercioExterior_PropietarioV11List)
+  TComercioExteriorV11_PropietarioList = class(TXMLNodeCollection, IComercioExteriorV11_PropietarioList)
   protected
-    { IComercioExterior_PropietarioV11List }
-    function Add: IComercioExterior_PropietarioV11;
-    function Insert(const Index: Integer): IComercioExterior_PropietarioV11;
+    { IComercioExteriorV11_PropietarioList }
+    function Add: IComercioExteriorV11_Propietario;
+    function Insert(const Index: Integer): IComercioExteriorV11_Propietario;
 
-    function Get_Item(Index: Integer): IComercioExterior_PropietarioV11;
+    function Get_Item(Index: Integer): IComercioExteriorV11_Propietario;
   end;
 
-{ TComercioExterior_ReceptorV11 }
+{ TComercioExteriorV11_Receptor }
 
-  TComercioExterior_ReceptorV11 = class(TXMLNode, IComercioExterior_ReceptorV11)
+  TComercioExteriorV11_Receptor = class(TXMLNode, IComercioExteriorV11_Receptor)
   protected
-    { IComercioExterior_ReceptorV11 }
+    { IComercioExteriorV11_Receptor }
     function Get_NumRegIdTrib: UnicodeString;
-    function Get_Domicilio: IComercioExterior_Receptor_DomicilioV11;
+    function Get_Domicilio: IComercioExteriorV11_Receptor_Domicilio;
     procedure Set_NumRegIdTrib(Value: UnicodeString);
   public
     procedure AfterConstruction; override;
   end;
 
-{ TComercioExterior_Receptor_DomicilioV11 }
+{ TComercioExteriorV11_Receptor_Domicilio }
 
-  TComercioExterior_Receptor_DomicilioV11 = class(TXMLNode, IComercioExterior_Receptor_DomicilioV11)
+  TComercioExteriorV11_Receptor_Domicilio = class(TXMLNode, IComercioExteriorV11_Receptor_Domicilio)
   protected
-    { IComercioExterior_Receptor_DomicilioV11 }
+    { IComercioExteriorV11_Receptor_Domicilio }
     function Get_Calle: UnicodeString;
     function Get_NumeroExterior: UnicodeString;
     function Get_NumeroInterior: UnicodeString;
@@ -509,38 +501,38 @@ type
     procedure Set_CodigoPostal(Value: UnicodeString);
   end;
 
-{ TComercioExterior_DestinatarioV11 }
+{ TComercioExteriorV11_Destinatario }
 
-  TComercioExterior_DestinatarioV11 = class(TXMLNodeCollection, IComercioExterior_DestinatarioV11)
+  TComercioExteriorV11_Destinatario = class(TXMLNodeCollection, IComercioExteriorV11_Destinatario)
   protected
-    { IComercioExterior_DestinatarioV11 }
+    { IComercioExteriorV11_Destinatario }
     function Get_NumRegIdTrib: UnicodeString;
     function Get_Nombre: UnicodeString;
-    function Get_Domicilio(Index: Integer): IComercioExterior_Destinatario_DomicilioV11;
+    function Get_Domicilio(Index: Integer): IComercioExteriorV11_Destinatario_Domicilio;
     procedure Set_NumRegIdTrib(Value: UnicodeString);
     procedure Set_Nombre(Value: UnicodeString);
-    function Add: IComercioExterior_Destinatario_DomicilioV11;
-    function Insert(const Index: Integer): IComercioExterior_Destinatario_DomicilioV11;
+    function Add: IComercioExteriorV11_Destinatario_Domicilio;
+    function Insert(const Index: Integer): IComercioExteriorV11_Destinatario_Domicilio;
   public
     procedure AfterConstruction; override;
   end;
 
-{ TComercioExterior_DestinatarioV11List }
+{ TComercioExteriorV11_DestinatarioList }
 
-  TComercioExterior_DestinatarioV11List = class(TXMLNodeCollection, IComercioExterior_DestinatarioV11List)
+  TComercioExteriorV11_DestinatarioList = class(TXMLNodeCollection, IComercioExteriorV11_DestinatarioList)
   protected
-    { IComercioExterior_DestinatarioV11List }
-    function Add: IComercioExterior_DestinatarioV11;
-    function Insert(const Index: Integer): IComercioExterior_DestinatarioV11;
+    { IComercioExteriorV11_DestinatarioList }
+    function Add: IComercioExteriorV11_Destinatario;
+    function Insert(const Index: Integer): IComercioExteriorV11_Destinatario;
 
-    function Get_Item(Index: Integer): IComercioExterior_DestinatarioV11;
+    function Get_Item(Index: Integer): IComercioExteriorV11_Destinatario;
   end;
 
-{ TComercioExterior_Destinatario_DomicilioV11 }
+{ TComercioExteriorV11_Destinatario_Domicilio }
 
-  TComercioExterior_Destinatario_DomicilioV11 = class(TXMLNode, IComercioExterior_Destinatario_DomicilioV11)
+  TComercioExteriorV11_Destinatario_Domicilio = class(TXMLNode, IComercioExteriorV11_Destinatario_Domicilio)
   protected
-    { IComercioExterior_Destinatario_DomicilioV11 }
+    { IComercioExteriorV11_Destinatario_Domicilio }
     function Get_Calle: UnicodeString;
     function Get_NumeroExterior: UnicodeString;
     function Get_NumeroInterior: UnicodeString;
@@ -563,47 +555,47 @@ type
     procedure Set_CodigoPostal(Value: UnicodeString);
   end;
 
-{ TComercioExterior_MercanciasV11 }
+{ TComercioExteriorV11_Mercancias }
 
-  TComercioExterior_MercanciasV11 = class(TXMLNodeCollection, IComercioExterior_MercanciasV11)
+  TComercioExteriorV11_Mercancias = class(TXMLNodeCollection, IComercioExteriorV11_Mercancias)
   protected
-    { IComercioExterior_MercanciasV11 }
-    function Get_Mercancia(Index: Integer): IComercioExterior_Mercancias_MercanciaV11;
-    function Add: IComercioExterior_Mercancias_MercanciaV11;
-    function Insert(const Index: Integer): IComercioExterior_Mercancias_MercanciaV11;
+    { IComercioExteriorV11_Mercancias }
+    function Get_Mercancia(Index: Integer): IComercioExteriorV11_Mercancias_Mercancia;
+    function Add: IComercioExteriorV11_Mercancias_Mercancia;
+    function Insert(const Index: Integer): IComercioExteriorV11_Mercancias_Mercancia;
   public
     procedure AfterConstruction; override;
   end;
 
-{ TComercioExterior_Mercancias_MercanciaV11 }
+{ TComercioExteriorV11_Mercancias_Mercancia }
 
-  TComercioExterior_Mercancias_MercanciaV11 = class(TXMLNodeCollection, IComercioExterior_Mercancias_MercanciaV11)
+  TComercioExteriorV11_Mercancias_Mercancia = class(TXMLNodeCollection, IComercioExteriorV11_Mercancias_Mercancia)
   protected
-    { IComercioExterior_Mercancias_MercanciaV11 }
+    { IComercioExteriorV11_Mercancias_Mercancia }
     function Get_NoIdentificacion: UnicodeString;
     function Get_FraccionArancelaria: UnicodeString;
     function Get_CantidadAduana: UnicodeString;
     function Get_UnidadAduana: UnicodeString;
     function Get_ValorUnitarioAduana: UnicodeString;
     function Get_ValorDolares: UnicodeString;
-    function Get_DescripcionesEspecificas(Index: Integer): IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
+    function Get_DescripcionesEspecificas(Index: Integer): IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
     procedure Set_NoIdentificacion(Value: UnicodeString);
     procedure Set_FraccionArancelaria(Value: UnicodeString);
     procedure Set_CantidadAduana(Value: UnicodeString);
     procedure Set_UnidadAduana(Value: UnicodeString);
     procedure Set_ValorUnitarioAduana(Value: UnicodeString);
     procedure Set_ValorDolares(Value: UnicodeString);
-    function Add: IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
-    function Insert(const Index: Integer): IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
+    function Add: IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
+    function Insert(const Index: Integer): IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
   public
     procedure AfterConstruction; override;
   end;
 
-{ TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11 }
+{ TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas }
 
-  TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11 = class(TXMLNode, IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11)
+  TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas = class(TXMLNode, IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas)
   protected
-    { IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11 }
+    { IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas }
     function Get_Marca: UnicodeString;
     function Get_Modelo: UnicodeString;
     function Get_SubModelo: UnicodeString;
@@ -648,19 +640,19 @@ begin
   Result := NewXMLDocument.GetDocBinding('cce11:ComercioExterior', TComercioExteriorV11, TargetNamespace) as IComercioExteriorV11;
 end;
 
-{ TComercioExteriorV11 }
+{ TComercioExterior }
 
 procedure TComercioExteriorV11.AfterConstruction;
 begin
   if (Self.AttributeNodes.FindNode('Version') = nil) then
       Self.Set_Version('1.1');
-  RegisterChildNode('Emisor', TComercioExterior_EmisorV11);
-  RegisterChildNode('Propietario', TComercioExterior_PropietarioV11);
-  RegisterChildNode('Receptor', TComercioExterior_ReceptorV11);
-  RegisterChildNode('Destinatario', TComercioExterior_DestinatarioV11);
-  RegisterChildNode('Mercancias', TComercioExterior_MercanciasV11);
-  FPropietario := CreateCollection(TComercioExterior_PropietarioV11List, IComercioExterior_PropietarioV11, 'Propietario') as IComercioExterior_PropietarioV11List;
-  FDestinatario := CreateCollection(TComercioExterior_DestinatarioV11List, IComercioExterior_DestinatarioV11, 'Destinatario') as IComercioExterior_DestinatarioV11List;
+  RegisterChildNode('Emisor', TComercioExteriorV11_Emisor);
+  RegisterChildNode('Propietario', TComercioExteriorV11_Propietario);
+  RegisterChildNode('Receptor', TComercioExteriorV11_Receptor);
+  RegisterChildNode('Destinatario', TComercioExteriorV11_Destinatario);
+  RegisterChildNode('Mercancias', TComercioExteriorV11_Mercancias);
+  FPropietario := CreateCollection(TComercioExteriorV11_PropietarioList, IComercioExteriorV11_Propietario, 'Propietario') as IComercioExteriorV11_PropietarioList;
+  FDestinatario := CreateCollection(TComercioExteriorV11_DestinatarioList, IComercioExteriorV11_Destinatario, 'Destinatario') as IComercioExteriorV11_DestinatarioList;
   inherited;
 end;
 
@@ -784,632 +776,632 @@ begin
   SetAttribute('TotalUSD', Value);
 end;
 
-function TComercioExteriorV11.Get_Emisor: IComercioExterior_EmisorV11;
+function TComercioExteriorV11.Get_Emisor: IComercioExteriorV11_Emisor;
 begin
-  Result := ChildNodes['Emisor'] as IComercioExterior_EmisorV11;
+  Result := ChildNodes['Emisor'] as IComercioExteriorV11_Emisor;
 end;
 
-function TComercioExteriorV11.Get_Propietario: IComercioExterior_PropietarioV11List;
+function TComercioExteriorV11.Get_Propietario: IComercioExteriorV11_PropietarioList;
 begin
   Result := FPropietario;
 end;
 
-function TComercioExteriorV11.Get_Receptor: IComercioExterior_ReceptorV11;
+function TComercioExteriorV11.Get_Receptor: IComercioExteriorV11_Receptor;
 begin
-  Result := ChildNodes['Receptor'] as IComercioExterior_ReceptorV11;
+  Result := ChildNodes['Receptor'] as IComercioExteriorV11_Receptor;
 end;
 
-function TComercioExteriorV11.Get_Destinatario: IComercioExterior_DestinatarioV11List;
+function TComercioExteriorV11.Get_Destinatario: IComercioExteriorV11_DestinatarioList;
 begin
   Result := FDestinatario;
 end;
 
-function TComercioExteriorV11.Get_Mercancias: IComercioExterior_MercanciasV11;
+function TComercioExteriorV11.Get_Mercancias: IComercioExteriorV11_Mercancias;
 begin
-  Result := ChildNodes['Mercancias'] as IComercioExterior_MercanciasV11;
+  Result := ChildNodes['Mercancias'] as IComercioExteriorV11_Mercancias;
 end;
 
-{ TComercioExterior_EmisorV11 }
+{ TComercioExteriorV11_Emisor }
 
-procedure TComercioExterior_EmisorV11.AfterConstruction;
+procedure TComercioExteriorV11_Emisor.AfterConstruction;
 begin
-  RegisterChildNode('Domicilio', TComercioExterior_Emisor_DomicilioV11);
+  RegisterChildNode('Domicilio', TComercioExteriorV11_Emisor_Domicilio);
   inherited;
 end;
 
-function TComercioExterior_EmisorV11.Get_Curp: UnicodeString;
+function TComercioExteriorV11_Emisor.Get_Curp: UnicodeString;
 begin
   Result := AttributeNodes['Curp'].Text;
 end;
 
-procedure TComercioExterior_EmisorV11.Set_Curp(Value: UnicodeString);
+procedure TComercioExteriorV11_Emisor.Set_Curp(Value: UnicodeString);
 begin
   SetAttribute('Curp', Value);
 end;
 
-function TComercioExterior_EmisorV11.Get_Domicilio: IComercioExterior_Emisor_DomicilioV11;
+function TComercioExteriorV11_Emisor.Get_Domicilio: IComercioExteriorV11_Emisor_Domicilio;
 begin
-  Result := ChildNodes['Domicilio'] as IComercioExterior_Emisor_DomicilioV11;
+  Result := ChildNodes['Domicilio'] as IComercioExteriorV11_Emisor_Domicilio;
 end;
 
-{ TComercioExterior_Emisor_DomicilioV11 }
+{ TComercioExteriorV11_Emisor_Domicilio }
 
-function TComercioExterior_Emisor_DomicilioV11.Get_Calle: UnicodeString;
+function TComercioExteriorV11_Emisor_Domicilio.Get_Calle: UnicodeString;
 begin
   Result := AttributeNodes['Calle'].Text;
 end;
 
-procedure TComercioExterior_Emisor_DomicilioV11.Set_Calle(Value: UnicodeString);
+procedure TComercioExteriorV11_Emisor_Domicilio.Set_Calle(Value: UnicodeString);
 begin
   SetAttribute('Calle', Value);
 end;
 
-function TComercioExterior_Emisor_DomicilioV11.Get_NumeroExterior: UnicodeString;
+function TComercioExteriorV11_Emisor_Domicilio.Get_NumeroExterior: UnicodeString;
 begin
   Result := AttributeNodes['NumeroExterior'].Text;
 end;
 
-procedure TComercioExterior_Emisor_DomicilioV11.Set_NumeroExterior(Value: UnicodeString);
+procedure TComercioExteriorV11_Emisor_Domicilio.Set_NumeroExterior(Value: UnicodeString);
 begin
   SetAttribute('NumeroExterior', Value);
 end;
 
-function TComercioExterior_Emisor_DomicilioV11.Get_NumeroInterior: UnicodeString;
+function TComercioExteriorV11_Emisor_Domicilio.Get_NumeroInterior: UnicodeString;
 begin
   Result := AttributeNodes['NumeroInterior'].Text;
 end;
 
-procedure TComercioExterior_Emisor_DomicilioV11.Set_NumeroInterior(Value: UnicodeString);
+procedure TComercioExteriorV11_Emisor_Domicilio.Set_NumeroInterior(Value: UnicodeString);
 begin
   SetAttribute('NumeroInterior', Value);
 end;
 
-function TComercioExterior_Emisor_DomicilioV11.Get_Colonia: UnicodeString;
+function TComercioExteriorV11_Emisor_Domicilio.Get_Colonia: UnicodeString;
 begin
   Result := AttributeNodes['Colonia'].Text;
 end;
 
-procedure TComercioExterior_Emisor_DomicilioV11.Set_Colonia(Value: UnicodeString);
+procedure TComercioExteriorV11_Emisor_Domicilio.Set_Colonia(Value: UnicodeString);
 begin
   SetAttribute('Colonia', Value);
 end;
 
-function TComercioExterior_Emisor_DomicilioV11.Get_Localidad: UnicodeString;
+function TComercioExteriorV11_Emisor_Domicilio.Get_Localidad: UnicodeString;
 begin
   Result := AttributeNodes['Localidad'].Text;
 end;
 
-procedure TComercioExterior_Emisor_DomicilioV11.Set_Localidad(Value: UnicodeString);
+procedure TComercioExteriorV11_Emisor_Domicilio.Set_Localidad(Value: UnicodeString);
 begin
   SetAttribute('Localidad', Value);
 end;
 
-function TComercioExterior_Emisor_DomicilioV11.Get_Referencia: UnicodeString;
+function TComercioExteriorV11_Emisor_Domicilio.Get_Referencia: UnicodeString;
 begin
   Result := AttributeNodes['Referencia'].Text;
 end;
 
-procedure TComercioExterior_Emisor_DomicilioV11.Set_Referencia(Value: UnicodeString);
+procedure TComercioExteriorV11_Emisor_Domicilio.Set_Referencia(Value: UnicodeString);
 begin
   SetAttribute('Referencia', Value);
 end;
 
-function TComercioExterior_Emisor_DomicilioV11.Get_Municipio: UnicodeString;
+function TComercioExteriorV11_Emisor_Domicilio.Get_Municipio: UnicodeString;
 begin
   Result := AttributeNodes['Municipio'].Text;
 end;
 
-procedure TComercioExterior_Emisor_DomicilioV11.Set_Municipio(Value: UnicodeString);
+procedure TComercioExteriorV11_Emisor_Domicilio.Set_Municipio(Value: UnicodeString);
 begin
   SetAttribute('Municipio', Value);
 end;
 
-function TComercioExterior_Emisor_DomicilioV11.Get_Estado: UnicodeString;
+function TComercioExteriorV11_Emisor_Domicilio.Get_Estado: UnicodeString;
 begin
   Result := AttributeNodes['Estado'].Text;
 end;
 
-procedure TComercioExterior_Emisor_DomicilioV11.Set_Estado(Value: UnicodeString);
+procedure TComercioExteriorV11_Emisor_Domicilio.Set_Estado(Value: UnicodeString);
 begin
   SetAttribute('Estado', Value);
 end;
 
-function TComercioExterior_Emisor_DomicilioV11.Get_Pais: UnicodeString;
+function TComercioExteriorV11_Emisor_Domicilio.Get_Pais: UnicodeString;
 begin
   Result := AttributeNodes['Pais'].Text;
 end;
 
-procedure TComercioExterior_Emisor_DomicilioV11.Set_Pais(Value: UnicodeString);
+procedure TComercioExteriorV11_Emisor_Domicilio.Set_Pais(Value: UnicodeString);
 begin
   SetAttribute('Pais', Value);
 end;
 
-function TComercioExterior_Emisor_DomicilioV11.Get_CodigoPostal: UnicodeString;
+function TComercioExteriorV11_Emisor_Domicilio.Get_CodigoPostal: UnicodeString;
 begin
   Result := AttributeNodes['CodigoPostal'].Text;
 end;
 
-procedure TComercioExterior_Emisor_DomicilioV11.Set_CodigoPostal(Value: UnicodeString);
+procedure TComercioExteriorV11_Emisor_Domicilio.Set_CodigoPostal(Value: UnicodeString);
 begin
   SetAttribute('CodigoPostal', Value);
 end;
 
-{ TComercioExterior_PropietarioV11 }
+{ TComercioExteriorV11_Propietario }
 
-function TComercioExterior_PropietarioV11.Get_NumRegIdTrib: UnicodeString;
+function TComercioExteriorV11_Propietario.Get_NumRegIdTrib: UnicodeString;
 begin
   Result := AttributeNodes['NumRegIdTrib'].Text;
 end;
 
-procedure TComercioExterior_PropietarioV11.Set_NumRegIdTrib(Value: UnicodeString);
+procedure TComercioExteriorV11_Propietario.Set_NumRegIdTrib(Value: UnicodeString);
 begin
   SetAttribute('NumRegIdTrib', Value);
 end;
 
-function TComercioExterior_PropietarioV11.Get_ResidenciaFiscal: UnicodeString;
+function TComercioExteriorV11_Propietario.Get_ResidenciaFiscal: UnicodeString;
 begin
   Result := AttributeNodes['ResidenciaFiscal'].Text;
 end;
 
-procedure TComercioExterior_PropietarioV11.Set_ResidenciaFiscal(Value: UnicodeString);
+procedure TComercioExteriorV11_Propietario.Set_ResidenciaFiscal(Value: UnicodeString);
 begin
   SetAttribute('ResidenciaFiscal', Value);
 end;
 
-{ TComercioExterior_PropietarioV11List }
+{ TComercioExteriorV11_PropietarioList }
 
-function TComercioExterior_PropietarioV11List.Add: IComercioExterior_PropietarioV11;
+function TComercioExteriorV11_PropietarioList.Add: IComercioExteriorV11_Propietario;
 begin
-  Result := AddItem(-1) as IComercioExterior_PropietarioV11;
+  Result := AddItem(-1) as IComercioExteriorV11_Propietario;
 end;
 
-function TComercioExterior_PropietarioV11List.Insert(const Index: Integer): IComercioExterior_PropietarioV11;
+function TComercioExteriorV11_PropietarioList.Insert(const Index: Integer): IComercioExteriorV11_Propietario;
 begin
-  Result := AddItem(Index) as IComercioExterior_PropietarioV11;
+  Result := AddItem(Index) as IComercioExteriorV11_Propietario;
 end;
 
-function TComercioExterior_PropietarioV11List.Get_Item(Index: Integer): IComercioExterior_PropietarioV11;
+function TComercioExteriorV11_PropietarioList.Get_Item(Index: Integer): IComercioExteriorV11_Propietario;
 begin
-  Result := List[Index] as IComercioExterior_PropietarioV11;
+  Result := List[Index] as IComercioExteriorV11_Propietario;
 end;
 
-{ TComercioExterior_ReceptorV11 }
+{ TComercioExteriorV11_Receptor }
 
-procedure TComercioExterior_ReceptorV11.AfterConstruction;
+procedure TComercioExteriorV11_Receptor.AfterConstruction;
 begin
-  RegisterChildNode('Domicilio', TComercioExterior_Receptor_DomicilioV11);
+  RegisterChildNode('Domicilio', TComercioExteriorV11_Receptor_Domicilio);
   inherited;
 end;
 
-function TComercioExterior_ReceptorV11.Get_NumRegIdTrib: UnicodeString;
+function TComercioExteriorV11_Receptor.Get_NumRegIdTrib: UnicodeString;
 begin
   Result := AttributeNodes['NumRegIdTrib'].Text;
 end;
 
-procedure TComercioExterior_ReceptorV11.Set_NumRegIdTrib(Value: UnicodeString);
+procedure TComercioExteriorV11_Receptor.Set_NumRegIdTrib(Value: UnicodeString);
 begin
   SetAttribute('NumRegIdTrib', Value);
 end;
 
-function TComercioExterior_ReceptorV11.Get_Domicilio: IComercioExterior_Receptor_DomicilioV11;
+function TComercioExteriorV11_Receptor.Get_Domicilio: IComercioExteriorV11_Receptor_Domicilio;
 begin
-  Result := ChildNodes['Domicilio'] as IComercioExterior_Receptor_DomicilioV11;
+  Result := ChildNodes['Domicilio'] as IComercioExteriorV11_Receptor_Domicilio;
 end;
 
-{ TComercioExterior_Receptor_DomicilioV11 }
+{ TComercioExteriorV11_Receptor_Domicilio }
 
-function TComercioExterior_Receptor_DomicilioV11.Get_Calle: UnicodeString;
+function TComercioExteriorV11_Receptor_Domicilio.Get_Calle: UnicodeString;
 begin
   Result := AttributeNodes['Calle'].Text;
 end;
 
-procedure TComercioExterior_Receptor_DomicilioV11.Set_Calle(Value: UnicodeString);
+procedure TComercioExteriorV11_Receptor_Domicilio.Set_Calle(Value: UnicodeString);
 begin
   SetAttribute('Calle', Value);
 end;
 
-function TComercioExterior_Receptor_DomicilioV11.Get_NumeroExterior: UnicodeString;
+function TComercioExteriorV11_Receptor_Domicilio.Get_NumeroExterior: UnicodeString;
 begin
   Result := AttributeNodes['NumeroExterior'].Text;
 end;
 
-procedure TComercioExterior_Receptor_DomicilioV11.Set_NumeroExterior(Value: UnicodeString);
+procedure TComercioExteriorV11_Receptor_Domicilio.Set_NumeroExterior(Value: UnicodeString);
 begin
   SetAttribute('NumeroExterior', Value);
 end;
 
-function TComercioExterior_Receptor_DomicilioV11.Get_NumeroInterior: UnicodeString;
+function TComercioExteriorV11_Receptor_Domicilio.Get_NumeroInterior: UnicodeString;
 begin
   Result := AttributeNodes['NumeroInterior'].Text;
 end;
 
-procedure TComercioExterior_Receptor_DomicilioV11.Set_NumeroInterior(Value: UnicodeString);
+procedure TComercioExteriorV11_Receptor_Domicilio.Set_NumeroInterior(Value: UnicodeString);
 begin
   SetAttribute('NumeroInterior', Value);
 end;
 
-function TComercioExterior_Receptor_DomicilioV11.Get_Colonia: UnicodeString;
+function TComercioExteriorV11_Receptor_Domicilio.Get_Colonia: UnicodeString;
 begin
   Result := AttributeNodes['Colonia'].Text;
 end;
 
-procedure TComercioExterior_Receptor_DomicilioV11.Set_Colonia(Value: UnicodeString);
+procedure TComercioExteriorV11_Receptor_Domicilio.Set_Colonia(Value: UnicodeString);
 begin
   SetAttribute('Colonia', Value);
 end;
 
-function TComercioExterior_Receptor_DomicilioV11.Get_Localidad: UnicodeString;
+function TComercioExteriorV11_Receptor_Domicilio.Get_Localidad: UnicodeString;
 begin
   Result := AttributeNodes['Localidad'].Text;
 end;
 
-procedure TComercioExterior_Receptor_DomicilioV11.Set_Localidad(Value: UnicodeString);
+procedure TComercioExteriorV11_Receptor_Domicilio.Set_Localidad(Value: UnicodeString);
 begin
   SetAttribute('Localidad', Value);
 end;
 
-function TComercioExterior_Receptor_DomicilioV11.Get_Referencia: UnicodeString;
+function TComercioExteriorV11_Receptor_Domicilio.Get_Referencia: UnicodeString;
 begin
   Result := AttributeNodes['Referencia'].Text;
 end;
 
-procedure TComercioExterior_Receptor_DomicilioV11.Set_Referencia(Value: UnicodeString);
+procedure TComercioExteriorV11_Receptor_Domicilio.Set_Referencia(Value: UnicodeString);
 begin
   SetAttribute('Referencia', Value);
 end;
 
-function TComercioExterior_Receptor_DomicilioV11.Get_Municipio: UnicodeString;
+function TComercioExteriorV11_Receptor_Domicilio.Get_Municipio: UnicodeString;
 begin
   Result := AttributeNodes['Municipio'].Text;
 end;
 
-procedure TComercioExterior_Receptor_DomicilioV11.Set_Municipio(Value: UnicodeString);
+procedure TComercioExteriorV11_Receptor_Domicilio.Set_Municipio(Value: UnicodeString);
 begin
   SetAttribute('Municipio', Value);
 end;
 
-function TComercioExterior_Receptor_DomicilioV11.Get_Estado: UnicodeString;
+function TComercioExteriorV11_Receptor_Domicilio.Get_Estado: UnicodeString;
 begin
   Result := AttributeNodes['Estado'].Text;
 end;
 
-procedure TComercioExterior_Receptor_DomicilioV11.Set_Estado(Value: UnicodeString);
+procedure TComercioExteriorV11_Receptor_Domicilio.Set_Estado(Value: UnicodeString);
 begin
   SetAttribute('Estado', Value);
 end;
 
-function TComercioExterior_Receptor_DomicilioV11.Get_Pais: UnicodeString;
+function TComercioExteriorV11_Receptor_Domicilio.Get_Pais: UnicodeString;
 begin
   Result := AttributeNodes['Pais'].Text;
 end;
 
-procedure TComercioExterior_Receptor_DomicilioV11.Set_Pais(Value: UnicodeString);
+procedure TComercioExteriorV11_Receptor_Domicilio.Set_Pais(Value: UnicodeString);
 begin
   SetAttribute('Pais', Value);
 end;
 
-function TComercioExterior_Receptor_DomicilioV11.Get_CodigoPostal: UnicodeString;
+function TComercioExteriorV11_Receptor_Domicilio.Get_CodigoPostal: UnicodeString;
 begin
   Result := AttributeNodes['CodigoPostal'].Text;
 end;
 
-procedure TComercioExterior_Receptor_DomicilioV11.Set_CodigoPostal(Value: UnicodeString);
+procedure TComercioExteriorV11_Receptor_Domicilio.Set_CodigoPostal(Value: UnicodeString);
 begin
   SetAttribute('CodigoPostal', Value);
 end;
 
-{ TComercioExterior_DestinatarioV11 }
+{ TComercioExteriorV11_Destinatario }
 
-procedure TComercioExterior_DestinatarioV11.AfterConstruction;
+procedure TComercioExteriorV11_Destinatario.AfterConstruction;
 begin
-  RegisterChildNode('Domicilio', TComercioExterior_Destinatario_DomicilioV11);
+  RegisterChildNode('Domicilio', TComercioExteriorV11_Destinatario_Domicilio);
   ItemTag := 'Domicilio';
-  ItemInterface := IComercioExterior_Destinatario_DomicilioV11;
+  ItemInterface := IComercioExteriorV11_Destinatario_Domicilio;
   inherited;
 end;
 
-function TComercioExterior_DestinatarioV11.Get_NumRegIdTrib: UnicodeString;
+function TComercioExteriorV11_Destinatario.Get_NumRegIdTrib: UnicodeString;
 begin
   Result := AttributeNodes['NumRegIdTrib'].Text;
 end;
 
-procedure TComercioExterior_DestinatarioV11.Set_NumRegIdTrib(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario.Set_NumRegIdTrib(Value: UnicodeString);
 begin
   SetAttribute('NumRegIdTrib', Value);
 end;
 
-function TComercioExterior_DestinatarioV11.Get_Nombre: UnicodeString;
+function TComercioExteriorV11_Destinatario.Get_Nombre: UnicodeString;
 begin
   Result := AttributeNodes['Nombre'].Text;
 end;
 
-procedure TComercioExterior_DestinatarioV11.Set_Nombre(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario.Set_Nombre(Value: UnicodeString);
 begin
   SetAttribute('Nombre', Value);
 end;
 
-function TComercioExterior_DestinatarioV11.Get_Domicilio(Index: Integer): IComercioExterior_Destinatario_DomicilioV11;
+function TComercioExteriorV11_Destinatario.Get_Domicilio(Index: Integer): IComercioExteriorV11_Destinatario_Domicilio;
 begin
-  Result := List[Index] as IComercioExterior_Destinatario_DomicilioV11;
+  Result := List[Index] as IComercioExteriorV11_Destinatario_Domicilio;
 end;
 
-function TComercioExterior_DestinatarioV11.Add: IComercioExterior_Destinatario_DomicilioV11;
+function TComercioExteriorV11_Destinatario.Add: IComercioExteriorV11_Destinatario_Domicilio;
 begin
-  Result := AddItem(-1) as IComercioExterior_Destinatario_DomicilioV11;
+  Result := AddItem(-1) as IComercioExteriorV11_Destinatario_Domicilio;
 end;
 
-function TComercioExterior_DestinatarioV11.Insert(const Index: Integer): IComercioExterior_Destinatario_DomicilioV11;
+function TComercioExteriorV11_Destinatario.Insert(const Index: Integer): IComercioExteriorV11_Destinatario_Domicilio;
 begin
-  Result := AddItem(Index) as IComercioExterior_Destinatario_DomicilioV11;
+  Result := AddItem(Index) as IComercioExteriorV11_Destinatario_Domicilio;
 end;
 
-{ TComercioExterior_DestinatarioV11List }
+{ TComercioExteriorV11_DestinatarioList }
 
-function TComercioExterior_DestinatarioV11List.Add: IComercioExterior_DestinatarioV11;
+function TComercioExteriorV11_DestinatarioList.Add: IComercioExteriorV11_Destinatario;
 begin
-  Result := AddItem(-1) as IComercioExterior_DestinatarioV11;
+  Result := AddItem(-1) as IComercioExteriorV11_Destinatario;
 end;
 
-function TComercioExterior_DestinatarioV11List.Insert(const Index: Integer): IComercioExterior_DestinatarioV11;
+function TComercioExteriorV11_DestinatarioList.Insert(const Index: Integer): IComercioExteriorV11_Destinatario;
 begin
-  Result := AddItem(Index) as IComercioExterior_DestinatarioV11;
+  Result := AddItem(Index) as IComercioExteriorV11_Destinatario;
 end;
 
-function TComercioExterior_DestinatarioV11List.Get_Item(Index: Integer): IComercioExterior_DestinatarioV11;
+function TComercioExteriorV11_DestinatarioList.Get_Item(Index: Integer): IComercioExteriorV11_Destinatario;
 begin
-  Result := List[Index] as IComercioExterior_DestinatarioV11;
+  Result := List[Index] as IComercioExteriorV11_Destinatario;
 end;
 
-{ TComercioExterior_Destinatario_DomicilioV11 }
+{ TComercioExteriorV11_Destinatario_Domicilio }
 
-function TComercioExterior_Destinatario_DomicilioV11.Get_Calle: UnicodeString;
+function TComercioExteriorV11_Destinatario_Domicilio.Get_Calle: UnicodeString;
 begin
   Result := AttributeNodes['Calle'].Text;
 end;
 
-procedure TComercioExterior_Destinatario_DomicilioV11.Set_Calle(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario_Domicilio.Set_Calle(Value: UnicodeString);
 begin
   SetAttribute('Calle', Value);
 end;
 
-function TComercioExterior_Destinatario_DomicilioV11.Get_NumeroExterior: UnicodeString;
+function TComercioExteriorV11_Destinatario_Domicilio.Get_NumeroExterior: UnicodeString;
 begin
   Result := AttributeNodes['NumeroExterior'].Text;
 end;
 
-procedure TComercioExterior_Destinatario_DomicilioV11.Set_NumeroExterior(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario_Domicilio.Set_NumeroExterior(Value: UnicodeString);
 begin
   SetAttribute('NumeroExterior', Value);
 end;
 
-function TComercioExterior_Destinatario_DomicilioV11.Get_NumeroInterior: UnicodeString;
+function TComercioExteriorV11_Destinatario_Domicilio.Get_NumeroInterior: UnicodeString;
 begin
   Result := AttributeNodes['NumeroInterior'].Text;
 end;
 
-procedure TComercioExterior_Destinatario_DomicilioV11.Set_NumeroInterior(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario_Domicilio.Set_NumeroInterior(Value: UnicodeString);
 begin
   SetAttribute('NumeroInterior', Value);
 end;
 
-function TComercioExterior_Destinatario_DomicilioV11.Get_Colonia: UnicodeString;
+function TComercioExteriorV11_Destinatario_Domicilio.Get_Colonia: UnicodeString;
 begin
   Result := AttributeNodes['Colonia'].Text;
 end;
 
-procedure TComercioExterior_Destinatario_DomicilioV11.Set_Colonia(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario_Domicilio.Set_Colonia(Value: UnicodeString);
 begin
   SetAttribute('Colonia', Value);
 end;
 
-function TComercioExterior_Destinatario_DomicilioV11.Get_Localidad: UnicodeString;
+function TComercioExteriorV11_Destinatario_Domicilio.Get_Localidad: UnicodeString;
 begin
   Result := AttributeNodes['Localidad'].Text;
 end;
 
-procedure TComercioExterior_Destinatario_DomicilioV11.Set_Localidad(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario_Domicilio.Set_Localidad(Value: UnicodeString);
 begin
   SetAttribute('Localidad', Value);
 end;
 
-function TComercioExterior_Destinatario_DomicilioV11.Get_Referencia: UnicodeString;
+function TComercioExteriorV11_Destinatario_Domicilio.Get_Referencia: UnicodeString;
 begin
   Result := AttributeNodes['Referencia'].Text;
 end;
 
-procedure TComercioExterior_Destinatario_DomicilioV11.Set_Referencia(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario_Domicilio.Set_Referencia(Value: UnicodeString);
 begin
   SetAttribute('Referencia', Value);
 end;
 
-function TComercioExterior_Destinatario_DomicilioV11.Get_Municipio: UnicodeString;
+function TComercioExteriorV11_Destinatario_Domicilio.Get_Municipio: UnicodeString;
 begin
   Result := AttributeNodes['Municipio'].Text;
 end;
 
-procedure TComercioExterior_Destinatario_DomicilioV11.Set_Municipio(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario_Domicilio.Set_Municipio(Value: UnicodeString);
 begin
   SetAttribute('Municipio', Value);
 end;
 
-function TComercioExterior_Destinatario_DomicilioV11.Get_Estado: UnicodeString;
+function TComercioExteriorV11_Destinatario_Domicilio.Get_Estado: UnicodeString;
 begin
   Result := AttributeNodes['Estado'].Text;
 end;
 
-procedure TComercioExterior_Destinatario_DomicilioV11.Set_Estado(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario_Domicilio.Set_Estado(Value: UnicodeString);
 begin
   SetAttribute('Estado', Value);
 end;
 
-function TComercioExterior_Destinatario_DomicilioV11.Get_Pais: UnicodeString;
+function TComercioExteriorV11_Destinatario_Domicilio.Get_Pais: UnicodeString;
 begin
   Result := AttributeNodes['Pais'].Text;
 end;
 
-procedure TComercioExterior_Destinatario_DomicilioV11.Set_Pais(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario_Domicilio.Set_Pais(Value: UnicodeString);
 begin
   SetAttribute('Pais', Value);
 end;
 
-function TComercioExterior_Destinatario_DomicilioV11.Get_CodigoPostal: UnicodeString;
+function TComercioExteriorV11_Destinatario_Domicilio.Get_CodigoPostal: UnicodeString;
 begin
   Result := AttributeNodes['CodigoPostal'].Text;
 end;
 
-procedure TComercioExterior_Destinatario_DomicilioV11.Set_CodigoPostal(Value: UnicodeString);
+procedure TComercioExteriorV11_Destinatario_Domicilio.Set_CodigoPostal(Value: UnicodeString);
 begin
   SetAttribute('CodigoPostal', Value);
 end;
 
-{ TComercioExterior_MercanciasV11 }
+{ TComercioExteriorV11_Mercancias }
 
-procedure TComercioExterior_MercanciasV11.AfterConstruction;
+procedure TComercioExteriorV11_Mercancias.AfterConstruction;
 begin
-  RegisterChildNode('Mercancia', TComercioExterior_Mercancias_MercanciaV11);
+  RegisterChildNode('Mercancia', TComercioExteriorV11_Mercancias_Mercancia);
   ItemTag := 'Mercancia';
-  ItemInterface := IComercioExterior_Mercancias_MercanciaV11;
+  ItemInterface := IComercioExteriorV11_Mercancias_Mercancia;
   inherited;
 end;
 
-function TComercioExterior_MercanciasV11.Get_Mercancia(Index: Integer): IComercioExterior_Mercancias_MercanciaV11;
+function TComercioExteriorV11_Mercancias.Get_Mercancia(Index: Integer): IComercioExteriorV11_Mercancias_Mercancia;
 begin
-  Result := List[Index] as IComercioExterior_Mercancias_MercanciaV11;
+  Result := List[Index] as IComercioExteriorV11_Mercancias_Mercancia;
 end;
 
-function TComercioExterior_MercanciasV11.Add: IComercioExterior_Mercancias_MercanciaV11;
+function TComercioExteriorV11_Mercancias.Add: IComercioExteriorV11_Mercancias_Mercancia;
 begin
-  Result := AddItem(-1) as IComercioExterior_Mercancias_MercanciaV11;
+  Result := AddItem(-1) as IComercioExteriorV11_Mercancias_Mercancia;
 end;
 
-function TComercioExterior_MercanciasV11.Insert(const Index: Integer): IComercioExterior_Mercancias_MercanciaV11;
+function TComercioExteriorV11_Mercancias.Insert(const Index: Integer): IComercioExteriorV11_Mercancias_Mercancia;
 begin
-  Result := AddItem(Index) as IComercioExterior_Mercancias_MercanciaV11;
+  Result := AddItem(Index) as IComercioExteriorV11_Mercancias_Mercancia;
 end;
 
-{ TComercioExterior_Mercancias_MercanciaV11 }
+{ TComercioExteriorV11_Mercancias_Mercancia }
 
-procedure TComercioExterior_Mercancias_MercanciaV11.AfterConstruction;
+procedure TComercioExteriorV11_Mercancias_Mercancia.AfterConstruction;
 begin
-  RegisterChildNode('DescripcionesEspecificas', TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11);
+  RegisterChildNode('DescripcionesEspecificas', TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas);
   ItemTag := 'DescripcionesEspecificas';
-  ItemInterface := IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
+  ItemInterface := IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
   inherited;
 end;
 
-function TComercioExterior_Mercancias_MercanciaV11.Get_NoIdentificacion: UnicodeString;
+function TComercioExteriorV11_Mercancias_Mercancia.Get_NoIdentificacion: UnicodeString;
 begin
   Result := AttributeNodes['NoIdentificacion'].Text;
 end;
 
-procedure TComercioExterior_Mercancias_MercanciaV11.Set_NoIdentificacion(Value: UnicodeString);
+procedure TComercioExteriorV11_Mercancias_Mercancia.Set_NoIdentificacion(Value: UnicodeString);
 begin
   SetAttribute('NoIdentificacion', Value);
 end;
 
-function TComercioExterior_Mercancias_MercanciaV11.Get_FraccionArancelaria: UnicodeString;
+function TComercioExteriorV11_Mercancias_Mercancia.Get_FraccionArancelaria: UnicodeString;
 begin
   Result := AttributeNodes['FraccionArancelaria'].Text;
 end;
 
-procedure TComercioExterior_Mercancias_MercanciaV11.Set_FraccionArancelaria(Value: UnicodeString);
+procedure TComercioExteriorV11_Mercancias_Mercancia.Set_FraccionArancelaria(Value: UnicodeString);
 begin
   SetAttribute('FraccionArancelaria', Value);
 end;
 
-function TComercioExterior_Mercancias_MercanciaV11.Get_CantidadAduana: UnicodeString;
+function TComercioExteriorV11_Mercancias_Mercancia.Get_CantidadAduana: UnicodeString;
 begin
   Result := AttributeNodes['CantidadAduana'].Text;
 end;
 
-procedure TComercioExterior_Mercancias_MercanciaV11.Set_CantidadAduana(Value: UnicodeString);
+procedure TComercioExteriorV11_Mercancias_Mercancia.Set_CantidadAduana(Value: UnicodeString);
 begin
   SetAttribute('CantidadAduana', Value);
 end;
 
-function TComercioExterior_Mercancias_MercanciaV11.Get_UnidadAduana: UnicodeString;
+function TComercioExteriorV11_Mercancias_Mercancia.Get_UnidadAduana: UnicodeString;
 begin
   Result := AttributeNodes['UnidadAduana'].Text;
 end;
 
-procedure TComercioExterior_Mercancias_MercanciaV11.Set_UnidadAduana(Value: UnicodeString);
+procedure TComercioExteriorV11_Mercancias_Mercancia.Set_UnidadAduana(Value: UnicodeString);
 begin
   SetAttribute('UnidadAduana', Value);
 end;
 
-function TComercioExterior_Mercancias_MercanciaV11.Get_ValorUnitarioAduana: UnicodeString;
+function TComercioExteriorV11_Mercancias_Mercancia.Get_ValorUnitarioAduana: UnicodeString;
 begin
   Result := AttributeNodes['ValorUnitarioAduana'].Text;
 end;
 
-procedure TComercioExterior_Mercancias_MercanciaV11.Set_ValorUnitarioAduana(Value: UnicodeString);
+procedure TComercioExteriorV11_Mercancias_Mercancia.Set_ValorUnitarioAduana(Value: UnicodeString);
 begin
   SetAttribute('ValorUnitarioAduana', Value);
 end;
 
-function TComercioExterior_Mercancias_MercanciaV11.Get_ValorDolares: UnicodeString;
+function TComercioExteriorV11_Mercancias_Mercancia.Get_ValorDolares: UnicodeString;
 begin
   Result := AttributeNodes['ValorDolares'].Text;
 end;
 
-procedure TComercioExterior_Mercancias_MercanciaV11.Set_ValorDolares(Value: UnicodeString);
+procedure TComercioExteriorV11_Mercancias_Mercancia.Set_ValorDolares(Value: UnicodeString);
 begin
   SetAttribute('ValorDolares', Value);
 end;
 
-function TComercioExterior_Mercancias_MercanciaV11.Get_DescripcionesEspecificas(Index: Integer): IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
+function TComercioExteriorV11_Mercancias_Mercancia.Get_DescripcionesEspecificas(Index: Integer): IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
 begin
-  Result := List[Index] as IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
+  Result := List[Index] as IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
 end;
 
-function TComercioExterior_Mercancias_MercanciaV11.Add: IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
+function TComercioExteriorV11_Mercancias_Mercancia.Add: IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
 begin
-  Result := AddItem(-1) as IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
+  Result := AddItem(-1) as IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
 end;
 
-function TComercioExterior_Mercancias_MercanciaV11.Insert(const Index: Integer): IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
+function TComercioExteriorV11_Mercancias_Mercancia.Insert(const Index: Integer): IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
 begin
-  Result := AddItem(Index) as IComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11;
+  Result := AddItem(Index) as IComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas;
 end;
 
-{ TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11 }
+{ TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas }
 
-function TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11.Get_Marca: UnicodeString;
+function TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas.Get_Marca: UnicodeString;
 begin
   Result := AttributeNodes['Marca'].Text;
 end;
 
-procedure TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11.Set_Marca(Value: UnicodeString);
+procedure TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas.Set_Marca(Value: UnicodeString);
 begin
   SetAttribute('Marca', Value);
 end;
 
-function TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11.Get_Modelo: UnicodeString;
+function TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas.Get_Modelo: UnicodeString;
 begin
   Result := AttributeNodes['Modelo'].Text;
 end;
 
-procedure TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11.Set_Modelo(Value: UnicodeString);
+procedure TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas.Set_Modelo(Value: UnicodeString);
 begin
   SetAttribute('Modelo', Value);
 end;
 
-function TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11.Get_SubModelo: UnicodeString;
+function TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas.Get_SubModelo: UnicodeString;
 begin
   Result := AttributeNodes['SubModelo'].Text;
 end;
 
-procedure TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11.Set_SubModelo(Value: UnicodeString);
+procedure TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas.Set_SubModelo(Value: UnicodeString);
 begin
   SetAttribute('SubModelo', Value);
 end;
 
-function TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11.Get_NumeroSerie: UnicodeString;
+function TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas.Get_NumeroSerie: UnicodeString;
 begin
   Result := AttributeNodes['NumeroSerie'].Text;
 end;
 
-procedure TComercioExterior_Mercancias_Mercancia_DescripcionesEspecificasV11.Set_NumeroSerie(Value: UnicodeString);
+procedure TComercioExteriorV11_Mercancias_Mercancia_DescripcionesEspecificas.Set_NumeroSerie(Value: UnicodeString);
 begin
   SetAttribute('NumeroSerie', Value);
 end;
