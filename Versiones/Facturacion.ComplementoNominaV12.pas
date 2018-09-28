@@ -3,7 +3,7 @@
 {       TFacturaElectronica                                 }
 {                                                           }
 {       Copyright (C) 2018 Bambu Code SA de CV              }
-{       Soporte del Complemento ComercioExterior v1.1       }
+{       Soporte del Complemento Nómina v1.2                 }
 {                                                           }
 {***********************************************************}
 
