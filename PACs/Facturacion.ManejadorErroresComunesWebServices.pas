@@ -53,11 +53,11 @@ end;
 
 class procedure TManejadorErroresComunesHelper.DetectarErroresConocidos(const aExcepcion: Exception);
 const
-  _SIN_INTERNET = 'No se pudo establecer una conexión';
-  _SIN_INTERNET_INGLES = 'A connection with the server could not be established ';
+  _SIN_INTERNET = 'No se pudo establecer una conexi';
+  _SIN_INTERNET_INGLES = 'A connection with the server could not be established';
   _CADENA_ERROR_DNS_ESPANOL                  = 'resolver el nombre de servidor';
   _CADENA_ERROR_DNS_INGLES                   = 'address could not be resolved';
-  _CADENA_TIMEOUT_GENERICO_ESPANOL           = 'el tiempo de espera para la operación';
+  _CADENA_TIMEOUT_GENERICO_ESPANOL           = 'el tiempo de espera para la operaci';
   _CADENA_TIMEOUT_GENERICO_INGLES            = 'timed out';
 begin
   if (AnsiPos(_SIN_INTERNET, aExcepcion.Message) > 0) or (AnsiPos(_SIN_INTERNET_INGLES, aExcepcion.Message) > 0) then
