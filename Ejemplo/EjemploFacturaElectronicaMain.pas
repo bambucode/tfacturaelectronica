@@ -265,9 +265,6 @@ implementation
 
               Impuestos.TotalImpuestosTrasladados  := '16.00';
 
-              //Agregamos una Addenda de ejemplo
-              WriteLn('Agregando Addenda CFDI v3.2...');
-              Addenda.AddChild('Ejemplo_Addenda').Attributes['observaciones'] := 'Linea 01'+sLineBreak+'Linea 02';
             end;
             {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
@@ -453,21 +450,27 @@ implementation
       Writeln('Cadena Original de Timbre:');
       Writeln(generadorCadena.obtenerCadenaOriginalDeTimbre(nuevaFactura));
 
-      Writeln('XML del Timbre');
-      facturaCFDIv33.Complemento.TimbreFiscalDigital.Leyenda := '';
-      Writeln( facturaCFDIv33.Complemento.TimbreFiscalDigital.XML );
-
-      if facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado<>
-         FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado ) ) then
+      if nuevaFactura.Version = '3.3' then
       begin
-       Writeln('La conversión de la Fecha Del Timbre es incorrecta');
-       Writeln(' Fecha del Timbre (Original)  : '+facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado);
-       Writeln(' Fecha del Timbre (Conversión): '+ FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado )) );
+       Writeln('XML del Timbre');
+       facturaCFDIv33.Complemento.TimbreFiscalDigital.Leyenda := '';
+       Writeln( facturaCFDIv33.Complemento.TimbreFiscalDigital.XML );
+
+       if facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado<>
+          FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado ) ) then
+       begin
+        Writeln('La conversión de la Fecha Del Timbre es incorrecta');
+        Writeln(' Fecha del Timbre (Original)  : '+facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado);
+        Writeln(' Fecha del Timbre (Conversión): '+ FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado )) );
+       end;
+       //Agregamos una Addenda de ejemplo
+       WriteLn('Agregando Addenda CFDI v3.2...');
+       facturaCFDIv33.Addenda.AddChild('Ejemplo_Addenda').Attributes['observaciones'] := 'Linea 01'+sLineBreak+'Linea 02';
       end;
 
       Writeln('Guardando XML...');
       admonFacturas.GuardarArchivo(nuevaFactura,
-                                  ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.xml');
+                                   ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi.xml');
 
       Writeln('Generando CBB corespondiente');
       generadorCBB.GenerarImagenCBB(nuevaFactura,
