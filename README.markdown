@@ -42,19 +42,20 @@ Complementos de Factura Soportados por v2.0
 		- Impuestos Locales 1.0
 	
 * Para CFDI 3.3
-	- Vía OOP, usando clases autogeneradas por medio de XML Databinding de Delphi (IXMLDocument, IXMLNode, etc.)
+	- Vía OOP, usando clases autogeneradas por medio de XML Databinding de Delphi (IXMLDocument, IXMLNode, etc.):
 		- Timbre Fiscal Digital 1.1
 		- Impuestos Locales 1.0
 		- Recepción de Pagos 1.0	
 		- Comercio Exterior 1.1		- colaboración de @fduenas
 		- Nómina 1.2 				- colaboración de @fduenas
 		- Notarios Publicos 1.0 	- colaboración de @fduenas
-	- Se ha modificado el archivo cadenaoriginal_3_3.xslt para que cualquiera de los complementos implementados por el SAT a la fecha (2018-09-28) sea tomado en cuenta al generarse la cadena original, con esto, aunque NO EXISTA una clase específica para un complemento (ej: TComercioExteriorV11), este puedan agregarse al nodo \<cfdi:Complemento\> de manera manual usando los métodos: 
-		- IComprobanteFiscalV33.Complemento.AddNode(\<nombre_complemento\>) --> Nueva Instancia IXMLNode
-		- IXMLNode.AddNode(\<nombre_nodohijo\>)
-		- IXMLNode.FindNode(\<nombre_nodohijo\>)
-		- IXMLNode.AttributeNodes\[\<nombre_atributo\>\].Text
-		- Para mayor información acerca de cómo trabajar con nodos XML en Delphi, consultar: http://docwiki.embarcadero.com/RADStudio/Tokyo/en/Working_with_XML_Nodes
+	- Manual:
+		- Todos: Se ha modificado el archivo cadenaoriginal_3_3.xslt para que cualquiera de los complementos implementados por el SAT a la fecha (2018-09-28) sea tomado en cuenta al generarse la cadena original, con esto, aunque NO EXISTA una clase específica para un complemento (ej: TComercioExteriorV11), este pueda agregarse al nodo \<cfdi:Complemento\> de manera manual usando los métodos: 
+			- IComprobanteFiscalV33.Complemento.AddNode(\<nombre_complemento\>) --> Nueva Instancia IXMLNode
+			- IXMLNode.AddNode(\<nombre_nodohijo\>)
+			- IXMLNode.FindNode(\<nombre_nodohijo\>)
+			- IXMLNode.AttributeNodes\[\<nombre_atributo\>\].Text
+			- Para mayor información acerca de cómo trabajar con nodos XML en Delphi, consultar: http://docwiki.embarcadero.com/RADStudio/Tokyo/en/Working_with_XML_Nodes
 	- El complemento que sea agregado de manera manual debe cumplir con las especificaciones establecidas por el SAT para dicho complemento. Para mayor información consultar la documentación técnica del complemento a agregar.
 
 Documentación Técnica
