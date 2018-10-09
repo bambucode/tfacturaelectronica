@@ -349,9 +349,6 @@ implementation
               totalIVA33.TasaOCuota := '0.160000';
               totalIVA33.Importe    := '16.00';
 
-              //Agregamos una Addenda de ejemplo
-              WriteLn('Agregando Addenda CFDI v3.3...');
-              Addenda.AddChild('Ejemplo_Addenda').Attributes['observaciones'] := 'Linea 01'+sLineBreak+'Linea 02';
             end;
             {$IFDEF undef}{$ENDREGION}{$ENDIF}
           end;
