@@ -14,29 +14,9 @@ uses Facturacion.Comprobante,
      Types
 {$IFEND};
 
-const
-  SB64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-  IB64: array[#0..#255] of integer = (
-    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
-    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
-    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $3E, $FF, $FF, $FF, $3F,
-    $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $FF, $FF, $FF, $FF, $FF, $FF,
-    $FF, $00, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E,
-    $0F, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $FF, $FF, $FF, $FF, $FF,
-    $FF, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23, $24, $25, $26, $27, $28,
-    $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $FF, $FF, $FF, $FF, $FF,
-    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
-    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
-    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
-    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
-    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
-    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
-    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
-    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
-  );
+//const
+
 type
-  SAByte = Array[0..0] of Byte;
-  PSAByte = ^SAByte;
 
   TFacturacionHelper = class
     class function UTF8ToBytes(const s: TCadenaUTF8): TByteDynArray; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
@@ -58,22 +38,14 @@ type
     class function DesdeTasa(const aTasa: String): Double;
     class function LimpiarCaracteresInvalidos(const aCadena: string): string;
     class function VerificarImporteEnRangoDeRedondeo(const aCantidad: Double; const aValorUnitario, aImporte: Currency): Boolean;
+    class function ObtenerConfiguracionRegionalLocal: TFormatSettings; //devuelve configuracion regional con la corrección del punto decimal
+    class function ObtenerConfiguracionRegionalLocalISO8601: TFormatSettings; //devuelve configuracion regional en formato ISO8601
 
     class procedure AgregarSchemaLocation(const aComprobante: IComprobanteFiscal; const aCadena: String);
     class procedure CorregirConfiguracionRegionalLocal; deprecated; // ya no son necesarias en Delphi7 o superior
     class procedure RegresarConfiguracionRegionalLocal; deprecated; // ya no son necesarias en Delphi7 o superior
     class procedure ReemplazarComaSiActuaComoPuntoDecimal(var aCadenaCatidad: String);
   end;
-
-var
-  separadorDecimalAnterior: Char;
-  separadorDeMiles: Char;
-  formatSettingsLocal : TFormatSettings;
-  formatSettingsLocalISO8601 : TFormatSettings;
-
-const
-  _PUNTO_DECIMAL = '.';
-  _COMA_DECIMAL  = ',';
 
 implementation
 
@@ -91,6 +63,39 @@ uses
   ,CodeSiteLogging
 {$ENDIF};
 
+var
+  separadorDecimalAnterior: Char;
+  separadorDeMiles: Char;
+  formatSettingsLocal : TFormatSettings;
+  formatSettingsLocalISO8601 : TFormatSettings;
+
+const
+  _PUNTO_DECIMAL = '.';
+  _COMA_DECIMAL  = ',';
+
+  SB64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  IB64: array[#0..#255] of integer = (
+    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
+    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
+    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $3E, $FF, $FF, $FF, $3F,
+    $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $3D, $FF, $FF, $FF, $FF, $FF, $FF,
+    $FF, $00, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0D, $0E,
+    $0F, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $FF, $FF, $FF, $FF, $FF,
+    $FF, $1A, $1B, $1C, $1D, $1E, $1F, $20, $21, $22, $23, $24, $25, $26, $27, $28,
+    $29, $2A, $2B, $2C, $2D, $2E, $2F, $30, $31, $32, $33, $FF, $FF, $FF, $FF, $FF,
+    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
+    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
+    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
+    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
+    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
+    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
+    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF,
+    $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
+  );
+
+Type
+ SAByte = Array[0..0] of Byte;
+ PSAByte = ^SAByte;
 
 { TFacturacionHelper }
 
@@ -270,6 +275,16 @@ class function TFacturacionHelper.LimpiarCaracteresInvalidos(
   const aCadena: string): string;
 begin
   Result := StringReplace(aCadena, '|', '',[rfReplaceAll, rfIgnoreCase]);
+end;
+
+class function TFacturacionHelper.ObtenerConfiguracionRegionalLocal: TFormatSettings;
+begin
+ result := formatSettingsLocal;
+end;
+
+class function TFacturacionHelper.ObtenerConfiguracionRegionalLocalISO8601: TFormatSettings;
+begin
+ result := formatSettingsLocalISO8601;
 end;
 
 class function TFacturacionHelper.Decode64(S: String): TByteDynArray;
