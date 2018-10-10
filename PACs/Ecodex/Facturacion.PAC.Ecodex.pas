@@ -52,17 +52,17 @@ type
     destructor Destroy; override;
     procedure Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
         const aCredencialesPAC, aCredencialesIntegrador:
-        TFacturacionCredencialesPAC; const aTransaccionInicial: Int64);
-    function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
+        TFacturacionCredencialesPAC; const aTransaccionInicial: Int64); override;
+    function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer; override;
+    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; override;
     function CancelarDocumentos(const aUUIDS: TListadoUUID):
-        TListadoCancelacionUUID;
+        TListadoCancelacionUUID; override;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
-        aIdTransaccionAUsar: Int64): TCadenaUTF8; overload;
-    function TimbrarDocumento(const aXML : TCadenaUTF8; const aIdTransaccionAUsar : Int64): TCadenaUTF8; overload;
-    function ObtenerAcuseDeCancelacion(const aUUID: string): string;
-    function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string;
-    function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8;
+        aIdTransaccionAUsar: Int64): TCadenaUTF8; overload; override;
+    function TimbrarDocumento(const aXML : TCadenaUTF8; const aIdTransaccionAUsar : Int64): TCadenaUTF8; overload; override;
+    function ObtenerAcuseDeCancelacion(const aUUID: string): string; override;
+    function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string; override;
+    function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8; override;
   end;
 
 const

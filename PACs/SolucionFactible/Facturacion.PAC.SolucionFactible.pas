@@ -32,7 +32,6 @@ type
       fDominioWebService: string;
       fCredencialesPAC: TFacturacionCredencialesPAC;
       procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
-      function UTF8Bytes(const s: UTF8String): TBytedynArray; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
    public
       destructor Destroy; override;
       procedure  Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
@@ -126,17 +125,6 @@ begin
   inherited;
 end;
 
-// sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
-function TProveedorSolucionFactible.UTF8Bytes(const s: UTF8String): TBytedynArray;
-begin
-   {$IF Compilerversion >= 20}
-   Assert(StringElementSize(s) = 1)
-   {$IFEND};
-   SetLength(Result, Length(s));
-   if Length(Result) > 0 then
-      Move(s[1], Result[0], Length(s));
-end;
-
 function TProveedorSolucionFactible.TimbrarDocumento(const aComprobante: IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8;
 var
    respuestaTimbrado: CFDICertificacion;
@@ -147,7 +135,7 @@ var
    {$ifeNd}
 
 begin
-   sXML := UTF8Bytes(aComprobante.Xml);
+   sXML := FacturacionHelper.UTF8ToBytes(aComprobante.Xml);
    respuestaTimbrado := fwsTimbradoSolucionFactible.timbrar(fCredencialesPAC.RFC, fCredencialesPAC.Clave, sXML, False);
 
    if respuestaTimbrado.status = 200 then

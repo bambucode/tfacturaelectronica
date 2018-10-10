@@ -1,0 +1,179 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{C1F9CC1F-AF32-4C1A-ADFF-308DC653B195}</ProjectGuid>
+			<MainSource>EjemploFacturaElectronicaComplementoPago_D7XE1.dpr</MainSource>
+			<Base>True</Base>
+			<Config Condition="'$(Config)'==''">Debug</Config>
+			<Platform>Win32</Platform>
+			<AppType>Console</AppType>
+			<FrameworkType>VCL</FrameworkType>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+			<ProjectVersion>12.3</ProjectVersion>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_UnitSearchPath>..\OpenSSL;..\PACs\Ecodex;..\Schemas\3.2;..\Schemas\3.3;..\Lib;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_UsePackage>vclx;vcl;vclimg;dbrtl;Rave90VCL;bdertl;rtl;vclactnband;xmlrtl;VclSmp;svnui;svn;TeeUI;Tee;TeeDB;vcldb;vcldbx;vcltouch;dsnap;dsnapcon;vclib;ibxpress;adortl;IndyCore;IndySystem;IndyProtocols;vclie;inet;websnap;webdsnap;inetdb;inetdbbde;inetdbxpress;soaprtl;vclribbon;dbexpress;DbxCommonDriver;DataSnapIndy10ServerTransport;DataSnapProviderClient;DbxClientDriver;DataSnapClient;dbxcds;DataSnapServer;AzureCloud;DBXInterBaseDriver;DBXMySQLDriver;DBXFirebirdDriver;DBXSybaseASEDriver;DBXSybaseASADriver;DBXOracleDriver;DBXMSSQLDriver;DBXInformixDriver;DBXDb2Driver;DbxDevartMySqlDriver150;QR5RunDXE;CodeSiteExpressVcl;apollo7DXE;FastZLibRunDsgD15;DBControlsFixedD2010;Halcyon6_D15dsgn;Halcyon6_D15run;wreg400_D15;tb2k_d15;XMLDataSet_D15;ZylGPSRecPack;TBX_D2011;SpTBXLib_d15;elegantMDI_D2011;dclATexto_D15;DCPdelphi2011;BarcodeStudio;tmsd2011;madBasicD15;madDisAsmD15;madExceptD15;GFDLIBXE;OIPKGXE;tmsexd2011;gaSQLParserD15;RunFusPKGXE;dwsLibRuntime;pckUCDataConnector_D15;pckUserControl_RT15;pckUCADOConnD15;pckUCBDEConnD15;pckUCDBXConnD15;pckUCIBXConnD15;pckUCMidasConnD15;BarcodeStudioEditors;vcwd2011;QBuilderDT_D15;QBuilderRT_D15;QImport3RT_D15;QExport4RT_D15;VCLZipD2011;LegSrsDXE;tmswizd2011;tmsxlsd2011;TMSScripter_Memo;TMSScripter_Legacy;TMSScripter;TMSScripter_VCL;TMSScripter_IDE;sbridge150;frx15;frxADO15;frxBDE15;frxDB15;frxDBX15;fs15;fsADO15;fsBDE15;fsDB15;frxe15;frxcs15;frxIBX15;frxTee15;fsIBX15;fsTee15;Xq;zDesign15;SyntEditDB15;SyntEdit15;TVidGrab;fcxcd15;fcxd15;fcxed15;fcxpd15;fcxpTeed15;RtmRxCtl150;RtmRxDB150;RtmRxBDE150;dclRBE1615;rbCIDE1615;rbIDE1615;rbRCL1615;rbBDE1615;rbUSERDesign1615;rbUSER1615;rbDIDE1615;rbDAD1615;dclRBBDE1615;rbDBDE1615;rbDB1615;dclRBADO1615;rbADO1615;rbRIDE1615;rbRAP1615;rbTCUI1615;rbTC1615;dclRBIBE1615;rbIBE1615;dclRBDBE1615;rbDBE1615;Vcl.gtxStdCtrlsDXE;paxcomp_xe;users_v20_D15;tc_custom_driver_D15;tc_ado_driver_D15;tc_AnyDAC_driver_D15;AnyDAC_Comp_D15;AnyDAC_Phys_D15;AnyDAC_ComI_D15;tc_dbexpress_driver_D15;TMSDiagram;TMSWorkflow;wsFireDACpck;tc_bde_driver_D15;kbmMemRunDXEPro;Intraweb_14_DXE;SynEdit_RXE;AnyDAC_PhysSQLITE_D15;AnyDAC_PhysPg_D15;AnyDAC_PhysIB_D15;AnyDAC_PhysTDBX_D15;AnyDAC_PhysADS_D15;AnyDAC_PhysASA_D15;AnyDAC_PhysODBC_D15;AnyDAC_PhysOracle_D15;AnyDAC_PhysMySQL_D15;AnyDAC_PhysDb2_D15;AnyDAC_PhysMSSQL_D15;AnyDAC_PhysMSAcc_D15;AnyDAC_GUIxForms_D15;JclDeveloperTools;Jcl;JclVcl;JclContainers;JvCore;JvSystem;JvStdCtrls;JvAppFrm;JvBands;JvDB;JvDlgs;JvBDE;JvControls;JvCmp;JvCrypt;JvCustom;JvDocking;JvDotNetCtrls;JvGlobus;JvHMI;JvJans;JvManagedThreads;JvMM;JvNet;JvPageComps;JvPascalInterpreter;JvPluginSystem;JvPrintPreview;JvRuntimeDesign;JvTimeFramework;JvWizards;JvXPCtrls;ZComponent;ZDbc;ZPlain;ZCore;ZParseSql;ConfServD2011;kbmMWRunDXEEnt;vcl.gtxReportExportDXE;vcl.gtxControlsDXE;vcl.gtxDBControlsDXE;tc_zeos_driver_D15;pckZeosConnD15;GR32_DSGN_RSXE1;GR32_RSXE1;IWCGJQCore_140_150;IWCGBootstrap_140_150;kbmMWAdvCompsRunDXEEnt;IWCGJQMobile_140_150;IWCGJQComps_140_150;Hydra_Core_D15;Hydra_TB2K_D15;TSSCoreD2011;IW14TSSUID2011;IWCGjQCompWriter_140_150;dbisamr;AbbreviaVCL;pscRunRS15;frxAddFunction15;GMXBaseClasses_RunD15;OXml;GMXUtils_RunD15;GMXGisCoreD15;dclcxIntlD15;cxGridRS15;cxPageControlRS15;cxLibraryRS15;dxGDIPlusRS15;dxCoreRS15;dxThemeRS15;cxDataRS15;cxEditorsRS15;cxExportRS15;dclcxIntlBars6D15;dxBarExtItemsRS15;dxBarRS15;dxComnRS15;dxBarDBNavRS15;Hydra_DX_D15;cxComboBoxControlsWithButtonsD15;dxOfficeCoreRS15;dxHttpIndyRequestRS15;dxServerModeRS15;dxADOServerModeRS15;dxDBXServerModeRS15;dxFireDACServerModeRS15;dxmdsRS15;dxAuthorizationAgentsRS15;dxLayoutControlRS15;dxDockingRS15;dxRichEditCoreRS15;dxRichEditDocumentModelRS15;dxRichEditControlRS15;dxRichEditControlCoreRS15;dxSpreadSheetCoreDialogsRS15;dxSpreadSheetCoreRS15;dxSpreadSheetRS15;dxSpreadSheetReportDesignerRS15;dxSpreadSheetInplaceRichEditRS15;dxRichEditInplaceRS15;dxNavBarRS15;dxWizardControlRS15;cxPivotGridRS15;cxPivotGridChartRS15;cxPivotGridOLAPRS15;cxTreeListRS15;dxRibbonRS15;dxRibbonCustomizationFormRS15;dxTabbedMDIRS15;dxBarExtDBItemsRS15;cxSchedulerRS15;cxSchedulerGridRS15;cxSchedulerTreeBrowserRS15;cxSchedulerRibbonStyleEventEditorRS15;cxSchedulerWebServiceStorageRS15;cxVerticalGridRS15;dxdbtrRS15;dxtrmdRS15;dxSkinsCoreRS15;dxPScxPCProdRS15;dxPSCoreRS15;dxPSLnksRS15;dxPScxCommonRS15;dxPScxExtCommonRS15;dxPSTeeChartRS15;dxPSDBTeeChartRS15;dxPsPrVwAdvRS15;dxPSPrVwRibbonRS15;dxSpellCheckerRS15;dxFlowChartRS15;dxFlowChartAdvancedCustomizeFormRS15;dxorgcRS15;dxdborRS15;dxTileControlRS15;dxGaugeControlRS15;dxMapControlRS15;dxPDFViewerRS15;dxSpreadSheetCoreConditionalFormattingDialogsRS15;dxSpreadSheetConditionalFormattingDialogsRS15;cxTreeListdxBarPopupMenuRS15;dxSkinBlackRS15;dxSkinBlueprintRS15;dxSkinBlueRS15;dxSkinCaramelRS15;dxSkinCoffeeRS15;dxSkinDarkRoomRS15;dxSkinDarkSideRS15;dxSkinDevExpressDarkStyleRS15;dxSkinDevExpressStyleRS15;dxSkinFoggyRS15;dxSkinGlassOceansRS15;dxSkinHighContrastRS15;dxSkiniMaginaryRS15;dxSkinLilianRS15;dxSkinLiquidSkyRS15;dxSkinLondonLiquidSkyRS15;dxSkinMcSkinRS15;dxSkinMetropolisDarkRS15;dxSkinMetropolisRS15;dxSkinMoneyTwinsRS15;dxSkinOffice2007BlackRS15;dxSkinOffice2007BlueRS15;dxSkinOffice2007GreenRS15;dxSkinOffice2007PinkRS15;dxSkinOffice2007SilverRS15;dxSkinOffice2010BlackRS15;dxSkinOffice2010BlueRS15;dxSkinOffice2010SilverRS15;dxSkinOffice2013DarkGrayRS15;dxSkinOffice2013LightGrayRS15;dxSkinOffice2013WhiteRS15;dxSkinPumpkinRS15;dxSkinSevenClassicRS15;dxSkinSevenRS15;dxSkinSharpPlusRS15;dxSkinSharpRS15;dxSkinSilverRS15;dxSkinSpringTimeRS15;dxSkinStardustRS15;dxSkinSummer2008RS15;dxSkinTheAsphaltWorldRS15;dxSkinValentineRS15;dxSkinVS2010RS15;dxSkinWhiteprintRS15;dxSkinXmas2008BlueRS15;dxSkinOffice2016ColorfulRS15;dxSkinOffice2016DarkRS15;dxSkinVisualStudio2013BlueRS15;dxSkinVisualStudio2013DarkRS15;dxSkinVisualStudio2013LightRS15;dxSkinTheBezierRS15;dxPSdxLCLnkRS15;dxPSdxSpreadSheetLnkRS15;dxPScxGridLnkRS15;dxPScxPivotGridLnkRS15;dxPScxSchedulerLnkRS15;dxPScxTLLnkRS15;dxPScxVGridLnkRS15;dxPSdxOCLnkRS15;dxPSdxDBOCLnkRS15;dxPSdxDBTVLnkRS15;dxPSdxFCLnkRS15;dxPSdxGaugeControlLnkRS15;dxPSRichEditControlLnkRS15;dxPSdxMapControlLnkRS15;dxPSdxPDFViewerLnkRS15;frxAdvPict15;frxZeos2011;frxAD15;BarcodeFastReport;GMXGisCoreTTKD15;GMXG3ClassesDK10_D15</DCC_UsePackage>
+			<DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_F>false</DCC_F>
+			<DCC_K>false</DCC_K>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_N>false</DCC_N>
+			<DCC_E>false</DCC_E>
+			<DCC_S>false</DCC_S>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+			<DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
+			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
+			<DCC_DebugInformation>false</DCC_DebugInformation>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+			<DCC_Optimize>false</DCC_Optimize>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="EjemploFacturaElectronicaComplementoPago_D7XE1.dpr">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<DCCReference Include="..\Versiones\Facturacion.ComprobanteV33.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.Comprobante.pas"/>
+			<DCCReference Include="..\Facturacion.Administrador.pas"/>
+			<DCCReference Include="..\Facturacion.GeneradorCadenaOriginal.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV33.pas"/>
+			<DCCReference Include="..\Facturacion.GeneradorSello.pas"/>
+			<DCCReference Include="..\Facturacion.OpenSSL.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV33.pas"/>
+			<DCCReference Include="..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas"/>
+			<DCCReference Include="..\Facturacion.ProveedorAutorizadoCertificacion.pas"/>
+			<DCCReference Include="..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas"/>
+			<DCCReference Include="..\PACs\Ecodex\EcodexWsClientes.pas"/>
+			<DCCReference Include="..\PACs\Ecodex\EcodexWsComun.pas"/>
+			<DCCReference Include="..\PACs\Ecodex\EcodexWsSeguridad.pas"/>
+			<DCCReference Include="..\PACs\Ecodex\EcodexWsTimbrado.pas"/>
+			<DCCReference Include="..\PACs\Ecodex\EcodexWsCancelacion.pas"/>
+			<DCCReference Include="..\Facturacion.GeneradorCBB.pas"/>
+			<DCCReference Include="..\Facturacion.GeneradorQRQuricol.pas"/>
+			<DCCReference Include="..\Facturacion.GeneradorLigaVerificacion.pas"/>
+			<DCCReference Include="..\PACs\SolucionFactible\Facturacion.PAC.SolucionFactible.pas"/>
+			<DCCReference Include="..\PACs\SolucionFactible\SolucionFactibleWsTimbrado.pas"/>
+			<DCCReference Include="..\PACs\MultiFacturas\Facturacion.PAC.MultiFacturas.pas"/>
+			<DCCReference Include="..\PACs\MultiFacturas\MultiFacturasWsTimbrado.pas"/>
+			<DCCReference Include="..\Facturacion.CertificadoDeSellos.pas"/>
+			<DCCReference Include="..\Facturacion.Helper.pas"/>
+			<DCCReference Include="..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv33.pas"/>
+			<DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
+			<DCCReference Include="..\Facturacion.GeneradorQR.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV33.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.ComprobanteV32.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.TimbreFiscalDigitalV32.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV32.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV32.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.GeneradorCBBv32.pas"/>
+			<DCCReference Include="..\Facturacion.Tipos.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.ImpuestosLocalesV1.pas"/>
+			<DCCReference Include="..\Versiones\Facturacion.ComplementoPagoV1.pas"/>
+			<DCCReference Include="EjemploFacturaElectronicaComplementoPagoMain.pas"/>
+			<DCCReference Include="..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas"/>
+			<DCCReference Include="..\PACs\FinkOK\FinkOkWsCancelacion.pas"/>
+			<DCCReference Include="..\PACs\FinkOK\FinkOkWsComun.pas"/>
+			<DCCReference Include="..\PACs\FinkOK\FinkOkWsTimbrado.pas"/>
+			<RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
+				<ContainerId>ResourceItem</ContainerId>
+				<ResourceType>RCDATA</ResourceType>
+				<ResourceId>XSLT_CADENAORIGINAL_V32</ResourceId>
+			</RcItem>
+			<RcItem Include="..\Schemas\3.3\cadenaoriginal_3_3.xslt">
+				<ContainerId>ResourceItem</ContainerId>
+				<ResourceType>RCDATA</ResourceType>
+				<ResourceId>XSLT_CADENAORIGINAL_V33</ResourceId>
+			</RcItem>
+			<RcItem Include="..\Schemas\3.2\cadenaoriginal_TFD_1_0.xslt">
+				<ContainerId>ResourceItem</ContainerId>
+				<ResourceType>RCDATA</ResourceType>
+				<ResourceId>XSLT_CADENAORIGINALTFD_V32</ResourceId>
+			</RcItem>
+			<RcItem Include="..\Schemas\3.3\cadenaoriginal_TFD_1_1.xslt">
+				<ContainerId>ResourceItem</ContainerId>
+				<ResourceType>RCDATA</ResourceType>
+				<ResourceId>XSLT_CADENAORIGINALTFD_V33</ResourceId>
+			</RcItem>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType>VCLApplication</Borland.ProjectType>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Source>
+						<Source Name="MainSource">EjemploFacturaElectronicaComplementoPago_D7XE1.dpr</Source>
+					</Source>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">1</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">0</VersionInfo>
+						<VersionInfo Name="Build">0</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">2058</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName"/>
+						<VersionInfoKeys Name="FileDescription"/>
+						<VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName"/>
+						<VersionInfoKeys Name="LegalCopyright"/>
+						<VersionInfoKeys Name="LegalTrademarks"/>
+						<VersionInfoKeys Name="OriginalFilename"/>
+						<VersionInfoKeys Name="ProductName"/>
+						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments"/>
+					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\8.0\Bpl\dclcxSizeGripD15.bpl">Theme Aware Size Grip Designtime Package</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\8.0\Bpl\cxThumbnailStripD15.bpl">Look &amp; Feel Aware Thumbnail Strip</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\8.0\Bpl\cxCheckTreeViewD15.bpl">Look &amp; Feel Aware TreeView with CheckBox Support</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\8.0\Bpl\dclIWFDComps_140_150.bpl">(untitled)</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\8.0\Bpl\dclgtxIWCtrls.bpl">Gnostice XtremeDocumentStudio Web</Excluded_Packages>
+					</Excluded_Packages>
+				</Delphi.Personality>
+				<Platforms>
+					<Platform value="Win32">True</Platform>
+				</Platforms>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>

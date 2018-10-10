@@ -3,21 +3,21 @@ unit ComercioWsComun;
 interface
 uses SysUtils,
      Facturacion.ProveedorAutorizadoCertificacion;
-   function CodEstatus(Codigo:string):Boolean;
+   function PACCodEstatus(Codigo:string):Boolean;
 
 implementation
 
-function CodEstatus(Codigo:string):Boolean;
-var iCodigo : Integer;
-  Code: Integer;
-  Value: Double;
-Begin
- Result:=False;
- val(Codigo, Value, Code);
- if Code=0 then // verifico si es numerico
-  Begin
-   iCodigo:=StrToInt(Codigo);
-   if Codigo='203' then raise EPACNoEncontradoParaCancelarException.Create('UUID No encontrado o no corresponde en el emisor',-1,iCodigo,False)
+ function RaisePACCodEstatusNumerico( Codigo: string ): Boolean;
+ var iCodigo: Integer;
+ begin
+   iCodigo:=StrToIntDef(Codigo,0);
+   result := true;
+   if ICodigo = 0 then
+   begin
+    result := false;
+    exit;
+   end
+   else if Codigo='203' then raise EPACNoEncontradoParaCancelarException.Create('UUID No encontrado o no corresponde en el emisor',-1,iCodigo,False)
    else if Codigo='204' then raise EPACNoEncontradoParaCancelarException.Create('UUID No aplicable para cancelación',-1,iCodigo,False)
    else if Codigo='205' then raise EPACNoEncontradoParaCancelarException.Create('UUID No existe',-1,iCodigo,False)
    else if Codigo='206' then raise EPACNoEncontradoParaCancelarException.Create('UUID no corresponde a un CFDI del Sector Primario',-1,iCodigo,False)
@@ -164,9 +164,11 @@ Begin
    else if Codigo='190' then raise EPACNoEncontradoParaCancelarException.Create('El valor del atributo cce:ComercioExterior:Mercancias:Mercancia:ValorUnitarioAduana debe ser mayor que cero cuando el valor del atributo cce:ComercioExterior:Mercancias:Mercancia:UnidadAduana es distinto de {99} que corresponde a los servicios.',-1,iCodigo,False)
    else if Codigo='191' then raise EPACNoEncontradoParaCancelarException.Create('El valor del atributo ComercioExterior:Mercancias:Mercancia:ValorDolares no cumple con los valores permitidos.',-1,iCodigo,False)
    else raise EPACNoEncontradoParaCancelarException.Create(Codigo,-1,-1,False);
-  End
- else
-  Begin
+  end;
+
+  function RaisePACCodEstatusAlfaCFDI( Codigo: string ): boolean;
+  begin
+   result := true;
    if Codigo='CFDI33101' then raise EPACNoEncontradoParaCancelarException.Create('"El campo Fecha no cumple con el patrón requerido."',-1,-1,False)
    else if Codigo='CFDI33102' then raise EPACNoEncontradoParaCancelarException.Create('El resultado de la digestión debe ser igual al resultado de la desencripción del sello.',-1,-1,False)
    else if Codigo='CFDI33103' then raise EPACNoEncontradoParaCancelarException.Create('Si existe el complemento para recepción de pagos el campo FormaPago no debe existir.',-1,-1,False)
@@ -251,8 +253,13 @@ Begin
    else if Codigo='CFDI33192' then raise EPACNoEncontradoParaCancelarException.Create('Debe haber sólo un registro con la misma combinación de impuesto, factor y tasa por cada traslado.',-1,-1,False)
    else if Codigo='CFDI33193' then raise EPACNoEncontradoParaCancelarException.Create('El valor seleccionado debe corresponder a un valor del catalogo donde la columna impuesto corresponda con el campo impuesto y la columna factor corresponda con el campo TipoFactor.',-1,-1,False)
    else if Codigo='CFDI33195' then raise EPACNoEncontradoParaCancelarException.Create('El campo Importe correspondiente a Traslado no es igual a la suma de los importes de los impuestos trasladados registrados en los conceptos donde el impuesto del concepto sea igual '+'al campo impuesto de este elemento y la TasaOCuota del concepto sea igual al campo TasaOCuota de este elemento.',-1,-1,False)
+   else result := false;
+  end;
 
-   else if Codigo='CCE101' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cfdi:Comprobante no tiene un valor valido',-1,-1,False)
+  function RaisePACCodEstatusAlfaCCE( Codigo: string ): boolean;
+  begin
+   result := true;
+   if Codigo='CCE101' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cfdi:Comprobante no tiene un valor valido',-1,-1,False)
    else if Codigo='CCE102' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cfdi:Comprobante:fecha no cumple con el patrón requerido.',-1,-1,False)
    else if Codigo='CCE103' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cfdi:Comprobante:subtotal no coincide con la suma de los atributos importe de los nodos Concepto.',-1,-1,False)
    else if Codigo='CCE104' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cfdi:Comprobante:Moneda se debe registrar',-1,-1,False)
@@ -327,7 +334,7 @@ Begin
    else if Codigo='CCE173' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cce11:ComercioExterior:Emisor:Domicilio:CodigoPostal debe contener una clave del catálogo catCFDI:c_CodigoPostal donde la columna clave de c_Estado debe ser igual a la clave registrada en el atributo Estado'+', la columna clave de c_Municipio debe ser igual a la clave registrada en el atributo Municipio y si existe el atributo de Localidad, la columna clave de c_Localidad debe ser igual a la clave registrada en el atributo Localidad.',-1,-1,False)
    else if Codigo='CCE174' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cce11:ComercioExterior:Propietario:NumRegIdTrib no tiene un valor que exista en el registro del país indicado en el atributo cce1:Propietario:ResidenciaFiscal.',-1,-1,False)
    else if Codigo='CCE175' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cce11:ComercioExterior:Propietario:NumRegIdTrib no cumple con el patrón publicado en la columna "Formato de registro de identidad tributaria" del país indicado en el atributo cce1:Propietario:ResidenciaFiscal.',-1,-1,False)
-   else if Codigo='CCE176' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cce11:ComercioExterior:Receptor:NumRegIdTrib no debe registrarse si la versión de CFDI es 3.3.',-1,-1,False)   
+   else if Codigo='CCE176' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cce11:ComercioExterior:Receptor:NumRegIdTrib no debe registrarse si la versión de CFDI es 3.3.',-1,-1,False)
    else if Codigo='CCE177' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cce11:ComercioExterior:Receptor:NumRegIdTrib debe registrarse si la versión de CFDI es 3.2.',-1,-1,False)
    else if Codigo='CCE178' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cce11:ComercioExterior:Receptor:NumRegIdTrib no tiene un valor que exista en el registro del país indicado en el atributo cfdi:Comprobante:Receptor:Domicilio:pais.',-1,-1,False)
    else if Codigo='CCE179' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cce11:ComercioExterior:Receptor:NumRegIdTrib no cumple con el patrón publicado en la columna "Formato de registro de identidad tributaria" del país indicado en el atributo cfdi:Comprobante:Receptor:Domicilio:pais.',-1,-1,False)
@@ -369,9 +376,29 @@ Begin
    else if Codigo='CCE215' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cce11:ComercioExterior:Mercancias:Mercancia:ValorUnitarioAduana debe ser mayor que "0" cuando  cce11:ComercioExterior:Mercancias:Mercancia:UnidadAduana es distinto de "99".',-1,-1,False)
    else if Codigo='CCE216' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cce11:ComercioExterior:Mercancias:ValorDolares de cada mercancía registrada debe ser mayor o igual que el límite inferior y menor o igual que el límtie superior o uno, cuando la '+'normatividad lo permita y exista el atributo cce11:ComercioExterior:Mercancias:Mercancia:CantidadAduana.',-1,-1,False)
    else if Codigo='CCE217' then raise EPACNoEncontradoParaCancelarException.Create('El atributo cce11:ComercioExterior:Mercancias:ValorDolares de cada mercancía registrada debe ser igual al producto del valor del atributo cfdi:Comprobante:Conceptos:Concepto:Importe por el valor '+'del atributo cfdi:Comprobante:TipoCambio y dividido entre el valor del atributo  cce11:ComercioExterior:TipoDeCambioUSD '+'donde el atributo cfdi:Comprobante:Conceptos:NoIdentificacion es igual al atributo  cce11:ComercioExterior:Mercancias:Mercancia:NoIdentificacion, "0" cuando el atributo cce11:ComercioExterior:Mercancias:Mercancia:UnidadAduana '+'o el atributo  cfdi:Comprobante:Conceptos:Concepto:Unidad tienen el valor "99", o "1", cuando la normatividad lo permita y no debe existir el atributo cce11:ComercioExterior:Mercancias:Mercancia:CantidadAduana',-1,-1,False)
-   else raise EPACNoEncontradoParaCancelarException.Create(Codigo,-1,-1,False);
+   else result := false;
+  end;
+
+function PACCodEstatus(Codigo:string):Boolean;
+var iCodigo : Integer;
+  Code: Integer;
+  Value: Double;
+Begin
+ Result:=False;
+ val(Codigo, Value, Code);
+
+ {NOTA: Se tuvo que dividir el lanzamiento de excepciones debido a que en delphi XE1
+  y anteriores manda un error de 'Too many local constants'
+ }
+ if Code=0 then // verifico si es numerico
+  Begin
+   RaisePACCodEstatusNumerico(Codigo);
+  End
+ else
+ Begin
+  if not RaisePACCodEstatusAlfaCFDI(Codigo) then
+      if not RaisePACCodEstatusAlfaCCE(Codigo) then
+         raise EPACErrorGenericoException.Create(Codigo,-1,-1,False);
   end;
  end;
-
-
 end.

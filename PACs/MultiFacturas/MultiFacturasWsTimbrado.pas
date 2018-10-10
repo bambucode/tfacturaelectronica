@@ -174,7 +174,7 @@ type
   // binding   : wserviceBinding
   // service   : wservice
   // port      : wservicePort
-  // URL       : http://pac1.facturacionmexico.com.mx/pac/timbrarnet.php
+  // URL       : http://ws.facturacionmexico.com.mx/pac/timbrarjava.php
   // ************************************************************************ //
   wservicePortType = interface(IInvokable)
   ['{7C5ED08C-B43C-FB0D-86AB-2836E6D407DC}']

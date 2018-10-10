@@ -57,7 +57,7 @@ begin
                    facturaV33.Receptor.RFC,
                    // Total del comprobante máximo a 25 posiciones (18 para los enteros, 1 para carácter “.”, 6 para los decimales),
                    // se deben omitir los ceros no significativos, precedido por el texto “&tt=”
-                   FloatToStrF(totalComprobante, ffFixed, 17, 6, Facturacion.Helper.formatSettingsLocal),
+                   FloatToStrF(totalComprobante, ffFixed, 17, 6, TFacturacionHelper.ObtenerConfiguracionRegionalLocal),
                    selloParcial]);
 end;
 

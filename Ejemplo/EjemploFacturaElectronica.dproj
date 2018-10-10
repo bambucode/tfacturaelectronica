@@ -69,6 +69,7 @@
         <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;Xml.Win;System.Win;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=;CFBundleName=</VerInfo_Keys>
+        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
@@ -111,6 +112,21 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
+        <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
+        <DCCReference Include="..\Lib\QuricolAPI.pas"/>
+        <DCCReference Include="..\Lib\QuricolCode.pas"/>
+        <DCCReference Include="..\OpenSSL\libeay32.pas"/>
+        <DCCReference Include="..\OpenSSL\LibEay32Plus.pas"/>
+        <DCCReference Include="..\OpenSSL\OpenSSLUtils.pas"/>
+        <DCCReference Include="..\Lib\synapse\synacode.pas"/>
+        <DCCReference Include="..\Lib\synapse\httpsend.pas"/>
+        <DCCReference Include="..\Lib\synapse\ssl_openssl.pas"/>
+        <DCCReference Include="..\Lib\synapse\blcksock.pas"/>
+        <DCCReference Include="..\Lib\synapse\synafpc.pas"/>
+        <DCCReference Include="..\Lib\synapse\synsock.pas"/>
+        <DCCReference Include="..\Lib\synapse\synautil.pas"/>
+        <DCCReference Include="..\Lib\synapse\synaip.pas"/>
+        <DCCReference Include="..\Lib\synapse\ssl_openssl_lib.pas"/>
         <DCCReference Include="..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas"/>
         <DCCReference Include="..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsClientes.pas"/>
@@ -118,7 +134,6 @@
         <DCCReference Include="..\PACs\Ecodex\EcodexWsSeguridad.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsTimbrado.pas"/>
         <DCCReference Include="..\PACs\Facturacion.ManejadorErroresComunesWebServices.pas"/>
-        <DCCReference Include="..\Lib\DelphiZXIngQRCode.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsCancelacion.pas"/>
         <DCCReference Include="..\PACs\SolucionFactible\Facturacion.PAC.SolucionFactible.pas"/>
         <DCCReference Include="..\PACs\SolucionFactible\SolucionFactibleWsTimbrado.pas"/>
@@ -157,15 +172,28 @@
         <DCCReference Include="..\PACs\ComercioDigital\Cancelacion.PAC.Comercio.pas"/>
         <DCCReference Include="..\PACs\ComercioDigital\ComercioWsComun.pas"/>
         <DCCReference Include="..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas"/>
-        <DCCReference Include="..\Lib\synapse\synacode.pas"/>
-        <DCCReference Include="..\Lib\synapse\httpsend.pas"/>
-        <DCCReference Include="..\Lib\synapse\ssl_openssl.pas"/>
-        <DCCReference Include="..\Lib\synapse\blcksock.pas"/>
-        <DCCReference Include="..\Lib\synapse\synafpc.pas"/>
-        <DCCReference Include="..\Lib\synapse\synsock.pas"/>
-        <DCCReference Include="..\Lib\synapse\synautil.pas"/>
-        <DCCReference Include="..\Lib\synapse\synaip.pas"/>
-        <DCCReference Include="..\Lib\synapse\ssl_openssl_lib.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.ComplementoComercioExteriorV11.pas"/>
+        <DCCReference Include="EjemploFacturaElectronicaMain.pas"/>
+        <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>XSLT_CADENAORIGINAL_V32</ResourceId>
+        </RcItem>
+        <RcItem Include="..\Schemas\3.3\cadenaoriginal_3_3.xslt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>XSLT_CADENAORIGINAL_V33</ResourceId>
+        </RcItem>
+        <RcItem Include="..\Schemas\3.2\cadenaoriginal_TFD_1_0.xslt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>XSLT_CADENAORIGINALTFD_V32</ResourceId>
+        </RcItem>
+        <RcItem Include="..\Schemas\3.3\cadenaoriginal_TFD_1_1.xslt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>XSLT_CADENAORIGINALTFD_V33</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -194,6 +222,30 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
+                <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_TFD_1_0.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Schemas\3.3\cadenaoriginal_TFD_1_1.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Schemas\3.3\cadenaoriginal_3_3.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_3_2.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="EjemploFacturaElectronica.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>EjemploFacturaElectronica.exe</RemoteName>
