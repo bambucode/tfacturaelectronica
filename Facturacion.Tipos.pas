@@ -76,6 +76,7 @@ const
   _RFC_VENTA_EXTRANJEROS                = 'XEXX010101000';
   _NOMBRE_CONTRIBUYENTE_PUBLICO_GENERAL = 'Público en General';
   _NOMBRE_CONTRIBUYENTE_EXTRANJERO      = 'Venta al extranjero';
+  _UUID_LONGITUD                        = 36;
 
 implementation
 

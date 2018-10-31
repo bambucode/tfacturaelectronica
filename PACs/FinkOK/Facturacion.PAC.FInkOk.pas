@@ -18,12 +18,16 @@ uses
      System.Types,
      System.SysUtils,
      System.Classes,
-     RegularExpressions,
+     System.RegularExpressions,
 {$ELSE}
      Types,
      SysUtils,
      Classes,
+   {$IF Compilerversion >= 22}
+     RegularExpressions,
+   {$ELSE}
      PerlRegEx,
+   {$IFEND}
 {$IFEND}
      Math,
      LibEay32Plus,
@@ -33,6 +37,8 @@ uses
      Facturacion.CertificadoDeSellos,
      Facturacion.ProveedorAutorizadoCertificacion,
      Facturacion.Comprobante,
+     Facturacion.Tipos,
+     Facturacion.Helper,
      FinkOkWsCancelacion,
      FinkOkWsTimbrado,
      FinkOkWsComun;
@@ -46,22 +52,20 @@ type
     fCredencialesPAC :  TFacturacionCredencialesPAC;
     fCredencialesIntegrador : TFacturacionCredencialesPAC;
     fDocumentoXMLCancelado : TXMLDocument;
-    function ExtraerNodoTimbre(const aComprobanteXML : TCadenaUTF8): TCadenaUTF8;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
-    function UTF8Bytes(const s: UTF8String): TBytedynArray; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
     function FileToByteArray( const FileName : string ) : TByteDynArray;
-    function WStringToArray(const S: WideString): StringArray;
-    function ExtraerUUID(const aDocumentoTimbrado: String) : String;
+    function FixedWideStringToArray(const aFixedWideString: WideString; const aElementFixedSize: Integer): StringArray;
+
   public
     procedure  Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
                          const aCredencialesPAC, aCredencialesIntegrador : TFacturacionCredencialesPAC;
                          const aTransaccionInicial: Int64);
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
-        aTransaccion: Int64): TCadenaUTF8; overload;
+        aTransaccion: Int64): TCadenaUTF8; overload; override;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; overload;
+    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; overload; override;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID;
-    function ObtenerAcuseDeCancelacion(const aUUID: string): string;
+    function ObtenerAcuseDeCancelacion(const aUUID: string): string; override;
     Function ObtenerEstatus(aUUID,Total,RFCReceptor: TCadenaUTF8):AcuseSATConsulta2;
     function ObtenerRelacionados(aUUID: TCadenaUTF8): Boolean;
     function ObtenerPendientes: stringArray2;
@@ -109,33 +113,19 @@ finally
  end;
 end;
 
-function TProveedorFinkOk.WStringToArray(const S: WideString): StringArray;
+function TProveedorFinkOk.FixedWideStringToArray(const aFixedWideString: WideString; const aElementFixedSize: Integer): StringArray;
 var
 i : integer;
 begin
-SetLength(result, Length(S) div 36); //cada uuid es de 36 caracteres
-if Length(S) > 0 then
-for i := 1 to Length(S) div 36 do begin
-SetLength(result[i-1], Length(S));
-result[i-1] := S;
-end;
-end;
-
-function TProveedorFinkOk.ExtraerUUID(const aDocumentoTimbrado: String) : String;
-const
-  _LONGITUD_UUID = 36;
-begin
-    Result:=Copy(aDocumentoTimbrado,
-                 AnsiPos('UUID="', aDocumentoTimbrado) + 6,
-                 _LONGITUD_UUID);
-end;
-
-function TProveedorFinkOk.UTF8Bytes(const s: UTF8String): TBytedynArray; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
-begin
-{$IF Compilerversion >= 20}Assert(StringElementSize(s)=1){$IFEND};
-  SetLength(Result, Length(s));
-  if Length(Result)>0 then
-    Move(s[1], Result[0], Length(s));
+ SetLength(result, Length(aFixedWideString) div aElementFixedSize);
+ if Length(aFixedWideString) > 0 then
+ begin
+  for i := 1 to Length(aFixedWideString) div aElementFixedSize do
+  begin
+   SetLength(result[i-1], Length(aFixedWideString));
+   result[i-1] := aFixedWideString;
+  end;
+ end;
 end;
 
 function TProveedorFinkOk.TimbrarDocumento(const aComprobante:
@@ -144,7 +134,7 @@ var
   respuestaTimbrado: TFinkOkRespuestaTimbrado;
   sXML:TByteDynArray;
 begin
-  sXML := UTF8Bytes(UTF8Encode(aComprobante.XML));
+  sXML := FacturacionHelper.UTF8ToBytes(UTF8Encode(aComprobante.XML));
   respuestaTimbrado := fwsTimbradoFinkOk.stamp(sXML,fCredencialesPAC.RFC,fCredencialesPAC.Clave);
   if Trim(respuestaTimbrado.CodEstatus) <> '' then
     Result := ExtraerNodoTimbre(respuestaTimbrado.xml);
@@ -163,35 +153,6 @@ begin
  Result:=0;
 end;
 
-function TProveedorFinkOk.ExtraerNodoTimbre(const aComprobanteXML : TCadenaUTF8): TCadenaUTF8;
-var
-  contenidoComprobanteXML: TCadenaUTF8;
- {$IF Compilerversion < 20}
-  TRegex : TPerlRegex;
- {$ifend}
-const
-  _REGEX_TIMBRE = '<tfd:TimbreFiscalDigital.*?/>';
-begin
-  Assert(aComprobanteXML <> '', 'La respuesta del servicio de timbrado fue nula');
-  {$IF Compilerversion >= 20}
-  // Delphi 2010 y superiores
-   contenidoComprobanteXML := aComprobanteXML;
-   Result := TRegEx.Match(contenidoComprobanteXML,_REGEX_TIMBRE).Value;
-  {$ELSE}
-   TRegex := TPerlRegex.Create(nil);
-   Try
-     TRegex.Subject:=UTF8String(aComprobanteXML);
-     TRegex.RegEx:=_REGEX_TIMBRE;
-     if TRegex.Match then
-      Result:=TRegex.MatchedExpression; 
-    Except
-       on E: Exception do
-        Writeln(E.ClassName, ': ', E.Message);
-    End;
-  {$IFEND}
-  Assert(Result <> '', 'El XML del timbre estuvo vacio');
-end;
-
 function TProveedorFinkOk.CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
 var
   certificadoSellos: ICertificadoDeSellos;
@@ -206,25 +167,25 @@ var
 begin
  Result:=True;
   fDocumentoXMLCancelado :=TXMLDocument.Create(nil);
-  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO)='' then
+  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO)='' then
      raise EPACRSACertificadoNoAsignadoException.Create('Certificado no asignado o vacío',0,0,false)
-  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA)='' then
+  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)='' then
      raise EPACRSALlavePrivadaNoAsignadaException.Create('Llave privada no asignada o vacía',0,0,false);
  OpenSSL:=TOpenSSL.Create;
  UUID:=UUIDS.Create;
 // obtenemos el certificado
  x509Certificado := TX509Certificate.Create;
- x509Certificado.LoadFromFile(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO));
- sCer:=UTF8Bytes(X509Certificado.AsBase64);
+ x509Certificado.LoadFromFile(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO));
+ sCer:=FacturacionHelper.UTF8ToBytes(X509Certificado.AsBase64);
  x509Certificado.Free;
 // obtenemos la llave
- llaveAbierta := openSSL.AbrirLlavePrivada(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA),ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));
- openSSL.GuardarLlavePrivadaEnPEM(llaveAbierta, ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA)+'.pem');
+ llaveAbierta := openSSL.AbrirLlavePrivada(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO),ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));
+ openSSL.GuardarLlavePrivadaEnPEM(llaveAbierta, ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
  OpenSSL.Free;
- sKey:=FileToByteArray(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA)+'.pem');
+ sKey:=FileToByteArray(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
 //Eliminamos el archivo temporal
- DeleteFile(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA)+'.pem');
- UUID.UUIDS:=WStringToArray(AUUID);
+ DeleteFile(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
+ UUID.UUIDS:=FixedWideStringToArray(AUUID, _UUID_LONGITUD); //cada uuid mide 36 caracteres
  try
    respuestaCancelacion := fwsCancelacionFinkOk.cancel(UUID,fCredencialesPAC.RFC,fCredencialesPAC.Clave,
                            fcredencialesIntegrador.RFC,sCer,sKey,False);
@@ -335,23 +296,26 @@ var
 begin
  Result:=True;
   fDocumentoXMLCancelado :=TXMLDocument.Create(nil);
-  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO)='' then
+ if True then
+
+  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO)='' then
      raise EPACRSACertificadoNoAsignadoException.Create('Certificado no asignado o vacío',0,0,false)
-  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA)='' then
+  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)='' then
      raise EPACRSALlavePrivadaNoAsignadaException.Create('Llave privada no asignada o vacía',0,0,false);
  OpenSSL:=TOpenSSL.Create;
 // obtenemos el certificado
  x509Certificado := TX509Certificate.Create;
- x509Certificado.LoadFromFile(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO));
- sCer:=UTF8Bytes(X509Certificado.AsBase64);
+ x509Certificado.LoadFromFile(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO));
+ sCer:=FacturacionHelper.UTF8ToBytes(X509Certificado.AsBase64);
  x509Certificado.Free;
 // obtenemos la llave
- llaveAbierta := openSSL.AbrirLlavePrivada(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA),ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));
- openSSL.GuardarLlavePrivadaEnPEM(llaveAbierta, ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA)+'.pem');
+ llaveAbierta := openSSL.AbrirLlavePrivada(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO),ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));
+ openSSL.GuardarLlavePrivadaEnPEM(llaveAbierta, ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
  OpenSSL.Free;
- sKey:=FileToByteArray(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA)+'.pem');
+ sKey:=FileToByteArray(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
 //Eliminamos el archivo temporal
- DeleteFile(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA)+'.pem');
+ DeleteFile(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
+
  try
    RespuestaRelacionados := fwsCancelacionFinkOk.Get_related(fCredencialesPAC.RFC,fCredencialesPAC.Clave,
                            fcredencialesIntegrador.RFC,aUUID,sCer,sKey);

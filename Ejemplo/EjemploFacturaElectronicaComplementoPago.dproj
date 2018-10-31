@@ -85,8 +85,6 @@
         <DCCReference Include="..\Facturacion.GeneradorCBB.pas"/>
         <DCCReference Include="..\Facturacion.GeneradorQRQuricol.pas"/>
         <DCCReference Include="..\Facturacion.GeneradorLigaVerificacion.pas"/>
-        <DCCReference Include="..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas"/>
-        <DCCReference Include="..\PACs\FinkOK\FinkOkWsTimbrado.pas"/>
         <DCCReference Include="..\PACs\SolucionFactible\Facturacion.PAC.SolucionFactible.pas"/>
         <DCCReference Include="..\PACs\SolucionFactible\SolucionFactibleWsTimbrado.pas"/>
         <DCCReference Include="..\PACs\MultiFacturas\Facturacion.PAC.MultiFacturas.pas"/>
@@ -106,6 +104,11 @@
         <DCCReference Include="..\Facturacion.Tipos.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ImpuestosLocalesV1.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ComplementoPagoV1.pas"/>
+        <DCCReference Include="..\PACs\FinkOK\Facturacion.PAC.FInkOk.pas"/>
+        <DCCReference Include="..\PACs\FinkOK\FinkOkWsCancelacion.pas"/>
+        <DCCReference Include="..\PACs\FinkOK\FinkOkWsComun.pas"/>
+        <DCCReference Include="..\PACs\FinkOK\FinkOkWsTimbrado.pas"/>
+        <DCCReference Include="EjemploFacturaElectronicaComplementoPagoMain.pas"/>
         <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>

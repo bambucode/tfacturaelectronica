@@ -22,7 +22,8 @@ uses
    {$IFEND}
 {$IFEND}
      Facturacion.Comprobante,
-     Facturacion.Tipos;
+     Facturacion.Tipos,
+     Facturacion.Helper;
 
   Const
    PAC_VALOR_CFDI_VERSION_32 = '3.2';
@@ -54,9 +55,14 @@ uses
    PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID = 'PAC_PARAM_SESION_INTEGRADOR_DISTRIBUIDOR_ID';
 
    //Certificado
-   PAC_PARAM_RSA_CERTIFICADO        = 'PAC_PARAM_RSA_CERTIFICADO';
-   PAC_PARAM_RSA_LLAVEPRIVADA       = 'PAC_PARAM_RSA_LLAVEPRIVADA';
-   PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE = 'PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE';
+   PAC_PARAM_RSA_CERTIFICADO_BASE64   = 'PAC_PARAM_RSA_CERTIFICADO_BASE64';  //contenido del certificado en Base64: usar ICertificadoSellos.ContenidoBase64
+   PAC_PARAM_RSA_LLAVEPRIVADA_BASE64  = 'PAC_PARAM_RSA_LLAVEPRIVADA_BASE64'; //contenido de la llave privada en Base64: usar IOpenSSL.LlavePrivadaComoBase64
+   PAC_PARAM_RSA_CERTIFICADO_PEM      = 'PAC_PARAM_RSA_CERTIFICADO_PEM';  //formato PEM del certificado: usar ICertificadoSellos.ContenidoPEM
+   PAC_PARAM_RSA_LLAVEPRIVADA_PEM     = 'PAC_PARAM_RSA_LLAVEPRIVADA_PEM'; //formato PEM de la llave privada: usar IOpenSSL.LlavePrivadaComoPEM
+   PAC_PARAM_RSA_CERTIFICADO_ARCHIVO  = 'PAC_PARAM_RSA_CERTIFICADO_ARCHIVO';  //Ruta y nombre del archivo de ceriticado (cer)
+   PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO = 'PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO'; //Ruta y nombre del archivo de la llave privada (key)
+
+   PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE = 'PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE'; //Clave/contraseña de la llave privada
 
 type
 
@@ -212,19 +218,28 @@ type
   TProveedorAutorizadoCertificacionBase = Class(TInterfacedObject, IProveedorAutorizadoCertificacion)
   protected
    fParametros: TStrings;
+   fFacturacionHelper: TFacturacionHelper;
    function ExtraerNodoTimbre(const aComprobanteXML: UnicodeString): UnicodeString; virtual;
+   function ExtraerTimbreUUID(const aDocumentoTimbrado: UnicodeString) : String;
   public
     destructor Destroy; override;
     procedure AfterConstruction; override;
+    procedure Configurar(const aDominioWebService: string;
+              const aCredencialesPAC: TFacturacionCredencialesPAC;
+              const aTransaccionInicial: Int64); overload; virtual;
     procedure Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
                          const aCredencialesPAC, aCredencialesIntegrador : TFacturacionCredencialesPAC;
-                         const aTransaccionInicial: Int64); virtual; abstract;
+                         const aTransaccionInicial: Int64); overload; virtual; abstract;
     procedure AsignarParametro( ANombreParametro: string; AValorParametro: string ); virtual;
+
+    function FacturacionHelper: TFacturacionHelper;
+
     function Nombre: string; virtual;
     function ObtenerParametro( ANombreParametro: string ): String; virtual;
     function ObtenerParametroDef( ANombreParametro: string; AValorPorDefault: string ): String; virtual;
     function Parametros: TStrings; virtual;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; virtual; abstract;
+    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; overload; virtual; abstract;
+    function CancelarDocumento(const aUUID: TCadenaUTF8; var aExtraInfo: TCadenaUTF8): Boolean; overload; virtual; abstract;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID; virtual; abstract;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
                               const aTransaccion: Int64) : TCadenaUTF8; overload; virtual;  abstract;
@@ -361,6 +376,7 @@ begin
   {$IFDEF CODESITE}
   CodeSite.Send('Se creo instancia de PAC '+Nombre);
   {$ENDIF}
+ fFacturacionHelper := TFacturacionHelper.Create;
  AsignarParametro(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_33);
  AsignarParametro(PAC_PARAM_SVC_CFG_MODO_PRODUCCION, PAC_VALOR_SI);
 end;
@@ -371,6 +387,14 @@ begin
  Parametros.Values[ANombreParametro] := AValorParametro;
 end;
 
+procedure TProveedorAutorizadoCertificacionBase.Configurar(
+  const aDominioWebService: string;
+  const aCredencialesPAC: TFacturacionCredencialesPAC;
+  const aTransaccionInicial: Int64);
+begin
+ Configurar(aDominioWebService,aDominioWebService,aDominioWebService,aCredencialesPAC,aCredencialesPAC, aTransaccionInicial);
+end;
+
 destructor TProveedorAutorizadoCertificacionBase.Destroy;
 begin
   if Assigned(fParametros) then
@@ -378,6 +402,10 @@ begin
   inherited;
 end;
 
+{.$DEFINE  PerlRegEx2009} // Define si se usa esta antigua versión, la cual no es compatible con XE1 y recientes
+                          // URL: https://www.regular-expressions.info/download/TPerlRegEx2009.zip
+                          // URL de la más reciente es: https://www.regular-expressions.info/download/TPerlRegEx.zip
+                          // Más info: https://www.regular-expressions.info/delphi.html
 function TProveedorAutorizadoCertificacionBase.ExtraerNodoTimbre(
   const aComprobanteXML: UnicodeString): UnicodeString;
 var
@@ -395,14 +423,23 @@ begin
   // Delphi XE1 y superiores
   Result := TRegEx.Match(contenidoComprobanteXML, _REGEX_TIMBRE).Value;
  {$ELSE}
-  LRegEx := TPerlRegEx.Create(nil);
+  {$IFNDEF PerlRegEx2009}
+   LRegEx := TPerlRegEx.Create; // No se necesita NIL si se usa la versión más reciente de TPerlRegEx: https://www.regular-expressions.info/download/TPerlRegEx.zip
+  {$ELSE}
+    LRegEx := TPerlRegEx.Create(nil);
+  {$ENDIF}
   try
   	LRegEx.RegEx := _REGEX_TIMBRE;
   	LRegEx.Options := [];
   	LRegEx.State := [];
   	LRegEx.Subject := contenidoComprobanteXML;
-	 if LRegEx.Match then begin
-    Result:=LRegEx.MatchedExpression;
+	 if LRegEx.Match then
+   begin
+    {$IFNDEF PerlRegEx2009}
+     Result:=LRegEx.MatchedText; // antes era MatchedExpression (deprecated), pero esta usa la versión más reciente de TPerlRegEx, más info: https://www.regular-expressions.info/delphi.html
+    {$ELSE}
+     Result:=LRegEx.MatchedExpression
+    {$ENDIF}
 	 end
   	else begin
   		Result := '';
@@ -415,6 +452,28 @@ begin
   Assert(Result <> '', 'El XML del timbre estuvo vacio');
   result := UTF8Decode( Result );
 end;
+function TProveedorAutorizadoCertificacionBase.ExtraerTimbreUUID(
+  const aDocumentoTimbrado: UnicodeString): String;
+var
+   _nodoTimbre: TCadenaUTF8;
+const
+  _LONGITUD_UUID = 36;
+begin
+    //Se extrae primero el nodo del timbre fiscal, para asegurarse que el UUID
+    //obtenido sea del Timbre y no de los UUID relacionados
+    _nodoTimbre := ExtraerNodoTimbre( aDocumentoTimbrado );
+    Result:=Copy(_nodoTimbre,
+                 AnsiPos('UUID="', aDocumentoTimbrado) + 6,
+                 _LONGITUD_UUID);
+end;
+
+function TProveedorAutorizadoCertificacionBase.FacturacionHelper: TFacturacionHelper;
+begin
+ if not assigned(fFacturacionHelper) then
+   fFacturacionHelper := TFacturacionHelper.Create;
+ result := fFacturacionHelper;
+end;
+
 function TProveedorAutorizadoCertificacionBase.Nombre: string;
 begin
  result := StringReplace(ClassName, 'TProveedor', '',[rfReplaceAll,rfIgnoreCase]);

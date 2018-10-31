@@ -139,7 +139,7 @@ begin
    resultadoAPI := TMemoryStream.Create;
   {$IFEND}
    Res.SaveToStream(resultadoAPI);
-   resultadoAPI.SaveToFile('d:\File.txt');
+   //resultadoAPI.SaveToFile('d:\File.txt');
    HTTP.Document.LoadFromStream(resultadoAPI);
    llamadoExitoso:=HTTP.HTTPMethod('POST', fURL);
     if llamadoExitoso then

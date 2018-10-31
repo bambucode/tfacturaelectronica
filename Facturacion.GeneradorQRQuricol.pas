@@ -83,9 +83,9 @@ begin
       imgResultado.Assign(bmpCBB);
       imgResultado.SaveToFile(aRutaAGuardar);
     finally
-      bmpCBB.Free;
     end;
   finally
+    bmpCBB.Free;
     imgResultado.Free;
   end;
 end;
