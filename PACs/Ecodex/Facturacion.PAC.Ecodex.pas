@@ -72,12 +72,13 @@ implementation
 
 uses
   Facturacion.Tipos,
+  Facturacion.ManejadorErroresComunesWebServices,
 {$IFDEF CODESITE}
   CodeSiteLogging,
 {$ENDIF}
-
 {$IF Compilerversion >= 23}
   Soap.XSBuiltIns,
+  Soap.Soaphttptrans,
   System.RegularExpressions,
   Xml.xmldom,
   Xml.XMLIntf,
@@ -86,6 +87,7 @@ uses
 {$ELSE}
   xmldom,
   XSBuiltIns,
+  Soaphttptrans,
   XMLIntf,
   Msxmldom,
   XMLDoc,
@@ -302,7 +304,8 @@ begin
     // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
     // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
     raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
-  end;
+  end else
+    TManejadorErroresComunesHelper.LanzarExcepcionSiDetectaFallaInternet(aExcepcion);
 end;
 
 function TProveedorEcodex.TimbrarDocumentoPrimeraVez(const aComprobante
@@ -739,7 +742,7 @@ begin
     except
       On E: Exception do
       begin
-        if Not (E Is EPACNoEncontradoParaCancelarException) then
+        if (Not (E Is EPACNoEncontradoParaCancelarException)) then
           ProcesarExcepcionDePAC(E)
         else
           raise;
