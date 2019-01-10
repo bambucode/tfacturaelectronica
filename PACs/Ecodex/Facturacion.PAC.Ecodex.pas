@@ -217,6 +217,7 @@ var
   mensajeExcepcion: string;
   numeroErrorSAT: Integer;
 const
+  _ERROR_RFC_FRANJA_FRONTERIZA           = 'CFDI33196 El RFC no se encuentra registrado para aplicar el Est';
   _ERROR_CODIGO_POSTAL_FRANJA_FRONTERIZA = 'postal no corresponde a Franja Fronteriza.';
   _ERROR_CLAVE_PROD_FRANJA_FRONTERIZA    = 'Franja Fronteriza para la clave de producto o servicio';
 begin
@@ -282,7 +283,9 @@ begin
         // 3. El código postal no corresponde a Franja Fronteriza.
         33196:
         begin
-          if mensajeExcepcion.Contains(_ERROR_CODIGO_POSTAL_FRANJA_FRONTERIZA) then
+          if mensajeExcepcion.Contains(_ERROR_RFC_FRANJA_FRONTERIZA) then
+            raise ESATRFCNoPerteneceFronteraException.Create(mensajeExcepcion, numeroErrorSAT, False)
+          else if mensajeExcepcion.Contains(_ERROR_CODIGO_POSTAL_FRANJA_FRONTERIZA) then
             raise ESATCodigoPostalNoPerteneceFronteraException.Create(mensajeExcepcion, numeroErrorSAT, False)
           else if mensajeExcepcion.Contains(_ERROR_CLAVE_PROD_FRANJA_FRONTERIZA) then
             raise ESATEstimuloFronteraNoAplicaAlProductoException.Create(mensajeExcepcion, numeroErrorSAT, False)
