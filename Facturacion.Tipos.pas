@@ -38,8 +38,7 @@ type
   private
     fCodigoError: Integer;
   public
-    constructor Create(const aMensajeExcepcion: String;
-      const aCodigoError: Integer; const aReintentable: Boolean);
+    constructor Create(const aMensajeExcepcion: String; const aCodigoError: Integer; const aReintentable: Boolean);
     property CodigoError: Integer read fCodigoError;
   end;
 
@@ -53,22 +52,25 @@ type
   // Los errores técnicos, donde se omiten nodos, no coincide, etc. no se calculó bien, etc
   // serán heredados de la siguiente excepcion. Estos errores deberán ser corregidos
   // en la librería directamente
-  ESATErrorTecnicoXMLException            = class(ESATErrorGenericoException);
+  ESATErrorTecnicoXMLException                    = class(ESATErrorGenericoException);
   // Error en el certificado, probablemente certificado caduco
-  ESATErrorEnCertificadoException         = class(ESATErrorGenericoException);
+  ESATErrorEnCertificadoException                 = class(ESATErrorGenericoException);
   // Los errores de "configuracion" donde algun dato del emisor está mal segun el SAT
-  ESATDatoEmisorIncorrectoException       = class(ESATErrorGenericoException);
-  ESATDatoReceptorIncorrectoException     = class(ESATErrorGenericoException);
+  ESATDatoEmisorIncorrectoException               = class(ESATErrorGenericoException);
+  ESATDatoReceptorIncorrectoException             = class(ESATErrorGenericoException);
   // El porcentaje del impuesto tiene un valor fuera del catalogo de tasas c_TasaOCuota.json
-  ESAImpuestoTasaIncorrectaException      = class(ESATErrorGenericoException);
+  ESAImpuestoTasaIncorrectaException              = class(ESATErrorGenericoException);
   // Cuando algun valor de un campo de catalogo no existió en el mismo
-  ESATValorNoEnCatalogoException          = class(ESATErrorGenericoException);
+  ESATValorNoEnCatalogoException                  = class(ESATErrorGenericoException);
   // El uso de cfdi no es valido para el receptor
-  EUsoCFDIIncorrectoException             = class(ESATErrorGenericoException);
+  EUsoCFDIIncorrectoException                     = class(ESATErrorGenericoException);
   // Existió un error arimético en el XML
-  ESATProblemaDeLlenadoException          = class(ESATErrorGenericoException);
-  ESATCampoConfirmacionRequeridoException = class(ESATErrorGenericoException);
-  ESATNoIdentificadoException             = class(ESATErrorGenericoException); // CFDI33196
+  ESATProblemaDeLlenadoException                  = class(ESATErrorGenericoException);
+  ESATCampoConfirmacionRequeridoException         = class(ESATErrorGenericoException);
+  ESATNoIdentificadoException                     = class(ESATErrorGenericoException); // CFDI33196
+  ESATRFCNoPerteneceFronteraException             = class(ESATErrorGenericoException); // CFDI33196
+  ESATCodigoPostalNoPerteneceFronteraException    = class(ESATErrorGenericoException); // CFDI33196
+  ESATEstimuloFronteraNoAplicaAlProductoException = class(ESATErrorGenericoException); // CFDI33196
   {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
 const
