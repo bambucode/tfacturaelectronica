@@ -218,6 +218,7 @@ var
   numeroErrorSAT: Integer;
 const
   _ERROR_CODIGO_POSTAL_FRANJA_FRONTERIZA = 'postal no corresponde a Franja Fronteriza.';
+  _ERROR_CLAVE_PROD_FRANJA_FRONTERIZA    = 'Franja Fronteriza para la clave de producto o servicio';
 begin
   mensajeExcepcion := aExcepcion.Message;
 
@@ -283,6 +284,8 @@ begin
         begin
           if mensajeExcepcion.Contains(_ERROR_CODIGO_POSTAL_FRANJA_FRONTERIZA) then
             raise ESATCodigoPostalNoPerteneceFronteraException.Create(mensajeExcepcion, numeroErrorSAT, False)
+          else if mensajeExcepcion.Contains(_ERROR_CLAVE_PROD_FRANJA_FRONTERIZA) then
+            raise ESATEstimuloFronteraNoAplicaAlProductoException.Create(mensajeExcepcion, numeroErrorSAT, False)
           else
             raise ESATNoIdentificadoException.Create(mensajeExcepcion, numeroErrorSAT, False);
         end
