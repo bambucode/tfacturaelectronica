@@ -216,6 +216,10 @@ procedure TProveedorEcodex.ProcesarExcepcionDePAC(const aExcepcion: Exception);
 var
   mensajeExcepcion: string;
   numeroErrorSAT: Integer;
+const
+  _ERROR_RFC_FRANJA_FRONTERIZA           = 'CFDI33196 El RFC no se encuentra registrado para aplicar el Est';
+  _ERROR_CODIGO_POSTAL_FRANJA_FRONTERIZA = 'postal no corresponde a Franja Fronteriza.';
+  _ERROR_CLAVE_PROD_FRANJA_FRONTERIZA    = 'Franja Fronteriza para la clave de producto o servicio';
 begin
   mensajeExcepcion := aExcepcion.Message;
 
@@ -273,9 +277,21 @@ begin
           raise ESATProblemaDeLlenadoException.Create(mensajeExcepcion,
             numeroErrorSAT, False);
 
+        // Errores posibles con el mismo codigo:
+        // 1. El RFC no se encuentra registrado para aplicar el Estímulo Franja Fronteriza.
+        // 2. No aplica Estímulo Franja Fronteriza para la clave de producto o servicio
+        // 3. El código postal no corresponde a Franja Fronteriza.
         33196:
-          raise ESATNoIdentificadoException.Create(mensajeExcepcion,
-            numeroErrorSAT, False);
+        begin
+          if mensajeExcepcion.Contains(_ERROR_RFC_FRANJA_FRONTERIZA) then
+            raise ESATRFCNoPerteneceFronteraException.Create(mensajeExcepcion, numeroErrorSAT, False)
+          else if mensajeExcepcion.Contains(_ERROR_CODIGO_POSTAL_FRANJA_FRONTERIZA) then
+            raise ESATCodigoPostalNoPerteneceFronteraException.Create(mensajeExcepcion, numeroErrorSAT, False)
+          else if mensajeExcepcion.Contains(_ERROR_CLAVE_PROD_FRANJA_FRONTERIZA) then
+            raise ESATEstimuloFronteraNoAplicaAlProductoException.Create(mensajeExcepcion, numeroErrorSAT, False)
+          else
+            raise ESATNoIdentificadoException.Create(mensajeExcepcion, numeroErrorSAT, False);
+        end
       else
         raise ESATErrorGenericoException.Create('ESATErrorGenericoException (' +
           IntToStr(EEcodexFallaValidacionException(aExcepcion).Numero) + ') ' +

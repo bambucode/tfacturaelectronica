@@ -504,10 +504,15 @@ end;
 { TPagos_PagoV1 }
 
 procedure TPagos_PagoV1.AfterConstruction;
+var
+  ItemTag : String;
 begin
   RegisterChildNode('DoctoRelacionado', TPagos_Pago_DoctoRelacionadoV1, TargetNamespace);
   RegisterChildNode('Impuestos', TPagos_Pago_ImpuestosV1);
-  FDoctoRelacionado := CreateCollection(TPagos_Pago_DoctoRelacionadoListV1, IPagos_Pago_DoctoRelacionadoV1, 'DoctoRelacionado') as IPagos_Pago_DoctoRelacionadoListV1;
+  ItemTag := 'Pago10:DoctoRelacionado';
+  FDoctoRelacionado := CreateCollection(TPagos_Pago_DoctoRelacionadoListV1,
+                                        IPagos_Pago_DoctoRelacionadoV1,
+                                        ItemTag) as IPagos_Pago_DoctoRelacionadoListV1;
   FImpuestos := CreateCollection(TPagos_Pago_ImpuestosListV1, IPagos_Pago_ImpuestosV1, 'Impuestos') as IPagos_Pago_ImpuestosListV1;
   inherited;
 end;
