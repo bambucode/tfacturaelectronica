@@ -310,6 +310,17 @@ initialization
   RemClassRegistry.RegisterXSClass(Incidencia, 'apps.services.soap.core.views', 'Incidencia');
   RemClassRegistry.RegisterXSInfo(TypeInfo(IncidenciaArray), 'apps.services.soap.core.views', 'IncidenciaArray');
   RemClassRegistry.RegisterXSClass(TFinkOkRespuestaTimbrado, 'apps.services.soap.core.views', 'AcuseRecepcionCFDI');
+/// registro las que son para cancelar
+//  InvRegistry.RegisterInterface(TypeInfo(IFinkOkCancelaTimbrado), 'http://facturacion.finkok.com/cancel', 'UTF-8');
+//  InvRegistry.RegisterDefaultSOAPAction(TypeInfo(IFinkOkCancelaTimbrado), '%operationName%');
+//  InvRegistry.RegisterInvokeOptions(TypeInfo(IFinkOkCancelaTimbrado), ioDocument);
+//  InvRegistry.RegisterExternalParamName(TypeInfo(IFinkOkCancelaTimbrado), 'get_receipt', 'type_', 'type');
+//  RemClassRegistry.RegisterXSInfo(TypeInfo(stringArray), 'http://facturacion.finkok.com/cancellation', 'stringArray');
+//  RemClassRegistry.RegisterXSClass(UUIDS, 'apps.services.soap.core.views', 'UUIDS');
+//  RemClassRegistry.RegisterXSClass(Folio, 'apps.services.soap.core.views', 'Folio');
+//  RemClassRegistry.RegisterXSInfo(TypeInfo(FolioArray), 'apps.services.soap.core.views', 'FolioArray');
+//  RemClassRegistry.RegisterXSClass(CancelaCFDResult, 'apps.services.soap.core.views', 'CancelaCFDResult');
+//  RemClassRegistry.RegisterXSClass(ReceiptResult, 'apps.services.soap.core.views', 'ReceiptResult');
 // registro las que son para dar de alta Clientes (RFC)
   InvRegistry.RegisterInterface(TypeInfo(IFinkOkAltaCliente), 'http://facturacion.finkok.com/registration', 'UTF-8');
   InvRegistry.RegisterDefaultSOAPAction(TypeInfo(IFinkOkAltaCliente), '%operationName%');

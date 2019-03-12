@@ -20,7 +20,14 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
      Classes,
 //     Forms,
      ComercioWsComun,
-     SysUtils;
+     SysUtils,
+
+     IdGlobal,
+     IdHTTP,
+     IdIOHandlerSocket,
+     {$IFDEF Indy100UP} IdSSL,{$ENDIF}
+     IdSSLOpenSSL;     
+
 
 type
 
@@ -34,6 +41,7 @@ type
     fCredencialesIntegrador : TFacturacionCredencialesPAC;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
     Function ProcesaErrorPac(const aLista : TStringList):Boolean;
+    function RealizarTimbradoREST1(const aDocumentoXML: TCadenaUTF8): TCadenaUTF8;
     function RealizarTimbradoREST(const aDocumentoXML: TCadenaUTF8): TCadenaUTF8;
     function RealizarCancelacionREST(RFCR, UUID, EmailR, EmailE, TipoC,
       Total: String): String;
@@ -56,6 +64,7 @@ implementation
 
 uses xmldom,
      XMLIntf,
+     Forms,
      {$IFDEF CODESITE}
      CodeSiteLogging,
      {$ENDIF}
@@ -163,6 +172,68 @@ begin
 
 end;
 
+Function TProveedorComercio.RealizarTimbradoREST1(const aDocumentoXML:
+    TCadenaUTF8): TCadenaUTF8;
+var  oHTTP: TIdHTTP;
+  oRequestStream : TStream;
+//  oSSLSocket   : {$IFDEF Indy100UP} TIdSSLIOHandlerSocketOpenSSL {$ELSE} TIdSSLIOHandlerSocket{$ENDIF};
+  oSSLSocket   : TIdSSLIOHandlerSocketOpenSSL;
+  oRespuestaServidor: TStrings;
+  LOperacionExitosa: Boolean;
+  LRespuestaDoc: TCadenaUTF8;
+begin
+  {$IF Compilerversion >= 20}
+   oRequestStream := TStringStream.Create('<?xml version="1.0" encoding="UTF-8"?>'+aDocumentoXML,TEncoding.UTF8 );
+  {$ELSE}
+   oRequestStream := TStringStream.Create('<?xml version="1.0" encoding="UTF-8"?>'+aDocumentoXML);
+  {$IFEND}
+//  oSSLSocket := {$IFDEF Indy100UP} TIdSSLIOHandlerSocketOpenSSL.Create{$ELSE}TIdSSLIOHandlerSocket.Create(nil){$ENDIF};
+  oSSLSocket :=TIdSSLIOHandlerSocketOpenSSL.Create;
+  oSSLSocket.SSLOptions.Method := sslvSSLv23;
+  oSSLSocket.SSLOptions.Mode   := sslmClient;
+
+  oHTTP := TidHTTP.Create(nil);
+  oHTTP.IOHandler := oSSLSocket;
+  try
+    // Copiamos el documento XML al Memory Stream
+    oRequestStream.Position := 0;
+    oHTTP.ProtocolVersion:=pv1_1;
+    {$IFDEF Indy100UP}
+     oHTTP.Request.ContentType:='text/xml';
+     oHTTP.Request.CharSet := 'UTF-8';
+    {$ELSE}
+     oHTTP.Request.ContentType:='text/xml;charset=utf-8';
+    {$ENDIF}
+    oHTTP.HandleRedirects := True;
+    oHTTP.HTTPOptions     := oHTTP.HTTPOptions + [hoKeepOrigProtocol] + [hoInProcessAuth] + [hoForceEncodeParams];
+    oHTTP.Request.UserAgent := 'Mozilla/3.0 (compatible); Indy Library)';
+    oHTTP.Request.Connection := 'keep-alive';
+    oHTTP.Request.CustomHeaders.Add('usrws: '+fCredencialesPAC.RFC);
+    oHTTP.Request.CustomHeaders.Add('pwdws: '+fCredencialesPAC.CLAVE);
+    oHTTP.Request.CustomHeaders.Add('tipo:TIMBRE'); //tipo:XML regresa todo el XML del CFDI
+   {$IF Compilerversion >= 20}
+    LRespuestaDoc := oHTTP.Post(fWsTimbradoComercio+'/timbre/timbrarv5.aspx', oRequestStream );
+   {$ELSE}
+    LRespuestaDoc := oHTTP.Post(fWsTimbradoComercio+'/timbre/timbrarv5.aspx', oRequestStream, TIdTextEncoding.Default);
+    LRespuestaDoc := UTF8Decode(LRespuestaDoc);
+   {$IFEND}
+    LOperacionExitosa := oHTTP.Response.ResponseCode in [100,200];
+    if (LOperacionExitosa) and
+       (ProcesaErrorPac(oHTTP.Response.RawHeaders)) then
+    begin
+       Result := LRespuestaDoc;
+    end
+    else
+      if (LRespuestaDoc='') and (fError='') then
+         raise EPACErrorGenericoException.Create('Error al Timbrar, respuesta vacía',0,0,false)
+      else
+        raise EPACErrorGenericoException.Create('Error al timbrar en API: ' + fError +' / Mensaje: '+fErrorMsg,0,StrToIntDef(fError,0),false);
+  finally
+    oHTTP.Free;
+    oRequestStream.Free;
+  end;
+end;
+    
 Function TProveedorComercio.RealizarTimbradoREST(const aDocumentoXML:
     TCadenaUTF8): TCadenaUTF8;
 var
@@ -190,6 +261,7 @@ begin
     HTTP.Headers.Add('pwdws: '+fCredencialesPAC.CLAVE);
     HTTP.Headers.Add('tipo:TIMBRE');
     HTTP.Document.CopyFrom(resultadoAPI, 0);
+    HTTP.Document.SaveToFile(ExtractFilePath(Application.ExeName)+'XML.XML');    
     llamadoExitoso:=HTTP.HTTPMethod('POST', fWsTimbradoComercio+'/timbre/timbrarv5.aspx');
     if (llamadoExitoso) and (ProcesaErrorPac(HTTP.Headers)) then
      begin
@@ -265,9 +337,14 @@ begin
      Result :=UTF8Encode(respuestaCadena);
     {$IFEND}
     end
+   Else CodeStatus(Trim(fRespuesta));
+{   else if Copy(Trim(fRespuesta),Pos('ERRMSG',UpperCase(Trim(fRespuesta)))+8,3)='CCE' then
+    CodEstatus(Copy(Trim(fRespuesta),Pos('ERRMSG',UpperCase(Trim(fRespuesta)))+8,6))
+   else if Copy(Trim(fRespuesta),Pos('ERRMSG',UpperCase(Trim(fRespuesta)))+8,6)='CFDI33' then
+    CodEstatus(Copy(Trim(fRespuesta),Pos('ERRMSG',UpperCase(Trim(fRespuesta)))+8,9))
    else
     CodEstatus(Copy(Trim(fRespuesta),Pos('CODIGO',UpperCase(Trim(fRespuesta)))+8,3));
-  except
+}  except
     On E:Exception do
     begin
      ProcesarExcepcionDePAC(E);

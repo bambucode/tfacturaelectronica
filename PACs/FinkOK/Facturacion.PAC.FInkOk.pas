@@ -327,11 +327,14 @@ end;
 
 function TProveedorFinkOk.ObtenerRelacionados(aUUID: TCadenaUTF8): Boolean;
 var
+  certificadoSellos: ICertificadoDeSellos;
   RespuestaRelacionados: RelatedResult2;
   sKey,sCer:TByteDynArray;
+  fAcuse:String;
   OpenSSL: TOpenSSL;
   LlaveAbierta: pPKCS8_Priv_Key_Info;
   x509Certificado : TX509Certificate;
+  key: TKeyPairGenerator;
 begin
  Result:=True;
   fDocumentoXMLCancelado :=TXMLDocument.Create(nil);
@@ -373,6 +376,7 @@ end;
 procedure TProveedorFinkOk.ProcesarExcepcionDePAC(const aExcepcion: Exception);
 var
   mensajeExcepcion : string;
+  numeroErrorSAT: Integer;
 begin
   mensajeExcepcion := aExcepcion.Message;
      // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC

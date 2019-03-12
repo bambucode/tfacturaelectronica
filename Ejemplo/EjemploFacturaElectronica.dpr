@@ -71,7 +71,6 @@ uses
   FinkOkWsTimbrado in '..\PACs\FinkOK\FinkOkWsTimbrado.pas',
   FinkOkWsCancelacion in '..\PACs\FinkOK\FinkOkWsCancelacion.pas',
   FinkOkWsComun in '..\PACs\FinkOK\FinkOkWsComun.pas',
-  Cancelacion.PAC.Comercio in '..\PACs\ComercioDigital\Cancelacion.PAC.Comercio.pas',
   ComercioWsComun in '..\PACs\ComercioDigital\ComercioWsComun.pas',
   Facturacion.PAC.Comercio in '..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas',
   synacode in '..\Lib\synapse\synacode.pas',
@@ -117,15 +116,24 @@ var
 
   queVersion, rutaCertificado, rutaLlavePrivada, claveLlavePrivada: string;
   reintentar                                                      : Boolean;
-  Url_WS                                                          : String;
+  Url_TIMBRADO_WS                                                 : String;
+  Url_CANCELACION_WS                                              : String;
+  Url_CLIENTES_WS                                                 : String;
 const
   _URL_ECODEX_PRUEBAS_V32        = 'https://pruebas.ecodex.com.mx:2045';
   _URL_ECODEX_PRUEBAS_V33        = 'https://wsdev.ecodex.com.mx:2045';
-  _URL_FINKOK_PRUEBAS            = 'http://demo-facturacion.finkok.com/servicios/soap';
-  _URL_COMERCIO_PRUEBAS          = 'https://pruebas.comercio-digital.mx';
   _URL_SOLUCIONFACTIBLE_PRUEBAS  = 'https://testing.solucionfactible.com/ws/services/Timbrado';
   _URL_MULTIFACTURAS_PRUEBAS     = 'http://ws.facturacionmexico.com.mx/pac/timbrarjava.php';   //SE DEBE ESPECIFICAR QUE ES MODO PRODUCCION
-  _NUMERO_TRANSACCION_INICIAL    = 1;
+  _URL_FINKOK_TIMBRADO_PRUEBAS       = 'http://demo-facturacion.finkok.com/servicios/soap/stamp';
+  _URL_FINKOK_TIMBRADO               = 'https://facturacion.finkok.com/servicios/soap/stamp';
+  _URL_FINKOK_CLIENTE_PRUEBAS        = 'http://demo-facturacion.finkok.com/servicios/soap/registration';
+  _URL_FINKOK_CLIENTE                = 'https://facturacion.finkok.com/servicios/soap/registration';
+  _URL_FINKOK_CANCELACION_PRUEBAS    = 'http://demo-facturacion.finkok.com/servicios/soap/cancel';
+  _URL_FINKOK_CANCELACION            = 'https://facturacion.finkok.com/servicios/soap/cancel';
+  _URL_COMERCIO_TIMBRADO_PRUEBAS     = 'https://pruebas.comercio-digital.mx';
+  _URL_COMERCIO_CANCELACION_PRUEBAS  = 'https://pruebas.comercio-digital.mx';
+  _URL_COMERCIO_CANCELACION          = 'https://cancela.comercio-digital.mx';
+  _URL_COMERCIO_TIMBRADO             = 'https://ws.comercio-digital.mx';  _NUMERO_TRANSACCION_INICIAL    = 1;
 
   //Hablitar solo una de las siguientes opciones
   {.$define PAC_DEMO_ECODEX}
@@ -165,16 +173,23 @@ begin
 
      {$ifdef PAC_DEMO_COMERCIODIGITAL}
       pac := TProveedorComercio.Create;
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.key';
+      claveLlavePrivada := '12345678a';
       CredencialesPAC.RFC   := 'AAA010101AAA';
       CredencialesPAC.Clave := 'PWD';
-      Url_WS := _URL_COMERCIO_PRUEBAS;
+      credencialesIntegrador.RFC:='';
+      Url_TIMBRADO_WS := _URL_COMERCIO_TIMBRADO_PRUEBAS;
+      Url_CANCELACION_WS := _URL_COMERCIO_CANCELACION_PRUEBAS;
      {$endif}
 
      {$ifdef PAC_DEMO_FINOK}
       pac := TProveedorFinkOk.Create;
       CredencialesPAC.RFC   := 'TuUsuario';
       CredencialesPAC.Clave := 'TuPassword';
-      Url_WS := _URL_FINKOK_PRUEBAS;
+      credencialesIntegrador.RFC:='LAN7008173R5';
+      Url_TIMBRADO_WS := _URL_FINKOK_TIMBRADO_PRUEBAS;
+      Url_CANCELACION_WS := _URL_FINKOK_CANCELACION_PRUEBAS;
      {$endif}
 
      {$ifdef PAC_DEMO_SOLUCIONFACTIBLE}
