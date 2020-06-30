@@ -388,32 +388,7 @@ var
   respuestaTimbrado: TEcodexRespuestaTimbrado;
   tokenDeUsuario: string;
   mensajeFalla: string;
-
 begin
-//  tmpTImbrado := GetTimbrado(False, fDominioWebService +
-//    '/ServicioTimbrado.svc');
-//
-//  // 2. Iniciamos una nueva sesion solicitando un nuevo token
-//  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
-//
-//  tmpSolicitud := SolicitudTimbraXML.Create;
-//  tmpSolicitud.ComprobanteXML          := ComprobanteXML2.Create;
-//  tmpSolicitud.ComprobanteXML.DatosXML := aComprobante.Xml;
-//  tmpSolicitud.RFC                     := fCredencialesPAC.RFC;
-//  tmpSolicitud.Token                   := tokenDeUsuario;
-//  tmpSolicitud.TransaccionID           := aTransaccion;
-//
-//  try
-//    tmpResp := tmpTImbrado.timbraXML(tmpSolicitud);
-//  except
-//    On E:Exception do
-//    begin
-//      raise E;
-//    end;
-//  end;
-//
-//  Exit;
-
   if fwsTimbradoEcodex = nil then
     raise EPACNoConfiguradoException.Create
       ('No se ha configurado el PAC, favor de configurar con metodo Configurar');
