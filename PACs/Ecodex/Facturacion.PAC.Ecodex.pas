@@ -18,6 +18,7 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
   EcodexWsCancelacion,
   PAC.Ecodex.ManejadorDeSesion,
 {$IF CompilerVersion >= 23}
+  Soap.SOAPHTTPTrans, System.Net.HttpClient,
   System.Generics.Collections,
   System.Classes,
   System.SysUtils
@@ -48,8 +49,15 @@ type
                                         const aTransaccion: Int64): TCadenaUTF8; overload;
     function TimbrarDocumentoPrimeraVez(const aXML : TCadenaUTF8;
                                         const aTransaccion: Int64): TCadenaUTF8; overload;
+
+     {$IF CompilerVersion >= 23}
+    procedure ManejarHttpSoapError(const HTTPReqResp: THTTPReqResp;
+                                   const HTTPResponse: IHTTPResponse; const Error: ESOAPHTTPException;
+                                   var Action: TSOAPHttpErrorAction);
+    {$IFEND}
   public
     destructor Destroy; override;
+    procedure AfterConstruction; override;
     procedure Configurar(const aWsTimbrado, aWsClientes, aWsCancelacion: string;
         const aCredencialesPAC, aCredencialesIntegrador:
         TFacturacionCredencialesPAC; const aTransaccionInicial: Int64); override;
@@ -103,6 +111,58 @@ begin
     FreeAndNil(fManejadorDeSesion);
   inherited;
 end;
+
+procedure TProveedorEcodex.AfterConstruction;
+begin
+  inherited;
+
+  // Insertamos un manejador de errores generico para requests SOAP
+  // Ref: https://stackoverflow.com/questions/59666531/how-to-get-at-response-headers-from-thttpreqresp
+  // NOTA: Solo funciona Delphi 10.3 o mayores
+  {$IF Compilerversion >= 23}
+  SetOnHttpError(ManejarHttpSoapError);
+  {$IFEND}
+end;
+
+{$IF Compilerversion >= 23}
+procedure TProveedorEcodex.ManejarHttpSoapError(const HTTPReqResp: THTTPReqResp;
+  const HTTPResponse: IHTTPResponse; const Error: ESOAPHTTPException;
+  var Action: TSOAPHttpErrorAction);
+var
+  respuestaWebService : String;
+  ex : EEcodexFallaValidacionException;
+
+  function ExtraerTextoEntreTags(const aTexto, aTagInicial, aTagFinal: String) : String;
+  begin
+    Result := Copy(aTexto, 
+                   AnsiPos(aTagInicial,aTexto) + Length(aTagInicial),
+                   AnsiPos(aTagFinal,aTexto) - AnsiPos(aTagInicial,aTexto)-Length(aTagInicial))
+  end;
+begin
+  respuestaWebService := HTTPResponse.ContentAsString();
+
+  {$IF CODESITE}
+  CodeSite.Send('Error', Error.Message);
+  CodeSite.Send('StatusText', HTTPResponse.StatusText);
+  CodeSite.Send('StatusCode', HTTPResponse.StatusCode);
+  CodeSite.Send('Content', respuestaWebService);
+  {$ENDIF}
+
+  // HACK: Convertimos el contenido de la respuesta del WebService 
+  // en su respectiva excepcion
+  if AnsiPos('FallaValidacion', respuestaWebService) > 0 then
+  begin
+    ex :=  EEcodexFallaValidacionException.Create;
+    ex.Numero      := StrToInt(ExtraerTextoEntreTags(respuestaWebService, '<Numero>', '</Numero>'));
+    ex.Descripcion := ExtraerTextoEntreTags(respuestaWebService, '<Descripcion>', '</Descripcion>');
+    ex.RFC         := ExtraerTextoEntreTags(respuestaWebService, '<RFC>', '</RFC>');
+    raise ex;
+  end;
+
+  Action := TSOAPHttpErrorAction.heaAbort; { or whatever }
+end;
+{$IFEND}
+
 
 { TProveedorEcodex }
 
