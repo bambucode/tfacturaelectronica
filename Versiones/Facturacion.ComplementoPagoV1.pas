@@ -509,7 +509,7 @@ var
 begin
   RegisterChildNode('DoctoRelacionado', TPagos_Pago_DoctoRelacionadoV1, TargetNamespace);
   RegisterChildNode('Impuestos', TPagos_Pago_ImpuestosV1);
-  ItemTag := 'Pago10:DoctoRelacionado';
+  ItemTag := 'pago10:DoctoRelacionado';
   FDoctoRelacionado := CreateCollection(TPagos_Pago_DoctoRelacionadoListV1,
                                         IPagos_Pago_DoctoRelacionadoV1,
                                         ItemTag) as IPagos_Pago_DoctoRelacionadoListV1;
