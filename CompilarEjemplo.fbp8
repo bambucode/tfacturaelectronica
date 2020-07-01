@@ -92,7 +92,6 @@ begin
           debuginfo = false
           definitionsonly = false
           emitruntimetypeinformation = false
-          exedescription = "IB Objects 5.7.7 TDataset Runtime"
           exportallsymbols = true
           extendedsyntax = true
           externaltd32 = false
@@ -142,7 +141,7 @@ begin
   variable
   begin
     comment = "Directorio base del proyecto"
-    defaultvalue = C:\\Delphi\\eleventa\\externos\\TFacturaelectronica\\
+    defaultvalue = C:\\Delphi\\TFacturaelectronica\\
     name = PROJDIR
     variablescope = vtProject
   end
