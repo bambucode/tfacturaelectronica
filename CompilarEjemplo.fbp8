@@ -106,7 +106,7 @@ begin
           includetd32 = false
           inlining = inOn
           iochecking = true
-          librarypath = "$(BDSLIB)\\$(Platform)\\release;$(BDSUSERDIR)\\Imports;$(BDS)\\Imports;$(BDSCOMMONDIR)\\Dcp;$(BDS)\\include;%PROJDIR%bambucomponents\\tbambulistadototales\\win32\\debug;%PROJDIR%TMS Advanced Charts;C:\\Delphi\\eleventa\\WinLicense\\Include\\Delphi;%PROJDIR%TMS Aurelius\\Source\\core;%PROJDIR%TMS Aurelius\\Source\\design;%PROJDIR%Varios;C:\\Program Files (x86)\\Raize\\CS5\\Lib\\RX10\\Win32;%PROJDIR%SynTaskDialog;C:\\Delphi\\eleventa\\WinLicense\\Include\\Delphi\\Macros;%PROJDIR%Raize6\\Source;%PROJDIR%Flat2k\\Source;%PROJDIR%dxPack\\Sources;%PROJDIR%nrComm Lib\\Delphi23\\Win32;%PROJDIR%nrComm Lib\\Res;%PROJDIR%TaskDialogs;%PROJDIR%TZipper;%PROJDIR%TZipper\\delphizlib;%PROJDIR%OmniThreadLibrary;%PROJDIR%OmniThreadLibrary\\src;%PROJDIR%FthLib\\Source;%PROJDIR%VirtualTrees\\Source;%PROJDIR%GPanel\\GPanel Component;%PROJDIR%BambuComponents\\TBambuCheckBoxPermisos;%PROJDIR%BambuComponents\\TBambuConfigurarCarrierRecargas;%PROJDIR%BambuComponents\\TBambuEditCodigoBarras;%PROJDIR%BambuComponents\\TBambuListadoTotales;%PROJDIR%BambuComponents\\TBambuSeleccionarCarrier;%PROJDIR%BambuComponents\\TipoPermisos;C:\\Delphi\\eleventa\\externos\\TFacturaElectronica\\CFD;%PROJDIR%KOL;%PROJDIR%DCPCrypt2;%PROJDIR%DCPCrypt2\\Hashes;%PROJDIR%DCPCrypt2\\Ciphers;%PROJDIR%SIMExport\\Sources;%PROJDIR%SIMImport\\Sources;%PROJDIR%TMS;%PROJDIR%VirtualTrees\\VSTEdit;%PROJDIR%X-Superobject;%PROJDIR%SuperObject;C:\\Delphi\\eleventa\\externos\\Delphi-Mocks;C:\\Delphi\\eleventa\\Modulos\\Interfases;%PROJDIR%TMS Flexcel;C:\\Delphi\\eleventa\\externos\\TFacturaElectronica;%PROJDIR%delphi-rest-client-api\\src;%PROJDIR%delphi-rest-client-api\\lib;%PROJDIR%Winlicense\\WinLicense DLL Control\\Include\\Delphi;%PROJDIR%TMS Flexcel\\Source\\Core;%PROJDIR%TMS Flexcel\\Source\\XlsAdapter;%PROJDIR%JCL\\lib\\d23\\win32;C:\\Delphi\\eleventa\\WinLicense\\WinlicenseSDK\\Include\\Delphi;%PROJDIR%SpringFramework\\Source\\Base\\Collections;%PROJDIR%SpringFramework\\Source\\Base;%PROJDIR%IBObjects\\lib\\d10\\Win32\\Release;%PROJDIR%SpringFramework\\Source\\Core\\Services;%PROJDIR%SpringFramework\\Source\\Core\\Container;%PROJDIR%SpringFramework\\Source\\Base\\Reflection;%PROJDIR%FastMM;%PROJDIR%eDocEngineVCL\\Lib\\RAD10\\$(Platform);%PROJDIR%Gnostice\\Shared\\Lib\\RAD10\\$(Platform);%PROJDIR%eDocEngineVCL\\Lib\\RAD10\\$(Platform)\\ExpIntf;%PROJDIR%eDocEngineVCL\\Lib\\RAD10\\$(Platform);%PROJDIR%Shared3\\Lib\\RAD10\\$(Platform);%PROJDIR%eDocEngineVCL\\Lib\\RAD10\\$(Platform)\\ExpIntf;%PROJDIR%Shared\\Source\\Compression;%PROJDIR%Shared\\Source\\Rtl;%PROJDIR%Shared\\Lib\\RAD10\\$(Platform);C:\\Delphi\\eleventa\\externos\\TFacturaelectronica\\GeneradorCBB;C:\\Delphi\\Output\\DCU;C:\\Delphi\\mormot;C:\\Delphi\\mormot\\SQLite3;C:\\Delphi\\mormot\\SynDBDataset;%PROJDIR%TMS Component Pack;%PROJDIR%TMS Component Pack\\Delphi10Seattle\\Win32\\Release;%PROJDIR%TMS Component Pack\\xlsAdapter;%PROJDIR%CleverComponents\\Common;%PROJDIR%mORMot;%PROJDIR%mORMot\\SQLite3;%PROJDIR%TMS BCL\\packages\\dseattle\\.\\Win32\\Release;C:\\Program Files (x86)\\Neos Eureka S.r.l\\EurekaLog 7\\Lib\\Common;C:\\Program Files (x86)\\Neos Eureka S.r.l\\EurekaLog 7\\Lib\\Win32\\Release\\Studio23;C:\\Program Files (x86)\\Neos Eureka S.r.l\\EurekaLog 7\\Source\\Extras;%PROJDIR%JVCL\\lib\\D23\\win32;%PROJDIR%JVCL\\common;%PROJDIR%JVCL\\Resources;%PROJDIR%eDocEngineVCL\\Lib\\RAD10\\$(Platform);%PROJDIR%Shared3\\Lib\\RAD10\\$(Platform);%PROJDIR%eDocEngineVCL\\Lib\\RAD10\\$(Platform)\\ExpIntf;%PROJDIR%HTMLEditors\\XE10\\source;%PROJDIR%HTMLEditors\\XE10\\source\\editor;%PROJDIR%HTMLEditors\\XE10\\source\\reports;%PROJDIR%HTL\\source;%PROJDIR%HTL\\source\\editor;%PROJDIR%HTL\\source\\reports"
+          librarypath = %LIBRARYPATH%
           linkeroutput = 0
           localsymbols = false
           mapfile = 0
@@ -137,6 +137,12 @@ begin
         end
       end
     end
+  end
+  variable
+  begin
+    defaultvalue = "C:\\Delphi\\Output\\Compilado;C:\\Build Tools\\Delphi10.3\\lib\\win32\\release;C:\\Build Tools\\CS510.3\\Lib\\RX10.3\\Win32;"
+    name = LIBRARYPATH
+    variablescope = vtProject
   end
   variable
   begin
