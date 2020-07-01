@@ -21,8 +21,9 @@ begin
         compileridl = true
         configname = Release
         debugversionnumbers = false
-        delphiversion = Delphi10Seattle
+        delphiversion = Delphi10_3
         description = "Compilar proyecto Delphi 10 Seattle [ %PROJDIR%\\Ejemplo\\EjemploFacturaElectronica.dpr ]"
+        enabletimeout = false
         eurekalogverboselogging = false
         frameworktype = VCL
         hintsaserror = false
@@ -41,18 +42,23 @@ begin
         majorversion = 5
         minorversion = 7
         platform = Win32
+        platformsdktype = ProjectSDK
         projectfile = %PROJDIR%\\Ejemplo\\EjemploFacturaElectronica.dpr
         regenerateresource = true
         releaseversion = 5
         resourcecompilertype = rcBorland
+        ridloutputsamefolder = true
         startingdir = %PROJDIR%\\Ejemplo\\
+        timeoutlength = 1
         updatedoffile = false
         updatepackagesource = false
         updateversioninfokeys = false
         useeurekalogcompiler = false
+        usefastdcccompiler = false
         useprojectsettings = []
         usepropertyset = false
         useversionfromdof = false
+        verboseoutput = false
         versioninfokeys = "CompanyName\=TFacturaElectronica" +
                           "FileDescription\=" +
                           "FileVersion\=5.7.7.2340" +
@@ -107,7 +113,7 @@ begin
           mapfile = 0
           maxstacksize = 1048576
           minstacksize = 16384
-          namespaceprefixes = System;Vcl;Data;WinAPI;Xml;Datasnap;Web;Soap;System.Win;Data.Win;Web.Win;Soap.Win;Bde;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;
+          namespaceprefixes = System;Xml;Data;Datasnap;Web;Soap;Winapi;System.Win;Data.Win;Web.Win;Soap.Win;Bde;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;
           objoutputdir = ..\\..\\lib\\d10\\$(Platform)\\Release
           openstrings = true
           optimisation = true
