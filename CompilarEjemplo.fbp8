@@ -75,7 +75,7 @@ begin
         delphi.compileroptions
         begin
           alwaysuseconditionalsfromdof = false
-          alwaysusedelphilibrarypath = true
+          alwaysusedelphilibrarypath = false
           alwaysusedofsearchpath = false
           assertions = true
           assignableconst = false
