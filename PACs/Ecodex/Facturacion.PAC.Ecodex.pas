@@ -1,4 +1,4 @@
-{ ******************************************************* }
+  { ******************************************************* }
 {                                                         }
 { TFacturaElectronica                                     }
 {                                                         }
@@ -130,33 +130,46 @@ procedure TProveedorEcodex.ManejarHttpSoapError(const HTTPReqResp: THTTPReqResp;
   var Action: TSOAPHttpErrorAction);
 var
   respuestaWebService : String;
-  ex : EEcodexFallaValidacionException;
+  exValidacion : EEcodexFallaValidacionException;
+  exSesion     : EEcodexFallaSesionException;
 
   function ExtraerTextoEntreTags(const aTexto, aTagInicial, aTagFinal: String) : String;
   begin
-    Result := Copy(aTexto, 
+    Result := Copy(aTexto,
                    AnsiPos(aTagInicial,aTexto) + Length(aTagInicial),
                    AnsiPos(aTagFinal,aTexto) - AnsiPos(aTagInicial,aTexto)-Length(aTagInicial))
   end;
 begin
   respuestaWebService := HTTPResponse.ContentAsString();
 
-  {$IF CODESITE}
+  {$IFDEF CODESITE}
   CodeSite.Send('Error', Error.Message);
   CodeSite.Send('StatusText', HTTPResponse.StatusText);
   CodeSite.Send('StatusCode', HTTPResponse.StatusCode);
   CodeSite.Send('Content', respuestaWebService);
   {$ENDIF}
 
-  // HACK: Convertimos el contenido de la respuesta del WebService 
+  // HACK: Convertimos el contenido de la respuesta del WebService
   // en su respectiva excepcion
   if AnsiPos('FallaValidacion', respuestaWebService) > 0 then
   begin
-    ex :=  EEcodexFallaValidacionException.Create;
-    ex.Numero      := StrToInt(ExtraerTextoEntreTags(respuestaWebService, '<Numero>', '</Numero>'));
-    ex.Descripcion := ExtraerTextoEntreTags(respuestaWebService, '<Descripcion>', '</Descripcion>');
-    ex.RFC         := ExtraerTextoEntreTags(respuestaWebService, '<RFC>', '</RFC>');
-    raise ex;
+    exValidacion :=  EEcodexFallaValidacionException.Create;
+    exValidacion.Numero      := StrToInt(ExtraerTextoEntreTags(respuestaWebService, '<Numero>', '</Numero>'));
+    exValidacion.Descripcion := ExtraerTextoEntreTags(respuestaWebService, '<Descripcion>', '</Descripcion>');
+    exValidacion.RFC         := ExtraerTextoEntreTags(respuestaWebService, '<RFC>', '</RFC>');
+    raise exValidacion;
+  end;
+
+  if AnsiPos('FallaSesion', respuestaWebService) > 0 then
+  begin
+    exSesion :=  EEcodexFallaSesionException.Create;
+    exSesion.Estatus      := StrToInt(ExtraerTextoEntreTags(respuestaWebService, '<Estatus>', '</Estatus>'));
+    exSesion.Descripcion := ExtraerTextoEntreTags(respuestaWebService, '<Descripcion>', '</Descripcion>');
+    exSesion.RFC         := ExtraerTextoEntreTags(respuestaWebService, '<RFC>', '</RFC>');
+    if LowerCase(exSesion.Descripcion).Contains('aun no tiene folios asignados') then
+      exSesion.Descripcion := exSesion.Descripcion + ' o vencieron';
+
+    raise exSesion;
   end;
 
   Action := TSOAPHttpErrorAction.heaAbort; { or whatever }
@@ -388,7 +401,32 @@ var
   respuestaTimbrado: TEcodexRespuestaTimbrado;
   tokenDeUsuario: string;
   mensajeFalla: string;
+
 begin
+//  tmpTImbrado := GetTimbrado(False, fDominioWebService +
+//    '/ServicioTimbrado.svc');
+//
+//  // 2. Iniciamos una nueva sesion solicitando un nuevo token
+//  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
+//
+//  tmpSolicitud := SolicitudTimbraXML.Create;
+//  tmpSolicitud.ComprobanteXML          := ComprobanteXML2.Create;
+//  tmpSolicitud.ComprobanteXML.DatosXML := aComprobante.Xml;
+//  tmpSolicitud.RFC                     := fCredencialesPAC.RFC;
+//  tmpSolicitud.Token                   := tokenDeUsuario;
+//  tmpSolicitud.TransaccionID           := aTransaccion;
+//
+//  try
+//    tmpResp := tmpTImbrado.timbraXML(tmpSolicitud);
+//  except
+//    On E:Exception do
+//    begin
+//      raise E;
+//    end;
+//  end;
+//
+//  Exit;
+
   if fwsTimbradoEcodex = nil then
     raise EPACNoConfiguradoException.Create
       ('No se ha configurado el PAC, favor de configurar con metodo Configurar');
