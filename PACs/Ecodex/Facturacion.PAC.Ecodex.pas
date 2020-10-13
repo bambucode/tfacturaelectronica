@@ -120,7 +120,9 @@ begin
   // Ref: https://stackoverflow.com/questions/59666531/how-to-get-at-response-headers-from-thttpreqresp
   // NOTA: Solo funciona Delphi 10.3 o mayores
   {$IF Compilerversion >= 23}
-  SetOnHttpError(ManejarHttpSoapError);
+    {$IFNDEF ELEVENTA}
+      SetOnHttpError(ManejarHttpSoapError);
+    {$ENDIF}
   {$IFEND}
 end;
 
@@ -171,8 +173,6 @@ begin
 
     raise exSesion;
   end;
-
-  Action := TSOAPHttpErrorAction.heaAbort; { or whatever }
 end;
 {$IFEND}
 
