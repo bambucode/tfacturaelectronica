@@ -22,7 +22,7 @@ Requerimientos técnicos
 
 Limitaciones
 --------------
-A partir de la versión 2.0 de la librería, que implementa el soporte para CFDI v3.3 (Julio 2017), se estandariza el uso de las clases auto generadas por Delphi para el manejo del XML de los comprobantes permitiendo el uso de todos los nodos, atributos y propiedades de cada version según los haya definido el SAT, sin embargo de omiten las validaciones de los campos y ahora esta responsabilidad será a cargo del programador / usuario de la librería.
+A partir de la versión 2.0 de la librería, que implementa el soporte para CFDI v3.3 (Julio 2017), se estandariza el uso de las clases auto generadas por Delphi para el manejo del XML de los comprobantes permitiendo el uso de todos los nodos, atributos y propiedades de cada version según los haya definido el SAT, sin embargo se omiten las validaciones de los campos y ahora esta responsabilidad será a cargo del programador / usuario de la librería.
 
 Por ejemplo la librería te permitirá llenar el atributo `Total` de la factura con una cadena, lo cual no es correcto pero a nivel XML es válido.
 
