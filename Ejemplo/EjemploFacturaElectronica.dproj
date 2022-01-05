@@ -180,12 +180,12 @@
         <RcItem Include="..\Schemas\3.2\cadenaoriginal_TFD_1_0.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
-            <ResourceId>XSLT_CADENAORIGINALTFD_V32</ResourceId>
+            <ResourceId>XSLT_CADENAORIGINALTFD_V10</ResourceId>
         </RcItem>
         <RcItem Include="..\Schemas\3.3\cadenaoriginal_TFD_1_1.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
-            <ResourceId>XSLT_CADENAORIGINALTFD_V33</ResourceId>
+            <ResourceId>XSLT_CADENAORIGINALTFD_V11</ResourceId>
         </RcItem>
         <RcItem Include="..\Schemas\4.0\cadenaoriginal_40.xslt">
             <ContainerId>ResourceItem</ContainerId>
