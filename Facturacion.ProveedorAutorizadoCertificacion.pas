@@ -28,6 +28,7 @@ uses
   Const
    PAC_VALOR_CFDI_VERSION_32 = '3.2';
    PAC_VALOR_CFDI_VERSION_33 = '3.3';
+   PAC_VALOR_CFDI_VERSION_40 = '4.0';
 
    PAC_VALOR_SI = 'SI';
    PAC_VALOR_NO = 'NO';

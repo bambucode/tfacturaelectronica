@@ -137,7 +137,8 @@ uses
      XMLIntf,
 {$IFEND}
      Facturacion.ComprobanteV32,
-     Facturacion.ComprobanteV33
+     Facturacion.ComprobanteV33,
+     Facturacion.ComprobanteV40
      {$IFDEF CODESITE}
      , CodeSiteLogging
      {$ENDIF}
@@ -154,6 +155,9 @@ begin
 
   if aVersion = '3.3' then
     Result := NewComprobanteFiscalV33;
+
+  if aVersion = '4.0' then
+    Result := NewComprobanteFiscalV40;
 
   if Result = nil then
     raise EVersionDeCFDINoSoportadaException.Create('La versión solicitada : ' + aVersion + ', no tiene implementación actual');
@@ -281,6 +285,9 @@ begin
 
       if (versionCFDI = '3.3') then
         Result := GetComprobanteFiscalV33(documentoXML);
+
+      if (versionCFDI = '4.0') then
+        Result := GetComprobanteFiscalV40(documentoXML);
     end;
 
     if Result = nil then

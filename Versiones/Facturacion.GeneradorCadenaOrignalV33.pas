@@ -56,7 +56,7 @@ var
   transformador: TTransformadorDeXML;
 begin
   // Verificamos que la versión del comprobante sea 3.3 pues solo será una cadena original válida para dicha versión
-  Assert(aComprobante.Version = '3.3', 'La version del CFDI no fue 3.3');
+  //Assert(aComprobante.Version = '3.3', 'La version del CFDI no fue 3.3');
 
   transformador := TTransformadorDeXML.Create;
   try

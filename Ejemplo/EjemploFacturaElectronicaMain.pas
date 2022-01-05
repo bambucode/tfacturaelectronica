@@ -29,6 +29,7 @@ uses
   Facturacion.GeneradorSelloV32,
   Facturacion.GeneradorCBBv32,
   Facturacion.ComprobanteV33,
+  Facturacion.ComprobanteV40,
   Facturacion.GeneradorCadenaOrignalV33,
   Facturacion.GeneradorSelloV33,
   Facturacion.GeneradorCBBv33,
@@ -50,11 +51,11 @@ implementation
   concepto32                                                      : IComprobanteFiscalV32_Conceptos_Concepto;
   iva32                                                           : IComprobanteFiscalV32_Impuestos_Traslados_Traslado;
 
-  // Instancias especificas para V33
-  facturaCFDIv33                                                  : IComprobanteFiscalV33;
-  concepto33                                                      : IComprobanteFiscalV33_Conceptos_Concepto;
-  iva33                                                           : IComprobanteFiscalV33_Conceptos_Concepto_Impuestos_Traslados_Traslado;
-  totalIVA33                                                      : IComprobanteFiscalV33_Impuestos_Traslados_Traslado;
+  // Instancias especificas para v40
+  facturaCFDIv40                                                  : IComprobanteFiscalv40;
+  concepto33                                                      : IComprobanteFiscalv40_Conceptos_Concepto;
+  iva33                                                           : IComprobanteFiscalv40_Conceptos_Concepto_Impuestos_Traslados_Traslado;
+  totalIVA33                                                      : IComprobanteFiscalv40_Impuestos_Traslados_Traslado;
 
   // Instancia de impuestos locales v1.0 (compatible con CFDI 3.2 y 3.3)
   impuestoLocalV1                                                 : IImpuestosLocalesV1;
@@ -77,7 +78,7 @@ implementation
   Url_WS                                                          : String;
  const
   _URL_ECODEX_PRUEBAS_V32        = 'https://pruebas.ecodex.com.mx:2045';
-  _URL_ECODEX_PRUEBAS_V33        = 'https://wsdev.ecodex.com.mx:2045';
+  _URL_ECODEX_PRUEBAS_v40        = 'https://pruebas-wsdex.ecodex.com.mx';
   _URL_FINKOK_PRUEBAS            = 'http://demo-facturacion.finkok.com/servicios/soap';
   _URL_COMERCIO_PRUEBAS          = 'https://pruebas.comercio-digital.mx';
   _URL_SOLUCIONFACTIBLE_PRUEBAS  = 'https://testing.solucionfactible.com/ws/services/Timbrado';
@@ -118,7 +119,7 @@ implementation
 
       credencialesIntegrador.RFC            := 'BBB010101001';
       credencialesIntegrador.DistribuidorID := 'DF627BC3-A872-4806-BF37-DBD040CBAC7C';
-      Url_WS := _URL_ECODEX_PRUEBAS_V33;
+      Url_WS := _URL_ECODEX_PRUEBAS_v40;
      {$endif}
 
      {$ifdef PAC_DEMO_COMERCIODIGITAL}
@@ -182,8 +183,9 @@ implementation
       WriteLn('Certificado y llave ... OK');
 
 
-      Writeln('Por favor escribe la version del CFDI que deseas generar (3.2 o 3.3):');
-      ReadLn(queVersion);
+      queVersion := '4.0';
+      //Writeln('Por favor escribe la version del CFDI que deseas generar (3.2 o 3.3):');
+      //ReadLn(queVersion);
       Writeln;
 
       Writeln('Creando instancia de PAC...');
@@ -209,7 +211,7 @@ implementation
             end;
 
             {$IFDEF undef}{$REGION 'Factura V32'}{$ENDIF}
-            // Creamos las instancias correspondientes para la v33
+            // Creamos las instancias correspondientes para la v40
             generadorCadena := TGeneradorCadenaOriginalV32.Create;
             generadorSello := TGeneradorSelloV32.Create;
             generadorSello.Configurar(openSSL);
@@ -270,25 +272,25 @@ implementation
 
           end;
 
-          if nuevaFactura.Version = '3.3' then
+          if nuevaFactura.Version = '4.0' then
           begin
-            if Not Supports(nuevaFactura, IComprobanteFiscalv33, facturaCFDIv33) then
+            if Not Supports(nuevaFactura, IComprobanteFiscalv40, facturaCFDIv40) then
             begin
-              Writeln('nuevaFactura no fue un Comprobante Fiscal v33');
+              Writeln('nuevaFactura no fue un Comprobante Fiscal v40');
               Exit;
             end;
 
-            {$IFDEF undef}{$REGION 'Factura V33'}{$ENDIF}
-            // Creamos las instancias correspondientes para la v33
-            generadorCadena := TGeneradorCadenaOriginalV33.Create;
-            generadorSello := TGeneradorSelloV33.Create;
+            {$IFDEF undef}{$REGION 'Factura v40'}{$ENDIF}
+            // Creamos las instancias correspondientes para la v40
+            generadorCadena := TGeneradorCadenaOriginalv33.Create;
+            generadorSello := TGeneradorSellov33.Create;
             generadorSello.Configurar(openSSL);
             generadorCBB  := TGeneradorCBBv33.Create;
 
             Writeln('Llenando comprobante CFDI v3.3...');
-            with facturaCFDIv33 do
+            with facturaCFDIv40 do
             begin
-              Serie     := 'Ver33';
+              Serie     := 'Ver40';
               Randomize;
               Folio     := IntToStr(Random(999999999));
               Fecha     := TFacturacionHelper.ComoFechaISO8601(Now);
@@ -339,7 +341,7 @@ implementation
 
               // NOTA: Agregamos el numero cuenta predial justo después de indicar
               // los impuestos del concepto pues el orden importa.
-              concepto33.CuentaPredial.Numero := '234989';
+              //concepto33.CuentaPredial.Numero := '234989';
 
               Impuestos.TotalImpuestosTrasladados  := '16.00';
 
@@ -355,22 +357,22 @@ implementation
 
           // Agregamos el impuesto local el cual se maneja de forma especial
           {$IFDEF undef}{$REGION 'Impuestos locales'}{$ENDIF}
-          impuestoLocalv1 := NewImpuestosLocalesV1;
-          impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
-          impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
-          trasladosImpuestosLocalesv1 := impuestoLocalv1.TrasladosLocales.Add;
-          trasladosImpuestosLocalesv1.ImpLocTrasladado := 'Otro';
-          trasladosImpuestosLocalesv1.TasadeTraslado   := '0.01';
-          trasladosImpuestosLocalesv1.Importe          := '1.00';
-
-          nuevaFactura.AgregarComplemento(impuestoLocalv1,
-                                          'implocal',
-                                          'http://www.sat.gob.mx/implocal',
-                                          'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
+//          impuestoLocalv1 := NewImpuestosLocalesV1;
+//          impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
+//          impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
+//          trasladosImpuestosLocalesv1 := impuestoLocalv1.TrasladosLocales.Add;
+//          trasladosImpuestosLocalesv1.ImpLocTrasladado := 'Otro';
+//          trasladosImpuestosLocalesv1.TasadeTraslado   := '0.01';
+//          trasladosImpuestosLocalesv1.Importe          := '1.00';
+//
+//          nuevaFactura.AgregarComplemento(impuestoLocalv1,
+//                                          'implocal',
+//                                          'http://www.sat.gob.mx/implocal',
+//                                          'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
           {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
-          //admonFacturas.GuardarArchivo(nuevaFactura,
-          //                            ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi-pre.xml');
+          admonFacturas.GuardarArchivo(nuevaFactura,
+                                      ExtractFilePath(Application.ExeName) + '\ejemplo-cfdi4.xml');
 
           // Obtenemos la cadena original y sellamos la factura automaticamente
           Writeln('Sellando comprobante...');
@@ -396,11 +398,11 @@ implementation
           pac.AsignarParametro(PAC_PARAM_SVC_CFG_MODO_PRODUCCION, PAC_VALOR_NO);
           pac.AsignarParametro(PAC_PARAM_SVC_CFG_MULTIPLES_URLS, PAC_VALOR_NO);
 
-          if nuevaFactura.Version = '3.3' then
+          if nuevaFactura.Version = '4.0' then
           begin
-           pac.AsignarParametro(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_33);
+           pac.AsignarParametro(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_40);
            {$ifdef PAC_DEMO_ECODEX}
-             Url_WS := _URL_ECODEX_PRUEBAS_V33;
+             Url_WS := _URL_ECODEX_PRUEBAS_v40;
            {$endif}
           end
           else
@@ -438,31 +440,31 @@ implementation
       end;
 
       // Checamos tener el Timbre Fiscal
-//      if Assigned(facturaCFDIv33.Complemento.TimbreFiscalDigital) then
+//      if Assigned(facturaCFDIv40.Complemento.TimbreFiscalDigital) then
 //      begin
-//         Writeln(facturaCFDIv33.Complemento.TimbreFiscalDigital.UUID);
+//         Writeln(facturaCFDIv40.Complemento.TimbreFiscalDigital.UUID);
 //      end else
 //         Writeln('**** NO SE TUVO TIMBRE ****');
 
       Writeln('Cadena Original de Timbre:');
       Writeln(generadorCadena.obtenerCadenaOriginalDeTimbre(nuevaFactura));
 
-      if nuevaFactura.Version = '3.3' then
+      if nuevaFactura.Version = '4.0' then
       begin
        Writeln('XML del Timbre');
-       facturaCFDIv33.Complemento.TimbreFiscalDigital.Leyenda := '';
-       Writeln( facturaCFDIv33.Complemento.TimbreFiscalDigital.XML );
+       facturaCFDIv40.Complemento.TimbreFiscalDigital.Leyenda := '';
+       Writeln( facturaCFDIv40.Complemento.TimbreFiscalDigital.XML );
 
-       if facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado<>
-          FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado ) ) then
+       if facturaCFDIv40.Complemento.TimbreFiscalDigital.FechaTimbrado<>
+          FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv40.Complemento.TimbreFiscalDigital.FechaTimbrado ) ) then
        begin
         Writeln('La conversión de la Fecha Del Timbre es incorrecta');
-        Writeln(' Fecha del Timbre (Original)  : '+facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado);
-        Writeln(' Fecha del Timbre (Conversión): '+ FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv33.Complemento.TimbreFiscalDigital.FechaTimbrado )) );
+        Writeln(' Fecha del Timbre (Original)  : '+facturaCFDIv40.Complemento.TimbreFiscalDigital.FechaTimbrado);
+        Writeln(' Fecha del Timbre (Conversión): '+ FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv40.Complemento.TimbreFiscalDigital.FechaTimbrado )) );
        end;
        //Agregamos una Addenda de ejemplo
        WriteLn('Agregando Addenda CFDI v3.3...');
-       facturaCFDIv33.Addenda.AddChild('Ejemplo_Addenda').Attributes['observaciones'] := 'Linea 01'+sLineBreak+'Linea 02';
+       facturaCFDIv40.Addenda.AddChild('Ejemplo_Addenda').Attributes['observaciones'] := 'Linea 01'+sLineBreak+'Linea 02';
       end;
 
       Writeln('Guardando XML...');
