@@ -86,7 +86,8 @@ uses
   Facturacion.PAC.Comercio in '..\PACs\ComercioDigital\Facturacion.PAC.Comercio.pas',
   Facturacion.ComplementoComercioExteriorV11 in '..\Versiones\Facturacion.ComplementoComercioExteriorV11.pas',
   EjemploFacturaElectronicaMain in 'EjemploFacturaElectronicaMain.pas',
-  Facturacion.ComprobanteV40 in '..\Versiones\Facturacion.ComprobanteV40.pas';
+  Facturacion.ComprobanteV40 in '..\Versiones\Facturacion.ComprobanteV40.pas',
+  Facturacion.GeneradorCadenaOrignalV40 in '..\Versiones\Facturacion.GeneradorCadenaOrignalV40.pas';
 
 begin
  EjemploFacturaElectronicaMain.Ejemplo;

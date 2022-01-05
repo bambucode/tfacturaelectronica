@@ -29,10 +29,12 @@ uses
   Facturacion.GeneradorSelloV32,
   Facturacion.GeneradorCBBv32,
   Facturacion.ComprobanteV33,
-  Facturacion.ComprobanteV40,
-  Facturacion.GeneradorCadenaOrignalV33,
+  //Facturacion.GeneradorCadenaOrignalV33,
   Facturacion.GeneradorSelloV33,
   Facturacion.GeneradorCBBv33,
+  // CFDI 4.0:
+  Facturacion.ComprobanteV40,
+  Facturacion.GeneradorCadenaOrignalV40,
   Facturacion.Helper,
   Facturacion.GeneradorLigaVerificacion,
   Facturacion.ImpuestosLocalesV1,
@@ -76,6 +78,7 @@ implementation
   queVersion, rutaCertificado, rutaLlavePrivada, claveLlavePrivada: string;
   reintentar                                                      : Boolean;
   Url_WS                                                          : String;
+  cadenaOriginal, selloDeLaFactura : String;
  const
   _URL_ECODEX_PRUEBAS_V32        = 'https://pruebas.ecodex.com.mx:2045';
   _URL_ECODEX_PRUEBAS_v40        = 'https://pruebas-wsdex.ecodex.com.mx';
@@ -282,7 +285,7 @@ implementation
 
             {$IFDEF undef}{$REGION 'Factura v40'}{$ENDIF}
             // Creamos las instancias correspondientes para la v40
-            generadorCadena := TGeneradorCadenaOriginalv33.Create;
+            generadorCadena := TGeneradorCadenaOriginalv40.Create;
             generadorSello := TGeneradorSellov33.Create;
             generadorSello.Configurar(openSSL);
             generadorCBB  := TGeneradorCBBv33.Create;
@@ -294,6 +297,7 @@ implementation
               Randomize;
               Folio     := IntToStr(Random(999999999));
               Fecha     := TFacturacionHelper.ComoFechaISO8601(Now);
+              Exportacion := '01';
 
               NoCertificado := certificadoSellos.NoCertificado;
               Certificado   := certificadoSellos.ContenidoBase64;
@@ -303,7 +307,7 @@ implementation
               Descuento         := TFacturacionHelper.ComoMoneda(0);
               Moneda            := 'MXN'; // De catálogo
               TipoCambio        := '1';//TFacturacionHelper.ComoMoneda(1);
-              Total             := TFacturacionHelper.ComoMoneda(117);
+              Total             := TFacturacionHelper.ComoMoneda(116);
               TipoDeComprobante := 'I'; // De catálogo
               MetodoPago        := 'PUE';
               LugarExpedicion   := '76030';
@@ -312,14 +316,16 @@ implementation
               Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
               Emisor.RegimenFiscal := '612'; // De catálogo
 
-              //Receptor.Rfc              := 'MTI0806042N7';
-              Receptor.Rfc              := 'XEXX010101000';
-              Receptor.Nombre           := 'Juan & José & ''Niño'' & "Niña"';
+              Receptor.Rfc              := Uppercase('cacx7605101p8');
+              Receptor.Nombre           := 'XOTICHL CASAS CHAVEZ';
               Receptor.UsoCFDI          := 'G01';
 
-              Receptor.ResidenciaFiscal := 'USA'; // De catálogo
+              Receptor.DomicilioFiscalReceptor := '76030';
+              Receptor.RegimenFiscalReceptor := '612';
+
+              //Receptor.ResidenciaFiscal := 'USA'; // De catálogo
               // Solo para cliente extranjero
-              Receptor.NumRegIdTrib     := '123456789'; // "formatoDeRegistroDeIdentidadTributaria": "[0-9]{9}",
+              //Receptor.NumRegIdTrib     := '123456789'; // "formatoDeRegistroDeIdentidadTributaria": "[0-9]{9}",
 
               concepto33 := Conceptos.Add;
               concepto33.ClaveProdServ    := '52161529';  // De catálogo
@@ -331,6 +337,8 @@ implementation
               concepto33.ValorUnitario    := '100.00';
               concepto33.Importe          := '100.00';
               concepto33.Descuento        := '0.00';
+
+              concepto33.ObjetoImp        := '02';
 
               iva33 := concepto33.Impuestos.Traslados.Add;
               iva33.Base        := '100.00';
@@ -346,6 +354,7 @@ implementation
               Impuestos.TotalImpuestosTrasladados  := '16.00';
 
               totalIVA33 := Impuestos.Traslados.Add;
+              totalIVA33.Base     := '100';
               totalIVA33.Impuesto := '002';
               totalIVA33.TipoFactor := 'Tasa';
               totalIVA33.TasaOCuota := '0.160000';
@@ -379,11 +388,11 @@ implementation
           admonFacturas.Sellar(nuevaFactura, generadorCadena, generadorSello);
 
           // 2. Si queremos obtener la Cadena Original o el Sello de forma separada:
-          // cadenaOriginal := generadorCadena.obtenerCadenaOriginal(nuevaFactura);
-          // Writeln(cadenaOriginal);
+          cadenaOriginal := generadorCadena.obtenerCadenaOriginal(nuevaFactura);
+          Writeln(cadenaOriginal);
           //
-          // selloDeLaFactura := generadorSello.GenerarSelloDeFactura(cadenaOriginal);
-          // Writeln(selloDeLaFactura);
+          selloDeLaFactura := generadorSello.GenerarSelloDeFactura(cadenaOriginal);
+          Writeln(selloDeLaFactura);
 
           // Dependiendo de la version usamos diferente servidor de pruebas
 

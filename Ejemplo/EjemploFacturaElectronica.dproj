@@ -166,6 +166,7 @@
         <DCCReference Include="..\Versiones\Facturacion.ComplementoComercioExteriorV11.pas"/>
         <DCCReference Include="EjemploFacturaElectronicaMain.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.ComprobanteV40.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.GeneradorCadenaOrignalV40.pas"/>
         <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
@@ -185,6 +186,11 @@
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>XSLT_CADENAORIGINALTFD_V33</ResourceId>
+        </RcItem>
+        <RcItem Include="..\Schemas\4.0\cadenaoriginal_40.xslt">
+            <ContainerId>ResourceItem</ContainerId>
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>XSLT_CADENAORIGINAL_V40</ResourceId>
         </RcItem>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
@@ -232,6 +238,12 @@
                     </Platform>
                 </DeployFile>
                 <DeployFile LocalName="..\Schemas\3.2\cadenaoriginal_3_2.xslt" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\Schemas\4.0\cadenaoriginal_40.xslt" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
                         <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
