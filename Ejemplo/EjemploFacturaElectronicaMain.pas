@@ -85,7 +85,7 @@ implementation
   _NUMERO_TRANSACCION_INICIAL    = 1;
 
   //Hablitar solo una de las siguientes opciones
-  {.$define PAC_DEMO_ECODEX}
+  {$define PAC_DEMO_ECODEX}
   {.$define PAC_DEMO_FINOK}
   {.$define PAC_DEMO_COMERCIODIGITAL}
   {.$define PAC_DEMO_SOLUCIONFACTIBLE}
@@ -102,18 +102,18 @@ implementation
          Para realizar pruebas con Edicom, se requiere una cuenta valida registrada en el PAC
       }
 
-      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_LAN7008173R5.cer';
-      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_LAN7008173R5.key';
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_XOJI740919U48.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_XOJI740919U48.key';
       claveLlavePrivada := '12345678a';
 
      // Configuramos al PAC con los datos para pruebas
      {$ifdef PAC_DEMO_ECODEX}
-      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.cer';
-      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_VOC990129I26.key';
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_XOJI740919U48.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_XOJI740919U48.key';
       claveLlavePrivada := '12345678a';
 
       pac := TProveedorEcodex.Create;
-      credencialesPAC.RFC                   := 'VOC990129I26';
+      credencialesPAC.RFC                   := 'XOJI740919U48';
       credencialesPAC.DistribuidorID        := '2b3a8764-d586-4543-9b7e-82834443f219';
 
       credencialesIntegrador.RFC            := 'BBB010101001';
@@ -308,7 +308,7 @@ implementation
 
               Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
               Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
-              Emisor.RegimenFiscal := '601'; // De catálogo
+              Emisor.RegimenFiscal := '612'; // De catálogo
 
               //Receptor.Rfc              := 'MTI0806042N7';
               Receptor.Rfc              := 'XEXX010101000';
