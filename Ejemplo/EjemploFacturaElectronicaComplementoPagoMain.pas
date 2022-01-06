@@ -73,6 +73,8 @@ implementation
   pagoComplementPagoV2: IPagosV20_Pago;
   doctoRelacionadoListV2 : IPagosV20_Pago_DoctoRelacionadoList;
   doctoRelacionadoComplementoPagoV2: IPagosV20_Pago_DoctoRelacionado;
+  impuestosTrasladadosV2 : IPagosV20_Pago_ImpuestosP_TrasladosP_TrasladoP;
+  impuestoTrasladadoDocRelacionadoV2 : IPagosV20_Pago_DoctoRelacionado_ImpuestosDR_TrasladosDR_TrasladoDR;
 
   // Instancia de impuestos locales v1.0 (compatible con CFDI 3.2 y 3.3)
   impuestoLocalV1: IImpuestosLocalesV1;
@@ -204,7 +206,8 @@ implementation
       {$ENDIF}
 
       Writeln('Por favor escribe la version del CFDI con complemento de pagos que deseas generar (3.3 o 4.0):');
-      ReadLn(queVersion);
+      //ReadLn(queVersion);
+      queVersion := '4.0';
       Writeln;
 
       // Inicializamos la variable de re-intentar en verdadero para intentar timbrar
@@ -352,16 +355,19 @@ implementation
               Total              := '0';   // Cero por Definicion
               TipoDeComprobante  := 'P';      // De catálogo
               LugarExpedicion    := '76030';
+              Exportacion        := '01';
+
 
               Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
               Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
-              Emisor.RegimenFiscal := '601'; // De catálogo
+              Emisor.RegimenFiscal := '612'; // De catálogo
 
               Receptor.Rfc              := Uppercase('cacx7605101p8');
               Receptor.Nombre           := 'XOTICHL CASAS CHAVEZ';
               Receptor.UsoCFDI          := 'G01';
               Receptor.DomicilioFiscalReceptor := '76030';
               Receptor.RegimenFiscalReceptor := '612';
+              Receptor.UsoCFDI         := 'CP01';
 
               concepto40 := Conceptos.Add;
               concepto40.ClaveProdServ    := '84111506';    // Por Definicion del SAT
@@ -370,15 +376,22 @@ implementation
               concepto40.Descripcion      := 'Pago';        // Por Definicion del SAT
               concepto40.ValorUnitario    := '0';        // Por Definicion del SAT
               concepto40.Importe          := '0';        // Por Definicion del SAT
+              concepto40.ObjetoImp        := '01';
 
               {$IFDEF undef}{$REGION 'Complemento Pagos'}{$ENDIF}
               complementoPagoV2 := NewComplementoPagoV20;
-              pagoComplementPagoV2 := complementoPagoV2.Pago.Add;
 
+              // El primer nodo especificado debe ser el de los totales de los abonos
+              complementoPagoV2.Totales.TotalTrasladosBaseIVA16 := '100';
+              complementoPagoV2.Totales.TotalTrasladosImpuestoIVA16 := '16';
+              complementoPagoV2.Totales.MontoTotalPagos := '100';
+
+              // Agregamos el pago
+              pagoComplementPagoV2 := complementoPagoV2.Pago.Add;
               pagoComplementPagoV2.FechaPago        := TFacturacionHelper.ComoFechaISO8601(Now);
               pagoComplementPagoV2.FormaDePagoP     := '02';
               pagoComplementPagoV2.MonedaP          := 'MXN';
-              //pagoComplementPagoV2.TipoCambioP      := '1.00';  // Ecodex no valida la inclusion de TipoCambioP
+              pagoComplementPagoV2.TipoCambioP      := '1';
               pagoComplementPagoV2.Monto            := '100.00';
               pagoComplementPagoV2.NumOperacion     := '323232';
               //pagoComplementPagoV2.RfcEmisorCtaOrd  := 'BBA940707IE1';
@@ -386,6 +399,7 @@ implementation
               //pagoComplementPagoV2.RfcEmisorCtaBen  := 'BBA830831LJ2';
               //pagoComplementPagoV2.CtaBeneficiario  := '123456789012345678';
 
+              // Agregamos cada uno de los documentos relacionados con el pago
               doctoRelacionadoListV2                   := pagoComplementPagoV2.DoctoRelacionado;
               doctoRelacionadoComplementoPagoV2        := doctoRelacionadoListV2.Add;
 
@@ -393,17 +407,36 @@ implementation
               doctoRelacionadoComplementoPagoV2.Serie              := 'A';
               doctoRelacionadoComplementoPagoV2.Folio              := '1';
               doctoRelacionadoComplementoPagoV2.MonedaDR           := 'MXN';
+              doctoRelacionadoComplementoPagoV2.EquivalenciaDR     := '1';
               //doctoRelacionadoComplementoPagoV2.TipoCambioDR       := '0.05';
               //doctoRelacionadoComplementoPagoV2.MetodoDePagoDR     := 'PPD';
               doctoRelacionadoComplementoPagoV2.NumParcialidad     := 1;
               doctoRelacionadoComplementoPagoV2.ImpSaldoAnt        := '1000.00';  //ImpPagado + impSaldoInsoluto
-              doctoRelacionadoComplementoPagoV2.ImpPagado          := '100.00';
+              doctoRelacionadoComplementoPagoV2.ImpPagado          := '100';
               doctoRelacionadoComplementoPagoV2.ImpSaldoInsoluto   := '900.00';
+              doctoRelacionadoComplementoPagoV2.ObjetoImpDR        := '02';
+
+              // Desglosamos los impuestos del abono: IVA 16%, IVA 0%, etc.
+              impuestoTrasladadoDocRelacionadoV2 := doctoRelacionadoComplementoPagoV2.ImpuestosDR.TrasladosDR.Add;
+              impuestoTrasladadoDocRelacionadoV2.BaseDR := '100';
+              impuestoTrasladadoDocRelacionadoV2.ImpuestoDR := '002';
+              impuestoTrasladadoDocRelacionadoV2.TipoFactorDR := 'Tasa';
+              impuestoTrasladadoDocRelacionadoV2.TasaOCuotaDR := '0.160000';
+              impuestoTrasladadoDocRelacionadoV2.ImporteDR := '16';
+
+
+              // Agregamos el resumen del pago
+              impuestosTrasladadosV2 := pagoComplementPagoV2.ImpuestosP.TrasladosP.Add;
+              impuestosTrasladadosV2.BaseP := '100';
+              impuestosTrasladadosV2.ImpuestoP := '002'; // De catálogos
+              impuestosTrasladadosV2.TipoFactorP := 'Tasa';
+              impuestosTrasladadosV2.TasaOCuotaP := '0.160000';
+              impuestosTrasladadosV2.ImporteP := '16';
 
               nuevaFactura.AgregarComplemento(complementoPagoV2,
                                               'pago20',
-                                              'http://www.sat.gob.mx/Pagos',
-                                              'http://www.sat.gob.mx/Pagos http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos20.xsd');
+                                              'http://www.sat.gob.mx/Pagos20',
+                                              'http://www.sat.gob.mx/Pagos20 http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos20.xsd');
               {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
               // Agregamos el impuesto local el cual se maneja de forma especial
