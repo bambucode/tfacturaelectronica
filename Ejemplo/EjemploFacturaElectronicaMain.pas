@@ -297,14 +297,14 @@ implementation
               Exit;
             end;
 
-            {$IFDEF undef}{$REGION 'Factura v40'}{$ENDIF}
+
             // Creamos las instancias correspondientes para la v40
             generadorCadena := TGeneradorCadenaOriginalv40.Create;
             generadorSello := TGeneradorSellov33.Create;
             generadorSello.Configurar(openSSL);
             generadorCBB  := TGeneradorCBBv33.Create;
 
-            Writeln('Llenando comprobante CFDI v3.3...');
+            Writeln('Llenando comprobante CFDI v4.0...');
             with facturaCFDIv40 do
             begin
               Serie     := 'Ver40';
@@ -375,7 +375,6 @@ implementation
               totalIVA40.Importe    := '16.00';
 
             end;
-            {$IFDEF undef}{$ENDREGION}{$ENDIF}
           end;
 
           {$ENDREGION}

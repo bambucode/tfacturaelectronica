@@ -67,7 +67,10 @@ uses
   FinkOkWsCancelacion in '..\PACs\FinkOK\FinkOkWsCancelacion.pas',
   FinkOkWsComun in '..\PACs\FinkOK\FinkOkWsComun.pas',
   FinkOkWsTimbrado in '..\PACs\FinkOK\FinkOkWsTimbrado.pas',
-  EjemploFacturaElectronicaComplementoPagoMain in 'EjemploFacturaElectronicaComplementoPagoMain.pas';
+  EjemploFacturaElectronicaComplementoPagoMain in 'EjemploFacturaElectronicaComplementoPagoMain.pas',
+  Facturacion.ComplementoPagoV2 in '..\Versiones\Facturacion.ComplementoPagoV2.pas',
+  Facturacion.ComprobanteV40 in '..\Versiones\Facturacion.ComprobanteV40.pas',
+  Facturacion.GeneradorCadenaOrignalV40 in '..\Versiones\Facturacion.GeneradorCadenaOrignalV40.pas';
 
 begin
  EjemploFacturaElectronicaComplementoPagoMain.Ejemplo;
