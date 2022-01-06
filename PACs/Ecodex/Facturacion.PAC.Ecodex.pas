@@ -2,7 +2,7 @@
 {                                                         }
 { TFacturaElectronica                                     }
 {                                                         }
-{ Copyright (C) 2017 Bambu Code SA de CV                  }
+{ Copyright (C) 2022 Bambu Code SA de CV                  }
 {                                                         }
 { ******************************************************* }
 
