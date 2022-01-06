@@ -325,7 +325,7 @@ implementation
               concepto33.Cantidad         := '1';
               concepto33.ClaveUnidad      := 'EA';  // De cat·logo
               concepto33.Unidad           := 'PZA'; // De cat·logo
-              concepto33.Descripcion      := 'Concepto No 1';
+              concepto33.Descripcion      := TFacturacionHelper.LimpiarCaracteresInvalidos('—Ò·¡È…ÌÕÛ”˙⁄¸ & "`''Concepto No 1');
               concepto33.ValorUnitario    := '100.00';
               concepto33.Importe          := '100.00';
               concepto33.Descuento        := '0.00';
