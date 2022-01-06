@@ -273,8 +273,24 @@ end;
 
 class function TFacturacionHelper.LimpiarCaracteresInvalidos(
   const aCadena: string): string;
+
+  function StrippedOfNonAscii(const s: string): string;
+  var
+    i, Count: Integer;
+  begin
+    SetLength(Result, Length(s));
+    Count := 0;
+    for i := 1 to Length(s) do begin
+      if ((s[i] >= #32) and (s[i] <= #127)) or (s[i] in [#10, #13]) then begin
+        inc(Count);
+        Result[Count] := s[i];
+      end;
+    end;
+    SetLength(Result, Count);
+  end;
+
 begin
-  Result := StringReplace(aCadena, '|', '',[rfReplaceAll, rfIgnoreCase]);
+  Result := StringReplace(StrippedOfNonAscii(aCadena), '|', '',[rfReplaceAll, rfIgnoreCase]);
 end;
 
 class function TFacturacionHelper.ObtenerConfiguracionRegionalLocal: TFormatSettings;
