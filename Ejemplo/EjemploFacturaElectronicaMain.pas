@@ -230,20 +230,20 @@ implementation
 
               NoCertificado := certificadoSellos.NoCertificado;
               Certificado   := certificadoSellos.ContenidoBase64;
-              FormaPago         := '01'; // De cat�logo
-              CondicionesDePago := 'Cr�dito a 30 d�as';
+              FormaPago         := '01'; // De catalogo
+              CondicionesDePago := 'Crédito a 30 días';
               Subtotal          := '100.00'; // Solo 2 decimales
               Descuento         := TFacturacionHelper.ComoMoneda(0);
-              Moneda            := 'MXN'; // De cat�logo
+              Moneda            := 'MXN'; // De catalogo
               TipoCambio        := '1';//TFacturacionHelper.ComoMoneda(1);
               Total             := TFacturacionHelper.ComoMoneda(116);
-              TipoDeComprobante := 'I'; // De cat�logo
+              TipoDeComprobante := 'I'; // De catalogo
               MetodoPago        := 'PUE';
               LugarExpedicion   := '76030';
 
               Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
               Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
-              Emisor.RegimenFiscal := '612'; // De cat�logo
+              Emisor.RegimenFiscal := '612'; // De catalogo
 
               Receptor.Rfc              := Uppercase('cacx7605101p8');
               Receptor.Nombre           := 'XOTICHL CASAS CHAVEZ';
@@ -257,8 +257,8 @@ implementation
               concepto33.ClaveProdServ    := '52161529';  // De cat�logo
               concepto33.NoIdentificacion := '1';
               concepto33.Cantidad         := '1';
-              concepto33.ClaveUnidad      := 'EA';  // De cat�logo
-              concepto33.Unidad           := 'PZA'; // De cat�logo
+              concepto33.ClaveUnidad      := 'EA';  // De catalogo
+              concepto33.Unidad           := 'PZA'; // De catalogo
               concepto33.Descripcion      := 'ALGODÃ“N 50 GR';
               concepto33.ValorUnitario    := '100.00';
               concepto33.Importe          := '100.00';
@@ -319,16 +319,16 @@ implementation
               CondicionesDePago := 'Crédito a 30 días';
               Subtotal          := '100.00'; // Solo 2 decimales
               Descuento         := TFacturacionHelper.ComoMoneda(0);
-              Moneda            := 'MXN'; // De cat�logo
+              Moneda            := 'MXN'; // De catalogo
               TipoCambio        := '1';//TFacturacionHelper.ComoMoneda(1);
               Total             := TFacturacionHelper.ComoMoneda(116);
-              TipoDeComprobante := 'I'; // De cat�logo
+              TipoDeComprobante := 'I'; // De catalogo
               MetodoPago        := 'PUE';
               LugarExpedicion   := '76030';
 
               Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
               Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
-              Emisor.RegimenFiscal := '612'; // De cat�logo
+              Emisor.RegimenFiscal := '612'; // De catalogo
 
               Receptor.Rfc              := Uppercase('cacx7605101p8');
               Receptor.Nombre           := 'XOTICHL CASAS CHAVEZ';
@@ -342,7 +342,7 @@ implementation
               //Receptor.NumRegIdTrib     := '123456789'; // "formatoDeRegistroDeIdentidadTributaria": "[0-9]{9}",
 
               concepto40 := Conceptos.Add;
-              concepto40.ClaveProdServ    := '52161529';  // De cat�logo
+              concepto40.ClaveProdServ    := '52161529';  // De catalogo
               concepto40.NoIdentificacion := '1';
               concepto40.Cantidad         := '1';
               concepto40.ClaveUnidad      := 'EA';  // De cat�logo
