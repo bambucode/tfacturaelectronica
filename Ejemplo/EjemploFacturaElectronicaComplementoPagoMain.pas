@@ -81,6 +81,7 @@ implementation
   trasladosImpuestosLocalesV1: IImpuestosLocalesV1_TrasladosLocales;
 
 
+  montoFacturaOriginal, montoPago, montoPagoIVA, montoPagoBase : Currency;
 
   // Instancias comunes independientes de la version
   cadenaOriginal : TCadenaUTF8;
@@ -100,7 +101,7 @@ implementation
   reintentar: Boolean;
   Url_WS: String;
  const
-   _URL_ECODEX_PRUEBAS_V33        = 'https://pruebas.ecodex.com.mx:2045';
+   _URL_ECODEX_PRUEBAS_V33       = 'https://pruebas.ecodex.com.mx:2045';
   _URL_ECODEX_PRUEBAS_v40        = 'https://pruebas-wsdex.ecodex.com.mx';
   _URL_FINKOK_PRUEBAS            = 'http://demo-facturacion.finkok.com/servicios/soap';
   _URL_COMERCIO_PRUEBAS          = 'https://pruebas.comercio-digital.mx';
@@ -341,6 +342,10 @@ implementation
             generadorCBB  := TGeneradorCBBv33.Create;
 
             Writeln('Llenando comprobante CFDI v4.0...');
+
+            // La guia de llenado del comprobante de pago v2.0 se encuentra en:
+            // http://omawww.sat.gob.mx/tramitesyservicios/Paginas/documentos/Guiallenadopagos311221.pdf
+
             with facturaCFDIv40 do
             begin
               Serie     := 'A';
@@ -381,10 +386,19 @@ implementation
               {$IFDEF undef}{$REGION 'Complemento Pagos'}{$ENDIF}
               complementoPagoV2 := NewComplementoPagoV20;
 
+
+              // Estos serán los datos que usaremos para llenar nuestro comprobante
+              montoFacturaOriginal := 1000;
+
+              montoPago := 100;
+              montoPagoIVA := montoPago * 0.16;
+              montoPagoBase := montoPago / 1.16;
+
+
               // El primer nodo especificado debe ser el de los totales de los abonos
-              complementoPagoV2.Totales.TotalTrasladosBaseIVA16 := '100';
-              complementoPagoV2.Totales.TotalTrasladosImpuestoIVA16 := '16';
-              complementoPagoV2.Totales.MontoTotalPagos := '100';
+              complementoPagoV2.Totales.TotalTrasladosBaseIVA16 := TFacturacionHelper.ComoMoneda(montoPagoBase, 2);
+              complementoPagoV2.Totales.TotalTrasladosImpuestoIVA16 := TFacturacionHelper.ComoMoneda(montoPagoIVA, 2);
+              complementoPagoV2.Totales.MontoTotalPagos := TFacturacionHelper.ComoMoneda(montoPago, 2);
 
               // Agregamos el pago
               pagoComplementPagoV2 := complementoPagoV2.Pago.Add;
@@ -392,12 +406,13 @@ implementation
               pagoComplementPagoV2.FormaDePagoP     := '02';
               pagoComplementPagoV2.MonedaP          := 'MXN';
               pagoComplementPagoV2.TipoCambioP      := '1';
-              pagoComplementPagoV2.Monto            := '100.00';
+              pagoComplementPagoV2.Monto            := TFacturacionHelper.ComoMoneda(montoPago, 2);
               pagoComplementPagoV2.NumOperacion     := '323232';
               //pagoComplementPagoV2.RfcEmisorCtaOrd  := 'BBA940707IE1';
               //pagoComplementPagoV2.CtaOrdenante     := '12345678901';
               //pagoComplementPagoV2.RfcEmisorCtaBen  := 'BBA830831LJ2';
               //pagoComplementPagoV2.CtaBeneficiario  := '123456789012345678';
+
 
               // Agregamos cada uno de los documentos relacionados con el pago
               doctoRelacionadoListV2                   := pagoComplementPagoV2.DoctoRelacionado;
@@ -411,27 +426,29 @@ implementation
               //doctoRelacionadoComplementoPagoV2.TipoCambioDR       := '0.05';
               //doctoRelacionadoComplementoPagoV2.MetodoDePagoDR     := 'PPD';
               doctoRelacionadoComplementoPagoV2.NumParcialidad     := 1;
-              doctoRelacionadoComplementoPagoV2.ImpSaldoAnt        := '1000.00';  //ImpPagado + impSaldoInsoluto
-              doctoRelacionadoComplementoPagoV2.ImpPagado          := '100';
-              doctoRelacionadoComplementoPagoV2.ImpSaldoInsoluto   := '900.00';
-              doctoRelacionadoComplementoPagoV2.ObjetoImpDR        := '02';
+              doctoRelacionadoComplementoPagoV2.ImpSaldoAnt        := TFacturacionHelper.ComoMoneda(montoFacturaOriginal, 2);  //ImpPagado + impSaldoInsoluto
+              doctoRelacionadoComplementoPagoV2.ImpPagado          := TFacturacionHelper.ComoMoneda(montoPago, 2);
+              doctoRelacionadoComplementoPagoV2.ImpSaldoInsoluto   := TFacturacionHelper.ComoMoneda(montoFacturaOriginal - montoPago, 2);
+              doctoRelacionadoComplementoPagoV2.ObjetoImpDR        := '02';  // 02-sujeto a impuesto
+
 
               // Desglosamos los impuestos del abono: IVA 16%, IVA 0%, etc.
               impuestoTrasladadoDocRelacionadoV2 := doctoRelacionadoComplementoPagoV2.ImpuestosDR.TrasladosDR.Add;
-              impuestoTrasladadoDocRelacionadoV2.BaseDR := '100';
-              impuestoTrasladadoDocRelacionadoV2.ImpuestoDR := '002';
+              impuestoTrasladadoDocRelacionadoV2.BaseDR := TFacturacionHelper.ComoMoneda(montoPago, 4);
+              impuestoTrasladadoDocRelacionadoV2.ImpuestoDR := '002';   // 001-ISR, 002-IVA, 003-IEPS
               impuestoTrasladadoDocRelacionadoV2.TipoFactorDR := 'Tasa';
               impuestoTrasladadoDocRelacionadoV2.TasaOCuotaDR := '0.160000';
-              impuestoTrasladadoDocRelacionadoV2.ImporteDR := '16';
+              impuestoTrasladadoDocRelacionadoV2.ImporteDR :=  TFacturacionHelper.ComoMoneda(montoPagoIVA, 4);
 
-
-              // Agregamos el resumen del pago
+               // Agregamos el resumen del pago
               impuestosTrasladadosV2 := pagoComplementPagoV2.ImpuestosP.TrasladosP.Add;
-              impuestosTrasladadosV2.BaseP := '100';
+              impuestosTrasladadosV2.BaseP := TFacturacionHelper.ComoMoneda(montoPagoBase, 4);
               impuestosTrasladadosV2.ImpuestoP := '002'; // De catálogos
               impuestosTrasladadosV2.TipoFactorP := 'Tasa';
               impuestosTrasladadosV2.TasaOCuotaP := '0.160000';
-              impuestosTrasladadosV2.ImporteP := '16';
+              impuestosTrasladadosV2.ImporteP := TFacturacionHelper.ComoMoneda(montoPagoIVA, 4);
+
+
 
               nuevaFactura.AgregarComplemento(complementoPagoV2,
                                               'pago20',
