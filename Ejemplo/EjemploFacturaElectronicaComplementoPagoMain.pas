@@ -368,9 +368,11 @@ implementation
               Emisor.RegimenFiscal := '612'; // De catálogo
 
               Receptor.Rfc              := Uppercase('cacx7605101p8');
-              Receptor.Nombre           := 'XOTICHL CASAS CHAVEZ';
+              // NOTA: El nombre del receptor debe ser EXACTAMENTE como aparece en la LCO
+              Receptor.Nombre           := 'XOCHILT CASAS CHAVEZ';
               Receptor.UsoCFDI          := 'G01';
-              Receptor.DomicilioFiscalReceptor := '76030';
+              // NOTA: El CP del domicilio del receptor debe ser EXACTAMENTE como aparece en la LCO
+              Receptor.DomicilioFiscalReceptor := '00000';
               Receptor.RegimenFiscalReceptor := '612';
               Receptor.UsoCFDI         := 'CP01';
 
