@@ -81,8 +81,9 @@ implementation
  const
   _URL_ECODEX_PRUEBAS_V33        = 'https://pruebas.ecodex.com.mx:2045';
   _URL_ECODEX_PRUEBAS_v40        = 'https://pruebas-wsdex.ecodex.com.mx';
-  _URL_FINKOK_PRUEBAS            = 'http://demo-facturacion.finkok.com/servicios/soap';
-  _URL_COMERCIO_PRUEBAS          = 'https://pruebas.comercio-digital.mx';
+  _URL_FINKOK_TIMBRADO_PRUEBAS      = 'https://demo-facturacion.finkok.com/servicios/soap/stamp.wsdl';
+  _URL_FINKOK_CANCELACION_PRUEBAS   = 'https://demo-facturacion.finkok.com/servicios/soap/cancel.wsdl';
+  _URL_COMERCIO_PRUEBAS             = 'https://pruebas.comercio-digital.mx';
   _URL_SOLUCIONFACTIBLE_PRUEBAS  = 'https://testing.solucionfactible.com/ws/services/Timbrado';
   _URL_MULTIFACTURAS_PRUEBAS     = 'http://ws.facturacionmexico.com.mx/pac/timbrarjava.php';   //SE DEBE ESPECIFICAR QUE ES MODO PRODUCCION
   _NUMERO_TRANSACCION_INICIAL    = 1;
@@ -125,6 +126,10 @@ implementation
      {$endif}
 
      {$ifdef PAC_DEMO_COMERCIODIGITAL}
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_MISC491214B86_20190528_175522.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_MISC491214B86_20190528_175522.key';
+      claveLlavePrivada := '12345678a';
+
       pac := TProveedorComercio.Create;
       CredencialesPAC.RFC   := 'AAA010101AAA';
       CredencialesPAC.Clave := 'PWD';
@@ -132,7 +137,11 @@ implementation
      {$endif}
 
      {$ifdef PAC_DEMO_FINOK}
-      pac := TProveedorFinkOk.Create;
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_MISC491214B86_20190528_175522.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_MISC491214B86_20190528_175522.key';
+      claveLlavePrivada := '12345678a';
+      
+	  pac := TProveedorFinkOk.Create;
       CredencialesPAC.RFC   := 'TuUsuario';
       CredencialesPAC.Clave := 'TuPassword';
       Url_WS := _URL_FINKOK_PRUEBAS;
@@ -330,13 +339,13 @@ implementation
               Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
               Emisor.RegimenFiscal := '612'; // De catalogo
 
-              Receptor.Rfc              := Uppercase('cacx7605101p8');
-              Receptor.Nombre           := 'XOTICHL CASAS CHAVEZ';
-              Receptor.UsoCFDI          := 'G01';
+              Receptor.Rfc              := Uppercase('aabf800614hi0');
+              Receptor.Nombre           := 'FELIX MANUEL ANDRADE BALLADO';
+              Receptor.UsoCFDI          := 'S01';
 
-              Receptor.DomicilioFiscalReceptor := '76030';
-              Receptor.RegimenFiscalReceptor := '612';
-
+              Receptor.DomicilioFiscalReceptor := '86400';
+              Receptor.RegimenFiscalReceptor := '616';
+			  
               //Receptor.ResidenciaFiscal := 'USA'; // De cat�logo
               // Solo para cliente extranjero
               //Receptor.NumRegIdTrib     := '123456789'; // "formatoDeRegistroDeIdentidadTributaria": "[0-9]{9}",
