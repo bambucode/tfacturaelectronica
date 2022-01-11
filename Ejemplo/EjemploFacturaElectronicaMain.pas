@@ -1,4 +1,4 @@
-﻿{*******************************************************}
+ï»¿{*******************************************************}
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
@@ -102,7 +102,7 @@ implementation
     try
       {
        NOTAS:
-         Recuerde que para realizar pruebas con Soluci�n Factible debe registrarse con el PAC para el proceso de pruebas.
+         Recuerde que para realizar pruebas con Soluciï¿½n Factible debe registrarse con el PAC para el proceso de pruebas.
          Para realizar pruebas con Edicom, se requiere una cuenta valida registrada en el PAC
       }
 
@@ -240,7 +240,7 @@ implementation
               NoCertificado := certificadoSellos.NoCertificado;
               Certificado   := certificadoSellos.ContenidoBase64;
               FormaPago         := '01'; // De catalogo
-              CondicionesDePago := 'Crédito a 30 días';
+              CondicionesDePago := 'CrÃ©dito a 30 dÃ­as';
               Subtotal          := '100.00'; // Solo 2 decimales
               Descuento         := TFacturacionHelper.ComoMoneda(0);
               Moneda            := 'MXN'; // De catalogo
@@ -258,17 +258,17 @@ implementation
               Receptor.Nombre           := 'XOTICHL CASAS CHAVEZ';
               Receptor.UsoCFDI          := 'G01';
 
-              //Receptor.ResidenciaFiscal := 'USA'; // De cat�logo
+              //Receptor.ResidenciaFiscal := 'USA'; // De catï¿½logo
               // Solo para cliente extranjero
               //Receptor.NumRegIdTrib     := '123456789'; // "formatoDeRegistroDeIdentidadTributaria": "[0-9]{9}",
 
               concepto33 := Conceptos.Add;
-              concepto33.ClaveProdServ    := '52161529';  // De cat�logo
+              concepto33.ClaveProdServ    := '52161529';  // De catï¿½logo
               concepto33.NoIdentificacion := '1';
               concepto33.Cantidad         := '1';
-              concepto33.ClaveUnidad      := 'EA';  // De catalogo
-              concepto33.Unidad           := 'PZA'; // De catalogo
-              concepto33.Descripcion      := 'ALGODÃ“N 50 GR';
+              concepto33.ClaveUnidad      := 'EA';  // De catálogo
+              concepto33.Unidad           := 'PZA'; // De catálogo
+              concepto33.Descripcion      := TFacturacionHelper.LimpiarCaracteresInvalidos('ÑñáÁéÉíÍóÓúÚü & "`''Concepto No 1');
               concepto33.ValorUnitario    := '100.00';
               concepto33.Importe          := '100.00';
               concepto33.Descuento        := '0.00';
@@ -280,7 +280,7 @@ implementation
               iva33.TasaOCuota  := '0.160000';
               iva33.Importe     := '16.00';
 
-              // NOTA: Agregamos el numero cuenta predial justo despu�s de indicar
+              // NOTA: Agregamos el numero cuenta predial justo despuï¿½s de indicar
               // los impuestos del concepto pues el orden importa.
               //concepto33.CuentaPredial.Numero := '234989';
 
@@ -324,8 +324,8 @@ implementation
 
               NoCertificado := certificadoSellos.NoCertificado;
               Certificado   := certificadoSellos.ContenidoBase64;
-              FormaPago         := '01'; // De cat�logo
-              CondicionesDePago := 'Crédito a 30 días';
+              FormaPago         := '01'; // De catï¿½logo
+              CondicionesDePago := 'CrÃ©dito a 30 dÃ­as';
               Subtotal          := '100.00'; // Solo 2 decimales
               Descuento         := TFacturacionHelper.ComoMoneda(0);
               Moneda            := 'MXN'; // De catalogo
@@ -346,7 +346,7 @@ implementation
               Receptor.DomicilioFiscalReceptor := '86400';
               Receptor.RegimenFiscalReceptor := '616';
 			  
-              //Receptor.ResidenciaFiscal := 'USA'; // De cat�logo
+              //Receptor.ResidenciaFiscal := 'USA'; // De catï¿½logo
               // Solo para cliente extranjero
               //Receptor.NumRegIdTrib     := '123456789'; // "formatoDeRegistroDeIdentidadTributaria": "[0-9]{9}",
 
@@ -354,9 +354,9 @@ implementation
               concepto40.ClaveProdServ    := '52161529';  // De catalogo
               concepto40.NoIdentificacion := '1';
               concepto40.Cantidad         := '1';
-              concepto40.ClaveUnidad      := 'EA';  // De cat�logo
-              concepto40.Unidad           := 'PZA'; // De cat�logo
-              concepto40.Descripcion      := 'ALGODÃ“N 50 GR';
+              concepto40.ClaveUnidad      := 'EA';  // De catï¿½logo
+              concepto40.Unidad           := 'PZA'; // De catï¿½logo
+              concepto40.Descripcion      := 'ALGODÃâN 50 GR';
               concepto40.ValorUnitario    := '100.00';
               concepto40.Importe          := '100.00';
               concepto40.Descuento        := '0.00';
@@ -370,7 +370,7 @@ implementation
               iva40.TasaOCuota  := '0.160000';
               iva40.Importe     := '16.00';
 
-              // NOTA: Agregamos el numero cuenta predial justo despu�s de indicar
+              // NOTA: Agregamos el numero cuenta predial justo despuï¿½s de indicar
               // los impuestos del concepto pues el orden importa.
               //concepto33.CuentaPredial.Numero := '234989';
 
@@ -491,9 +491,9 @@ implementation
        if facturaCFDIv40.Complemento.TimbreFiscalDigital.FechaTimbrado<>
           FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv40.Complemento.TimbreFiscalDigital.FechaTimbrado ) ) then
        begin
-        Writeln('La conversi�n de la Fecha Del Timbre es incorrecta');
+        Writeln('La conversiï¿½n de la Fecha Del Timbre es incorrecta');
         Writeln(' Fecha del Timbre (Original)  : '+facturaCFDIv40.Complemento.TimbreFiscalDigital.FechaTimbrado);
-        Writeln(' Fecha del Timbre (Conversi�n): '+ FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv40.Complemento.TimbreFiscalDigital.FechaTimbrado )) );
+        Writeln(' Fecha del Timbre (Conversiï¿½n): '+ FormatDateTime('yyyy-mm-dd"T"HH:nn:ss', TFacturacionHelper.DesdeFechaISO8601( facturaCFDIv40.Complemento.TimbreFiscalDigital.FechaTimbrado )) );
        end;
        //Agregamos una Addenda de ejemplo
        WriteLn('Agregando Addenda CFDI v4.0...');
