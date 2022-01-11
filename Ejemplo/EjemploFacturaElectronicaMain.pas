@@ -1,4 +1,4 @@
-ï»¿{*******************************************************}
+﻿{*******************************************************}
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
@@ -144,7 +144,7 @@ implementation
 	  pac := TProveedorFinkOk.Create;
       CredencialesPAC.RFC   := 'TuUsuario';
       CredencialesPAC.Clave := 'TuPassword';
-      Url_WS := _URL_FINKOK_PRUEBAS;
+      Url_WS := _URL_FINKOK_TIMBRADO_PRUEBAS;
      {$endif}
 
      {$ifdef PAC_DEMO_SOLUCIONFACTIBLE}
@@ -240,7 +240,7 @@ implementation
               NoCertificado := certificadoSellos.NoCertificado;
               Certificado   := certificadoSellos.ContenidoBase64;
               FormaPago         := '01'; // De catalogo
-              CondicionesDePago := 'CrÃ©dito a 30 dÃ­as';
+              CondicionesDePago := 'Crédito a 30 días';
               Subtotal          := '100.00'; // Solo 2 decimales
               Descuento         := TFacturacionHelper.ComoMoneda(0);
               Moneda            := 'MXN'; // De catalogo
@@ -325,7 +325,7 @@ implementation
               NoCertificado := certificadoSellos.NoCertificado;
               Certificado   := certificadoSellos.ContenidoBase64;
               FormaPago         := '01'; // De catï¿½logo
-              CondicionesDePago := 'CrÃ©dito a 30 dÃ­as';
+              CondicionesDePago := 'Crédito a 30 días';
               Subtotal          := '100.00'; // Solo 2 decimales
               Descuento         := TFacturacionHelper.ComoMoneda(0);
               Moneda            := 'MXN'; // De catalogo
@@ -354,9 +354,9 @@ implementation
               concepto40.ClaveProdServ    := '52161529';  // De catalogo
               concepto40.NoIdentificacion := '1';
               concepto40.Cantidad         := '1';
-              concepto40.ClaveUnidad      := 'EA';  // De catï¿½logo
-              concepto40.Unidad           := 'PZA'; // De catï¿½logo
-              concepto40.Descripcion      := 'ALGODÃâN 50 GR';
+              concepto40.ClaveUnidad      := 'EA';
+              concepto40.Unidad           := 'PZA';
+              concepto40.Descripcion      := 'Algodón 50gr áéíúó';
               concepto40.ValorUnitario    := '100.00';
               concepto40.Importe          := '100.00';
               concepto40.Descuento        := '0.00';
