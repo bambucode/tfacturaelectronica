@@ -66,13 +66,14 @@ implementation
   reintentar: Boolean;
   Url_WS: String;
  const
-   _URL_ECODEX_PRUEBAS_V33       = 'https://pruebas.ecodex.com.mx:2045';
-  _URL_ECODEX_PRUEBAS_v40        = 'https://pruebas-wsdex.ecodex.com.mx';
-  _URL_FINKOK_PRUEBAS            = 'http://demo-facturacion.finkok.com/servicios/soap';
-  _URL_COMERCIO_PRUEBAS          = 'https://pruebas.comercio-digital.mx';
-  _URL_SOLUCIONFACTIBLE_PRUEBAS  = 'https://testing.solucionfactible.com/ws/services/Timbrado';
-  _URL_MULTIFACTURAS_PRUEBAS     = 'http://ws.facturacionmexico.com.mx/pac/timbrarjava.php';   //SE DEBE ESPECIFICAR QUE ES MODO PRODUCCION
-  _NUMERO_TRANSACCION_INICIAL    = 1;
+   _URL_ECODEX_PRUEBAS_V33       	= 'https://pruebas.ecodex.com.mx:2045';
+  _URL_ECODEX_PRUEBAS_v40       	= 'https://pruebas-wsdex.ecodex.com.mx';
+  _URL_FINKOK_TIMBRADO_PRUEBAS      = 'https://demo-facturacion.finkok.com/servicios/soap/stamp.wsdl';
+  _URL_FINKOK_CANCELACION_PRUEBAS   = 'https://demo-facturacion.finkok.com/servicios/soap/cancel.wsdl';
+  _URL_COMERCIO_PRUEBAS          	= 'https://pruebas.comercio-digital.mx';
+  _URL_SOLUCIONFACTIBLE_PRUEBAS  	= 'https://testing.solucionfactible.com/ws/services/Timbrado';
+  _URL_MULTIFACTURAS_PRUEBAS     	= 'http://ws.facturacionmexico.com.mx/pac/timbrarjava.php';   //SE DEBE ESPECIFICAR QUE ES MODO PRODUCCION
+  _NUMERO_TRANSACCION_INICIAL    	= 1;
 
   //Hablitar solo una de las siguientes opciones
   {$define PAC_DEMO_ECODEX}
@@ -120,10 +121,14 @@ implementation
      {$endif}
 
      {$ifdef PAC_DEMO_FINOK}
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_MISC491214B86_20190528_175522.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_MISC491214B86_20190528_175522.key';
+      claveLlavePrivada := '12345678a';
+
       pac := TProveedorFinkOk.Create;
       CredencialesPAC.RFC   := 'TuUsuario';
       CredencialesPAC.Clave := 'TuPassword';
-      Url_WS := _URL_FINKOK_PRUEBAS;
+      Url_WS := _URL_FINKOK_TIMBRADO_PRUEBAS;
      {$endif}
 
      {$ifdef PAC_DEMO_SOLUCIONFACTIBLE}
