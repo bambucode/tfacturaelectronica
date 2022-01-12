@@ -49,8 +49,6 @@ procedure GenerarFacturaV40Pagos(var nuevaFactura: IComprobanteFiscal; openSSL: 
 var
   facturaCFDIv40 : IComprobanteFiscalv40;
   concepto40 : IComprobanteFiscalv40_Conceptos_Concepto;
-  iva40  : IComprobanteFiscalv40_Conceptos_Concepto_Impuestos_Traslados_Traslado;
-  totalIVA40 : IComprobanteFiscalv40_Impuestos_Traslados_Traslado;
   complementoPagoV2: IPagosV20;
   pagoComplementPagoV2: IPagosV20_Pago;
   doctoRelacionadoListV2 : IPagosV20_Pago_DoctoRelacionadoList;
@@ -111,16 +109,15 @@ begin
       concepto40.Importe          := '0';        // Por Definicion del SAT
       concepto40.ObjetoImp        := '01';
 
-      {$IFDEF undef}{$REGION 'Complemento Pagos'}{$ENDIF}
       complementoPagoV2 := NewComplementoPagoV20;
 
 
       // Estos serán los datos que usaremos para llenar nuestro comprobante
       montoFacturaOriginal := 1000;
 
-      montoPago := 100;
-      montoPagoIVA := montoPago * 0.16;
-      montoPagoBase := montoPago / 1.16;
+      montoPagoBase := 100;
+      montoPagoIVA := montoPagoBase * 0.16;
+      montoPago := montoPagoBase + montoPagoIVA;
 
 
       // El primer nodo especificado debe ser el de los totales de los abonos
@@ -154,49 +151,33 @@ begin
       //doctoRelacionadoComplementoPagoV2.TipoCambioDR       := '0.05';
       //doctoRelacionadoComplementoPagoV2.MetodoDePagoDR     := 'PPD';
       doctoRelacionadoComplementoPagoV2.NumParcialidad     := 1;
-      doctoRelacionadoComplementoPagoV2.ImpSaldoAnt        := TFacturacionHelper.ComoMoneda(montoFacturaOriginal, 2);  //ImpPagado + impSaldoInsoluto
+      doctoRelacionadoComplementoPagoV2.ImpSaldoAnt        := TFacturacionHelper.ComoMoneda(montoPago, 2);  //ImpPagado + impSaldoInsoluto
       doctoRelacionadoComplementoPagoV2.ImpPagado          := TFacturacionHelper.ComoMoneda(montoPago, 2);
-      doctoRelacionadoComplementoPagoV2.ImpSaldoInsoluto   := TFacturacionHelper.ComoMoneda(montoFacturaOriginal - montoPago, 2);
+      doctoRelacionadoComplementoPagoV2.ImpSaldoInsoluto   := TFacturacionHelper.ComoMoneda(0, 2);
       doctoRelacionadoComplementoPagoV2.ObjetoImpDR        := '02';  // 02-sujeto a impuesto
 
 
       // Desglosamos los impuestos del abono: IVA 16%, IVA 0%, etc.
       impuestoTrasladadoDocRelacionadoV2 := doctoRelacionadoComplementoPagoV2.ImpuestosDR.TrasladosDR.Add;
-      impuestoTrasladadoDocRelacionadoV2.BaseDR := TFacturacionHelper.ComoMoneda(montoPago, 4);
+      impuestoTrasladadoDocRelacionadoV2.BaseDR := TFacturacionHelper.ComoMoneda(montoPagoBase, 2);
       impuestoTrasladadoDocRelacionadoV2.ImpuestoDR := '002';   // 001-ISR, 002-IVA, 003-IEPS
       impuestoTrasladadoDocRelacionadoV2.TipoFactorDR := 'Tasa';
       impuestoTrasladadoDocRelacionadoV2.TasaOCuotaDR := '0.160000';
-      impuestoTrasladadoDocRelacionadoV2.ImporteDR :=  TFacturacionHelper.ComoMoneda(montoPagoIVA, 4);
+      impuestoTrasladadoDocRelacionadoV2.ImporteDR :=  TFacturacionHelper.ComoMoneda(montoPagoIVA, 2);
 
        // Agregamos el resumen del pago
       impuestosTrasladadosV2 := pagoComplementPagoV2.ImpuestosP.TrasladosP.Add;
-      impuestosTrasladadosV2.BaseP := TFacturacionHelper.ComoMoneda(montoPagoBase, 4);
+      impuestosTrasladadosV2.BaseP := TFacturacionHelper.ComoMoneda(montoPagoBase, 2);
       impuestosTrasladadosV2.ImpuestoP := '002'; // De catálogos
       impuestosTrasladadosV2.TipoFactorP := 'Tasa';
       impuestosTrasladadosV2.TasaOCuotaP := '0.160000';
-      impuestosTrasladadosV2.ImporteP := TFacturacionHelper.ComoMoneda(montoPagoIVA, 4);
+      impuestosTrasladadosV2.ImporteP := TFacturacionHelper.ComoMoneda(montoPagoIVA, 2);
 
       nuevaFactura.AgregarComplemento(complementoPagoV2,
                                       'pago20',
                                       'http://www.sat.gob.mx/Pagos20',
                                       'http://www.sat.gob.mx/Pagos20 http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos20.xsd');
 
-
-      // Agregamos el impuesto local el cual se maneja de forma especial
-      {$IFDEF undef}{$REGION 'Impuestos locales'}{$ENDIF}
-      {impuestoLocalv1 := NewImpuestosLocalesV1;
-      impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
-      impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
-      trasladosImpuestosLocalesv1 := impuestoLocalv1.TrasladosLocales.Add;
-      trasladosImpuestosLocalesv1.ImpLocTrasladado := 'Otro';
-      trasladosImpuestosLocalesv1.TasadeTraslado   := '0.01';
-      trasladosImpuestosLocalesv1.Importe          := '1.00';
-
-      nuevaFactura.AgregarComplemento(impuestoLocalv1,
-                                      'implocal',
-                                      'http://www.sat.gob.mx/implocal',
-                                      'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd'); }
-      {$IFDEF undef}{$ENDREGION}{$ENDIF}
     end;
 
   end;
