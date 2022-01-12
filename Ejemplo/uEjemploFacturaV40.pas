@@ -39,6 +39,9 @@ var
   concepto40 : IComprobanteFiscalv40_Conceptos_Concepto;
   iva40  : IComprobanteFiscalv40_Conceptos_Concepto_Impuestos_Traslados_Traslado;
   totalIVA40 : IComprobanteFiscalv40_Impuestos_Traslados_Traslado;
+
+  impuestoLocalV1 : IImpuestosLocalesV1;
+  trasladosImpuestosLocalesV1 : IImpuestosLocalesV1_TrasladosLocales;
 begin
   if nuevaFactura.Version = '4.0' then
   begin
@@ -69,7 +72,7 @@ begin
       Descuento         := TFacturacionHelper.ComoMoneda(0);
       Moneda            := 'MXN'; // De catalogo
       TipoCambio        := '1';//TFacturacionHelper.ComoMoneda(1);
-      Total             := TFacturacionHelper.ComoMoneda(116);
+      Total             := TFacturacionHelper.ComoMoneda(116 + 1);
       TipoDeComprobante := 'I'; // De catalogo
       MetodoPago        := 'PUE';
       LugarExpedicion   := '76030';
@@ -79,7 +82,9 @@ begin
       Emisor.RegimenFiscal := '612'; // De catalogo
 
       Receptor.Rfc              := Uppercase('aabf800614hi0');
-      Receptor.Nombre           := 'FELIX MANUEL ANDRADE BALLADO';
+      // NOTA: Al parecer el SAT espera los nombres sean en mayusculas y exactamente
+      // como están en la LCO
+      Receptor.Nombre           := Uppercase('FELIX MANUEL ANDRADE BALLADO');
       Receptor.UsoCFDI          := 'S01';
 
       Receptor.DomicilioFiscalReceptor := '86400';
@@ -109,7 +114,7 @@ begin
       iva40.TasaOCuota  := '0.160000';
       iva40.Importe     := '16.00';
 
-      // NOTA: Agregamos el numero cuenta predial justo despuï¿½s de indicar
+      // NOTA: Agregamos el numero cuenta predial justo despues de indicar
       // los impuestos del concepto pues el orden importa.
       //concepto33.CuentaPredial.Numero := '234989';
 
@@ -122,6 +127,20 @@ begin
       totalIVA40.TasaOCuota := '0.160000';
       totalIVA40.Importe    := '16.00';
     end;
+
+    // Agregamos el impuesto local el cual se maneja de forma especial
+    impuestoLocalv1 := NewImpuestosLocalesV1;
+    impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
+    impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
+    trasladosImpuestosLocalesv1 := impuestoLocalv1.TrasladosLocales.Add;
+    trasladosImpuestosLocalesv1.ImpLocTrasladado := 'Otro';
+    trasladosImpuestosLocalesv1.TasadeTraslado   := '0.01';
+    trasladosImpuestosLocalesv1.Importe          := '1.00';
+
+    nuevaFactura.AgregarComplemento(impuestoLocalv1,
+                                    'implocal',
+                                    'http://www.sat.gob.mx/implocal',
+                                    'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
 
   end;
 end;
