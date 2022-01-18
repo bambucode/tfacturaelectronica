@@ -75,17 +75,17 @@ begin
       LugarExpedicion   := '76030';
 
       {$REGION '**** ESPECIFICO DE CFDI GLOBAL ********'}
-      InformacionGlobal.Periodicidad := '01'; // Mensual
+      InformacionGlobal.Periodicidad := '04'; // 01-Diario, 02-Semanal, 03-Quincencal, 04-Mensual, 05-Bimestral
       InformacionGlobal.Meses := '01'; // Enero
-      InformacionGlobal.Año := 2021;
+      InformacionGlobal.Año := 2022;
 
       Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
       Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
       Emisor.RegimenFiscal := '612'; // De catalogo
 
       // Deben ser estos datos para la factura global
-      Receptor.Rfc              := 'XAXX010101000';
       Receptor.Nombre           := 'PUBLICO EN GENERAL';
+      Receptor.Rfc              := 'XAXX010101000';
 
       // Este valor debe ser el mismo que el de "LugarExpedicion"
       Receptor.DomicilioFiscalReceptor := LugarExpedicion;

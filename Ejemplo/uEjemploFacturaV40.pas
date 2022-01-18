@@ -72,7 +72,7 @@ begin
       Descuento         := TFacturacionHelper.ComoMoneda(0);
       Moneda            := 'MXN'; // De catalogo
       TipoCambio        := '1';//TFacturacionHelper.ComoMoneda(1);
-      Total             := TFacturacionHelper.ComoMoneda(116 + 1);
+      Total             := TFacturacionHelper.ComoMoneda(116);
       TipoDeComprobante := 'I'; // De catalogo
       MetodoPago        := 'PUE';
       LugarExpedicion   := '76030';
@@ -85,14 +85,28 @@ begin
       // NOTA: Al parecer el SAT espera los nombres sean en mayusculas y exactamente
       // como están en la LCO
       Receptor.Nombre           := Uppercase('FELIX MANUEL ANDRADE BALLADO');
-      Receptor.UsoCFDI          := 'S01';
-
+      Receptor.UsoCFDI          := 'G03';
       Receptor.DomicilioFiscalReceptor := '86400';
-      Receptor.RegimenFiscalReceptor := '616';
+      Receptor.RegimenFiscalReceptor := '612';
 
-      //Receptor.ResidenciaFiscal := 'USA'; // De catï¿½logo
-      // Solo para cliente extranjero
-      //Receptor.NumRegIdTrib     := '123456789'; // "formatoDeRegistroDeIdentidadTributaria": "[0-9]{9}",
+      {$REGION 'Receptor con RFC de publico en general}
+//      Receptor.Rfc              := Uppercase('XAXX010101000');
+//      Receptor.Nombre           := Uppercase('JUAN PEREZ PEREZ');
+//      Receptor.UsoCFDI          := 'S01'; // Sin efectos fiscales para extranjeros
+//      Receptor.DomicilioFiscalReceptor := LugarExpedicion;
+//      Receptor.RegimenFiscalReceptor := '616'; // Sin obligaciones para extranjeros
+      {$ENDREGION}
+
+      {$REGION 'Receptor con RFC extranjero}
+//      Receptor.Rfc              := Uppercase('XEXX010101000');
+//      Receptor.Nombre           := Uppercase('VENTA AL EXTRANJERO');
+//      Receptor.UsoCFDI          := 'S01'; // Sin efectos fiscales para extranjeros
+//      Receptor.DomicilioFiscalReceptor := LugarExpedicion;
+//      Receptor.RegimenFiscalReceptor := '616'; // Sin obligaciones para extranjeros
+//      Receptor.ResidenciaFiscal := 'USA'; // De catalogo
+//      // Solo para cliente extranjero
+//      Receptor.NumRegIdTrib     := '123456789'; // "formatoDeRegistroDeIdentidadTributaria": "[0-9]{9}",
+      {$ENDREGION}
 
       concepto40 := Conceptos.Add;
       concepto40.ClaveProdServ    := '52161529';  // De catalogo
@@ -128,19 +142,19 @@ begin
       totalIVA40.Importe    := '16.00';
     end;
 
-    // Agregamos el impuesto local el cual se maneja de forma especial
-    impuestoLocalv1 := NewImpuestosLocalesV1;
-    impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
-    impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
-    trasladosImpuestosLocalesv1 := impuestoLocalv1.TrasladosLocales.Add;
-    trasladosImpuestosLocalesv1.ImpLocTrasladado := 'Otro';
-    trasladosImpuestosLocalesv1.TasadeTraslado   := '0.01';
-    trasladosImpuestosLocalesv1.Importe          := '1.00';
-
-    nuevaFactura.AgregarComplemento(impuestoLocalv1,
-                                    'implocal',
-                                    'http://www.sat.gob.mx/implocal',
-                                    'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
+//    // Agregamos el impuesto local el cual se maneja de forma especial
+//    impuestoLocalv1 := NewImpuestosLocalesV1;
+//    impuestoLocalv1.TotaldeTraslados   := TFacturacionHelper.ComoMoneda(1);
+//    impuestoLocalv1.TotaldeRetenciones := TFacturacionHelper.ComoMoneda(0);
+//    trasladosImpuestosLocalesv1 := impuestoLocalv1.TrasladosLocales.Add;
+//    trasladosImpuestosLocalesv1.ImpLocTrasladado := 'Otro';
+//    trasladosImpuestosLocalesv1.TasadeTraslado   := '0.01';
+//    trasladosImpuestosLocalesv1.Importe          := '1.00';
+//
+//    nuevaFactura.AgregarComplemento(impuestoLocalv1,
+//                                    'implocal',
+//                                    'http://www.sat.gob.mx/implocal',
+//                                    'http://www.sat.gob.mx/implocal http://www.sat.gob.mx/sitio_internet/cfd/implocal/implocal.xsd');
 
   end;
 end;
