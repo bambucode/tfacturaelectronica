@@ -75,7 +75,8 @@ uses
   uEjemploFacturaV40Pagos in 'uEjemploFacturaV40Pagos.pas',
   uEjemploFacturaV40 in 'uEjemploFacturaV40.pas',
   uEjemploFacturaV33 in 'uEjemploFacturaV33.pas',
-  uEjemploFacturaV33Pagos in 'uEjemploFacturaV33Pagos.pas';
+  uEjemploFacturaV33Pagos in 'uEjemploFacturaV33Pagos.pas',
+  uEjemploFacturaV40Frontera in 'uEjemploFacturaV40Frontera.pas';
 
 begin
  EjemploFacturaElectronicaMain.Ejemplo;

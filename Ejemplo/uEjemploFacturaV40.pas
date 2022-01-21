@@ -72,15 +72,16 @@ begin
       Descuento         := TFacturacionHelper.ComoMoneda(0);
       Moneda            := 'MXN'; // De catalogo
       TipoCambio        := '1';//TFacturacionHelper.ComoMoneda(1);
-      Total             := TFacturacionHelper.ComoMoneda(116);
+      Total             := TFacturacionHelper.ComoMoneda(100 + 16);
       TipoDeComprobante := 'I'; // De catalogo
       MetodoPago        := 'PUE';
-      LugarExpedicion   := '76030';
+      LugarExpedicion   := '26015';
 
       Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
       Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
-      Emisor.RegimenFiscal := '612'; // De catalogo
+      Emisor.RegimenFiscal := '601'; // De catalogo
 
+      {$REGION 'Receptor normal'}
       Receptor.Rfc              := Uppercase('aabf800614hi0');
       // NOTA: Al parecer el SAT espera los nombres sean en mayusculas y exactamente
       // como están en la LCO
@@ -88,18 +89,19 @@ begin
       Receptor.UsoCFDI          := 'G03';
       Receptor.DomicilioFiscalReceptor := '86400';
       Receptor.RegimenFiscalReceptor := '612';
+      {$ENDREGION}
 
-      {$REGION 'Receptor con RFC de publico en general}
+      {$REGION 'Receptor con RFC de publico en general'}
 //      Receptor.Rfc              := Uppercase('XAXX010101000');
-//      Receptor.Nombre           := Uppercase('JUAN PEREZ PEREZ');
+//      Receptor.Nombre           := Uppercase('Juan Perez Perez');
 //      Receptor.UsoCFDI          := 'S01'; // Sin efectos fiscales para extranjeros
 //      Receptor.DomicilioFiscalReceptor := LugarExpedicion;
 //      Receptor.RegimenFiscalReceptor := '616'; // Sin obligaciones para extranjeros
       {$ENDREGION}
 
-      {$REGION 'Receptor con RFC extranjero}
+      {$REGION 'Receptor con RFC extranjero'}
 //      Receptor.Rfc              := Uppercase('XEXX010101000');
-//      Receptor.Nombre           := Uppercase('VENTA AL EXTRANJERO');
+//      Receptor.Nombre           := Uppercase('Joseph Biden');
 //      Receptor.UsoCFDI          := 'S01'; // Sin efectos fiscales para extranjeros
 //      Receptor.DomicilioFiscalReceptor := LugarExpedicion;
 //      Receptor.RegimenFiscalReceptor := '616'; // Sin obligaciones para extranjeros
@@ -119,6 +121,7 @@ begin
       concepto40.Importe          := '100.00';
       concepto40.Descuento        := '0.00';
 
+      {$REGION 'Con IVA 16%'}
       concepto40.ObjetoImp        := '02';
 
       iva40 := concepto40.Impuestos.Traslados.Add;
@@ -127,19 +130,40 @@ begin
       iva40.TipoFactor  := 'Tasa';
       iva40.TasaOCuota  := '0.160000';
       iva40.Importe     := '16.00';
+//
+        Impuestos.TotalImpuestosTrasladados  := '16.00';
+
+        totalIVA40 := Impuestos.Traslados.Add;
+        totalIVA40.Base     := '100';
+        totalIVA40.Impuesto := '002';
+        totalIVA40.TipoFactor := 'Tasa';
+        totalIVA40.TasaOCuota := '0.160000';
+        totalIVA40.Importe    := '16.00';
+      {$ENDREGION}
+
+//      {$REGION 'Con IVA exento'}
+//      concepto40.ObjetoImp        := '02';
+//      iva40 := concepto40.Impuestos.Traslados.Add;
+//      iva40.Base        := '100.00';
+//      iva40.Impuesto    := '002';
+//      iva40.TipoFactor  := 'Exento';
+//      //iva40.TasaOCuota  := '0.160000';
+//      //iva40.Importe     := '16.00';
+//
+//      //Impuestos.TotalImpuestosTrasladados  := '0.00';
+//
+//      totalIVA40 := Impuestos.Traslados.Add;
+//      totalIVA40.Base     := '100';
+//      totalIVA40.Impuesto := '002';
+//      totalIVA40.TipoFactor := 'Exento';
+//      //totalIVA40.Importe  := '0.00';
+//      {$ENDREGION}
 
       // NOTA: Agregamos el numero cuenta predial justo despues de indicar
       // los impuestos del concepto pues el orden importa.
       //concepto33.CuentaPredial.Numero := '234989';
 
-      Impuestos.TotalImpuestosTrasladados  := '16.00';
 
-      totalIVA40 := Impuestos.Traslados.Add;
-      totalIVA40.Base     := '100';
-      totalIVA40.Impuesto := '002';
-      totalIVA40.TipoFactor := 'Tasa';
-      totalIVA40.TasaOCuota := '0.160000';
-      totalIVA40.Importe    := '16.00';
     end;
 
 //    // Agregamos el impuesto local el cual se maneja de forma especial

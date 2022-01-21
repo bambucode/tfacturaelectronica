@@ -39,6 +39,7 @@ uses
   uEjemploFacturaV33Pagos,
   uEjemploFacturaV40Pagos,
   uEjemploFacturaV40,
+  uEjemploFacturaV40Frontera,
   uEjemploFacturaGlobalV40;
 
   procedure Ejemplo;
@@ -94,18 +95,18 @@ implementation
       }
 
       //Este certificado se usa en casi todo los PACs para realizar pruebas
-      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_XOJI740919U48.cer';
-      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_XOJI740919U48.key';
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Escuela_Kemper_Urgate_EKU9003173C9_20190617_131753.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Escuela_Kemper_Urgate_EKU9003173C9_20190617_131753.key';
       claveLlavePrivada := '12345678a';
 
      // Configuramos al PAC con los datos para pruebas
      {$ifdef PAC_DEMO_ECODEX}
-      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_XOJI740919U48.cer';
-      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_XOJI740919U48.key';
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Escuela_Kemper_Urgate_EKU9003173C9_20190617_131753.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Escuela_Kemper_Urgate_EKU9003173C9_20190617_131753.key';
       claveLlavePrivada := '12345678a';
 
       pac := TProveedorEcodex.Create;
-      credencialesPAC.RFC                   := 'XOJI740919U48';
+      credencialesPAC.RFC                   := 'EKU9003173C9';
       credencialesPAC.DistribuidorID        := '2b3a8764-d586-4543-9b7e-82834443f219';
 
       credencialesIntegrador.RFC            := 'BBB010101001';
@@ -155,6 +156,26 @@ implementation
         exit;
       end;
 
+
+      {$IFDEF FullDebugMode}
+        Writeln('FastMM4 Habilitado :)');
+      {$ENDIF}
+
+      Writeln('Por favor ingresa el numero de opción del ejemplo que deseas ejecutar:');
+      Writeln;
+      Writeln('1. Ejemplo CFDI 3.3');
+      Writeln('2. Ejemplo CFDI 3.3 con complemento de pagos');
+      Writeln('3. Ejemplo CFDI 4.0');
+      Writeln('4. Ejemplo CFDI 4.0 con complemento de pagos');
+      Writeln('5. Ejemplo CFDI 4.0 factura global');
+      Writeln('6. Ejemplo CFDI 4.0 de Franja Fronteriza');
+      WriteLn;
+      WriteLn('>');
+      ReadLn(queOpcion);
+      //queOpcion := '5';
+      Writeln;
+      Writeln;
+
       openSSL := TOpenSSL.Create;
       openSSL.AsignarLlavePrivada(rutaLlavePrivada,
                                   claveLlavePrivada);
@@ -172,25 +193,6 @@ implementation
       WriteLn('Certificado y llave ... OK');
 
 
-      {$IFDEF FullDebugMode}
-        Writeln('FastMM4 Habilitado :)');
-      {$ENDIF}
-
-      Writeln('Por favor ingresa el numero de opción del ejemplo que deseas ejecutar:');
-      Writeln;
-      Writeln('1. Ejemplo CFDI 3.3');
-      Writeln('2. Ejemplo CFDI 3.3 con complemento de pagos');
-      Writeln('3. Ejemplo CFDI 4.0');
-      Writeln('4. Ejemplo CFDI 4.0 con complemento de pagos');
-      Writeln('5. Ejemplo CFDI 4.0 factura global');
-      WriteLn;
-      WriteLn('>');
-      ReadLn(queOpcion);
-      //queOpcion := '5';
-      Writeln;
-      Writeln;
-
-
       admonFacturas := TAdministradorFacturas.Create;
 
       // Creamos las instancias comunes segun la versión
@@ -203,7 +205,7 @@ implementation
           generadorSello.Configurar(openSSL);
           generadorCBB  := TGeneradorCBBv33.Create;
         end;
-        3,4,5: // Instancias de CFDI 4.0
+        3,4,5,6: // Instancias de CFDI 4.0
         begin
           // Creamos las instancias correspondientes para la v40
           generadorCadena := TGeneradorCadenaOriginalV40.Create;
@@ -275,6 +277,22 @@ implementation
                                      generadorCadena,
                                      generadorSello
                                      );
+            end;
+            6: // Factura CFDI 4.0 global
+            begin
+               WriteLn('Generando factura CFDI 4.0 Franja Fronteriza');
+               nuevaFactura := admonFacturas.Nueva('4.0');
+               GenerarFacturaV40Frontera(nuevaFactura,
+                                         openSSL,
+                                         certificadoSellos,
+                                         generadorCadena,
+                                         generadorSello
+                                         );
+
+               // Modificamos el RFC login Ecodex ya que usamos otro
+               {$ifdef PAC_DEMO_ECODEX}
+                credencialesPAC.RFC := 'EKU9003173C9';
+               {$endif}
             end;
           else
             WriteLn('Opción inválida');

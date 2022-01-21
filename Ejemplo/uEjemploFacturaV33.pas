@@ -79,11 +79,11 @@ begin
       Total             := TFacturacionHelper.ComoMoneda(117);
       TipoDeComprobante := 'I'; // De catálogo
       MetodoPago        := 'PUE';
-      LugarExpedicion   := '76030';
+      LugarExpedicion   := '26015';
 
       Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
       Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
-      Emisor.RegimenFiscal := '612'; // De catálogo
+      Emisor.RegimenFiscal := '601'; // De catálogo
 
       //Receptor.Rfc              := 'MTI0806042N7';
       Receptor.Rfc              := 'XEXX010101000';

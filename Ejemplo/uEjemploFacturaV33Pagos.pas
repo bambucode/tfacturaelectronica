@@ -75,11 +75,11 @@ begin
       Moneda             := 'XXX';    // Cero por Definicion
       Total              := '0';   // Cero por Definicion
       TipoDeComprobante  := 'P';      // De catálogo
-      LugarExpedicion    := '76030';
+      LugarExpedicion    := '26015';
 
       Emisor.Rfc           := certificadoSellos.EmitidoParaRFC;
       Emisor.Nombre        := certificadoSellos.EmitidoParaNombre;
-      Emisor.RegimenFiscal := '612'; // De catálogo
+      Emisor.RegimenFiscal := '601'; // De catálogo
 
       Receptor.Rfc         := Uppercase('cacx7605101p8');
       Receptor.Nombre      := 'XOTICHL CASAS CHAVEZ';

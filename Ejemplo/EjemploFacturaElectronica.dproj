@@ -125,6 +125,7 @@
         <DCCReference Include="uEjemploFacturaV40.pas"/>
         <DCCReference Include="uEjemploFacturaV33.pas"/>
         <DCCReference Include="uEjemploFacturaV33Pagos.pas"/>
+        <DCCReference Include="uEjemploFacturaV40Frontera.pas"/>
         <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
