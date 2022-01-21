@@ -1,4 +1,4 @@
-TFACTURACIONELECTRONICA v2.0 - Alpha
+TFACTURACIONELECTRONICA v4.0
 --------------------------------------
 Esta es una librería que sirve para generar una factura electrónica (CFDI) de acuerdo a los artículos y leyes establecidas en la ley de Mexico y definidos por el SAT.
 
@@ -34,18 +34,22 @@ Proveedores Autorizados de Certificación (PAC) Soportados por v2.0
 * Solución Factible - colaboración de @ffaccinetto 
 * Multifacturas - <http://www.multifacturas.com> - colaboración de @fduenas
 
-Complementos de Factura Soportados por v2.0
+Complementos de Factura Soportados 
 -------------
-* Para CFDI 3.2
+* Para CFDI 4.0
 	- Vía OOP, usando clases autogeneradas por medio de XML Databinding de Delphi (IXMLDocument, IXMLNode, etc.)
-		- Timbre Fiscal Digital 1.0
+		- Timbre Fiscal Digital 1.1
+		- Complemento de Pagos 2.0
 		- Impuestos Locales 1.0
+		- Comercio Exterior 1.1		- colaboración de @fduenas
+		- Nómina 1.2 				- colaboración de @fduenas
+		- Notarios Publicos 1.0 	- colaboración de @fduenas
 	
 * Para CFDI 3.3
 	- Vía OOP, usando clases autogeneradas por medio de XML Databinding de Delphi (IXMLDocument, IXMLNode, etc.):
 		- Timbre Fiscal Digital 1.1
 		- Impuestos Locales 1.0
-		- Recepción de Pagos 1.0	
+		- Complemento de Pagos 1.0	
 		- Comercio Exterior 1.1		- colaboración de @fduenas
 		- Nómina 1.2 				- colaboración de @fduenas
 		- Notarios Publicos 1.0 	- colaboración de @fduenas
@@ -64,8 +68,10 @@ A partir de la v2.0 de la librería, se ha documentado de forma extensiva el pro
 
 ¿Qué falta?
 -------------------
-A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
+A Enero de 2022 falta de implementar lo siguiente (en orden de importancia):
 
+- ~~Generación de CFDI 4.0~~
+- ~~Integrar complemento de pagos 2.0~~
 - ~~Lectura de CFDI 3.3~~
 - ~~Generación de CBB con cambios para CFDI 3.3~~.
 - ~~Soporte para generación/lectura de CFDI 3.2 (para fines de compatibilidad y migración)~~
@@ -80,7 +86,7 @@ A Mayo de 2017 falta de implementar lo siguiente (en orden de importancia):
 
 Notas de compatibilidad con otras versiones de Delphi
 -------------------
--  Se agregó y probó exitósamente el soporte con Delphi 7, Delphi XE1 y Delphi XE 10.2.3 (Tokyo), por lo que no debe haber problemas con Delphi 2009 y 2010 y demás versiones intermedias.
+-  Se agregó y probó exitósamente el soporte con  Delphi 10.3, por lo que no debe haber problemas con Delphi 2009 y 2010 y demás versiones intermedias.
 
 -  Para el soporte con Delphi 7, Delphi 2007, Delphi 2009 y Delphi 2010 se requiere usar la librería TPerlRegExp para el uso de Expresiones Regulares, debido a que el soporte nativo para estas últimas se agregó a partir de Delphi XE1.
 	- Esta se encuentra en la carpeta: lib/external/legacy/TPerlRegEx (agregada el 2018-09-25)
@@ -89,19 +95,18 @@ Notas de compatibilidad con otras versiones de Delphi
 	- Además se conserva una copia de dicha librería desde el repositorio: <https://github.com/fduenas/TPerlRegEx>
 	- Una vez descargado el archivo, extraerlo en la carpeta de su conveniencia 
 	- Agregar el folder que contiene los archivos a la configuracion Library Path del Proyecto (Project/Options/Delphi Compiler/Search path) o del IDE de Delphi (Tools/Environment Options/Library/Library path)
-	
 	- Para Mayor información acerca del uso de esta librería consultar: https://www.regular-expressions.info/delphi.html
 	- Para que el Pac Comercio Digital pueda funcionar es necesaria la libreria SynaCode, se encuentra en el directorio de Lib\synapse
 
 ¿Cómo puedo ayudar?
 -------------------
-La librería lleva más de 4 años de haber sido liberada al público, sin embargo aun falta mucho trabajo por hacer. Puedes comenzar checando el apartado de "Issues" del proyecto para ver en que puedes colaborar, una vez que lo hagas puedes mandar un pull-request para que implementemos tus cambios.
+La librería lleva más de 8 años de haber sido liberada al público, sin embargo aun falta mucho trabajo por hacer. Puedes comenzar checando el apartado de "Issues" del proyecto para ver en que puedes colaborar, una vez que lo hagas puedes mandar un pull-request para que implementemos tus cambios.
 
-Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a través del foro oficial de la librería en <https://groups.google.com/forum/#!forum/tfacturaelectronica>
+Si te interesa contribuir en mejorar, extender o corregir esta librería para el beneficio de la comunidad y crédito para tí ponte en contacto a través del foro oficial de la librería en <https://github.com/bambucode/tfacturaelectronica/discussions>
 
 Soporte Técnico
 ------------
-El soporte técnico se hace a través de la comunidad en el foro oficial de la librería al cual se puede acceder en: <https://groups.google.com/forum/#!forum/tfacturaelectronica> . De manera adicional, si encuentras alguna falla o te gustaría alguna funcionalidad favor de reportarla en esta página en la sección de "Issues" para que otros usuarios puedan colaborar y encontrar una solución como comunidad, te agradecemos intentes corregir cualquier problema primero antes de reportarlo para al menos saber que has intentado solucionarlo por tu cuenta.
+El soporte técnico se hace a través de la comunidad en el foro oficial de la librería al cual se puede acceder en: <https://github.com/bambucode/tfacturaelectronica/discussions> . De manera adicional, si encuentras alguna falla o te gustaría alguna funcionalidad favor de reportarla en esta página en la sección de "Issues" para que otros usuarios puedan colaborar y encontrar una solución como comunidad, te agradecemos intentes corregir cualquier problema primero antes de reportarlo para al menos saber que has intentado solucionarlo por tu cuenta.
 
 Notas adicionales
 ------------
@@ -113,7 +118,7 @@ Icono proporcionado por: http://pc.de/icons/
 
 Compatibilidad con versiones
 ------------
-La libreria ha sido probada solamente con Delphi 7, Delphi XE1, Delphi XE2, delphi XE10.2.3 (Tokyo), por lo que no debería haber problema con versiones intermedias y aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 7, si se encuentra algún error, favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2. Antes de realizar pruebas con versiones anteriores a Rad Studio XE1, es importante leer la sección "Notas de compatibilidad con otras versiones de Delphi".
+La libreria ha sido probada solamente con Delphi 10.3, por lo que no debería haber problema con versiones intermedias y aunque se ha tratado de mantener la compatibilidad con versiones desde Delphi 7, si se encuentra algún error, favor de reportarlo a la brevedad. En especial las rutinas de generación de CFDI v3.2 no han sido probadas en versiones anteriores a Delphi XE2. Antes de realizar pruebas con versiones anteriores a Rad Studio XE1, es importante leer la sección "Notas de compatibilidad con otras versiones de Delphi".
 
 Colaboradores actuales.
 -------------
