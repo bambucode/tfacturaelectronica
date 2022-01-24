@@ -41,7 +41,7 @@ type
       function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8; overload; override;
       function TimbrarDocumento(const aXML : TCadenaUTF8; const aTransaccion : Int64): TCadenaUTF8; overload; override;
       function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer; override;
-      function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; overload; override;
+      function CancelarDocumento(const aUUID: TSolicitudCancelacion): Boolean; overload; override;
       function CancelarDocumento(const aUUID: TCadenaUTF8; var aExtraInfo: TCadenaUTF8): Boolean; overload; override;
       function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID; override;
       function ObtenerAcuseDeCancelacion(const aUUID: string): string; override;
@@ -87,11 +87,11 @@ begin
 end;
 
 function TProveedorMultiFacturas.CancelarDocumento(
-  const aUUID: TCadenaUTF8): Boolean;
+  const aUUID: TSolicitudCancelacion): Boolean;
 var LExtraInfo: TCadenaUTF8;
 begin
 
- result := CancelarDocumento(aUUID, LExtraInfo);
+ result := CancelarDocumento(aUUID[0].UUID, LExtraInfo);
 
 end;
 

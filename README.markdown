@@ -78,6 +78,7 @@ A Enero de 2022 falta de implementar lo siguiente (en orden de importancia):
 - ~~Lanzar excepciones basado en el catálogo de errores de CFDI 3.3~~ (Parcial)
 - ~~Poder incluir impuestos locales (3.2 y 3.3)~~.
 - ~~Complemento de pagos~~ con ayuda de @ffaccinetto
+- ~~Cancelación para 2022 con PAC FinkOk con ayuda de @ptorres
 - Otros complementos (donatarias, hidrocarburos, etc.)
 - Pruebas de unidad
 - Validaciones de campos basado en los múltiples catálogos publicados por el SAT.
@@ -124,6 +125,6 @@ Colaboradores actuales.
 -------------
 * Ing. Luis Carrasco - Bambú Code SA de CV - <http://github.com/lcarrasco>
 * Ing. Eduardo  Padilla - Bambú Code SA de CV - <https://github.com/epadillac>
-* Ing. Pablo Torres - <http://www.tecsisnet.net>
+* Ing. Pablo Torres - <http://www.tecsis.mx>
 * Felipe Faccinetto - <https://github.com/ffaccinetto>
 * Lic. Francisco Armando Dueñas Rodriguez - <https://github.com/fduenas>

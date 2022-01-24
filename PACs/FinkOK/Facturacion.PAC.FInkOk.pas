@@ -2,8 +2,8 @@
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
-{       Copyright (C) 2018 Bambu Code SA de CV          }
-{        Soporte del pac FinkOK TecsisNet.net           }
+{       Copyright (C) 2022 Bambu Code SA de CV          }
+{        Soporte del pac FinkOK Tecsis.Mx               }
 {                                                       }
 {*******************************************************}
 
@@ -63,11 +63,11 @@ type
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
         aTransaccion: Int64): TCadenaUTF8; overload; override;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; overload; override;
+    function CancelarDocumento(const aUUID: TSolicitudCancelacion): Boolean; overload; override;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID;
     function ObtenerAcuseDeCancelacion(const aUUID: string): string; override;
-    Function ObtenerEstatus(aUUID,Total,RFCReceptor: TCadenaUTF8):AcuseSATConsulta2;
-    function ObtenerRelacionados(aUUID: TCadenaUTF8): Boolean;
+    Function ObtenerEstatus(aUUID,Total,RFCReceptor: TCadenaUTF8):AcuseSATConsulta;
+    function ObtenerRelacionados(aUUID: TCadenaUTF8): TCadenaUTF8;
     function ObtenerPendientes: stringArray2;
   end;
 
@@ -84,7 +84,7 @@ begin
   // Incializamos las instancias de los WebServices
   fwsTimbradoFinkOk := GetWsFinkOkTimbrado(False, aWsTimbrado);
   fwsClientesFinkOk := GetFinkOkCliente(False, aWsClientes);
-  fwsCancelacionFinkOk := GetIFinkOkServicioCancelacion(False, aWsCancelacion);
+  fwsCancelacionFinkOk := GetIFinkOkServicioCancelacion(True,aWsCancelacion);
   fCredencialesIntegrador.RFC:=aCredencialesIntegrador.RFC;
 end;
 
@@ -153,41 +153,49 @@ begin
  Result:=0;
 end;
 
-function TProveedorFinkOk.CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
+
+function TProveedorFinkOk.CancelarDocumento(const aUUID: TSolicitudCancelacion): Boolean;
 var
   certificadoSellos: ICertificadoDeSellos;
   respuestaCancelacion: FinkOKRespuestaCancelacion2;
   sKey,sCer:TByteDynArray;
+  vUUID:UUIDArray;
   fAcuse:String;
-  UUID:UUIDS2;
   OpenSSL: TOpenSSL;
   LlaveAbierta: pPKCS8_Priv_Key_Info;
   x509Certificado : TX509Certificate;
   key: TKeyPairGenerator;
+  I: Integer;
 begin
- Result:=True;
+ Result:=False;//'';
   fDocumentoXMLCancelado :=TXMLDocument.Create(nil);
-  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO)='' then
+  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_BASE64)='' then
      raise EPACRSACertificadoNoAsignadoException.Create('Certificado no asignado o vacío',0,0,false)
-  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)='' then
+  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)='' then
      raise EPACRSALlavePrivadaNoAsignadaException.Create('Llave privada no asignada o vacía',0,0,false);
  OpenSSL:=TOpenSSL.Create;
- UUID:=UUIDS.Create;
 // obtenemos el certificado
  x509Certificado := TX509Certificate.Create;
- x509Certificado.LoadFromFile(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO));
+ x509Certificado.LoadFromFile(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_BASE64));
  sCer:=FacturacionHelper.UTF8ToBytes(X509Certificado.AsBase64);
  x509Certificado.Free;
 // obtenemos la llave
- llaveAbierta := openSSL.AbrirLlavePrivada(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO),ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));
- openSSL.GuardarLlavePrivadaEnPEM(llaveAbierta, ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
+ llaveAbierta := openSSL.AbrirLlavePrivada(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64),ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));
+ openSSL.GuardarLlavePrivadaEnPEM(llaveAbierta, ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)+'.pem');
  OpenSSL.Free;
- sKey:=FileToByteArray(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
+ sKey:=FileToByteArray(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)+'.pem');
 //Eliminamos el archivo temporal
- DeleteFile(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
- UUID.UUIDS:=FixedWideStringToArray(AUUID, _UUID_LONGITUD); //cada uuid mide 36 caracteres
+ DeleteFile(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)+'.pem');
+ SetLength(vUUID,Length(aUUID));
+ for I := 0 to Length(aUUID)-1 do
+  Begin
+   vUUID[I]:=UUID.Create;
+   vUUID[I].UUID:=aUUID[I].UUID;
+   vUUID[I].FolioSustitucion:=aUUID[I].FolioSustitucion;
+   vUUID[I].Motivo:=aUUID[I].Motivo;
+  End;
  try
-   respuestaCancelacion := fwsCancelacionFinkOk.cancel(UUID,fCredencialesPAC.RFC,fCredencialesPAC.Clave,
+   respuestaCancelacion := fwsCancelacionFinkOk.cancel(vUUID,fCredencialesPAC.RFC,fCredencialesPAC.Clave,
                            fcredencialesIntegrador.RFC,sCer,sKey,False);
        {$IFDEF CODESITE}
       CodeSite.Send('Folio', respuestaCancelacion.CodEstatus);
@@ -223,7 +231,6 @@ begin
   end
  Else
   raise EPACNoEncontradoParaCancelarException.Create(respuestaCancelacion.CodEstatus,-1,-1,False);
- UUID.Free;
  except
   On E: Exception do
    if Not(E Is EPACException) then
@@ -231,7 +238,8 @@ begin
    else
    raise;
  end;
-end;
+
+end;
 
 function TProveedorFinkOk.CancelarDocumentos(
   const aUUID: TListadoUUID): TListadoCancelacionUUID;
@@ -245,9 +253,9 @@ begin
   Result:=fDocumentoXMLCancelado.XML.Text;
 end;
 
-function TProveedorFinkOk.ObtenerEstatus(aUUID,Total,RFCReceptor: TCadenaUTF8): AcuseSATConsulta2;
+function TProveedorFinkOk.ObtenerEstatus(aUUID,Total,RFCReceptor: TCadenaUTF8): AcuseSATConsulta;
 var
-  RespuestaEstatus: AcuseSatEstatus2;
+  RespuestaEstatus: AcuseSatEstatus;
 begin
  try
    RespuestaEstatus := fwsCancelacionFinkOk.get_sat_status(fCredencialesPAC.RFC,fCredencialesPAC.Clave,
@@ -267,7 +275,7 @@ end;
 
 function TProveedorFinkOk.ObtenerPendientes: stringArray2;
 var
-  RespuestaEstatus: CancelPendingResult2;
+  RespuestaEstatus: CancelPendingResult;
 begin
  try
    RespuestaEstatus := fwsCancelacionFinkOk.Get_pending(fCredencialesPAC.RFC,fCredencialesPAC.Clave,
@@ -285,54 +293,69 @@ begin
  end;
 end;
 
-
-function TProveedorFinkOk.ObtenerRelacionados(aUUID: TCadenaUTF8): Boolean;
+function TProveedorFinkOk.ObtenerRelacionados(aUUID: TCadenaUTF8): TCadenaUTF8;
 var
-  RespuestaRelacionados: RelatedResult2;
+  Relacionados:TCadenaUTF8;
+  certificadoSellos: ICertificadoDeSellos;
+  RespuestaRelacionados: RelatedResult;//RelatedResult2;
   sKey,sCer:TByteDynArray;
+  fAcuse:String;
   OpenSSL: TOpenSSL;
   LlaveAbierta: pPKCS8_Priv_Key_Info;
   x509Certificado : TX509Certificate;
+  key: TKeyPairGenerator;
+  I: Integer;
 begin
- Result:=True;
+ Result:='';
   fDocumentoXMLCancelado :=TXMLDocument.Create(nil);
- if True then
-
-  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO)='' then
+  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_BASE64)='' then
      raise EPACRSACertificadoNoAsignadoException.Create('Certificado no asignado o vacío',0,0,false)
-  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)='' then
+  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)='' then
      raise EPACRSALlavePrivadaNoAsignadaException.Create('Llave privada no asignada o vacía',0,0,false);
  OpenSSL:=TOpenSSL.Create;
 // obtenemos el certificado
  x509Certificado := TX509Certificate.Create;
- x509Certificado.LoadFromFile(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO));
+ x509Certificado.LoadFromFile(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_BASE64));
  sCer:=FacturacionHelper.UTF8ToBytes(X509Certificado.AsBase64);
  x509Certificado.Free;
 // obtenemos la llave
- llaveAbierta := openSSL.AbrirLlavePrivada(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO),ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));
- openSSL.GuardarLlavePrivadaEnPEM(llaveAbierta, ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
+ llaveAbierta := openSSL.AbrirLlavePrivada(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64),ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));
+ openSSL.GuardarLlavePrivadaEnPEM(llaveAbierta, ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)+'.pem');
  OpenSSL.Free;
- sKey:=FileToByteArray(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
+ sKey:=FileToByteArray(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)+'.pem');
 //Eliminamos el archivo temporal
- DeleteFile(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
-
+ DeleteFile(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64)+'.pem');
  try
    RespuestaRelacionados := fwsCancelacionFinkOk.Get_related(fCredencialesPAC.RFC,fCredencialesPAC.Clave,
-                           fcredencialesIntegrador.RFC,aUUID,sCer,sKey);
+                           fcredencialesIntegrador.RFC,fcredencialesIntegrador.RFC,aUUID,sCer,sKey);
+
  if RespuestaRelacionados.error='' then
-  begin
-  // Falta agregar que hacer si encuentra
-  end
+  Begin
+   for I := 0 to Length(RespuestaRelacionados.Padres) - 1 do
+    Begin
+     Relacionados:='PADRES=UUID:'+RespuestaRelacionados.Padres[I].uuid+Chr(13);
+     Relacionados:='PADRES=Emisor:'+RespuestaRelacionados.Padres[I].emisor+Chr(13);
+     Relacionados:='PADRES=Receptor:'+RespuestaRelacionados.Padres[I].receptor+Chr(13);
+    End;
+   for I := 0 to Length(RespuestaRelacionados.Hijos) - 1 do
+    Begin
+     Relacionados:='HIJOS=UUID:'+RespuestaRelacionados.Hijos[I].uuid+Chr(13);
+     Relacionados:='HIJOS=Emisor:'+RespuestaRelacionados.Hijos[I].emisor+Chr(13);
+     Relacionados:='HIJOS=Receptor:'+RespuestaRelacionados.Hijos[I].receptor+Chr(13);
+    End;
+    Result:=Relacionados;
+  End
  Else
   CodEstatus(RespuestaRelacionados.error);
  except
   On E: Exception do
    if Not(E Is EPACException) then
-   ProcesarExcepcionDePAC(E)
+     ProcesarExcepcionDePAC(E)
    else
    raise;
  end;
 end;
+
 
 procedure TProveedorFinkOk.ProcesarExcepcionDePAC(const aExcepcion: Exception);
 var

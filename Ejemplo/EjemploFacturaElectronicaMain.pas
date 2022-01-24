@@ -62,7 +62,7 @@ implementation
   credencialesPAC : TFacturacionCredencialesPAC;
   credencialesIntegrador : TFacturacionCredencialesPAC;
   generadorCBB: IGeneradorCBB;
-
+  UUIDa:TSolicitudCancelacion;
   rutaCertificado, rutaLlavePrivada, claveLlavePrivada, queOpcion: string;
   reintentar: Boolean;
   Url_WS: String;
@@ -128,7 +128,8 @@ implementation
 
       pac := TProveedorFinkOk.Create;
       CredencialesPAC.RFC   := 'TuUsuario';
-      CredencialesPAC.Clave := 'TuPassword';
+      CredencialesPAC.Clave := 'TuContraseña';
+      CredencialesIntegrador.RFC :='MISC491214B86';
       Url_WS := _URL_FINKOK_TIMBRADO_PRUEBAS;
      {$endif}
 
@@ -169,6 +170,7 @@ implementation
       Writeln('4. Ejemplo CFDI 4.0 con complemento de pagos');
       Writeln('5. Ejemplo CFDI 4.0 factura global');
       Writeln('6. Ejemplo CFDI 4.0 de Franja Fronteriza');
+      Writeln('7. Ejemplo Cancelación 2022');
       WriteLn;
       WriteLn('>');
       ReadLn(queOpcion);
@@ -294,49 +296,62 @@ implementation
                 credencialesPAC.RFC := 'EKU9003173C9';
                {$endif}
             end;
+            7:
+            begin
+             {$ifdef PAC_DEMO_FINOK}
+               Url_WS:=_URL_FINKOK_CANCELACION_PRUEBAS;
+               WriteLn('Cancelando CFDI Pac FinkOK');
+               SetLength(UUIDA,1);
+               UUIDA[0]:= TUUID.Create;
+               UUIDA[0].UUID:='CB3424B2-A7B1-57D3-B864-982FB7BFD4A3';
+               UUIDA[0].FolioSustitucion:='';//'697EF015-0028-505C-8E09-5D340ABD5356';
+               UUIDA[0].Motivo:='02';
+             {$endif}
+            end;
           else
             WriteLn('Opción inválida');
           end;
+           //Especificar que se encuentra en modo de pruebas
+           pac.AsignarParametro(PAC_PARAM_SVC_CFG_MODO_PRODUCCION, PAC_VALOR_NO);
+           pac.AsignarParametro(PAC_PARAM_SVC_CFG_MULTIPLES_URLS, PAC_VALOR_NO);
 
-
+          if StrToInt(queOpcion)<>7 then
+           Begin
           // Obtenemos la cadena original y sellamos la factura automaticamente
-          Writeln('Sellando comprobante...');
-          admonFacturas.Sellar(nuevaFactura, generadorCadena, generadorSello);
+              Writeln('Sellando comprobante...');
+              admonFacturas.Sellar(nuevaFactura, generadorCadena, generadorSello);
 
-          admonFacturas.GuardarArchivo(nuevaFactura, ExtractFilePath(Application.ExeName) + '\ejemplo.xml');
+              admonFacturas.GuardarArchivo(nuevaFactura, ExtractFilePath(Application.ExeName) + '\ejemplo.xml');
 
-          // 2. Si queremos obtener la Cadena Original o el Sello de forma separada:
-          cadenaOriginal := generadorCadena.obtenerCadenaOriginal(nuevaFactura);
-          Writeln(cadenaOriginal);
+              // 2. Si queremos obtener la Cadena Original o el Sello de forma separada:
+              cadenaOriginal := generadorCadena.obtenerCadenaOriginal(nuevaFactura);
+              Writeln(cadenaOriginal);
 
-          selloDeLaFactura := generadorSello.GenerarSelloDeFactura(cadenaOriginal);
-          Writeln(selloDeLaFactura);
+              selloDeLaFactura := generadorSello.GenerarSelloDeFactura(cadenaOriginal);
+              Writeln(selloDeLaFactura);
 
-          {
-          pac.AsignarParametro(PAC_PARAM_SEGURIDAD_CERTIFICADO, certificadoSellos.ContenidoBase64);
-          pac.AsignarParametro(PAC_PARAM_SEGURIDAD_LLAVEPRIVADA, openSSL.LlavePrivadaComoBase64);
-          pac.AsignarParametro(PAC_PARAM_SEGURIDAD_LLAVEPRIVADA_CLAVE, claveLlavePrivada);
+              {
+              pac.AsignarParametro(PAC_PARAM_SEGURIDAD_CERTIFICADO, certificadoSellos.ContenidoBase64);
+              pac.AsignarParametro(PAC_PARAM_SEGURIDAD_LLAVEPRIVADA, openSSL.LlavePrivadaComoBase64);
+              pac.AsignarParametro(PAC_PARAM_SEGURIDAD_LLAVEPRIVADA_CLAVE, claveLlavePrivada);
 
-          }
+              }
 
-          //Especificar que se encuentra en modo de pruebas
-          pac.AsignarParametro(PAC_PARAM_SVC_CFG_MODO_PRODUCCION, PAC_VALOR_NO);
-          pac.AsignarParametro(PAC_PARAM_SVC_CFG_MULTIPLES_URLS, PAC_VALOR_NO);
-
-          if nuevaFactura.Version = '4.0' then
-          begin
-           pac.AsignarParametro(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_33);
-           {$ifdef PAC_DEMO_ECODEX}
-             Url_WS := _URL_ECODEX_PRUEBAS_V40;
-           {$endif}
-          end
-          else
-          begin
-           pac.AsignarParametro(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_32);
-           {$ifdef PAC_DEMO_ECODEX}
-             Url_WS := _URL_ECODEX_PRUEBAS_V33;
-           {$endif}
-          end;
+            if nuevaFactura.Version = '4.0' then
+            begin
+             pac.AsignarParametro(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_33);
+             {$ifdef PAC_DEMO_ECODEX}
+               Url_WS := _URL_ECODEX_PRUEBAS_V40;
+             {$endif}
+            end
+            else
+            begin
+             pac.AsignarParametro(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_32);
+             {$ifdef PAC_DEMO_ECODEX}
+               Url_WS := _URL_ECODEX_PRUEBAS_V33;
+             {$endif}
+            end;
+           End;
 
           pac.Configurar(Url_WS,
                          Url_WS,
@@ -344,15 +359,25 @@ implementation
                          credencialesPAC,
                          credencialesIntegrador,
                          _NUMERO_TRANSACCION_INICIAL);
-          // 4. La mandamos timbrar
-          Writeln('Intentando timbrar comprobante...');
-          xmlTimbre := pac.TimbrarDocumento(nuevaFactura, Random(9999));
+          if StrToInt(queOpcion)=7 then
+           Begin
+            pac.AsignarParametro(PAC_PARAM_RSA_CERTIFICADO_BASE64,rutaCertificado);
+            pac.AsignarParametro(PAC_PARAM_RSA_LLAVEPRIVADA_BASE64,rutaLlavePrivada);
+            pac.AsignarParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE,claveLlavePrivada);
+            PAC.CancelarDocumento(UUIDa);
+           End
+          Else
+           Begin
+            // 4. La mandamos timbrar
+            Writeln('Intentando timbrar comprobante...');
+            xmlTimbre := pac.TimbrarDocumento(nuevaFactura, Random(9999));
 
-          Writeln('Asignando Timbre Fiscal al comprobante...');
-          nuevaFactura.AsignarTimbreFiscal(xmlTimbre);
+            Writeln('Asignando Timbre Fiscal al comprobante...');
+            nuevaFactura.AsignarTimbreFiscal(xmlTimbre);
 
-//          // Recibimos el timbre de forma exitosa, dejamos de "reintentar"
-          reintentar := False;
+  //          // Recibimos el timbre de forma exitosa, dejamos de "reintentar"
+            reintentar := False;
+           End;
         except
           On E: EPACErrorGenericoException do
           begin

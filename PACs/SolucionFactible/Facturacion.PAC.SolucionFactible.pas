@@ -40,7 +40,7 @@ type
       function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8; overload;
       function TimbrarDocumento(const aXML : TCadenaUTF8; const aTransaccion : Int64): TCadenaUTF8; overload;
       function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;
-           function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
+           function CancelarDocumento(const aUUID: TSolicitudCancelacion): Boolean;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID;
     function ObtenerAcuseDeCancelacion(const aUUID: string): string;
     function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string;
@@ -79,7 +79,7 @@ begin
 end;
 
 function TProveedorSolucionFactible.CancelarDocumento(
-  const aUUID: TCadenaUTF8): Boolean;
+  const aUUID: TSolicitudCancelacion): Boolean;
 begin
 
 end;

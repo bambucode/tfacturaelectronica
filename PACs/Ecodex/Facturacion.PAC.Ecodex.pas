@@ -62,7 +62,7 @@ type
         const aCredencialesPAC, aCredencialesIntegrador:
         TFacturacionCredencialesPAC; const aTransaccionInicial: Int64); override;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer; override;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; override;
+    function CancelarDocumento(const aUUID: TSolicitudCancelacion): Boolean; override;
     function CancelarDocumentos(const aUUIDS: TListadoUUID):
         TListadoCancelacionUUID; override;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
@@ -723,7 +723,7 @@ begin
 
 end;
 
-function TProveedorEcodex.CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
+function TProveedorEcodex.CancelarDocumento(const aUUID: TSolicitudCancelacion): Boolean;
 var
   arregloUUIDs: TListadoUUID;
   resultadoCancelacion : TListadoCancelacionUUID;
@@ -735,12 +735,12 @@ begin
   tokenDeUsuario                     := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
 
   SetLength(arregloUUIDs, 1);
-  arregloUUIDs[0] := aUUID;
+  arregloUUIDs[0] := aUUID[0].UUID;
   resultadoCancelacion := Self.CancelarDocumentos(arregloUUIDs);
  {$IF CompilerVersion >= 20}
-  Result               := resultadoCancelacion.Items[aUUID];
+  Result               := resultadoCancelacion.Items[aUUID[0].UUID];
  {$ELSE}
-  Result :=            resultadoCancelacion.cancelado[aUUID];
+  Result :=            resultadoCancelacion.cancelado[aUUID[0].UUID];
  {$IFEND}
 end;
 

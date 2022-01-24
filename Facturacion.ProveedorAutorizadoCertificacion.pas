@@ -67,7 +67,19 @@ uses
 
 type
 
-  TListadoUUID = Array of string;
+  TUUID = class
+  private
+    FUUID: WideString;
+    FFolioSustitucion: WideString;
+    FMotivo: WideString;
+  published
+    property UUID:             WideString  read FUUID write FUUID ;
+    property FolioSustitucion: WideString  read FFolioSustitucion write FFolioSustitucion;
+    property Motivo:           WideString  read FMotivo write FMotivo;
+  end;
+
+  TSolicitudCancelacion = array of TUUID;
+  TListadoUUID = Array of String;
   // NOTA: Aqui se debera cambiar el TDictionary por otro codigo para versiones de
   // Delphi anteriores
 
@@ -205,7 +217,7 @@ type
     function ObtenerParametro( ANombreParametro: string ): String;
     function ObtenerParametroDef( ANombreParametro: string; AValorPorDefault: string ): String;
     function Parametros: TStrings;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
+    function CancelarDocumento(const aUUID: TSolicitudCancelacion): Boolean;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
                               const aTransaccion: Int64) : TCadenaUTF8; overload;
@@ -239,7 +251,7 @@ type
     function ObtenerParametro( ANombreParametro: string ): String; virtual;
     function ObtenerParametroDef( ANombreParametro: string; AValorPorDefault: string ): String; virtual;
     function Parametros: TStrings; virtual;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; overload; virtual; abstract;
+    function CancelarDocumento(const aUUID: TSolicitudCancelacion): Boolean; overload; virtual; abstract;
     function CancelarDocumento(const aUUID: TCadenaUTF8; var aExtraInfo: TCadenaUTF8): Boolean; overload; virtual; abstract;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID; virtual; abstract;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
