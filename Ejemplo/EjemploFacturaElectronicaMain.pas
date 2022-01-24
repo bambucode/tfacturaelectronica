@@ -63,6 +63,7 @@ implementation
   credencialesIntegrador : TFacturacionCredencialesPAC;
   generadorCBB: IGeneradorCBB;
   UUIDa:TSolicitudCancelacion;
+  NuevoUUID:TUUID;  
   rutaCertificado, rutaLlavePrivada, claveLlavePrivada, queOpcion: string;
   reintentar: Boolean;
   Url_WS: String;
@@ -301,11 +302,11 @@ implementation
              {$ifdef PAC_DEMO_FINOK}
                Url_WS:=_URL_FINKOK_CANCELACION_PRUEBAS;
                WriteLn('Cancelando CFDI Pac FinkOK');
-               SetLength(UUIDA,1);
-               UUIDA[0]:= TUUID.Create;
-               UUIDA[0].UUID:='CB3424B2-A7B1-57D3-B864-982FB7BFD4A3';
-               UUIDA[0].FolioSustitucion:='';//'697EF015-0028-505C-8E09-5D340ABD5356';
-               UUIDA[0].Motivo:='02';
+               NuevoUUID.UUID:='CB3424B2-A7B1-57D3-B864-982FB7BFD4A3';
+               NuevoUUID.FolioSustitucion:='';//'697EF015-0028-505C-8E09-5D340ABD5356';
+               NuevoUUID.Motivo:='02';
+               SetLength(UUIDA, Length(UUIDA) + 1);
+               UUIDA[Length(UUIDA) - 1] := NuevoUUID;
              {$endif}
             end;
           else

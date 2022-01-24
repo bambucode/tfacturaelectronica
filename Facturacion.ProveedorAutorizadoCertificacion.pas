@@ -67,18 +67,14 @@ uses
 
 type
 
-  TUUID = class
-  private
-    FUUID: WideString;
-    FFolioSustitucion: WideString;
-    FMotivo: WideString;
-  published
-    property UUID:             WideString  read FUUID write FUUID ;
-    property FolioSustitucion: WideString  read FFolioSustitucion write FFolioSustitucion;
-    property Motivo:           WideString  read FMotivo write FMotivo;
+  TUUID = record
+    UUID: WideString;
+    FolioSustitucion: WideString;
+    Motivo: WideString;
   end;
-
-  TSolicitudCancelacion = array of TUUID;
+  
+  TSolicitudCancelacion = Array of TUUID;
+  
   TListadoUUID = Array of String;
   // NOTA: Aqui se debera cambiar el TDictionary por otro codigo para versiones de
   // Delphi anteriores
