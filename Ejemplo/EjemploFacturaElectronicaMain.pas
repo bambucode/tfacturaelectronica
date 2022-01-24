@@ -162,7 +162,7 @@ implementation
         Writeln('FastMM4 Habilitado :)');
       {$ENDIF}
 
-      Writeln('Por favor ingresa el numero de opción del ejemplo que deseas ejecutar:');
+      Writeln('Por favor ingresa el número de opción del ejemplo que deseas ejecutar:');
       Writeln;
       Writeln('1. Ejemplo CFDI 3.3');
       Writeln('2. Ejemplo CFDI 3.3 con complemento de pagos');
