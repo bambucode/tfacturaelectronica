@@ -800,6 +800,9 @@ begin
     // ToDO: Falta documentar muchos mas errores y excepciones
     case restRequest.Response.StatusCode of
       202: Result := True; // Exitosa
+      401:
+        raise EPACCredencialesIncorrectasException.Create(restRequest.Response.content,
+                                                          0, 0, False);
       403: // Integrador sin acceso al API
         raise Exception.Create(restRequest.Response.StatusText);
       305: // Certificado no valido para RfcEmisor?
@@ -857,7 +860,7 @@ begin
 
     // ToDO: Falta documentar muchos mas errores y excepciones
     case restRequest.Response.StatusCode of
-      205: Result := restRequest.Response.content; // Exitosa
+      205: Result := restRequest.Response.content; // Recibimos el XML del documento cancelado
       404: // Integrador sin acceso al API
         raise EPACAcuseNoEncontradoException.Create(restRequest.Response.content,
                                                     0,

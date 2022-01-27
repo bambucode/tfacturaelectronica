@@ -105,8 +105,8 @@ implementation
       credencialesPAC.DistribuidorID        := '2b3a8764-d586-4543-9b7e-82834443f219';
 
       credencialesIntegrador.RFC            := 'BBB010101001';
-      credencialesIntegrador.DistribuidorID := 'DF627BC3-A872-4806-BF37-DBD040CBAC7C';
-      //credencialesIntegrador.DistribuidorID := '0BBC2E82-95D8-4751-A0A1-A8AE6F50F1CB';
+      //credencialesIntegrador.DistribuidorID := 'DF627BC3-A872-4806-BF37-DBD040CBAC7C';
+      credencialesIntegrador.DistribuidorID := '0BBC2E82-95D8-4751-A0A1-A8AE6F50F1CB';
       Url_WS := _URL_ECODEX_PRUEBAS_V33;
      {$endif}
 
@@ -176,7 +176,8 @@ implementation
       Writeln('4. Ejemplo CFDI 4.0 con complemento de pagos');
       Writeln('5. Ejemplo CFDI 4.0 factura global');
       Writeln('6. Ejemplo CFDI 4.0 de Franja Fronteriza');
-      Writeln('7. Cancelación CFDI 2022');
+      Writeln('7. Solicitud de cancelación CFDI 2022');
+      Writeln('8. Obtener acuse de cancelación CFDI 2022');
       WriteLn;
       WriteLn('>');
       ReadLn(queOpcion);
@@ -306,6 +307,14 @@ implementation
             begin
                WriteLn('Realizando cancelación con esquema 2022');
                CancelarCFDI(pac);
+               // Nos salimos para no "mandar sellar" nada pues no estamos generando facturas
+               Readln;
+               Exit;
+            end;
+            8:
+            begin
+               WriteLn('Solicitando acuse de cancelación con esquema 2022');
+               ObtenerAcuseCFDI(pac);
                // Nos salimos para no "mandar sellar" nada pues no estamos generando facturas
                Readln;
                Exit;
