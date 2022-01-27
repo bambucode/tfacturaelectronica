@@ -63,9 +63,12 @@ type
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
         aTransaccion: Int64): TCadenaUTF8; overload; override;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; overload; override;
+    function CancelarDocumento(const aSolicitudCancelacion: TSolicitudCancelacionCFD;
+                               const aArchivoCertificado : String = '';
+                               const aArchivoLLavePrivada : String = '';
+                               const aContrasenaLlavePrivada: String = ''): Boolean; overload; override;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID;
-    function ObtenerAcuseDeCancelacion(const aUUID: string): string; override;
+    function ObtenerAcuseDeCancelacion(const aSolicitudAcuse: TSolicitudAcuseCancelacionCFD): string; override;
     Function ObtenerEstatus(aUUID,Total,RFCReceptor: TCadenaUTF8):AcuseSATConsulta2;
     function ObtenerRelacionados(aUUID: TCadenaUTF8): Boolean;
     function ObtenerPendientes: stringArray2;
@@ -153,7 +156,10 @@ begin
  Result:=0;
 end;
 
-function TProveedorFinkOk.CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
+function TProveedorFinkOk.CancelarDocumento(const aSolicitudCancelacion: TSolicitudCancelacionCFD;
+                               const aArchivoCertificado : String = '';
+                               const aArchivoLLavePrivada : String = '';
+                               const aContrasenaLlavePrivada: String = ''): Boolean;
 var
   certificadoSellos: ICertificadoDeSellos;
   respuestaCancelacion: FinkOKRespuestaCancelacion2;
@@ -165,72 +171,72 @@ var
   x509Certificado : TX509Certificate;
   key: TKeyPairGenerator;
 begin
- Result:=True;
-  fDocumentoXMLCancelado :=TXMLDocument.Create(nil);
-  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO)='' then
-     raise EPACRSACertificadoNoAsignadoException.Create('Certificado no asignado o vacío',0,0,false)
-  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)='' then
-     raise EPACRSALlavePrivadaNoAsignadaException.Create('Llave privada no asignada o vacía',0,0,false);
- OpenSSL:=TOpenSSL.Create;
- UUID:=UUIDS.Create;
-// obtenemos el certificado
- x509Certificado := TX509Certificate.Create;
- x509Certificado.LoadFromFile(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO));
- sCer:=FacturacionHelper.UTF8ToBytes(X509Certificado.AsBase64);
- x509Certificado.Free;
-// obtenemos la llave
- llaveAbierta := openSSL.AbrirLlavePrivada(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO),ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));
- openSSL.GuardarLlavePrivadaEnPEM(llaveAbierta, ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
- OpenSSL.Free;
- sKey:=FileToByteArray(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
-//Eliminamos el archivo temporal
- DeleteFile(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
- UUID.UUIDS:=FixedWideStringToArray(AUUID, _UUID_LONGITUD); //cada uuid mide 36 caracteres
- try
-   respuestaCancelacion := fwsCancelacionFinkOk.cancel(UUID,fCredencialesPAC.RFC,fCredencialesPAC.Clave,
-                           fcredencialesIntegrador.RFC,sCer,sKey,False);
-       {$IFDEF CODESITE}
-      CodeSite.Send('Folio', respuestaCancelacion.CodEstatus);
-      CodeSite.Send('Acuse', respuestaCancelacion.Acuse);
-      CodeSite.Send('Fecha de Inicio', respuestaCancelacion.Fecha);
-      CodeSite.Send('Fecha de fin', respuestaCancelacion.RfcEmisor);
-      {$ENDIF}
- if respuestaCancelacion.CodEstatus='' then
-  begin
-   fAcuse:=respuestaCancelacion.Acuse;
-   if Trim(respuestaCancelacion.Folios[0].EstatusUUID)='201' then
-    Begin
-      {$IF Compilerversion >= 20}
-       fDocumentoXMLCancelado.XML.Text:=respuestaCancelacion.Acuse;
-      {$ELSE}
-       fDocumentoXMLCancelado.XML.Text:=UTF8Encode(respuestaCancelacion.Acuse);
-      {$IFEND}
-       fDocumentoXMLCancelado.Active:=True;
-      if Trim(respuestaCancelacion.CodEstatus)<>'' then
-       {$IFDEF CODESITE}
-        CodeSite.Send('Falla Validacion Error No.', respuestaCancelacion.CodEstatus);
-       {$ELSE}
-        raise exception.Create('Falla Validacion Error No.'+ respuestaCancelacion.CodEstatus);
-       {$ENDIF}
-    End
-   Else if (Trim(respuestaCancelacion.Folios[0].EstatusUUID)='202') then
-    Begin
-     Result:=False;
-     raise EPACNoEncontradoParaCancelarException.Create('Petición de cancelación realizada Previamente',-1,202,False);
-    End
-   else
-    Result:=CodEstatus(respuestaCancelacion.Folios[0].EstatusUUID);
-  end
- Else
-  raise EPACNoEncontradoParaCancelarException.Create(respuestaCancelacion.CodEstatus,-1,-1,False);
- UUID.Free;
- except
-  On E: Exception do
-   if Not(E Is EPACException) then
-   ProcesarExcepcionDePAC(E)
-   else
-   raise;
- end;
+// Result:=True;
+//  fDocumentoXMLCancelado :=TXMLDocument.Create(nil);
+//  if ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO)='' then
+//     raise EPACRSACertificadoNoAsignadoException.Create('Certificado no asignado o vacío',0,0,false)
+//  else if ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)='' then
+//     raise EPACRSALlavePrivadaNoAsignadaException.Create('Llave privada no asignada o vacía',0,0,false);
+// OpenSSL:=TOpenSSL.Create;
+// UUID:=UUIDS.Create;
+//// obtenemos el certificado
+// x509Certificado := TX509Certificate.Create;
+// x509Certificado.LoadFromFile(ObtenerParametro(PAC_PARAM_RSA_CERTIFICADO_ARCHIVO));
+// sCer:=FacturacionHelper.UTF8ToBytes(X509Certificado.AsBase64);
+// x509Certificado.Free;
+//// obtenemos la llave
+// llaveAbierta := openSSL.AbrirLlavePrivada(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO),ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_CLAVE));
+// openSSL.GuardarLlavePrivadaEnPEM(llaveAbierta, ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
+// OpenSSL.Free;
+// sKey:=FileToByteArray(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
+////Eliminamos el archivo temporal
+// DeleteFile(ObtenerParametro(PAC_PARAM_RSA_LLAVEPRIVADA_ARCHIVO)+'.pem');
+// UUID.UUIDS:=FixedWideStringToArray(AUUID, _UUID_LONGITUD); //cada uuid mide 36 caracteres
+// try
+//   respuestaCancelacion := fwsCancelacionFinkOk.cancel(UUID,fCredencialesPAC.RFC,fCredencialesPAC.Clave,
+//                           fcredencialesIntegrador.RFC,sCer,sKey,False);
+//       {$IFDEF CODESITE}
+//      CodeSite.Send('Folio', respuestaCancelacion.CodEstatus);
+//      CodeSite.Send('Acuse', respuestaCancelacion.Acuse);
+//      CodeSite.Send('Fecha de Inicio', respuestaCancelacion.Fecha);
+//      CodeSite.Send('Fecha de fin', respuestaCancelacion.RfcEmisor);
+//      {$ENDIF}
+// if respuestaCancelacion.CodEstatus='' then
+//  begin
+//   fAcuse:=respuestaCancelacion.Acuse;
+//   if Trim(respuestaCancelacion.Folios[0].EstatusUUID)='201' then
+//    Begin
+//      {$IF Compilerversion >= 20}
+//       fDocumentoXMLCancelado.XML.Text:=respuestaCancelacion.Acuse;
+//      {$ELSE}
+//       fDocumentoXMLCancelado.XML.Text:=UTF8Encode(respuestaCancelacion.Acuse);
+//      {$IFEND}
+//       fDocumentoXMLCancelado.Active:=True;
+//      if Trim(respuestaCancelacion.CodEstatus)<>'' then
+//       {$IFDEF CODESITE}
+//        CodeSite.Send('Falla Validacion Error No.', respuestaCancelacion.CodEstatus);
+//       {$ELSE}
+//        raise exception.Create('Falla Validacion Error No.'+ respuestaCancelacion.CodEstatus);
+//       {$ENDIF}
+//    End
+//   Else if (Trim(respuestaCancelacion.Folios[0].EstatusUUID)='202') then
+//    Begin
+//     Result:=False;
+//     raise EPACNoEncontradoParaCancelarException.Create('Petición de cancelación realizada Previamente',-1,202,False);
+//    End
+//   else
+//    Result:=CodEstatus(respuestaCancelacion.Folios[0].EstatusUUID);
+//  end
+// Else
+//  raise EPACNoEncontradoParaCancelarException.Create(respuestaCancelacion.CodEstatus,-1,-1,False);
+// UUID.Free;
+// except
+//  On E: Exception do
+//   if Not(E Is EPACException) then
+//   ProcesarExcepcionDePAC(E)
+//   else
+//   raise;
+// end;
 end;
 
 function TProveedorFinkOk.CancelarDocumentos(
@@ -239,10 +245,9 @@ begin
 
 end;
 
-function TProveedorFinkOk.ObtenerAcuseDeCancelacion(
-  const aUUID: string): string;
+function TProveedorFinkOk.ObtenerAcuseDeCancelacion(const aSolicitudAcuse: TSolicitudAcuseCancelacionCFD): string;
 begin
-  Result:=fDocumentoXMLCancelado.XML.Text;
+  raise Exception.Create('No implementado');
 end;
 
 function TProveedorFinkOk.ObtenerEstatus(aUUID,Total,RFCReceptor: TCadenaUTF8): AcuseSATConsulta2;

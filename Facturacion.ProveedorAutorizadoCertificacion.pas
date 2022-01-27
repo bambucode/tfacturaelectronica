@@ -67,6 +67,18 @@ uses
 
 type
 
+  TSolicitudCancelacionCFD = record
+    RFCEmisor: String;
+    UUID: String;
+    Motivo: String;
+    UUIDSustituto: String;
+  end;
+
+  TSolicitudAcuseCancelacionCFD = record
+    RFCEmisor: String;
+    UUID: String;
+  end;
+
   TListadoUUID = Array of string;
   // NOTA: Aqui se debera cambiar el TDictionary por otro codigo para versiones de
   // Delphi anteriores
@@ -205,13 +217,16 @@ type
     function ObtenerParametro( ANombreParametro: string ): String;
     function ObtenerParametroDef( ANombreParametro: string; AValorPorDefault: string ): String;
     function Parametros: TStrings;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
+    function CancelarDocumento(const aSolicitudCancelacion: TSolicitudCancelacionCFD;
+                               const aArchivoCertificado : String = '';
+                               const aArchivoLLavePrivada : String = '';
+                               const aContrasenaLlavePrivada: String = ''): Boolean;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
                               const aTransaccion: Int64) : TCadenaUTF8; overload;
     function TimbrarDocumento(const aXML : TCadenaUTF8; const aTransaccion : Int64): TCadenaUTF8; overload;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer;
-    function ObtenerAcuseDeCancelacion(const aUUID: string): string;
+    function ObtenerAcuseDeCancelacion(const aSolicitudAcuse: TSolicitudAcuseCancelacionCFD): string;
     function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string;
     function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8;
   end;
@@ -239,14 +254,17 @@ type
     function ObtenerParametro( ANombreParametro: string ): String; virtual;
     function ObtenerParametroDef( ANombreParametro: string; AValorPorDefault: string ): String; virtual;
     function Parametros: TStrings; virtual;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; overload; virtual; abstract;
+    function CancelarDocumento(const aSolicitudCancelacion: TSolicitudCancelacionCFD;
+                               const aArchivoCertificado : String = '';
+                               const aArchivoLLavePrivada : String = '';
+                               const aContrasenaLlavePrivada: String = ''): Boolean; overload; virtual; abstract;
     function CancelarDocumento(const aUUID: TCadenaUTF8; var aExtraInfo: TCadenaUTF8): Boolean; overload; virtual; abstract;
     function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID; virtual; abstract;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal;
                               const aTransaccion: Int64) : TCadenaUTF8; overload; virtual;  abstract;
     function TimbrarDocumento(const aXML : TCadenaUTF8; const aTransaccion : Int64): TCadenaUTF8; overload; virtual; abstract;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String) : Integer; virtual; abstract;
-    function ObtenerAcuseDeCancelacion(const aUUID: string): string; virtual; abstract;
+    function ObtenerAcuseDeCancelacion(const aSolicitudAcuse: TSolicitudAcuseCancelacionCFD): string; virtual; abstract;
     function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string; virtual; abstract;
     function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8; virtual; abstract;
   end;

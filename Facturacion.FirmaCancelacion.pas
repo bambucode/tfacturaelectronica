@@ -13,7 +13,8 @@ type
     function GenerarFirmaCancelacion(const aRFC: String;
                                                    const aFecha: String;
                                                    const aUUID: String;
-                                                   const aMotivo: String) : TCadenaUTF8;
+                                                   const aMotivo: String;
+                                                   const aUUIDSustituto: String) : TCadenaUTF8;
 
   end;
 
@@ -33,7 +34,8 @@ type
     function GenerarFirmaCancelacion(const aRFC: String;
                                      const aFecha: String;
                                      const aUUID: String;
-                                     const aMotivo: String) : TCadenaUTF8;
+                                     const aMotivo: String;
+                                     const aUUIDSustituto: String) : TCadenaUTF8;
   end;
 
 implementation
@@ -159,7 +161,8 @@ end;
 function TFirmaCancelacion.GenerarFirmaCancelacion(const aRFC: String;
                                                    const aFecha: String;
                                                    const aUUID: String;
-                                                   const aMotivo: String) : TCadenaUTF8;
+                                                   const aMotivo: String;
+                                                   const aUUIDSustituto: String) : TCadenaUTF8;
 var
   cancelaCFD: ICancelaCFD;
   folioCancelacion: ICancelaCFD_Folios;
@@ -181,6 +184,10 @@ begin
   cancelaCFD.Fecha := aFecha;
   cancelaCFD.RfcEmisor := aRFC;
   folioCancelacion := cancelaCFD.Folios.Add;
+
+  if (aUUIDSustituto <> '') then
+    folioCancelacion.Folio.FolioSustitucion := aUUIDSustituto;
+
   folioCancelacion.Folio.Motivo := aMotivo;
   folioCancelacion.Folio.UUID := aUUID;
 

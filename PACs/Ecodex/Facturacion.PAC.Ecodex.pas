@@ -15,7 +15,6 @@ uses Facturacion.ProveedorAutorizadoCertificacion,
   EcodexWsComun,
   EcodexWsTimbrado,
   EcodexWsClientes,
-  EcodexWsCancelacion,
   PAC.Ecodex.ManejadorDeSesion,
 {$IF CompilerVersion >= 23}
   Soap.SOAPHTTPTrans, System.Net.HttpClient,
@@ -41,8 +40,8 @@ type
     fManejadorDeSesion: TEcodexManejadorDeSesion;
     fwsClientesEcodex: IEcodexServicioClientes;
     fwsTimbradoEcodex: IEcodexServicioTimbrado;
-    fwsCancelacionEcodex: IEcodexServicioCancelacion;
     fParametros: TStrings;
+    fURLServicioRestCancelacion: string;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
     procedure ProcesarFallasEspecificasDeEcodex(const aExcepcion: Exception);
     function TimbrarDocumentoPrimeraVez(const aComprobante : IComprobanteFiscal;
@@ -54,6 +53,7 @@ type
     procedure ManejarHttpSoapError(const HTTPReqResp: THTTPReqResp;
                                    const HTTPResponse: IHTTPResponse; const Error: ESOAPHTTPException;
                                    var Action: TSOAPHttpErrorAction);
+    function ObtenerTokenParaCancelacion: String;
     {$IFEND}
   public
     destructor Destroy; override;
@@ -62,13 +62,16 @@ type
         const aCredencialesPAC, aCredencialesIntegrador:
         TFacturacionCredencialesPAC; const aTransaccionInicial: Int64); override;
     function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer; override;
-    function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; override;
+    function CancelarDocumento(const aSolicitudCancelacion: TSolicitudCancelacionCFD;
+                               const aArchivoCertificado : String = '';
+                               const aArchivoLLavePrivada : String = '';
+                               const aContrasenaLlavePrivada: String = ''): Boolean; override;
     function CancelarDocumentos(const aUUIDS: TListadoUUID):
         TListadoCancelacionUUID; override;
     function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const
         aIdTransaccionAUsar: Int64): TCadenaUTF8; overload; override;
     function TimbrarDocumento(const aXML : TCadenaUTF8; const aIdTransaccionAUsar : Int64): TCadenaUTF8; overload; override;
-    function ObtenerAcuseDeCancelacion(const aUUID: string): string; override;
+    function ObtenerAcuseDeCancelacion(const aSolicitudAcuse: TSolicitudAcuseCancelacionCFD): string; override;
     function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string; override;
     function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8; override;
   end;
@@ -80,6 +83,14 @@ implementation
 
 uses
   Facturacion.Tipos,
+  Facturacion.FirmaCancelacion,
+  REST.Client,
+  Facturacion.Helper,
+  REST.Types,
+  REST.Authenticator.Basic,
+  System.DateUtils,
+  System.Hash,
+  CodeSiteLogging,
 {$IFDEF CODESITE}
   CodeSiteLogging,
 {$ENDIF}
@@ -197,8 +208,8 @@ begin
     '/ServicioTimbrado.svc');
   fwsClientesEcodex := GetWsEcodexClientes(False, aWsClientes +
     '/ServicioClientes.svc');
-  fwsCancelacionEcodex := GetWsEcodexCancelacion(False, aWsCancelacion +
-    '/ServicioCancelacion.svc');
+
+  fURLServicioRestCancelacion := aWsCancelacion;
 
   AsignarParametro(PAC_PARAM_SESION_PAC_USUARIO_ID, aCredencialesPAC.RFC);
   AsignarParametro(PAC_PARAM_SESION_PAC_USUARIO_CLAVE, aCredencialesPAC.Clave);
@@ -216,9 +227,6 @@ begin
     '/ServicioTimbrado.svc');
   AsignarParametro(PAC_PARAM_SVC_URL_API_CLIENTES, aWsTimbrado+
     '/ServicioClientes.svc');
-  AsignarParametro(PAC_PARAM_SVC_URL_API_CANCELACION, aWsTimbrado+
-    '/ServicioCancelacion.svc');
-
 end;
 
 function TProveedorEcodex.ObtenerSaldoTimbresDeCliente
@@ -387,11 +395,11 @@ begin
         IntToStr(EEcodexFallaSesionException(aExcepcion).Estatus) + ') ' +
         EEcodexFallaSesionException(aExcepcion).Descripcion;
     end;
-
-    // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
-    // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
-    raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
   end;
+
+  // Si llegamos aqui y no se ha lanzado ningun otro error lanzamos el error genérico de PAC
+  // con la propiedad reintentable en verdadero para que el cliente pueda re-intentar el proceso anterior
+  raise EPACErrorGenericoException.Create(mensajeExcepcion, 0, 0, True);
 end;
 
 function TProveedorEcodex.TimbrarDocumentoPrimeraVez(const aComprobante
@@ -401,32 +409,7 @@ var
   respuestaTimbrado: TEcodexRespuestaTimbrado;
   tokenDeUsuario: string;
   mensajeFalla: string;
-
 begin
-//  tmpTImbrado := GetTimbrado(False, fDominioWebService +
-//    '/ServicioTimbrado.svc');
-//
-//  // 2. Iniciamos una nueva sesion solicitando un nuevo token
-//  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
-//
-//  tmpSolicitud := SolicitudTimbraXML.Create;
-//  tmpSolicitud.ComprobanteXML          := ComprobanteXML2.Create;
-//  tmpSolicitud.ComprobanteXML.DatosXML := aComprobante.Xml;
-//  tmpSolicitud.RFC                     := fCredencialesPAC.RFC;
-//  tmpSolicitud.Token                   := tokenDeUsuario;
-//  tmpSolicitud.TransaccionID           := aTransaccion;
-//
-//  try
-//    tmpResp := tmpTImbrado.timbraXML(tmpSolicitud);
-//  except
-//    On E:Exception do
-//    begin
-//      raise E;
-//    end;
-//  end;
-//
-//  Exit;
-
   if fwsTimbradoEcodex = nil then
     raise EPACNoConfiguradoException.Create
       ('No se ha configurado el PAC, favor de configurar con metodo Configurar');
@@ -723,146 +706,177 @@ begin
 
 end;
 
-function TProveedorEcodex.CancelarDocumento(const aUUID: TCadenaUTF8): Boolean;
-var
-  arregloUUIDs: TListadoUUID;
-  resultadoCancelacion : TListadoCancelacionUUID;
-  solicitudCancelacion: TEcodexSolicitudCancelacion;
-  respuestaCancelacion: TEcodexRespuestaCancelacion;
-  tokenDeUsuario : String;
-begin
-  Assert(Length(aUUID) = _LONGITUD_UUID, 'La longitud del UUID debio de ser de ' + IntToStr(_LONGITUD_UUID));
-  tokenDeUsuario                     := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
 
-  SetLength(arregloUUIDs, 1);
-  arregloUUIDs[0] := aUUID;
-  resultadoCancelacion := Self.CancelarDocumentos(arregloUUIDs);
- {$IF CompilerVersion >= 20}
-  Result               := resultadoCancelacion.Items[aUUID];
- {$ELSE}
-  Result :=            resultadoCancelacion.cancelado[aUUID];
- {$IFEND}
+function TProveedorEcodex.ObtenerTokenParaCancelacion: String;
+var
+  fechaUTC: TDateTime;
+
+  function GetUTC(dt: TDateTime): TDateTime;
+  begin
+    result := TTimeZone.Local.ToUniversalTime(dt);
+  end;
+
+begin
+
+  {El servicio requiere de autenticación tipo ‘basic’ mediante la cabecera ‘Authorization’ y el
+   valor debe ser el valor base64 del Rfc del integrador, dos puntos: y el valor generado mediante
+   una digestión sha256 del id privado del integrador, un caracter pipe | y la fecha actual (UTC)
+   en formato yyyyMMdd|HHmm. Cada token generado tiene una vigencia de 10 minutos.}
+  fechaUTC := GetUTC(Now());
+
+  Result := System.Hash.THashSHA2.GetHashString(Format('%s|%s|%s',
+                                                  [fCredencialesIntegrador.DistribuidorID,
+                                                   FormatDateTime('yyyymmdd', fechaUTC),
+                                                   FormatDateTime('hhnn', fechaUTC)]),
+                                                   THashSHA2.TSHA2Version.SHA256);
 end;
 
-function TProveedorEcodex.ObtenerAcuseDeCancelacion(const aUUID: string):
-    string;
+function TProveedorEcodex.CancelarDocumento(const aSolicitudCancelacion: TSolicitudCancelacionCFD;
+                                           const aArchivoCertificado : String = '';
+                                           const aArchivoLLavePrivada : String = '';
+                                           const aContrasenaLlavePrivada: String = ''): Boolean;
 var
-  tokenDeUsuario: String;
-  solicitudAcuse : TEcodexSolicitudAcuse;
-  respuestaAcuse : TEcodexRespuestaRecuperarAcuse;
+  firmaCancelacion: IFirmaCancelacion;
+  xmlFirmaCancelacion : TCadenaUTF8;
+  restClient: TRESTClient;
+  restRequest: TRESTRequest;
+  restAuth: THTTPBasicAuthenticator;
+  tokenAuth, rfcEmisor: String;
 begin
-  Assert(Length(aUUID) = _LONGITUD_UUID, 'La longitud del UUID debio de ser de ' + IntToStr(_LONGITUD_UUID));
-  Result := '';
+  // Validamos la solicitud
+  Assert(aSolicitudCancelacion.RFCEmisor <> '', 'Por favor especifica el RFC del emisor que esta cancelando');
+  Assert(Length(aSolicitudCancelacion.UUID) = _LONGITUD_UUID, 'La longitud del UUID a cancelar debio de ser de ' + IntToStr(_LONGITUD_UUID));
+  Assert(aSolicitudCancelacion.Motivo <> '', 'El motivo de cancelacion no puede estar vacio');
 
-  // 1. Creamos la solicitud de cancelacion
-  solicitudAcuse := TEcodexSolicitudAcuse.Create;
+  firmaCancelacion := TFirmaCancelacion.Create;
 
-  // 2. Iniciamos una nueva sesion solicitando un nuevo token
-  tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario;
+  firmaCancelacion.Configurar(aArchivoCertificado,
+                             aArchivoLLavePrivada,
+                             aContrasenaLlavePrivada);
+
+
+  rfcEmisor := aSolicitudCancelacion.RFCEmisor;
+  // 1. Generamos la firma de cancelacion
+  xmlFirmaCancelacion := firmaCancelacion.GenerarFirmaCancelacion(rfcEmisor,
+                                                                   TFacturacionHelper.ComoFechaISO8601(Now),
+                                                                   aSolicitudCancelacion.UUID,
+                                                                   aSolicitudCancelacion.Motivo,
+                                                                   aSolicitudCancelacion.UUIDSustituto);
+
 
   try
-    try
-      solicitudAcuse.UUID          := aUUID;
-      solicitudAcuse.RFC           := fCredencialesPAC.RFC;
-      solicitudAcuse.Token         := tokenDeUsuario;
-      solicitudAcuse.TransaccionID := fManejadorDeSesion.NumeroDeTransaccion;
+    restAuth := THTTPBasicAuthenticator.Create(fCredencialesIntegrador.RFC, // Usuario
+                                               ObtenerTokenParaCancelacion()); // Contraseña
 
-      respuestaAcuse := fwsCancelacionEcodex.RecuperarAcuses(solicitudAcuse);
-      Result := respuestaAcuse.AcuseXML;
-      respuestaAcuse.Free;
-    except
-      On E:Exception do
-        ProcesarExcepcionDePAC(E);
+
+    restClient :=TRESTClient.Create(nil);
+    with restClient do
+    begin
+      Authenticator := restAuth;
+      Accept := 'application/json, text/plain; q=0.9, text/html;q=0.8,';
+      AcceptCharset := 'utf-8, *;q=0.8';
+      BaseURL := fURLServicioRestCancelacion + '/v1/cancelaciones/enviar/' + rfcEmisor;
+      ContentType := 'application/x-www-form-urlencoded';
+    end;
+
+    restRequest := TRESTRequest.Create(nil);
+    with restRequest do
+    begin
+      Client := restClient;
+      Method := rmPOST;
+      SynchronizedEvents := False
+    end;
+
+    // Agregamos al cuerpo del mensaje el XML de la firma de cancelacion
+    restRequest.Body.Add (xmlFirmaCancelacion, ctAPPLICATION_XML);
+    restRequest.Execute;
+
+    CodeSite.Send('',restRequest.Response.StatusCode);
+    CodeSite.Send(restRequest.Response.StatusText);
+    CodeSite.Send(restRequest.Response.content);
+
+    Result := False;
+
+    // ToDO: Falta documentar muchos mas errores y excepciones
+    case restRequest.Response.StatusCode of
+      202: Result := True; // Exitosa
+      403: // Integrador sin acceso al API
+        raise Exception.Create(restRequest.Response.StatusText);
+      305: // Certificado no valido para RfcEmisor?
+        raise Exception.Create(restRequest.Response.StatusText);
     end;
   finally
-    if Assigned(solicitudAcuse) then
-      solicitudAcuse.Free;
+    restAuth.Free;
+    restClient.Free;
+    restRequest.Free;
+  end;
+
+end;
+
+function TProveedorEcodex.ObtenerAcuseDeCancelacion(const aSolicitudAcuse: TSolicitudAcuseCancelacionCFD):
+    string;
+var
+  restClient: TRESTClient;
+  restRequest: TRESTRequest;
+  restAuth: THTTPBasicAuthenticator;
+  tokenAuth: String;
+begin
+  // Validamos la solicitud
+  Assert(aSolicitudAcuse.RFCEmisor <> '', 'Por favor especifica el RFC del emisor');
+  Assert(Length(aSolicitudAcuse.UUID) = _LONGITUD_UUID, 'La longitud del UUID a obtener acuse debio de ser de ' + IntToStr(_LONGITUD_UUID));
+
+  try
+    restAuth := THTTPBasicAuthenticator.Create(fCredencialesIntegrador.RFC, // Usuario
+                                               ObtenerTokenParaCancelacion()); // Contraseña
+
+
+    restClient :=TRESTClient.Create(nil);
+    with restClient do
+    begin
+      Authenticator := restAuth;
+      Accept := 'application/json, text/plain; q=0.9, text/html;q=0.8,';
+      AcceptCharset := 'utf-8, *;q=0.8';
+      BaseURL := Format(fURLServicioRestCancelacion + '/v1/cancelaciones/acuse/%s/%s',
+                        [aSolicitudAcuse.RFCEmisor,
+                         aSolicitudAcuse.UUID]);
+    end;
+
+    restRequest := TRESTRequest.Create(nil);
+    with restRequest do
+    begin
+      Client := restClient;
+      Method := rmGET;
+      SynchronizedEvents := False
+    end;
+
+    restRequest.Execute;
+
+    CodeSite.Send('',restRequest.Response.StatusCode);
+    CodeSite.Send(restRequest.Response.StatusText);
+    CodeSite.Send(restRequest.Response.content);
+
+    // ToDO: Falta documentar muchos mas errores y excepciones
+    case restRequest.Response.StatusCode of
+      205: Result := restRequest.Response.content; // Exitosa
+      404: // Integrador sin acceso al API
+        raise EPACAcuseNoEncontradoException.Create(restRequest.Response.content,
+                                                    0,
+                                                    restRequest.Response.StatusCode,
+                                                    False);
+      305: // Certificado no valido para RfcEmisor?
+        raise Exception.Create(restRequest.Response.StatusText);
+    end;
+  finally
+    restAuth.Free;
+    restClient.Free;
+    restRequest.Free;
   end;
 end;
 
 function TProveedorEcodex.CancelarDocumentos(const aUUIDS: TListadoUUID):
     TListadoCancelacionUUID;
-var
-  solicitudCancelacion: TEcodexSolicitudCancelaMultiple;
-  respuestaCancelacion: TEcodexRespuestaCancelaMultiple;
-  tokenDeUsuario: string;
-  mensajeFalla: string;
-  uuidPorCancelar, estado: String;
-  I: Integer;
-  arregloGuids : Array_Of_guid;
-const
-  // Ref: Pagina 15 de "Guia de integracion Ecodex".
-  _CADENA_CANCELADO     = 'Cancelado';
-  _CADENA_NO_ENCONTRADO = 'No Encontrado';
 begin
-  Assert(fwsCancelacionEcodex <> nil, 'La instancia fwsCancelacionEcodex no debio ser nula');
-
-  if fwsTimbradoEcodex = nil then
-    raise EPACNoConfiguradoException.Create
-      ('No se ha configurado el PAC, favor de configurar con metodo Configurar');
-
-  // 1. Creamos la solicitud de timbrado
-  solicitudCancelacion := TEcodexSolicitudCancelaMultiple.Create;
-  Result               := TListadoCancelacionUUID.Create;
-
-  try
-    // 2. Iniciamos una nueva sesion solicitando un nuevo token
-    tokenDeUsuario := fManejadorDeSesion.ObtenerNuevoTokenDeUsuario();
-
-    // 3. Asignamos los parametros de cancelacion
-    SetLength(arregloGuids, Length(aUUIDS));
-    for I := 0 to Length(aUUIDS) - 1 do
-    begin
-      uuidPorCancelar := Uppercase(aUUIDS[I]);
-      arregloGuids[I] := uuidPorCancelar;
-    end;
-
-    solicitudCancelacion.ListaCancelar := TEcodexListaCancelar2.Create;
-    solicitudCancelacion.ListaCancelar.guid := arregloGuids;
-    solicitudCancelacion.RFC := TXSString.Create;
-    solicitudCancelacion.RFC.XSToNative(fCredencialesPAC.RFC);
-
-    solicitudCancelacion.Token := TXSString.Create;
-    solicitudCancelacion.Token.XSToNative(tokenDeUsuario);
-
-    solicitudCancelacion.TransaccionID             := fManejadorDeSesion.NumeroDeTransaccion;
-
-    try
-      mensajeFalla := '';
-
-      // 4. Realizamos la solicitud de cancelacion
-      respuestaCancelacion := fwsCancelacionEcodex.CancelaMultiple(solicitudCancelacion);
-
-      // Convertir el array que regresa Ecodex al dictionary que
-      // estamos regresando
-      for I := 0 to Length(respuestaCancelacion.Resultado.ResultadoCancelacion) - 1 do
-      begin
-        estado := respuestaCancelacion.Resultado.ResultadoCancelacion[I].Estatus.NativeToXS;
-
-        // ¿No se encontró documento?
-        if estado = _CADENA_NO_ENCONTRADO then
-          raise EPACNoEncontradoParaCancelarException.Create('No se encontró la factura ' + respuestaCancelacion.Resultado.ResultadoCancelacion[I].UUID +
-                                                            ' con el PAC. Imposible cancelar', -1, -1, False);
-
-        Result.Add(Uppercase(respuestaCancelacion.Resultado.ResultadoCancelacion[I].UUID),
-                   estado = _CADENA_CANCELADO);
-      end;
-
-
-      respuestaCancelacion.Free;
-    except
-      On E: Exception do
-      begin
-        if Not (E Is EPACNoEncontradoParaCancelarException) then
-          ProcesarExcepcionDePAC(E)
-        else
-          raise;
-      end;
-    end;
-  finally
-    if Assigned(solicitudCancelacion) then
-      solicitudCancelacion.Free;
-  end;
+  raise Exception.Create('No implementado');
 end;
 
 procedure TProveedorEcodex.ProcesarFallasEspecificasDeEcodex(const aExcepcion:
