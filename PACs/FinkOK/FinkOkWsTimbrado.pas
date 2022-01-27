@@ -1,33 +1,13 @@
+{*******************************************************}
+{                                                       }
+{       TFacturaElectronica                             }
+{                                                       }
+{       Copyright (C) 2022 Bambu Code SA de CV          }
+{        Soporte del pac FinkOK Tecsis.Mx               }
+{                                                       }
+{*******************************************************}
 unit FinkOkWsTimbrado;
-{* *****************************************************************************
-  PROYECTO FACTURACION ELECTRONICA
-  Copyright (C) 2010-2018 - Bambú Code SA de CV
 
-  Este archivo pertenece al proyecto de codigo abierto de Bambú Code:
-  http://bambucode.com/codigoabierto
-
-  La licencia de este código fuente se encuentra en:
-  http://github.com/bambucode/tfacturaelectronica/blob/master/LICENCIA
-
-  ***************************************************************************** *}
-
-// ************************************************************************ //
-// The types declared in this file were generated from data read from the
-// WSDL File described below:
-// WSDL     : http://demo-facturacion.finkok.com/servicios/soap/stamp.wsdl
-// Encoding : UTF-8
-// Version  : 1.0
-// (11/25/2013 1:07:55 PM - 1.33.2.5)
-// ************************************************************************ //
-
-// ************************************************************************ //
-// The types declared in this file were generated from data read from the
-// WSDL File described below:
-// WSDL     : http://demo-facturacion.finkok.com/servicios/soap/registration.wsdl
-// Encoding : UTF-8
-// Version  : 1.0
-// (11/26/2013 10:04:30 AM - 1.33.2.5)
-// ************************************************************************ //
 
 interface
 
