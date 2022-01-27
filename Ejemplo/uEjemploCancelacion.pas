@@ -35,6 +35,17 @@ begin
   archivoLlavePrivada := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Escuela_Kemper_Urgate_EKU9003173C9_20190617_131753.key';
   contrasenaLlavePrivada := '12345678a';
 
+  {$ifdef PAC_DEMO_FINOK}
+      rutaCertificado   := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_MISC491214B86_20190528_175522.cer';
+      rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Pruebas_CFDI_MISC491214B86_20190528_175522.key';
+      claveLlavePrivada := '12345678a';
+//      solicitudCancelacion.RFCEmisor := 'EKU9003173C9';
+
+      olicitudCancelacion.UUID := '5EB5DCB4-A500-5C0E-A3F2-6912C1BF4B05';
+      solicitudCancelacion.UUIDSustitutoFolioSustitucion:='';//'697EF015-0028-505C-8E09-5D340ABD5356';
+      solicitudCancelacion.Motivo:='02';
+  {$endif}
+
   if aPAC.CancelarDocumento(solicitudCancelacion,
                             archivoCertificados,
                             archivoLlavePrivada,

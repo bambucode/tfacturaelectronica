@@ -125,9 +125,9 @@ implementation
 
       pac := TProveedorFinkOk.Create;
       CredencialesPAC.RFC   := 'TuUsuario';
-      CredencialesPAC.Clave := 'TuPassword';
+      CredencialesPAC.Clave := 'TuContraseña';
       Url_WS := _URL_FINKOK_TIMBRADO_PRUEBAS;
-      URLServicioCancelaciones := Url_WS;
+      URLServicioCancelaciones := _URL_FINKOK_CANCELACION_PRUEBAS;
      {$endif}
 
      {$ifdef PAC_DEMO_SOLUCIONFACTIBLE}
