@@ -82,14 +82,12 @@
         <DCCReference Include="..\Facturacion.GeneradorSello.pas"/>
         <DCCReference Include="..\Facturacion.OpenSSL.pas"/>
         <DCCReference Include="..\Versiones\Facturacion.GeneradorSelloV33.pas"/>
-        <DCCReference Include="..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas"/>
         <DCCReference Include="..\Facturacion.ProveedorAutorizadoCertificacion.pas"/>
         <DCCReference Include="..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsClientes.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsComun.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsSeguridad.pas"/>
         <DCCReference Include="..\PACs\Ecodex\EcodexWsTimbrado.pas"/>
-        <DCCReference Include="..\PACs\Ecodex\EcodexWsCancelacion.pas"/>
         <DCCReference Include="..\Facturacion.GeneradorCBB.pas"/>
         <DCCReference Include="..\Facturacion.GeneradorQRQuricol.pas"/>
         <DCCReference Include="..\Facturacion.GeneradorLigaVerificacion.pas"/>
@@ -126,6 +124,9 @@
         <DCCReference Include="uEjemploFacturaV33.pas"/>
         <DCCReference Include="uEjemploFacturaV33Pagos.pas"/>
         <DCCReference Include="uEjemploFacturaV40Frontera.pas"/>
+        <DCCReference Include="uEjemploCancelacion.pas"/>
+        <DCCReference Include="..\Versiones\Facturacion.CancelaCFD.pas"/>
+        <DCCReference Include="..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas"/>
         <RcItem Include="..\Schemas\3.2\cadenaoriginal_3_2.xslt">
             <ContainerId>ResourceItem</ContainerId>
             <ResourceType>RCDATA</ResourceType>
