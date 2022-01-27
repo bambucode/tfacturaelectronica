@@ -1528,3 +1528,4 @@ initialization
   RemClassRegistry.RegisterXSClass(CancelPendingResult2, 'apps.services.soap.core.views', 'CancelPendingResult2', 'CancelPendingResult');
 
 end.
+
