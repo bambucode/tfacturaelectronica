@@ -33,14 +33,12 @@ uses
   Facturacion.GeneradorSello in '..\Facturacion.GeneradorSello.pas',
   Facturacion.OpenSSL in '..\Facturacion.OpenSSL.pas',
   Facturacion.GeneradorSelloV33 in '..\Versiones\Facturacion.GeneradorSelloV33.pas',
-  Facturacion.PAC.Ecodex in '..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas',
   Facturacion.ProveedorAutorizadoCertificacion in '..\Facturacion.ProveedorAutorizadoCertificacion.pas',
   PAC.Ecodex.ManejadorDeSesion in '..\PACs\Ecodex\PAC.Ecodex.ManejadorDeSesion.pas',
   EcodexWsClientes in '..\PACs\Ecodex\EcodexWsClientes.pas',
   EcodexWsComun in '..\PACs\Ecodex\EcodexWsComun.pas',
   EcodexWsSeguridad in '..\PACs\Ecodex\EcodexWsSeguridad.pas',
   EcodexWsTimbrado in '..\PACs\Ecodex\EcodexWsTimbrado.pas',
-  EcodexWsCancelacion in '..\PACs\Ecodex\EcodexWsCancelacion.pas',
   Facturacion.GeneradorCBB in '..\Facturacion.GeneradorCBB.pas',
   Facturacion.GeneradorQRQuricol in '..\Facturacion.GeneradorQRQuricol.pas',
   Facturacion.GeneradorLigaVerificacion in '..\Facturacion.GeneradorLigaVerificacion.pas',
@@ -76,7 +74,10 @@ uses
   uEjemploFacturaV40 in 'uEjemploFacturaV40.pas',
   uEjemploFacturaV33 in 'uEjemploFacturaV33.pas',
   uEjemploFacturaV33Pagos in 'uEjemploFacturaV33Pagos.pas',
-  uEjemploFacturaV40Frontera in 'uEjemploFacturaV40Frontera.pas';
+  uEjemploFacturaV40Frontera in 'uEjemploFacturaV40Frontera.pas',
+  uEjemploCancelacion in 'uEjemploCancelacion.pas',
+  Facturacion.CancelaCFD in '..\Versiones\Facturacion.CancelaCFD.pas',
+  Facturacion.PAC.Ecodex in '..\PACs\Ecodex\Facturacion.PAC.Ecodex.pas';
 
 begin
  EjemploFacturaElectronicaMain.Ejemplo;

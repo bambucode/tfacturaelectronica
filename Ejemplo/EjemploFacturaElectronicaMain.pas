@@ -22,19 +22,12 @@ uses
   Facturacion.PAC.SolucionFactible,
   Facturacion.ProveedorAutorizadoCertificacion, Facturacion.OpenSSL,
   Facturacion.GeneradorCBB,
-//  Facturacion.ComprobanteV32,
-//  Facturacion.GeneradorCadenaOrignalV32,
-//  Facturacion.GeneradorSelloV32,
-//  Facturacion.GeneradorCBBv32,
-
-
   Facturacion.GeneradorCadenaOrignalV33, Facturacion.GeneradorSelloV33, Facturacion.GeneradorCBBv33,
   Facturacion.GeneradorCadenaOrignalV40,
-
   Facturacion.Helper,
   Facturacion.GeneradorLigaVerificacion,
   Facturacion.ImpuestosLocalesV1,
-
+  uEjemploCancelacion,
   uEjemploFacturaV33,
   uEjemploFacturaV33Pagos,
   uEjemploFacturaV40Pagos,
@@ -65,7 +58,7 @@ implementation
 
   rutaCertificado, rutaLlavePrivada, claveLlavePrivada, queOpcion: string;
   reintentar: Boolean;
-  Url_WS: String;
+  Url_WS, URLServicioCancelaciones: String;
  const
   _URL_ECODEX_PRUEBAS_V33           = 'https://pruebas.ecodex.com.mx:2045';
   _URL_ECODEX_PRUEBAS_v40           = 'https://pruebas-wsdex.ecodex.com.mx';
@@ -105,12 +98,15 @@ implementation
       rutaLlavePrivada  := ExtractFilePath(Application.ExeName) + '..\CSD Pruebas\CSD_Escuela_Kemper_Urgate_EKU9003173C9_20190617_131753.key';
       claveLlavePrivada := '12345678a';
 
+      URLServicioCancelaciones := 'https://wsdevapicancelaciones.ecodex.com.mx';
+
       pac := TProveedorEcodex.Create;
       credencialesPAC.RFC                   := 'EKU9003173C9';
       credencialesPAC.DistribuidorID        := '2b3a8764-d586-4543-9b7e-82834443f219';
 
       credencialesIntegrador.RFC            := 'BBB010101001';
-      credencialesIntegrador.DistribuidorID := 'DF627BC3-A872-4806-BF37-DBD040CBAC7C';
+      //credencialesIntegrador.DistribuidorID := 'DF627BC3-A872-4806-BF37-DBD040CBAC7C';
+      credencialesIntegrador.DistribuidorID := '0BBC2E82-95D8-4751-A0A1-A8AE6F50F1CB';
       Url_WS := _URL_ECODEX_PRUEBAS_V33;
      {$endif}
 
@@ -119,6 +115,7 @@ implementation
       CredencialesPAC.RFC   := 'AAA010101AAA';
       CredencialesPAC.Clave := 'PWD';
       Url_WS := _URL_COMERCIO_PRUEBAS;
+      URLServicioCancelaciones := Url_WS;
      {$endif}
 
      {$ifdef PAC_DEMO_FINOK}
@@ -128,8 +125,9 @@ implementation
 
       pac := TProveedorFinkOk.Create;
       CredencialesPAC.RFC   := 'TuUsuario';
-      CredencialesPAC.Clave := 'TuPassword';
+      CredencialesPAC.Clave := 'TuContraseña';
       Url_WS := _URL_FINKOK_TIMBRADO_PRUEBAS;
+      URLServicioCancelaciones := _URL_FINKOK_CANCELACION_PRUEBAS;
      {$endif}
 
      {$ifdef PAC_DEMO_SOLUCIONFACTIBLE}
@@ -137,6 +135,7 @@ implementation
       CredencialesPAC.RFC   := 'testing@solucionfactible.com';;
       CredencialesPAC.Clave := 'timbrado.SF.16672';
       Url_WS := _URL_SOLUCIONFACTIBLE_PRUEBAS;
+      URLServicioCancelaciones := Url_WS;
      {$endif}
 
      {$ifdef PAC_DEMO_MULTIFACTURAS}
@@ -144,6 +143,7 @@ implementation
       CredencialesPAC.RFC   := 'DEMO700101XXX';
       CredencialesPAC.Clave := 'DEMO700101XXX';
       Url_WS := _URL_MULTIFACTURAS_PRUEBAS;
+      URLServicioCancelaciones := Url_WS;
      {$endif}
 
      if not assigned(pac) then
@@ -155,6 +155,13 @@ implementation
         Readln;
         exit;
       end;
+
+      pac.Configurar(Url_WS,
+                     Url_WS,
+                     URLServicioCancelaciones,
+                     credencialesPAC,
+                     credencialesIntegrador,
+                     _NUMERO_TRANSACCION_INICIAL);
 
 
       {$IFDEF FullDebugMode}
@@ -169,6 +176,8 @@ implementation
       Writeln('4. Ejemplo CFDI 4.0 con complemento de pagos');
       Writeln('5. Ejemplo CFDI 4.0 factura global');
       Writeln('6. Ejemplo CFDI 4.0 de Franja Fronteriza');
+      Writeln('7. Solicitud de cancelación CFDI 2022');
+      Writeln('8. Obtener acuse de cancelación CFDI 2022');
       WriteLn;
       WriteLn('>');
       ReadLn(queOpcion);
@@ -294,6 +303,22 @@ implementation
                 credencialesPAC.RFC := 'EKU9003173C9';
                {$endif}
             end;
+            7:
+            begin
+               WriteLn('Realizando cancelación con esquema 2022');
+               CancelarCFDI(pac);
+               // Nos salimos para no "mandar sellar" nada pues no estamos generando facturas
+               Readln;
+               Exit;
+            end;
+            8:
+            begin
+               WriteLn('Solicitando acuse de cancelación con esquema 2022');
+               ObtenerAcuseCFDI(pac);
+               // Nos salimos para no "mandar sellar" nada pues no estamos generando facturas
+               Readln;
+               Exit;
+            end
           else
             WriteLn('Opción inválida');
           end;
@@ -338,12 +363,7 @@ implementation
            {$endif}
           end;
 
-          pac.Configurar(Url_WS,
-                         Url_WS,
-                         Url_WS,
-                         credencialesPAC,
-                         credencialesIntegrador,
-                         _NUMERO_TRANSACCION_INICIAL);
+
           // 4. La mandamos timbrar
           Writeln('Intentando timbrar comprobante...');
           xmlTimbre := pac.TimbrarDocumento(nuevaFactura, Random(9999));
