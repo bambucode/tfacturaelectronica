@@ -156,12 +156,7 @@ implementation
         exit;
       end;
 
-      pac.Configurar(Url_WS,
-                     Url_WS,
-                     URLServicioCancelaciones,
-                     credencialesPAC,
-                     credencialesIntegrador,
-                     _NUMERO_TRANSACCION_INICIAL);
+     
 
 
       {$IFDEF FullDebugMode}
@@ -213,6 +208,9 @@ implementation
           generadorSello := TGeneradorSelloV33.Create;
           generadorSello.Configurar(openSSL);
           generadorCBB  := TGeneradorCBBv33.Create;
+          {$ifdef PAC_DEMO_ECODEX}
+            Url_WS := _URL_ECODEX_PRUEBAS_V33;
+          {$endif}
         end;
         3,4,5,6: // Instancias de CFDI 4.0
         begin
@@ -221,8 +219,18 @@ implementation
           generadorSello := TGeneradorSelloV33.Create;
           generadorSello.Configurar(openSSL);
           generadorCBB  := TGeneradorCBBv33.Create;
+          {$ifdef PAC_DEMO_ECODEX}
+             Url_WS := _URL_ECODEX_PRUEBAS_V40;
+          {$endif}
         end;
       end;
+
+       pac.Configurar(Url_WS,
+                     Url_WS,
+                     URLServicioCancelaciones,
+                     credencialesPAC,
+                     credencialesIntegrador,
+                     _NUMERO_TRANSACCION_INICIAL);
 
       // Inicializamos la variable de re-intentar en verdadero para intentar timbrar
       // cada vez que falle el servicio del PAC
@@ -351,16 +359,12 @@ implementation
           if nuevaFactura.Version = '4.0' then
           begin
            pac.AsignarParametro(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_33);
-           {$ifdef PAC_DEMO_ECODEX}
-             Url_WS := _URL_ECODEX_PRUEBAS_V40;
-           {$endif}
+
           end
           else
           begin
            pac.AsignarParametro(PAC_PARAM_SVC_CFDI_VERSION, PAC_VALOR_CFDI_VERSION_32);
-           {$ifdef PAC_DEMO_ECODEX}
-             Url_WS := _URL_ECODEX_PRUEBAS_V33;
-           {$endif}
+
           end;
 
 
