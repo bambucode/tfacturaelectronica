@@ -90,7 +90,6 @@ uses
   REST.Authenticator.Basic,
   System.DateUtils,
   System.Hash,
-  CodeSiteLogging,
 {$IFDEF CODESITE}
   CodeSiteLogging,
 {$ENDIF}

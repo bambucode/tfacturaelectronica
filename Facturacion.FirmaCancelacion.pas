@@ -20,7 +20,7 @@ type
 
 
   TFirmaCancelacion = class(TInterfacedObject, IFirmaCancelacion)
-  var
+  private
     fOpenSSL: IOpenSSL;
     fArchivoCertificado: String;
     function ObtenerDigest(const aXMLCanonizado: TCadenaUTF8) : String;
