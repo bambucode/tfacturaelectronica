@@ -71,6 +71,9 @@ type
   ESATRFCNoPerteneceFronteraException             = class(ESATErrorGenericoException); // CFDI33196
   ESATCodigoPostalNoPerteneceFronteraException    = class(ESATErrorGenericoException); // CFDI33196
   ESATEstimuloFronteraNoAplicaAlProductoException = class(ESATErrorGenericoException); // CFDI33196
+  ESATDomicilioFiscalReceptorIncorrectoException  = class(ESATErrorGenericoException); // CFDI40148
+  ESATNombreReceptorIncorrectoException           = class(ESATErrorGenericoException); // CFDI40145
+
   {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
 const

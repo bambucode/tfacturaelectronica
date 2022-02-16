@@ -371,7 +371,15 @@ begin
             raise ESATEstimuloFronteraNoAplicaAlProductoException.Create(mensajeExcepcion, numeroErrorSAT, False)
           else
             raise ESATNoIdentificadoException.Create(mensajeExcepcion, numeroErrorSAT, False);
-        end
+        end;
+        40145:
+        begin
+          raise ESATNombreReceptorIncorrectoException.Create(mensajeExcepcion, numeroErrorSAT, True);
+        end;
+        40148:
+        begin
+          raise ESATDomicilioFiscalReceptorIncorrectoException.Create(mensajeExcepcion, numeroErrorSAT, True);
+        end;
       else
         raise ESATErrorGenericoException.Create('ESATErrorGenericoException (' +
           IntToStr(EEcodexFallaValidacionException(aExcepcion).Numero) + ') ' +
