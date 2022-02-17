@@ -380,6 +380,10 @@ begin
         begin
           raise ESATDomicilioFiscalReceptorIncorrectoException.Create(mensajeExcepcion, numeroErrorSAT, True);
         end;
+        40158:
+        begin
+          raise ESATRegimenFiscalNoCorrespondeException.Create(mensajeExcepcion, numeroErrorSAT, False);
+        end;
       else
         raise ESATErrorGenericoException.Create('ESATErrorGenericoException (' +
           IntToStr(EEcodexFallaValidacionException(aExcepcion).Numero) + ') ' +
