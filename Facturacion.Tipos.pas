@@ -73,7 +73,8 @@ type
   ESATEstimuloFronteraNoAplicaAlProductoException = class(ESATErrorGenericoException); // CFDI33196
   ESATDomicilioFiscalReceptorIncorrectoException  = class(ESATErrorGenericoException); // CFDI40148
   ESATNombreReceptorIncorrectoException           = class(ESATErrorGenericoException); // CFDI40145
-  ESATRegimenFiscalNoCorrespondeException         = class(ESATErrorGenericoException); // CFDI40158
+  ESATRegimenFiscalReceptorNoCorrespondeException = class(ESATErrorGenericoException); // CFDI40158
+  ESATRegimenFiscalEmisorNoCorrespondeException   = class(ESATErrorGenericoException); // CFDI40141
   {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
 const

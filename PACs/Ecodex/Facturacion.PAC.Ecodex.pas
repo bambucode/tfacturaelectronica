@@ -382,8 +382,12 @@ begin
         end;
         40158:
         begin
-          raise ESATRegimenFiscalNoCorrespondeException.Create(mensajeExcepcion, numeroErrorSAT, False);
+          raise ESATRegimenFiscalReceptorNoCorrespondeException.Create(mensajeExcepcion, numeroErrorSAT, False);
         end;
+        40141:
+        begin
+          raise ESATRegimenFiscalEmisorNoCorrespondeException.Create(mensajeExcepcion, numeroErrorSAT, False);
+        end
       else
         raise ESATErrorGenericoException.Create('ESATErrorGenericoException (' +
           IntToStr(EEcodexFallaValidacionException(aExcepcion).Numero) + ') ' +
