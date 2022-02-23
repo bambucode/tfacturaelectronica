@@ -36,6 +36,7 @@ type
   private
     fCredencialesPAC: TFacturacionCredencialesPAC;
     fCredencialesIntegrador: TFacturacionCredencialesPAC;
+    fDistribuidorIDCancelaciones: string;
     fDominioWebService: string;
     fManejadorDeSesion: TEcodexManejadorDeSesion;
     fwsClientesEcodex: IEcodexServicioClientes;
@@ -74,6 +75,8 @@ type
     function ObtenerAcuseDeCancelacion(const aSolicitudAcuse: TSolicitudAcuseCancelacionCFD): string; override;
     function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string; override;
     function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8; override;
+    property DistribuidorIDCancelaciones: string read FDistribuidorIDCancelaciones
+        write FDistribuidorIDCancelaciones;
   end;
 
 const
@@ -197,6 +200,8 @@ begin
   fDominioWebService      := aWsTimbrado;
   fCredencialesPAC        := aCredencialesPAC;
   fCredencialesIntegrador := aCredencialesIntegrador;
+  // Por default será el mismo
+  fDistribuidorIDCancelaciones := fCredencialesIntegrador.DistribuidorID;
 
   fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService,
     aTransaccionInicial);
@@ -744,7 +749,7 @@ begin
   fechaUTC := GetUTC(Now());
 
   Result := System.Hash.THashSHA2.GetHashString(Format('%s|%s|%s',
-                                                  [fCredencialesIntegrador.DistribuidorID,
+                                                  [fDistribuidorIDCancelaciones,
                                                    FormatDateTime('yyyymmdd', fechaUTC),
                                                    FormatDateTime('hhnn', fechaUTC)]),
                                                    THashSHA2.TSHA2Version.SHA256);
