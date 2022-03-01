@@ -393,6 +393,10 @@ begin
         begin
           raise ESATRegimenFiscalEmisorNoCorrespondeException.Create(mensajeExcepcion, numeroErrorSAT, False);
         end;
+        40161:
+        begin
+          raise ESATUsoCFDIReceptorNoCorrespondeRegimen.Create(mensajeExcepcion, numeroErrorSAT, False);
+        end;
         40143:
         begin
           raise ESATReceptorRFCNoExisteEnLCO.Create(mensajeExcepcion, numeroErrorSAT, False);
