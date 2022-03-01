@@ -75,6 +75,7 @@ type
   ESATNombreReceptorIncorrectoException           = class(ESATErrorGenericoException); // CFDI40145
   ESATRegimenFiscalReceptorNoCorrespondeException = class(ESATErrorGenericoException); // CFDI40158
   ESATRegimenFiscalEmisorNoCorrespondeException   = class(ESATErrorGenericoException); // CFDI40141
+  ESATUsoCFDIReceptorNoCorrespondeRegimen         = class(ESATErrorGenericoException); // CFDI40161
   ESATReceptorRFCNoExisteEnLCO                    = class(ESATErrorGenericoException); // CFDI40143
 
   {$IFDEF undef}{$ENDREGION}{$ENDIF}
