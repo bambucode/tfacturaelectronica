@@ -819,9 +819,11 @@ begin
     restRequest.Body.Add (xmlFirmaCancelacion, ctAPPLICATION_XML);
     restRequest.Execute;
 
+    {$IFDEF CODESITE}
     CodeSite.Send('',restRequest.Response.StatusCode);
     CodeSite.Send(restRequest.Response.StatusText);
     CodeSite.Send(restRequest.Response.content);
+    {$ENDIF}
 
     Result := False;
 
@@ -882,9 +884,11 @@ begin
 
     restRequest.Execute;
 
+    {$IFDEF CODESITE}
     CodeSite.Send('',restRequest.Response.StatusCode);
     CodeSite.Send(restRequest.Response.StatusText);
     CodeSite.Send(restRequest.Response.content);
+    {$ENDIF}
 
     // ToDO: Falta documentar muchos mas errores y excepciones
     case restRequest.Response.StatusCode of
