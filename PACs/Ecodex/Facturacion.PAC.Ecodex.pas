@@ -203,8 +203,8 @@ begin
   // Por default será el mismo
   fDistribuidorIDCancelaciones := fCredencialesIntegrador.DistribuidorID;
 
-  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(fDominioWebService,
-    aTransaccionInicial);
+  // En produccion, el WebService de seguridad es distinto al de timbrado (2022)
+  fManejadorDeSesion := TEcodexManejadorDeSesion.Create(aWsClientes, aTransaccionInicial);
   fManejadorDeSesion.AsignarCredenciales(fCredencialesPAC);
 
   // Incializamos las instancias de los WebServices
