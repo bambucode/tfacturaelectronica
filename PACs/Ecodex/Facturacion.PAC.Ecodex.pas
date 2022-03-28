@@ -377,6 +377,7 @@ begin
           else
             raise ESATNoIdentificadoException.Create(mensajeExcepcion, numeroErrorSAT, False);
         end;
+        40138: raise ESATNombreEmisorIncorrectoException.Create(mensajeExcepcion, numeroErrorSAT, True);
         40145:
         begin
           raise ESATNombreReceptorIncorrectoException.Create(mensajeExcepcion, numeroErrorSAT, True);
