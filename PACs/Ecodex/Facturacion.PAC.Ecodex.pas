@@ -41,6 +41,7 @@ type
     fManejadorDeSesion: TEcodexManejadorDeSesion;
     fwsClientesEcodex: IEcodexServicioClientes;
     fwsTimbradoEcodex: IEcodexServicioTimbrado;
+    fWsVerificarTimbradoEcodex : IEcodexServicioTimbrado;
     fParametros: TStrings;
     fURLServicioRestCancelacion: string;
     procedure ProcesarExcepcionDePAC(const aExcepcion: Exception);
@@ -192,9 +193,10 @@ end;
 
 { TProveedorEcodex }
 
-procedure TProveedorEcodex.Configurar(const aWsTimbrado, aWsClientes,
-    aWsCancelacion: string; const aCredencialesPAC, aCredencialesIntegrador:
-    TFacturacionCredencialesPAC; const aTransaccionInicial: Int64);
+procedure TProveedorEcodex.Configurar(
+    const aWsTimbrado, aWsClientes, aWsCancelacion: string;
+    const aCredencialesPAC, aCredencialesIntegrador: TFacturacionCredencialesPAC;
+    const aTransaccionInicial: Int64);
 begin
   Assert(aWsTimbrado <> '', 'La instancia aWsTimbrado no debio ser vacia');
   fDominioWebService      := aWsTimbrado;
@@ -212,6 +214,12 @@ begin
     '/ServicioTimbrado.svc');
   fwsClientesEcodex := GetWsEcodexClientes(False, aWsClientes +
     '/ServicioClientes.svc');
+
+  // Creamos una copia del WS de timbrado especificar para consultar
+  // timbres previos, ya que el servidor de produccion de timbrado solo
+  // soporta el metodo TimbraXML
+  fWsVerificarTimbradoEcodex := GetWsEcodexTimbrado(False, aWsClientes +
+    '/ServicioTimbrado.svc');
 
   fURLServicioRestCancelacion := aWsCancelacion;
 
@@ -650,7 +658,7 @@ begin
 
     try
       // 5. Realizamos la solicitud de timbre previo
-      respuestaObtenerTimbre := fWsTimbradoEcodex.ObtenerTimbrado(solicitudObtenerTimbre);
+      respuestaObtenerTimbre := fWsVerificarTimbradoEcodex.ObtenerTimbrado(solicitudObtenerTimbre);
 
       // 5. Extraemos las propiedades del timbre de la respuesta del WebService
       Result := ExtraerNodoTimbre(respuestaObtenerTimbre.ComprobanteXML.DatosXML);
