@@ -992,19 +992,6 @@ begin
     raise EPACCancelacionFallidaDocumentoNoEncontradoException.Create(_ECODEX_DOCUMENTO_CANCELAR_NO_ENCONTRADO, 0,
                                                                      EEcodexFallaValidacionException(aExcepcion).Numero, False);
 
-  // TBD: https://github.com/bambucode/eleventa/issues/1721
- { if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_USADO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorCorreoUsadoException.Create('El correo asignado ya está en uso por otro emisor.', 0, 97, False);
-  if AnsiPos(_ECODEX_EMISOR_PREVIAMENTE_DADO_DE_ALTA, mensajeExcepcion) > 0 then
-    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta con un integrador.', 0, 98, False);
-  if AnsiPos(_ECODEX_ALTA_EMISOR_REPETIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorExistenteException.Create('El emisor ya está dado de alta.', 0, 98, False);
-  if AnsiPos(_ECODEX_ALTA_EMISOR_RFC_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorRFCInvalidoException.Create('El RFC del emisor no es válido.', 0, 890, False);
-  if AnsiPos(_ECODEX_ALTA_EMISOR_CORREO_INVALIDO, mensajeExcepcion) > _NO_ENCONTRADO then
-    raise EEcodexAltaEmisorCorreoInvalidoException.Create('El correo del emisor no es válido.', 0, 891, False);        }
-
-
   if (aExcepcion Is EEcodexFallaServicioException) then
   begin
     case EEcodexFallaServicioException(aExcepcion).Numero of

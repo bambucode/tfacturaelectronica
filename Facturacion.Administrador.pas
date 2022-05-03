@@ -237,8 +237,6 @@ function TAdministradorFacturas.LeerDesdeArchivo(const aRutaComprobante: TFileNa
 var
   documentoXML: IXMLDocument;
 begin
-  // TBD: Lanzar excepciones si el archivo no existe, etc.
-
   documentoXML :=  LoadXMLDocument(aRutaComprobante);
  {$IF CompilerVersion >= 20}
   Result := LeerDesdeXML( documentoXML.XML.Text );
