@@ -762,7 +762,7 @@ begin
   fechaUTC := GetUTC(Now());
 
   Result := System.Hash.THashSHA2.GetHashString(Format('%s|%s|%s',
-                                                  [fDistribuidorIDCancelaciones,
+                                                  [fCredencialesPAC.DistribuidorID,
                                                    FormatDateTime('yyyymmdd', fechaUTC),
                                                    FormatDateTime('hhnn', fechaUTC)]),
                                                    THashSHA2.TSHA2Version.SHA256);
@@ -779,6 +779,8 @@ var
   restRequest: TRESTRequest;
   restAuth: THTTPBasicAuthenticator;
   tokenAuth, rfcEmisor: String;
+const
+  _CODIGO_ERROR_CANCELACION_DUPLICADA = 'API122';
 begin
   // Validamos la solicitud
   Assert(aSolicitudCancelacion.RFCEmisor <> '', 'Por favor especifica el RFC del emisor que esta cancelando');
@@ -844,6 +846,13 @@ begin
                                                           0, 0, False);
       403: // Integrador sin acceso al API
         raise Exception.Create(restRequest.Response.StatusText);
+      404: // Posiblemente cancelacion duplicada
+        begin
+          if restRequest.Response.content.Contains(_CODIGO_ERROR_CANCELACION_DUPLICADA) then
+            raise EPACCancelacionPeticionDuplicadaException.Create(restRequest.Response.content, 0, 0, False)
+          else
+            raise EPACErrorGenericoException.Create(restRequest.Response.content, 0, 0, False);
+        end;
       305: // Certificado no valido para RfcEmisor?
         raise Exception.Create(restRequest.Response.StatusText);
     end;
@@ -899,16 +908,28 @@ begin
     CodeSite.Send(restRequest.Response.content);
     {$ENDIF}
 
-    // ToDO: Falta documentar muchos mas errores y excepciones
     case restRequest.Response.StatusCode of
-      205: Result := restRequest.Response.content; // Recibimos el XML del documento cancelado
-      404: // Integrador sin acceso al API
+      200:
+        // Recibimos el XML del documento cancelado
+        Result := restRequest.Response.content;
+
+      201: // El acuse aun no se genera ...
+        raise EPACCancelacionAcuseNoDisponibleAunException.Create(restRequest.Response.content,
+                                                                  0,
+                                                                  restRequest.Response.StatusCode,
+                                                                  True);
+
+      404:
         raise EPACAcuseNoEncontradoException.Create(restRequest.Response.content,
                                                     0,
                                                     restRequest.Response.StatusCode,
                                                     False);
-      305: // Certificado no valido para RfcEmisor?
-        raise Exception.Create(restRequest.Response.StatusText);
+    else
+        // Cualquier otro error lo manejamos como genérico
+        raise EPACErrorGenericoException.Create(restRequest.Response.content,
+                                                0,
+                                                restRequest.Response.StatusCode,
+                                                False);
     end;
   finally
     restAuth.Free;
