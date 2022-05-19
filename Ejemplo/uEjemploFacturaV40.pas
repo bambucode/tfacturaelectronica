@@ -38,7 +38,9 @@ var
   facturaCFDIv40 : IComprobanteFiscalv40;
   concepto40 : IComprobanteFiscalv40_Conceptos_Concepto;
   iva40  : IComprobanteFiscalv40_Conceptos_Concepto_Impuestos_Traslados_Traslado;
+  isr125, ivaRet : IComprobanteFiscalv40_Conceptos_Concepto_Impuestos_Retenciones_Retencion;
   totalIVA40 : IComprobanteFiscalv40_Impuestos_Traslados_Traslado;
+  totalISR125, totalRetIva: IComprobanteFiscalv40_Impuestos_Retenciones_Retencion;
 
   impuestoLocalV1 : IImpuestosLocalesV1;
   trasladosImpuestosLocalesV1 : IImpuestosLocalesV1_TrasladosLocales;
@@ -68,11 +70,11 @@ begin
       Certificado   := certificadoSellos.ContenidoBase64;
       FormaPago         := '01'; //
       CondicionesDePago := 'Crédito a 30 días';
-      Subtotal          := '100.00'; // Solo 2 decimales
+      Subtotal          := '320.06'; // Solo 2 decimales
       Descuento         := TFacturacionHelper.ComoMoneda(0);
       Moneda            := 'MXN'; // De catalogo
       TipoCambio        := '1';//TFacturacionHelper.ComoMoneda(1);
-      Total             := TFacturacionHelper.ComoMoneda(100 + 16);
+      Total             := TFacturacionHelper.ComoMoneda(320.06 + (320.06*0.16) - (320.06 * 0.106667) - (320.06*0.10));
       TipoDeComprobante := 'I'; // De catalogo
       MetodoPago        := 'PUE';
       LugarExpedicion   := '26015';
@@ -88,7 +90,7 @@ begin
       Receptor.Nombre           := Uppercase('FELIX MANUEL ANDRADE BALLADO');
       Receptor.UsoCFDI          := 'G03';
       Receptor.DomicilioFiscalReceptor := '86400';
-      Receptor.RegimenFiscalReceptor := '612';
+      Receptor.RegimenFiscalReceptor := '626'; //612
       {$ENDREGION}
 
       {$REGION 'Receptor con RFC de publico en general'}
@@ -117,29 +119,65 @@ begin
       concepto40.ClaveUnidad      := 'EA';
       concepto40.Unidad           := 'PZA';
       concepto40.Descripcion      := 'Algodón 50gr áéíúó';
-      concepto40.ValorUnitario    := '100.00';
-      concepto40.Importe          := '100.00';
+      concepto40.ValorUnitario    := '320.06';
+      concepto40.Importe          := '320.06';
       concepto40.Descuento        := '0.00';
 
-      {$REGION 'Con IVA 16%'}
       concepto40.ObjetoImp        := '02';
 
+      {$REGION 'Con IVA 16%'}
       iva40 := concepto40.Impuestos.Traslados.Add;
-      iva40.Base        := '100.00';
+      iva40.Base        := '320.06';
       iva40.Impuesto    := '002';
       iva40.TipoFactor  := 'Tasa';
       iva40.TasaOCuota  := '0.160000';
-      iva40.Importe     := '16.00';
-//
-        Impuestos.TotalImpuestosTrasladados  := '16.00';
-
-        totalIVA40 := Impuestos.Traslados.Add;
-        totalIVA40.Base     := '100';
-        totalIVA40.Impuesto := '002';
-        totalIVA40.TipoFactor := 'Tasa';
-        totalIVA40.TasaOCuota := '0.160000';
-        totalIVA40.Importe    := '16.00';
+      iva40.Importe     := '51.21';
       {$ENDREGION}
+
+      {$REGION 'Retencion de IVA'}
+      ivaRet := concepto40.Impuestos.Retenciones.Add;
+      ivaRet.Base        := iva40.Base; // La base es el IVA
+      ivaRet.Impuesto    := '002'; // IVA
+      ivaRet.TipoFactor  := 'Tasa';
+      ivaRet.TasaOCuota  := '0.106667'; // 2/3 partes de IVA
+      ivaRet.Importe     := TFacturacionHelper.ComoMoneda(320.06 * 0.106667);
+      {$ENDREGION}
+
+       {$REGION 'Retencion de ISR'}
+      isr125 := concepto40.Impuestos.Retenciones.Add;
+      isr125.Base        := concepto40.ValorUnitario;
+      isr125.Impuesto    := '001'; // ISR
+      isr125.TipoFactor  := 'Tasa';
+      isr125.TasaOCuota  := '0.100000';
+      isr125.Importe     := TFacturacionHelper.ComoMoneda(320.06 * 0.10);
+      {$ENDREGION}
+
+      // ******* TOTALES **************
+
+      Impuestos.TotalImpuestosRetenidos  := TFacturacionHelper.ComoMoneda(
+                                              TFacturacionHelper.DesdeMoneda(isr125.Importe)
+                                              + TFacturacionHelper.DesdeMoneda(ivaRet.Importe)
+                                             );
+
+       // Suma de retenciones de toda la factura de IVA
+      totalRetIva := Impuestos.Retenciones.Add;
+      totalRetIva.Impuesto := '002';
+      totalRetIva.Importe  := ivaRet.Importe;
+
+      // Suma de retenciones de toda la factura de ISR
+      totalISR125 := Impuestos.Retenciones.Add;
+      totalISR125.Impuesto := '001';
+      totalISR125.Importe  := isr125.Importe;
+
+      // Impuestos trasladados
+      Impuestos.TotalImpuestosTrasladados  := '51.21';
+
+      totalIVA40 := Impuestos.Traslados.Add;
+      totalIVA40.Base     := '320.06';
+      totalIVA40.Impuesto := '002';
+      totalIVA40.TipoFactor := 'Tasa';
+      totalIVA40.TasaOCuota := '0.160000';
+      totalIVA40.Importe    := '51.21';
 
 //      {$REGION 'Con IVA exento'}
 //      concepto40.ObjetoImp        := '02';
