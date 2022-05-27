@@ -399,7 +399,7 @@ begin
 end;
 
 class function TFacturacionHelper.VerificarImporteEnRangoDeRedondeo(const
-    aCantidad: Double; const aValorUnitario, aImporte: Currency): Boolean;
+    aCantidad: Double; const aValorUnitario: Double; const aImporte: Currency): Boolean;
 var
   limiteInferior, limiteSuperior: Extended;
 const
