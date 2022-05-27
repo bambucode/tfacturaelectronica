@@ -37,7 +37,8 @@ type
     class function DesdeMoneda(aMoneda: String): Currency;
     class function DesdeTasa(const aTasa: String): Double;
     class function LimpiarCaracteresInvalidos(const aCadena: string): string;
-    class function VerificarImporteEnRangoDeRedondeo(const aCantidad: Double; const aValorUnitario, aImporte: Currency): Boolean;
+    class function VerificarImporteEnRangoDeRedondeo(const aCantidad: Double; const
+        aValorUnitario: Double; const aImporte: Currency): Boolean;
     class function ObtenerConfiguracionRegionalLocal: TFormatSettings; //devuelve configuracion regional con la corrección del punto decimal
     class function ObtenerConfiguracionRegionalLocalISO8601: TFormatSettings; //devuelve configuracion regional en formato ISO8601
 
