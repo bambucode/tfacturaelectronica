@@ -6,7 +6,7 @@
 //  >Import : https://solucionfactible.com/ws/services/Timbrado?wsdl>1
 // Encoding : UTF-8
 // Version  : 1.0
-// (27/08/2017 01:05:36 p. m. - - $Rev: 90173 $)
+// (27/08/2022 01:05:36 p. m. - - $Rev: 90173 $)
 // ************************************************************************ //
 
 unit SolucionFactibleWsTimbrado;

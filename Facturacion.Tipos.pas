@@ -71,13 +71,21 @@ type
   ESATRFCNoPerteneceFronteraException             = class(ESATErrorGenericoException); // CFDI33196
   ESATCodigoPostalNoPerteneceFronteraException    = class(ESATErrorGenericoException); // CFDI33196
   ESATEstimuloFronteraNoAplicaAlProductoException = class(ESATErrorGenericoException); // CFDI33196
+  ESATDomicilioFiscalReceptorIncorrectoException  = class(ESATErrorGenericoException); // CFDI40148
+  ESATNombreReceptorIncorrectoException           = class(ESATErrorGenericoException); // CFDI40145
+  ESATRegimenFiscalReceptorNoCorrespondeException = class(ESATErrorGenericoException); // CFDI40158
+  ESATRegimenFiscalEmisorNoCorrespondeException   = class(ESATErrorGenericoException); // CFDI40141
+  ESATUsoCFDIReceptorNoCorrespondeRegimen         = class(ESATErrorGenericoException); // CFDI40161
+  ESATReceptorRFCNoExisteEnLCO                    = class(ESATErrorGenericoException); // CFDI40143
+  ESATNombreEmisorIncorrectoException             = class(ESATErrorGenericoException); // CFDI40138
+
   {$IFDEF undef}{$ENDREGION}{$ENDIF}
 
 const
   _RFC_VENTA_PUBLICO_EN_GENERAL         = 'XAXX010101000';
   _RFC_VENTA_EXTRANJEROS                = 'XEXX010101000';
-  _NOMBRE_CONTRIBUYENTE_PUBLICO_GENERAL = 'Público en General';
-  _NOMBRE_CONTRIBUYENTE_EXTRANJERO      = 'Venta al extranjero';
+  _NOMBRE_CONTRIBUYENTE_PUBLICO_GENERAL = 'PUBLICO EN GENERAL';
+  _NOMBRE_CONTRIBUYENTE_EXTRANJERO      = 'VENTA AL EXTRANJERO';
   _UUID_LONGITUD                        = 36;
 
 implementation

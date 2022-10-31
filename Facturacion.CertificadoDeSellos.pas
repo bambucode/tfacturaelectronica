@@ -2,7 +2,7 @@
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
-{       Copyright (C) 2017 Bambu Code SA de CV          }
+{       Copyright (C) 2022 Bambu Code SA de CV          }
 {                                                       }
 {*******************************************************}
 
@@ -30,6 +30,7 @@ type
     function GetContenidoPEM: string;
     function GetEmitidoParaNombre: string;
     function GetEmitidoParaRFC: String;
+    function GetEmitidoPor: string;
     function GetNoCertificado: string;
     function GetTipoCertificado: TTipoCertificado;
     function GetVigenciaFin: TDateTime;
@@ -39,6 +40,7 @@ type
     property ContenidoBase64: string read GetContenidoBase64;
     property EmitidoParaNombre: string read GetEmitidoParaNombre;
     property EmitidoParaRFC: String read GetEmitidoParaRFC;
+    property EmitidorPor: string read GetEmitidoPor;
     property NoCertificado: string read GetNoCertificado;
     property TipoCertificado: TTipoCertificado read GetTipoCertificado;
     property VigenciaFin: TDateTime read GetVigenciaFin;
@@ -54,16 +56,19 @@ type
     fNoCertificado: string;
     FContenidoBase64: string;
     fSubjectCertificado: String;
+    fEmitidorPor: String;
     fTipoCertificado: TTipoCertificado;
     function GetContenidoBase64: string;
     function GetContenidoPEM: string;
     function GetEmitidoParaNombre: string;
     function GetEmitidoParaRFC: String;
+    function GetEmitidoPor: string;
     function GetNoCertificado: string;
     function GetTipoCertificado: TTipoCertificado;
     function GetVigenciaFin: TDateTime;
     function GetVigenciaInicio: TDateTime;
     procedure IdentificarTipoDeCertificado(const aContenidoCertificado: String);
+    property EmitidoPor: string read GetEmitidoPor;
   public
     destructor Destroy; override;
     procedure Leer(const aRutaCertificado: TFileName);
@@ -111,6 +116,8 @@ begin
     end;
 
     FFueLeido := True;
+
+    fEmitidorPor := fx509Certificado.Issuer;
 
     {$IFDEF CODESITE}
     CodeSite.AddSeparator;
@@ -203,6 +210,11 @@ begin
                       _LONGITUD_RFC));
 
   Result := UpperCase(Result);
+end;
+
+function TCertificadoDeSellos.GetEmitidoPor: string;
+begin
+  Result := fEmitidorPor;
 end;
 
 procedure TCertificadoDeSellos.IdentificarTipoDeCertificado(const

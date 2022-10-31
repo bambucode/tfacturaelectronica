@@ -61,8 +61,8 @@ var
   generadorLigaVerificacion: IGeneradorLigaVerificacion;
   facturaV33 : IComprobanteFiscalV33;
 begin
-  if Not Supports(aComprobante, IComprobanteFiscalV33, facturaV33) then
-    raise Exception.Create('Se intentó generar un CBB de CFDI 3.3 de un comprobante que no es de dicha versión');
+  //if Not Supports(aComprobante, IComprobanteFiscalV33, facturaV33) then
+  //  raise Exception.Create('Se intentó generar un CBB de CFDI 3.3 de un comprobante que no es de dicha versión');
 
   // Obtenemos la liga de verificación del SAT
   generadorLigaVerificacion := TGeneradorLigaVerificacion.Create;

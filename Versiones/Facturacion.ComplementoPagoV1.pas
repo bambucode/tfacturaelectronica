@@ -3,7 +3,7 @@
 {                                                                                    }
 {                                  XML Data Binding                                  }
 {                                                                                    }
-{         Generated on: 7/17/2017 14:34:24                                           }
+{         Generated on: 7/17/2022 14:34:24                                           }
 {       Generated from: http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos10.xsd   }
 {                                                                                    }
 {************************************************************************************}

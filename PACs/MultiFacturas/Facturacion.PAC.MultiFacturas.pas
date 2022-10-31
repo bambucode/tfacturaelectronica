@@ -41,10 +41,13 @@ type
       function TimbrarDocumento(const aComprobante: IComprobanteFiscal; const aTransaccion: Int64): TCadenaUTF8; overload; override;
       function TimbrarDocumento(const aXML : TCadenaUTF8; const aTransaccion : Int64): TCadenaUTF8; overload; override;
       function ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer; override;
-      function CancelarDocumento(const aUUID: TCadenaUTF8): Boolean; overload; override;
+      function CancelarDocumento(const aSolicitudCancelacion: TSolicitudCancelacionCFD;
+                               const aArchivoCertificado : String = '';
+                               const aArchivoLLavePrivada : String = '';
+                               const aContrasenaLlavePrivada: String = ''): Boolean; overload; override;
       function CancelarDocumento(const aUUID: TCadenaUTF8; var aExtraInfo: TCadenaUTF8): Boolean; overload; override;
       function CancelarDocumentos(const aUUID: TListadoUUID): TListadoCancelacionUUID; override;
-      function ObtenerAcuseDeCancelacion(const aUUID: string): string; override;
+      function ObtenerAcuseDeCancelacion(const aSolicitudAcuse: TSolicitudAcuseCancelacionCFD): string; override;
       function AgregarCliente(const aRFC, aRazonSocial, aCorreo: String): string; override;
       function ObtenerTimbrePrevio(const aIdTransaccionOriginal: Int64): TCadenaUTF8; override;
    end;
@@ -86,13 +89,13 @@ begin
 
 end;
 
-function TProveedorMultiFacturas.CancelarDocumento(
-  const aUUID: TCadenaUTF8): Boolean;
+function TProveedorMultiFacturas.CancelarDocumento(const aSolicitudCancelacion: TSolicitudCancelacionCFD;
+                               const aArchivoCertificado : String = '';
+                               const aArchivoLLavePrivada : String = '';
+                               const aContrasenaLlavePrivada: String = ''): Boolean;
 var LExtraInfo: TCadenaUTF8;
 begin
-
- result := CancelarDocumento(aUUID, LExtraInfo);
-
+ result := CancelarDocumento(aSolicitudCancelacion.UUID, LExtraInfo);
 end;
 
 function TProveedorMultiFacturas.CancelarDocumento(const aUUID: TCadenaUTF8;
@@ -184,9 +187,9 @@ begin
 end;
 
 function TProveedorMultiFacturas.ObtenerAcuseDeCancelacion(
-  const aUUID: string): string;
+  const aSolicitudAcuse: TSolicitudAcuseCancelacionCFD): string;
 begin
-
+  raise Exception.Create('No implementado');
 end;
 
 function TProveedorMultiFacturas.ObtenerSaldoTimbresDeCliente(const aRFC: String): Integer;

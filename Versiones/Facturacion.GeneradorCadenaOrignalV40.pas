@@ -6,7 +6,7 @@
 {                                                       }
 {*******************************************************}
 
-unit Facturacion.GeneradorCadenaOrignalV33;
+unit Facturacion.GeneradorCadenaOrignalV40;
 
 interface
 
@@ -20,7 +20,7 @@ uses Facturacion.Comprobante,
 
 type
 
-  TGeneradorCadenaOriginalV33 = class(TInterfacedObject,
+  TGeneradorCadenaOriginalV40 = class(TInterfacedObject,
     IGeneradorCadenaOriginal)
   public
     function ObtenerCadenaOriginal(const aComprobante: IComprobanteFiscal):
@@ -40,15 +40,15 @@ uses
   {$IFEND}
 {$IFEND}
   XMLIntf,
-  Facturacion.ComprobanteV33;
+  Facturacion.ComprobanteV40;
 
 const
-  _NOMBRE_RECURSO_CADENA_ORIGINAL = 'XSLT_CADENAORIGINAL_V33';
+  _NOMBRE_RECURSO_CADENA_ORIGINAL = 'XSLT_CADENAORIGINAL_V40';
   _NOMBRE_RECURSO_CADENA_ORIGINAL_TFD = 'XSLT_CADENAORIGINALTFD_V11';
 
-  { TGeneradorCadenaOriginalV33 }
+  { TGeneradorCadenaOriginalV40 }
 
-function TGeneradorCadenaOriginalV33.ObtenerCadenaOriginal(const aComprobante:
+function TGeneradorCadenaOriginalV40.ObtenerCadenaOriginal(const aComprobante:
   IComprobanteFiscal): TCadenaUTF8;
 var
   contenidoXMLComprobante: TCadenaUTF8;
@@ -56,7 +56,7 @@ var
   transformador: TTransformadorDeXML;
 begin
   // Verificamos que la versión del comprobante sea 3.3 pues solo será una cadena original válida para dicha versión
-  //Assert(aComprobante.Version = '3.3', 'La version del CFDI no fue 3.3');
+  Assert(aComprobante.Version = '4.0', 'La version del CFDI no fue 4.0');
 
   transformador := TTransformadorDeXML.Create;
   try
@@ -75,28 +75,28 @@ begin
   end;
 end;
 
-function TGeneradorCadenaOriginalV33.ObtenerCadenaOriginalDeTimbre(const
+function TGeneradorCadenaOriginalV40.ObtenerCadenaOriginalDeTimbre(const
   aComprobante: IComprobanteFiscal): TCadenaUTF8;
 var
   contenidoXMLComprobante: TCadenaUTF8;
   contenidoXSLTCadenaOriginal: TCadenaUTF8;
   transformador: TTransformadorDeXML;
-  facturaV33: IComprobanteFiscalV33;
+  facturaV40: IComprobanteFiscalV40;
 begin
   Assert(aComprobante <> nil, 'La instancia aComprobante no debio ser nula');
   // Verificamos que la versión del comprobante sea 3.3 pues solo será una cadena original válida para dicha versión
-  Assert(aComprobante.Version = '3.3', 'La version del CFDI no fue 3.3');
+  Assert(aComprobante.Version = '4.0', 'La version del CFDI no fue 4.0');
 
-  if not Supports(aComprobante, IComprobanteFiscalV33, facturaV33) then
-    raise Exception.Create('El comprobante no es v3.3');
+  if not Supports(aComprobante, IComprobanteFiscalV40, facturaV40) then
+    raise Exception.Create('El comprobante no es v4.0');
 
-  if facturaV33.Complemento.TimbreFiscalDigital = nil then
+  if facturaV40.Complemento.TimbreFiscalDigital = nil then
     raise
       Exception.Create('El comprobante no esta timbrado, imposible generar cadena original del timbre.');
 
   transformador := TTransformadorDeXML.Create;
   try
-    contenidoXMLComprobante := facturaV33.Complemento.TimbreFiscalDigital.XML;
+    contenidoXMLComprobante := facturaV40.Complemento.TimbreFiscalDigital.XML;
     contenidoXSLTCadenaOriginal :=
       transformador.obtenerXSLTDeRecurso(_NOMBRE_RECURSO_CADENA_ORIGINAL_TFD);
     // Obtenemos la Cadena original del CFDI 3.3 usando el archivo XSLT proveido por el SAT

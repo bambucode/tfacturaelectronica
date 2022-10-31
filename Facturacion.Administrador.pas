@@ -2,7 +2,7 @@
 {                                                       }
 {       TFacturaElectronica                             }
 {                                                       }
-{       Copyright (C) 2017 Bambu Code SA de CV          }
+{       Copyright (C) 2022 Bambu Code SA de CV          }
 {                                                       }
 {*******************************************************}
 
@@ -137,7 +137,8 @@ uses
      XMLIntf,
 {$IFEND}
      Facturacion.ComprobanteV32,
-     Facturacion.ComprobanteV33
+     Facturacion.ComprobanteV33,
+     Facturacion.ComprobanteV40
      {$IFDEF CODESITE}
      , CodeSiteLogging
      {$ENDIF}
@@ -154,6 +155,9 @@ begin
 
   if aVersion = '3.3' then
     Result := NewComprobanteFiscalV33;
+
+  if aVersion = '4.0' then
+    Result := NewComprobanteFiscalV40;
 
   if Result = nil then
     raise EVersionDeCFDINoSoportadaException.Create('La versión solicitada : ' + aVersion + ', no tiene implementación actual');
@@ -233,8 +237,6 @@ function TAdministradorFacturas.LeerDesdeArchivo(const aRutaComprobante: TFileNa
 var
   documentoXML: IXMLDocument;
 begin
-  // TBD: Lanzar excepciones si el archivo no existe, etc.
-
   documentoXML :=  LoadXMLDocument(aRutaComprobante);
  {$IF CompilerVersion >= 20}
   Result := LeerDesdeXML( documentoXML.XML.Text );
@@ -281,6 +283,9 @@ begin
 
       if (versionCFDI = '3.3') then
         Result := GetComprobanteFiscalV33(documentoXML);
+
+      if (versionCFDI = '4.0') then
+        Result := GetComprobanteFiscalV40(documentoXML);
     end;
 
     if Result = nil then
