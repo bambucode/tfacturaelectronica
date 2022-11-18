@@ -18,6 +18,12 @@ uses Facturacion.Comprobante,
 
 type
 
+  TResultadoVerificacionRedondeo = record
+    Valido: Boolean;
+    LimiteInferior: Extended;
+    LimiteSuperior: Extended;
+  end;
+
   TFacturacionHelper = class
     class function UTF8ToBytes(const s: TCadenaUTF8): TByteDynArray; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
     class function BytesToUTF8(const ABytes: TByteDynArray): TCadenaUTF8; // sacada de http://stackoverflow.com/questions/5233480/string-to-byte-array-in-utf-8
@@ -38,7 +44,8 @@ type
     class function DesdeTasa(const aTasa: String): Double;
     class function LimpiarCaracteresInvalidos(const aCadena: string): string;
     class function VerificarImporteEnRangoDeRedondeo(const aCantidad: Double; const
-        aValorUnitario: Double; const aImporte: Currency): Boolean;
+        aValorUnitario: Double; const aImporte: Currency):
+        TResultadoVerificacionRedondeo;
     class function ObtenerConfiguracionRegionalLocal: TFormatSettings; //devuelve configuracion regional con la corrección del punto decimal
     class function ObtenerConfiguracionRegionalLocalISO8601: TFormatSettings; //devuelve configuracion regional en formato ISO8601
 
@@ -47,6 +54,8 @@ type
     class procedure RegresarConfiguracionRegionalLocal; deprecated; // ya no son necesarias en Delphi7 o superior
     class procedure ReemplazarComaSiActuaComoPuntoDecimal(var aCadenaCatidad: String);
   end;
+
+
 
 implementation
 
@@ -400,37 +409,38 @@ begin
 end;
 
 class function TFacturacionHelper.VerificarImporteEnRangoDeRedondeo(const
-    aCantidad: Double; const aValorUnitario: Double; const aImporte: Currency): Boolean;
-var
-  limiteInferior, limiteSuperior: Extended;
+    aCantidad: Double; const aValorUnitario: Double; const aImporte: Currency): TResultadoVerificacionRedondeo;
 const
   _NUMERO_DECIMALES_MXN = 2;
   _BASE = 10;
 begin
+  Result.LimiteInferior := 0;
+  Result.LimiteSuperior := 0;
+
   if aCantidad <= 0 then
   begin
-    Result := True;
+    Result.Valido := True;
     exit;
   end;
   // Ref: http://www.fiscalia.com/publicaciones/10414
   // http://www.sat.gob.mx/informacion_fiscal/factura_electronica/Documents/cfdv33.pdf
 
   // Calculamos el limite inferior de acuerdo al Anexo 20
-  limiteInferior := (aCantidad - RoundTo(IntPower(_BASE, _NUMERO_DECIMALES_MXN * -1)/2, -2)) *
+  Result.limiteInferior := (aCantidad - RoundTo(IntPower(_BASE, _NUMERO_DECIMALES_MXN * -1)/2, -2)) *
                     (aValorUnitario - RoundTo(IntPower(_BASE,_NUMERO_DECIMALES_MXN * -1)/2, -2));
 
   // Establecemos el tipo de redondeo a truncado a dos decimales para el limite inferior
-  limiteInferior := Trunc(limiteInferior * 100) / 100;
+  Result.limiteInferior := Trunc(Result.limiteInferior * 100) / 100;
 
   // Calculamos el limite superior de acuerdo al Anexo 20
-  limiteSuperior := (aCantidad + RoundTo(IntPower(_BASE, -1 * _NUMERO_DECIMALES_MXN)/2, -2) - IntPower(_BASE,-12)) *
+  Result.limiteSuperior := (aCantidad + RoundTo(IntPower(_BASE, -1 * _NUMERO_DECIMALES_MXN)/2, -2) - IntPower(_BASE,-12)) *
                     (aValorUnitario + RoundTo(IntPower(_BASE,_NUMERO_DECIMALES_MXN * -1)/2, -2) - IntPower(_BASE,-12));
 
   // Para el limite superior, redondeamos "hacia arriba"
-  limiteSuperior := Ceil(limiteSuperior * 100) / 100;
+  Result.limiteSuperior := Ceil(Result.limiteSuperior * 100) / 100;
 
   // ¿El importe calculado, esta dentro de rango validado por el SAT?
-  Result := {$IF CompilerVersion >= 23}System.Math.{$ELSE}Math.{$IFEND}InRange(aImporte, limiteInferior, limiteSuperior);
+  Result.Valido := {$IF CompilerVersion >= 23}System.Math.{$ELSE}Math.{$IFEND}InRange(aImporte, Result.limiteInferior, Result.limiteSuperior);
 end;
 
 initialization
