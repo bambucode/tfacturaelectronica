@@ -410,6 +410,10 @@ begin
         begin
           raise ESATReceptorRFCNoExisteEnLCO.Create(mensajeExcepcion, numeroErrorSAT, False);
         end;
+        140225:
+        begin
+          raise ESATImpuestoISRDebeExistirException.Create(mensajeExcepcion, numeroErrorSAT, False);
+        end
       else
         raise ESATErrorGenericoException.Create('ESATErrorGenericoException (' +
           IntToStr(EEcodexFallaValidacionException(aExcepcion).Numero) + ') ' +
