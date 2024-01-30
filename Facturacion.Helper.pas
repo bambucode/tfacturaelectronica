@@ -291,7 +291,7 @@ class function TFacturacionHelper.LimpiarCaracteresInvalidos(
     SetLength(Result, Length(s));
     Count := 0;
     for i := 1 to Length(s) do begin
-      if ((s[i] >= #32) and (s[i] <= #127)) or (s[i] in [#10, #13]) or (AnsiPos(S[i], 'ÑñáÁéÉíÍóÓúÚü') > 0) then
+      if ((s[i] >= #32) and (s[i] <= #127)) or (s[i] in [#10, #13]) or (AnsiPos(S[i], 'ÑñáÁéÉíÍóÓúÚüÜ') > 0) then
       begin
         inc(Count);
         Result[Count] := s[i];
